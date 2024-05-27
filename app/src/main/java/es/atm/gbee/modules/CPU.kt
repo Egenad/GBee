@@ -103,6 +103,13 @@ class CPU {
             0x16 -> ld_d_n()        // LD D, n
             0x17 -> rla()           // RLA
             0x18 -> jr_n()          // JR n
+            0x19 -> add_hl_de()     // ADD HL, DE
+            0x1A -> ld_a_de()       // LD A, [DE]
+            0x1B -> dec_de()        // DEC DE
+            0x1C -> inc_e()         // INC E
+            0x1D -> dec_e()         // INC E
+            0x1E -> ld_e_n()        // LD E, n
+            0x1F -> rra()           // RRA
             else -> throw IllegalArgumentException("Instrucción no soportada: ${opcode.toInt() and 0xFF}")
         }
     }
@@ -184,7 +191,6 @@ class CPU {
     }
 
     fun ld_nn_sp(): Int{
-
         val address = fetch16()
 
         val spLow = SP and 0xFF
@@ -197,7 +203,6 @@ class CPU {
     }
 
     fun add_hl_bc():Int{
-
         val hl = (H.toInt() shl 8) or L.toInt()  // HL (16 bits)
         val bc = (B.toInt() shl 8) or C.toInt()  // BC (16 bits)
 
@@ -214,7 +219,6 @@ class CPU {
     }
 
     fun ld_a_bc(): Int{
-
         val address = ((B.toInt() shl 8) or (C.toInt() and 0xFF)) and 0xFFFF
         A = memory[address]
 
@@ -303,7 +307,6 @@ class CPU {
     }
 
     fun rla(): Int{
-
         val carry = if ((F.toInt() and FLAG_C) != 0) 1 else 0
 
         A = ((A.toInt() shl 1) or carry).toByte()
@@ -320,5 +323,57 @@ class CPU {
         val offset = fetch()
         PC += offset.toInt()
         return CYCLES_12
+    }
+
+    fun add_hl_de(): Int{
+        val hl = (H.toInt() shl 8) or L.toInt()  // HL (16 bits)
+        val de = (D.toInt() shl 8) or E.toInt()  // DE (16 bits)
+
+        val result = hl + de
+
+        H = (result shr 8).toByte()
+        L = (result and 0xFF).toByte()
+
+        clearFlag(FLAG_N)
+        updateFlag(FLAG_H, ((hl and 0xFFF) + (de and 0xFFF)) and 0x1000 != 0)
+        updateFlag(FLAG_C, result and 0x10000 != 0)
+
+        return CYCLES_8
+    }
+
+    fun ld_a_de(): Int{
+        val address = ((D.toInt() shl 8) or (E.toInt() and 0xFF)) and 0xFFFF
+        A = memory[address]
+
+        return CYCLES_8
+    }
+
+    fun dec_de(): Int{
+        val de = (D.toInt() shl 8) or (E.toInt() and 0xFF)
+        val newDe = (de - 1) and 0xFFFF
+        B = (newDe shr 8).toByte()
+        C = (newDe and 0xFF).toByte()
+        return CYCLES_8
+    }
+
+    fun inc_e(): Int{
+        E = inc_8bit_register(E)
+        return CYCLES_8
+    }
+
+    fun dec_e(): Int{
+        E = dec_8bit_register(E)
+        return CYCLES_4
+    }
+
+    fun ld_e_n(): Int{
+        val value = fetch()
+        E = value
+        return CYCLES_8
+    }
+
+    fun rra(): Int{
+
+        return CYCLES_4
     }
 }
