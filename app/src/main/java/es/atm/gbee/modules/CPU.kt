@@ -56,6 +56,10 @@ class CPU {
         }
     }
 
+    private fun flagIsSet(flag: Int): Boolean{
+        return (F.toInt() and flag) != 0
+    }
+
     private fun handleTimers(cycles: Int) {
         // Actualiza los temporizadores y otros eventos basados en ciclos
     }
@@ -110,12 +114,20 @@ class CPU {
             0x1D -> dec_e()         // INC E
             0x1E -> ld_e_n()        // LD E, n
             0x1F -> rra()           // RRA
-            else -> throw IllegalArgumentException("Instrucción no soportada: ${opcode.toInt() and 0xFF}")
+            0x20 -> jr_nz_n()       // JR NZ, n
+            0x21 -> ld_hl_nn()      // LD HL, nn
+            0x22 -> ld_hlp_a()      // LD (HL+), A
+            0x23 -> inc_hl()        // INC HL
+            else -> throw IllegalArgumentException("Instruction not supported: ${opcode.toInt() and 0xFF}")
         }
     }
 
     fun nop(): Int{
         return CYCLES_4
+    }
+
+    fun get_16bit_address(high: Byte, low: Byte): Int{
+        return (high.toInt() shl 8) or (low.toInt() and 0xFF)
     }
 
     fun inc_8bit_register(register: Byte): Byte{
@@ -148,13 +160,13 @@ class CPU {
     }
 
     fun ld_bc_a(): Int{
-        val address = ((B.toInt() shl 8) or (C.toInt() and 0xFF)) and 0xFFFF
+        val address = get_16bit_address(B, C)
         memory[address] = A
         return CYCLES_8
     }
 
     fun inc_bc(): Int{
-        val oldValue = ((B.toInt() shl 8) or (C.toInt() and 0xFF))
+        val oldValue = get_16bit_address(B, C)
         val newValue = (oldValue + 1) and 0xFFFF
         B = (newValue shr 8).toByte()
         C = newValue.toByte()
@@ -203,8 +215,8 @@ class CPU {
     }
 
     fun add_hl_bc():Int{
-        val hl = (H.toInt() shl 8) or L.toInt()  // HL (16 bits)
-        val bc = (B.toInt() shl 8) or C.toInt()  // BC (16 bits)
+        val hl = get_16bit_address(H, L)
+        val bc = get_16bit_address(B, C)
 
         val result = hl + bc
 
@@ -219,14 +231,14 @@ class CPU {
     }
 
     fun ld_a_bc(): Int{
-        val address = ((B.toInt() shl 8) or (C.toInt() and 0xFF)) and 0xFFFF
+        val address = get_16bit_address(B, C)
         A = memory[address]
 
         return CYCLES_8
     }
 
     fun dec_bc(): Int{
-        val bc = (B.toInt() shl 8) or (C.toInt() and 0xFF)
+        val bc = get_16bit_address(B, C)
         val newBc = (bc - 1) and 0xFFFF
         B = (newBc shr 8).toByte()
         C = (newBc and 0xFF).toByte()
@@ -326,8 +338,8 @@ class CPU {
     }
 
     fun add_hl_de(): Int{
-        val hl = (H.toInt() shl 8) or L.toInt()  // HL (16 bits)
-        val de = (D.toInt() shl 8) or E.toInt()  // DE (16 bits)
+        val hl = get_16bit_address(H, L)
+        val de = get_16bit_address(D, E)
 
         val result = hl + de
 
@@ -342,14 +354,14 @@ class CPU {
     }
 
     fun ld_a_de(): Int{
-        val address = ((D.toInt() shl 8) or (E.toInt() and 0xFF)) and 0xFFFF
+        val address = get_16bit_address(D, E)
         A = memory[address]
 
         return CYCLES_8
     }
 
     fun dec_de(): Int{
-        val de = (D.toInt() shl 8) or (E.toInt() and 0xFF)
+        val de = get_16bit_address(D, E)
         val newDe = (de - 1) and 0xFFFF
         B = (newDe shr 8).toByte()
         C = (newDe and 0xFF).toByte()
@@ -374,6 +386,55 @@ class CPU {
 
     fun rra(): Int{
 
+        val oldValue = A.toInt() and 0xFF
+        val carry = if ((F.toInt() and FLAG_C) != 0) 1 else 0
+
+        A = ((A.toInt() ushr 1) or (carry shl 7)).toByte()
+
+        updateFlag(FLAG_Z, A == 0.toByte())
+        clearFlag(FLAG_N)
+        clearFlag(FLAG_H)
+        updateFlag(FLAG_C, (oldValue and 0x01) != 0)
+
         return CYCLES_4
     }
+
+    fun jr_nz_n(): Int{
+        val offset = fetch()
+        if (!flagIsSet(FLAG_Z)) {
+            PC += offset.toInt()
+            return CYCLES_12
+        }
+        return CYCLES_8
+    }
+
+    fun ld_hl_nn(): Int{
+        val low = fetch().toInt() and 0xFF
+        val high = fetch().toInt() and 0xFF
+        H = high.toByte()
+        L = low.toByte()
+
+        return CYCLES_12
+    }
+
+    fun ld_hlp_a(): Int{
+        val hl = get_16bit_address(H, L)
+        memory[hl] = A
+
+        val newHL = hl + 1
+        H = (newHL ushr 8).toByte()
+        L = (newHL and 0xFF).toByte()
+
+        return CYCLES_8
+    }
+
+    fun inc_hl(): Int{
+        val hl = get_16bit_address(H, L)
+        val newHL = hl + 1
+        H = (newHL ushr 8).toByte()
+        L = (newHL and 0xFF).toByte()
+        return CYCLES_4
+    }
+
+
 }
