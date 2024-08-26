@@ -118,6 +118,10 @@ class CPU {
             0x21 -> ld_hl_nn()      // LD HL, nn
             0x22 -> ld_hlp_a()      // LD (HL+), A
             0x23 -> inc_hl()        // INC HL
+            0x24 -> inc_h()         // INC H
+            0x25 -> dec_h()         // DEC H
+            0x26 -> ld_h_n()        // LD H, n
+            0x27 -> daa()           // DAA
             else -> throw IllegalArgumentException("Instruction not supported: ${opcode.toInt() and 0xFF}")
         }
     }
@@ -247,7 +251,7 @@ class CPU {
 
     fun inc_c(): Int{
         C = inc_8bit_register(C)
-        return CYCLES_8
+        return CYCLES_4
     }
 
     fun dec_c(): Int{
@@ -304,7 +308,7 @@ class CPU {
 
     fun inc_d(): Int{
         D = inc_8bit_register(D)
-        return CYCLES_8
+        return CYCLES_4
     }
 
     fun dec_d(): Int{
@@ -370,7 +374,7 @@ class CPU {
 
     fun inc_e(): Int{
         E = inc_8bit_register(E)
-        return CYCLES_8
+        return CYCLES_4
     }
 
     fun dec_e(): Int{
@@ -433,8 +437,38 @@ class CPU {
         val newHL = hl + 1
         H = (newHL ushr 8).toByte()
         L = (newHL and 0xFF).toByte()
+        return CYCLES_8
+    }
+
+    fun inc_h(): Int{
+        D = inc_8bit_register(H)
         return CYCLES_4
     }
 
+    fun dec_h(): Int{
+        D = dec_8bit_register(H)
+        return CYCLES_4
+    }
 
+    fun ld_h_n(): Int{
+        val value = fetch()
+        H = value
+        return CYCLES_8
+    }
+
+    fun daa(): Int{
+
+        /*
+        val oldValue = A.toInt() and 0xFF
+        val carry = if ((F.toInt() and FLAG_C) != 0) 1 else 0
+
+        A = ((A.toInt() ushr 1) or (carry shl 7)).toByte()
+
+        updateFlag(FLAG_Z, A == 0.toByte())
+        clearFlag(FLAG_N)
+        clearFlag(FLAG_H)
+        updateFlag(FLAG_C, (oldValue and 0x01) != 0)*/
+
+        return CYCLES_4
+    }
 }
