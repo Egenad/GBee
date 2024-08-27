@@ -1,10 +1,14 @@
 package es.atm.gbee.modules
 
+// These are CLOCK CYCLES, not MACHINE CYCLES
+// 1 Machine Cycle = 4 Clock Cycles
+
 const val CYCLES_4 = 4
 const val CYCLES_8 = 8
 const val CYCLES_12 = 12
 const val CYCLES_20 = 20
 
+// Nibble --> 4 Bits
 // Byte --> 8 Bits
 // Int --> 32 Bits
 
@@ -29,6 +33,12 @@ class CPU {
     private var FLAG_N = 0x40 // Subtract Flag
     private var FLAG_H = 0x20 // Half Carry Flag
     private var FLAG_C = 0x10 // Carry Flag
+
+    // Flags description:
+    // Z = Set to 1 if the result of the last operation is zero. Cleared to 0 if the result is not zero.
+    // N = Set to 1 if the last operation was a subtraction. Cleared to 0 if the last operation was an addition or not a subtraction.
+    // H = Set to 1 if there was a carry between the low nibble and the high nibble in the last addition or subtraction operation. Specifically, it is set if the sum of the low nibbles produces a carry, i.e., if the result of adding the low nibbles exceeds 0x0F.
+    // C = Set to 1 if there was a carry out of the most significant bit in the last addition or subtraction operation, or if there was a borrow in the last subtraction operation.
 
     // Total Memory
     val memory = ByteArray(0x10000) // 64KB
@@ -111,17 +121,57 @@ class CPU {
             0x1A -> ld_a_de()       // LD A, [DE]
             0x1B -> dec_de()        // DEC DE
             0x1C -> inc_e()         // INC E
-            0x1D -> dec_e()         // INC E
+            0x1D -> dec_e()         // DEC E
             0x1E -> ld_e_n()        // LD E, n
             0x1F -> rra()           // RRA
             0x20 -> jr_nz_n()       // JR NZ, n
             0x21 -> ld_hl_nn()      // LD HL, nn
-            0x22 -> ld_hlp_a()      // LD (HL+), A
+            0x22 -> ldi_hl_a()      // LD [HL+], A
             0x23 -> inc_hl()        // INC HL
             0x24 -> inc_h()         // INC H
             0x25 -> dec_h()         // DEC H
             0x26 -> ld_h_n()        // LD H, n
             0x27 -> daa()           // DAA
+            0x28 -> jr_z_n()        // JR Z,N
+            0x29 -> add_hl_hl()     // ADD HL,HL
+            0x2A -> ldi_a_hl()      // LD A,[HL+]
+            0x2B -> dec_hl()        // DEC HL
+            0x2C -> inc_l()         // INC L
+            0x2D -> dec_l()         // DEC L
+            0x2E -> ld_l_n()        // LD L, n
+            0x2F -> cpl()           // CPL
+            0x30 -> jr_nc_n()       // JR NC, n
+            0x31 -> ld_sp_nn()      // LD SP, nn
+            0x32 -> ldd_hl_a()      // LD [HL-], A
+            0x33 -> inc_sp()        // INC SP
+            0x34 -> inc_hl_v()      // INC [HL]
+            0x35 -> dec_hl_v()      // DEC [HL]
+            0x36 -> ld_hl_v_n()     // LD (HL), n
+            0x37 -> scf()           // SCF
+            0x38 -> jr_c_n()        // JR C, n
+            0x39 -> add_hl_sp()     // ADD HL, SP
+            0x3A -> ldd_a_hl()      // LD A, [HL-]
+            0x3B -> dec_sp()        // DEC SP
+            0x3C -> inc_a()         // INC A
+            0x3D -> dec_a()         // DEC A
+            0x3E -> ld_a_n()        // LD A, n
+            0x3F -> ccf()           // CCF
+            0x40 -> ld_b_b()        // LD B, B
+            0x41 -> ld_b_c()        // LD B, C
+            0x42 -> ld_b_d()        // LD B, D
+            0x43 -> ld_b_e()        // LD B, E
+            0x44 -> ld_b_h()        // LD B, H
+            0x45 -> ld_b_l()        // LD B, H
+            0x46 -> ld_b_hl()       // LD B, [HL]
+            0x47 -> ld_b_a()        // LD B, A
+            0x48 -> ld_c_b()        // LD C, B
+            0x49 -> ld_c_c()        // LD C, C
+            0x4A -> ld_c_d()        // LD C, D
+            0x4B -> ld_c_e()        // LD C, E
+            0x4C -> ld_c_h()        // LD C, H
+            0x4D -> ld_c_l()        // LD C, L
+            0x4E -> ld_c_hl()       // LD C, [HL]
+            0x4F -> ld_c_a()        // LD C, A
             else -> throw IllegalArgumentException("Instruction not supported: ${opcode.toInt() and 0xFF}")
         }
     }
@@ -367,8 +417,8 @@ class CPU {
     fun dec_de(): Int{
         val de = get_16bit_address(D, E)
         val newDe = (de - 1) and 0xFFFF
-        B = (newDe shr 8).toByte()
-        C = (newDe and 0xFF).toByte()
+        D = (newDe shr 8).toByte()
+        E = (newDe and 0xFF).toByte()
         return CYCLES_8
     }
 
@@ -421,11 +471,11 @@ class CPU {
         return CYCLES_12
     }
 
-    fun ld_hlp_a(): Int{
+    fun ldi_hl_a(): Int{
         val hl = get_16bit_address(H, L)
         memory[hl] = A
 
-        val newHL = hl + 1
+        val newHL = (hl + 1) and 0xFFFF
         H = (newHL ushr 8).toByte()
         L = (newHL and 0xFF).toByte()
 
@@ -458,17 +508,315 @@ class CPU {
 
     fun daa(): Int{
 
-        /*
-        val oldValue = A.toInt() and 0xFF
-        val carry = if ((F.toInt() and FLAG_C) != 0) 1 else 0
+        var result = A.toInt() and 0xFF
 
-        A = ((A.toInt() ushr 1) or (carry shl 7)).toByte()
+        if (!flagIsSet(FLAG_N)) { // Addition
 
-        updateFlag(FLAG_Z, A == 0.toByte())
+            if ((result and 0x0F) > 9 || flagIsSet(FLAG_H)) // Lower nibble
+                result += 0x06
+
+            if ((result and 0xF0) > 0x90 || flagIsSet(FLAG_C)) // Higher nibble
+                result += 0x60
+
+        }else{ // Substraction
+            if (flagIsSet(FLAG_H)) // Lower nibble
+                result -= 0x06
+
+            if (flagIsSet(FLAG_C)) // Higher nibble
+                result -= 0x60
+        }
+
+        updateFlag(FLAG_Z, (result and 0xFF) == 0x00)
+        clearFlag(FLAG_H)
+        updateFlag(FLAG_C, result > 0xFF)
+
+        result = result and 0xFF
+        A = result.toByte()
+
+        return CYCLES_4
+    }
+
+    fun jr_z_n(): Int{
+        val offset = fetch()
+        if (flagIsSet(FLAG_Z)) {
+            PC += offset.toInt()
+            return CYCLES_12
+        }
+        return CYCLES_8
+    }
+
+    fun add_hl_hl(): Int{
+        val hl = get_16bit_address(H, L)
+
+        val result = hl + hl
+
+        H = (result shr 8).toByte()
+        L = (result and 0xFF).toByte()
+
+        clearFlag(FLAG_N)
+        updateFlag(FLAG_H, ((hl and 0xFFF) + (hl and 0xFFF)) and 0x1000 != 0)
+        updateFlag(FLAG_C, result and 0x10000 != 0)
+
+        return CYCLES_8
+    }
+
+    fun ldi_a_hl(): Int{
+        val hl = get_16bit_address(H, L)
+        A = memory[hl]
+
+        val newHL = (hl + 1) and 0xFFFF
+        H = (newHL ushr 8).toByte()
+        L = (newHL and 0xFF).toByte()
+
+        return CYCLES_8
+    }
+
+    fun dec_hl(): Int{
+        val hl = get_16bit_address(H, L)
+        val newHl = (hl - 1) and 0xFFFF
+        H = (newHl shr 8).toByte()
+        L = (newHl and 0xFF).toByte()
+        return CYCLES_8
+    }
+
+    fun inc_l(): Int{
+        L = inc_8bit_register(L)
+        return CYCLES_4
+    }
+
+    fun dec_l(): Int{
+        L = dec_8bit_register(L)
+        return CYCLES_4
+    }
+
+    fun ld_l_n(): Int{
+        val value = fetch()
+        L = value
+        return CYCLES_8
+    }
+
+    fun cpl(): Int{
+
+        A = (A.toInt() xor 0xFF).toByte()
+
+        setFlag(FLAG_N)
+        setFlag(FLAG_H)
+
+        return CYCLES_4
+    }
+
+    fun jr_nc_n(): Int{
+        val offset = fetch()
+        if (!flagIsSet(FLAG_C)) {
+            PC += offset.toInt()
+            return CYCLES_12
+        }
+        return CYCLES_8
+    }
+
+    fun ld_sp_nn(): Int{
+        val low = fetch().toInt() and 0xFF
+        val high = fetch().toInt() and 0xFF
+
+        SP = (high shl 8) or low
+
+        return CYCLES_12
+    }
+
+    fun ldd_hl_a(): Int{
+        val hl = get_16bit_address(H, L)
+        memory[hl] = A
+
+        val newHL = (hl - 1) and 0xFFFF
+        H = (newHL ushr 8).toByte()
+        L = (newHL and 0xFF).toByte()
+
+        return CYCLES_8
+    }
+
+    fun inc_sp(): Int{
+        SP = (SP + 1) and 0xFFFF
+        return CYCLES_8
+    }
+
+    fun inc_hl_v(): Int{
+        val hl = get_16bit_address(H, L)
+
+        memory[hl] = ((memory[hl] + 1) and 0xFF).toByte()
+
+        return CYCLES_12
+    }
+
+    fun dec_hl_v(): Int{
+        val hl = get_16bit_address(H, L)
+
+        memory[hl] = ((memory[hl] - 1) and 0xFF).toByte()
+
+        return CYCLES_12
+    }
+
+    fun ld_hl_v_n(): Int{
+        val value = fetch()
+        val hl = get_16bit_address(H, L)
+
+        memory[hl] = value
+
+        return CYCLES_12
+    }
+
+    fun scf(): Int{
+
         clearFlag(FLAG_N)
         clearFlag(FLAG_H)
-        updateFlag(FLAG_C, (oldValue and 0x01) != 0)*/
+        setFlag(FLAG_C)
 
+        return CYCLES_4
+    }
+
+    fun jr_c_n(): Int{
+        val offset = fetch()
+        if (flagIsSet(FLAG_C)) {
+            PC += offset.toInt()
+            return CYCLES_12
+        }
+        return CYCLES_8
+    }
+
+    fun add_hl_sp(): Int{
+        val hl = get_16bit_address(H, L)
+
+        val result = hl + SP
+
+        H = (result shr 8).toByte()
+        L = (result and 0xFF).toByte()
+
+        clearFlag(FLAG_N)
+        updateFlag(FLAG_H, ((hl and 0xFFF) + (SP and 0xFFF)) and 0x1000 != 0)
+        updateFlag(FLAG_C, result and 0x10000 != 0)
+
+        return CYCLES_8
+    }
+
+    fun ldd_a_hl(): Int{
+        val hl = get_16bit_address(H, L)
+        A = memory[hl]
+
+        val newHL = (hl - 1) and 0xFFFF
+        H = (newHL ushr 8).toByte()
+        L = (newHL and 0xFF).toByte()
+
+        return CYCLES_8
+    }
+
+    fun dec_sp(): Int{
+        SP = (SP - 1) and 0xFFFF
+        return CYCLES_8
+    }
+
+    fun inc_a(): Int{
+        A = inc_8bit_register(A)
+        return CYCLES_4
+    }
+
+    fun dec_a(): Int{
+        A = dec_8bit_register(A)
+        return CYCLES_4
+    }
+
+    fun ld_a_n(): Int{
+        val value = fetch()
+        A = value
+        return CYCLES_8
+    }
+
+    fun ccf(): Int{
+
+        val newCarry = (F.toInt() and FLAG_C) == 0
+        updateFlag(FLAG_C, newCarry)
+
+        setFlag(FLAG_N)
+        setFlag(FLAG_H)
+
+        return CYCLES_4
+    }
+
+    fun ld_b_b(): Int {
+        return CYCLES_4 // LD B, B -> B doesn't change, but we need to return the cycles
+    }
+
+    fun ld_b_c(): Int{
+        B = C
+        return CYCLES_4
+    }
+
+    fun ld_b_d(): Int{
+        B = D
+        return CYCLES_4
+    }
+
+    fun ld_b_e(): Int{
+        B = E
+        return CYCLES_4
+    }
+
+    fun ld_b_h(): Int{
+        B = H
+        return CYCLES_4
+    }
+
+    fun ld_b_l(): Int{
+        B = L
+        return CYCLES_4
+    }
+
+    fun ld_b_hl(): Int{
+        val hl = get_16bit_address(H, L)
+        B = memory[hl]
+        return CYCLES_8
+    }
+
+    fun ld_b_a(): Int{
+        B = A
+        return CYCLES_4
+    }
+
+    fun ld_c_b(): Int{
+        C = B
+        return CYCLES_4
+    }
+
+    fun ld_c_c(): Int {
+        return CYCLES_4 // LD C, C -> C doesn't change, but we need to return the cycles
+    }
+
+    fun ld_c_d(): Int{
+        C = D
+        return CYCLES_4
+    }
+
+    fun ld_c_e(): Int{
+        C = E
+        return CYCLES_4
+    }
+
+    fun ld_c_h(): Int{
+        C = H
+        return CYCLES_4
+    }
+
+    fun ld_c_l(): Int{
+        C = L
+        return CYCLES_4
+    }
+
+    fun ld_c_hl(): Int{
+        val hl = get_16bit_address(H, L)
+        C = memory[hl]
+        return CYCLES_8
+    }
+
+    fun ld_c_a(): Int{
+        C = A
         return CYCLES_4
     }
 }
