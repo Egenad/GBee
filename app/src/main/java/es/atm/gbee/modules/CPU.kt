@@ -2,7 +2,6 @@ package es.atm.gbee.modules
 
 // These are CLOCK CYCLES, not MACHINE CYCLES
 // 1 Machine Cycle = 4 Clock Cycles
-
 const val CYCLES_4 = 4
 const val CYCLES_8 = 8
 const val CYCLES_12 = 12
@@ -12,7 +11,7 @@ const val CYCLES_20 = 20
 // Byte --> 8 Bits
 // Int --> 32 Bits
 
-class CPU {
+object CPU {
 
     // 8 bits registers
     var A: Byte = 0
@@ -42,6 +41,10 @@ class CPU {
 
     // Total Memory
     val memory = ByteArray(0x10000) // 64KB
+
+    init {
+        println("CPU inicializada")
+    }
 
     fun step() {
         val opcode = fetch()
@@ -172,16 +175,66 @@ class CPU {
             0x4D -> ld_c_l()        // LD C, L
             0x4E -> ld_c_hl()       // LD C, [HL]
             0x4F -> ld_c_a()        // LD C, A
+            0x50 -> ld_d_b()        // LD D, B
+            0x51 -> ld_d_c()        // LD D, C
+            0x52 -> ld_d_d()        // LD D, D
+            0x53 -> ld_d_e()        // LD D, E
+            0x54 -> ld_d_h()        // LD D, H
+            0x55 -> ld_d_l()        // LD D, L
+            0x56 -> ld_d_hl()       // LD D, [HL]
+            0x57 -> ld_d_a()        // LD D, A
+            0x58 -> ld_e_b()        // LD E, B
+            0x59 -> ld_e_c()        // LD E, C
+            0x5A -> ld_e_d()        // LD E, D
+            0x5B -> ld_e_e()        // LD E, E
+            0x5C -> ld_e_h()        // LD E, H
+            0x5D -> ld_e_l()        // LD E, L
+            0x5E -> ld_e_hl()       // LD E, [HL]
+            0x5F -> ld_e_a()        // LD E, A
+            0x60 -> ld_h_b()        // LD H, B
+            0x61 -> ld_h_c()        // LD H, C
+            0x62 -> ld_h_d()        // LD H, D
+            0x63 -> ld_h_e()        // LD H, E
+            0x64 -> ld_h_h()        // LD H, H
+            0x65 -> ld_h_l()        // LD H, L
+            0x66 -> ld_h_hl()       // LD H, [HL]
+            0x67 -> ld_h_a()        // LD H, A
+            0x68 -> ld_l_b()        // LD L, B
+            0x69 -> ld_l_c()        // LD L, C
+            0x6A -> ld_l_d()        // LD L, D
+            0x6B -> ld_l_e()        // LD L, E
+            0x6C -> ld_l_h()        // LD L, H
+            0x6D -> ld_l_l()        // LD L, L
+            0x6E -> ld_l_hl()       // LD L, [HL]
+            0x6F -> ld_l_a()        // LD L, A
+            0x70 -> ld_hl_b()       // LD [HL], B
+            0x71 -> ld_hl_c()       // LD [HL], C
+            0x72 -> ld_hl_d()       // LD [HL], D
+            0x73 -> ld_hl_e()       // LD [HL], E
+            0x74 -> ld_hl_h()       // LD [HL], H
+            0x75 -> ld_hl_l()       // LD [HL], L
+            0x76 -> halt()          // HALT
+            0x77 -> ld_hl_a()       // LD [HL], A
+            0x78 -> ld_a_b()        // LD A, B
+            0x79 -> ld_a_c()        // LD A, C
+            0x7A -> ld_a_d()        // LD A, D
+            0x7B -> ld_a_e()        // LD A, E
+            0x7C -> ld_a_h()        // LD A, H
+            0x7D -> ld_a_l()        // LD A, L
+            0x7E -> ld_a_hl()       // LD A, [HL]
+            0x7F -> ld_a_a()        // LD A, A
+            0x80 -> add_a_b()        // ADD A, B
             else -> throw IllegalArgumentException("Instruction not supported: ${opcode.toInt() and 0xFF}")
         }
     }
 
-    fun nop(): Int{
-        return CYCLES_4
-    }
-
     fun get_16bit_address(high: Byte, low: Byte): Int{
         return (high.toInt() shl 8) or (low.toInt() and 0xFF)
+    }
+
+    fun set_16bit_address_value(high: Byte, low: Byte, value: Byte){
+        val address = (high.toInt() shl 8) or (low.toInt() and 0xFF)
+        memory[address] = value
     }
 
     fun inc_8bit_register(register: Byte): Byte{
@@ -202,6 +255,14 @@ class CPU {
         updateFlag(FLAG_H, (register.toInt() and 0xF == 0x00))
 
         return toReturn
+    }
+
+    // -------------------------------- //
+    //            OPCODES
+    // -------------------------------- //
+
+    fun nop(): Int{
+        return CYCLES_4
     }
 
     fun ld_bc_nn(): Int{
@@ -657,9 +718,7 @@ class CPU {
 
     fun ld_hl_v_n(): Int{
         val value = fetch()
-        val hl = get_16bit_address(H, L)
-
-        memory[hl] = value
+        set_16bit_address_value(H, L, value)
 
         return CYCLES_12
     }
@@ -817,6 +876,259 @@ class CPU {
 
     fun ld_c_a(): Int{
         C = A
+        return CYCLES_4
+    }
+
+    fun ld_d_b(): Int{
+        D = B
+        return CYCLES_4
+    }
+
+    fun ld_d_c(): Int{
+        D = C
+        return CYCLES_4
+    }
+
+    fun ld_d_d(): Int {
+        return CYCLES_4 // LD D, D -> D doesn't change, but we need to return the cycles
+    }
+
+    fun ld_d_e(): Int{
+        D = E
+        return CYCLES_4
+    }
+
+    fun ld_d_h(): Int{
+        D = H
+        return CYCLES_4
+    }
+
+    fun ld_d_l(): Int{
+        D = L
+        return CYCLES_4
+    }
+
+    fun ld_d_hl(): Int{
+        val hl = get_16bit_address(H, L)
+        D = memory[hl]
+        return CYCLES_8
+    }
+
+    fun ld_d_a(): Int{
+        D = A
+        return CYCLES_4
+    }
+
+    fun ld_e_b(): Int{
+        E = B
+        return CYCLES_4
+    }
+
+    fun ld_e_c(): Int{
+        E = C
+        return CYCLES_4
+    }
+
+    fun ld_e_d(): Int{
+        E = D
+        return CYCLES_4
+    }
+
+    fun ld_e_e(): Int{
+        return CYCLES_4 // LD E, E -> E doesn't change, but we need to return the cycles
+    }
+
+    fun ld_e_h(): Int{
+        E = H
+        return CYCLES_4
+    }
+
+    fun ld_e_l(): Int{
+        E = L
+        return CYCLES_4
+    }
+
+    fun ld_e_hl(): Int{
+        val hl = get_16bit_address(H, L)
+        E = memory[hl]
+        return CYCLES_8
+    }
+
+    fun ld_e_a(): Int{
+        E = A
+        return CYCLES_4
+    }
+
+    fun ld_h_b(): Int{
+        H = B
+        return CYCLES_4
+    }
+
+    fun ld_h_c(): Int{
+        H = C
+        return CYCLES_4
+    }
+
+    fun ld_h_d(): Int{
+        H = D
+        return CYCLES_4
+    }
+
+    fun ld_h_e(): Int{
+        H = E
+        return CYCLES_4
+    }
+
+    fun ld_h_h(): Int{
+        return CYCLES_4 // LD H, H -> H doesn't change, but we need to return the cycles
+    }
+
+    fun ld_h_l(): Int{
+        H = L
+        return CYCLES_4
+    }
+
+    fun ld_h_hl(): Int{
+        val hl = get_16bit_address(H, L)
+        H = memory[hl]
+        return CYCLES_8
+    }
+
+    fun ld_h_a(): Int{
+        H = A
+        return CYCLES_4
+    }
+
+    fun ld_l_b(): Int{
+        L = B
+        return CYCLES_4
+    }
+
+    fun ld_l_c(): Int{
+        L = C
+        return CYCLES_4
+    }
+
+    fun ld_l_d(): Int{
+        L = D
+        return CYCLES_4
+    }
+
+    fun ld_l_e(): Int{
+        L = E
+        return CYCLES_4
+    }
+
+    fun ld_l_h(): Int{
+        L = H
+        return CYCLES_4
+    }
+
+    fun ld_l_l(): Int{
+        return CYCLES_4 // LD L, L -> L doesn't change, but we need to return the cycles
+    }
+
+    fun ld_l_hl(): Int{
+        val hl = get_16bit_address(H, L)
+        L = memory[hl]
+        return CYCLES_8
+    }
+
+    fun ld_l_a(): Int{
+        L = A
+        return CYCLES_4
+    }
+
+    fun ld_hl_b(): Int{
+        set_16bit_address_value(H, L, B)
+        return CYCLES_8
+    }
+
+    fun ld_hl_c(): Int{
+        set_16bit_address_value(H, L, C)
+        return CYCLES_8
+    }
+
+    fun ld_hl_d(): Int{
+        set_16bit_address_value(H, L, D)
+        return CYCLES_8
+    }
+
+    fun ld_hl_e(): Int{
+        val hl = get_16bit_address(H, L)
+        memory[hl] = E
+
+        return CYCLES_8
+    }
+
+    fun ld_hl_h(): Int{
+        set_16bit_address_value(H, L, H)
+        return CYCLES_8
+    }
+
+    fun ld_hl_l(): Int{
+        set_16bit_address_value(H, L, L)
+        return CYCLES_8
+    }
+
+    fun halt(): Int{
+        return CYCLES_4
+    }
+
+    fun ld_hl_a(): Int{
+        set_16bit_address_value(H, L, A)
+        return CYCLES_8
+    }
+
+    fun ld_a_b(): Int{
+        A = B
+        return CYCLES_4
+    }
+
+    fun ld_a_c(): Int{
+        A = C
+        return CYCLES_4
+    }
+
+    fun ld_a_d(): Int{
+        A = D
+        return CYCLES_4
+    }
+
+    fun ld_a_e(): Int{
+        A = E
+        return CYCLES_4
+    }
+
+    fun ld_a_h(): Int{
+        A = H
+        return CYCLES_4
+    }
+
+    fun ld_a_l(): Int{
+        A = L
+        return CYCLES_4
+    }
+
+    fun ld_a_hl(): Int{
+        val hl = get_16bit_address(H, L)
+        A = memory[hl]
+        return CYCLES_8
+    }
+
+    fun ld_a_a(): Int{
+        return CYCLES_4 // LD A, A -> A doesn't change, but we need to return the cycles
+    }
+
+    fun add_a_b(): Int{
+        val result = A.toInt() + B.toInt()
+        A = (result and 0xFF).toByte()
+
+        updateFlag(FLAG_Z, A.toInt() == 0)
+        clearFlag(FLAG_N)
+        updateFlag(FLAG_H, (A.toInt() and 0xF) + (B.toInt() and 0xF) > 0xF)
+        updateFlag(FLAG_C, result > 0xFF)
+
         return CYCLES_4
     }
 }
