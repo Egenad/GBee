@@ -223,7 +223,36 @@ object CPU {
             0x7D -> ld_a_l()        // LD A, L
             0x7E -> ld_a_hl()       // LD A, [HL]
             0x7F -> ld_a_a()        // LD A, A
-            0x80 -> add_a_b()        // ADD A, B
+            0x80 -> add_a_b()       // ADD A, B
+            0x81 -> add_a_c()       // ADD A, C
+            0x82 -> add_a_d()       // ADD A, D
+            0x83 -> add_a_e()       // ADD A, E
+            0x84 -> add_a_h()       // ADD A, H
+            0x85 -> add_a_l()       // ADD A, L
+            0x86 -> add_a_hl()      // ADD A, [HL]
+            0x87 -> add_a_a()       // ADD A, A
+            0x88 -> adc_a_b()       // ADC A, B
+            0x89 -> adc_a_c()       // ADC A, C
+            0x8A -> adc_a_d()       // ADC A, D
+            0x8B -> adc_a_e()       // ADC A, E
+            0x8C -> adc_a_h()       // ADC A, H
+            0x8D -> adc_a_l()       // ADC A, L
+            0x8E -> adc_a_hl()      // ADC A, [HL]
+            0x8F -> adc_a_a()       // ADC A, A
+            0x90 -> sub_b()         // SUB B
+            0x91 -> sub_c()         // SUB C
+            0x92 -> sub_d()         // SUB D
+            0x93 -> sub_e()         // SUB E
+            0x94 -> sub_h()         // SUB H
+            0x95 -> sub_l()         // SUB L
+            0x96 -> sub_hl()        // SUB [HL]
+            0x97 -> sub_a()         // SUB A
+            0x98 -> sbc_a_b()       // SBC A, B
+            0x99 -> sbc_a_c()       // SBC A, C
+            0x9A -> sbc_a_d()       // SBC A, D
+            0x9B -> sbc_a_e()       // SBC A, E
+            0x9C -> sbc_a_h()       // SBC A, H
+            0x9D -> sbc_a_l()       // SBC A, L
             else -> throw IllegalArgumentException("Instruction not supported: ${opcode.toInt() and 0xFF}")
         }
     }
@@ -255,6 +284,20 @@ object CPU {
         updateFlag(FLAG_H, (register.toInt() and 0xF == 0x00))
 
         return toReturn
+    }
+
+    fun updateAddOperationFlags(val1: Int, val2: Int, result: Int){
+        updateFlag(FLAG_Z, result == 0)                               // Activated (1) if the result of the operation is 0.
+        clearFlag(FLAG_N)                                                     // Set to 0
+        updateFlag(FLAG_H, (val1 and 0xF) + (val2 and 0xF) > 0xF)     // Set (1) if there was a carry from the low nibble (the first 4 bits) during the operation.
+        updateFlag(FLAG_C, result > 0xFF)                             // Set (1) if there was a carry during the addition (greater than 0xFF)
+    }
+
+    fun updateSubOperationFlags(val1: Int, val2: Int, result: Int){
+        updateFlag(FLAG_Z, result == 0)                               // Activated (1) if the result of the operation is 0.
+        updateFlag(FLAG_N, true)                                      // Activated (1) because a subtraction was performed.
+        updateFlag(FLAG_H, (val1 and 0xF) < (val2 and 0xF))           // Set (1) if there was a carry from the low nibble (the first 4 bits) during the subtraction.
+        updateFlag(FLAG_C, (val1 and 0xFF) < (val2 and 0xFF))         // Set (1) if there was a carry during the subtraction from the most significant bit (bit 7).
     }
 
     // -------------------------------- //
@@ -1121,13 +1164,347 @@ object CPU {
     }
 
     fun add_a_b(): Int{
-        val result = A.toInt() + B.toInt()
+        val intA = A.toInt()
+        val intB = B.toInt()
+        val result = intA + intB
         A = (result and 0xFF).toByte()
 
-        updateFlag(FLAG_Z, A.toInt() == 0)
-        clearFlag(FLAG_N)
-        updateFlag(FLAG_H, (A.toInt() and 0xF) + (B.toInt() and 0xF) > 0xF)
-        updateFlag(FLAG_C, result > 0xFF)
+        updateAddOperationFlags(intA, intB, result)
+
+        return CYCLES_4
+    }
+
+    fun add_a_c(): Int{
+        val intA = A.toInt()
+        val intC = C.toInt()
+        val result = intA + intC
+        A = (result and 0xFF).toByte()
+
+        updateAddOperationFlags(intA, intC, result)
+
+        return CYCLES_4
+    }
+
+    fun add_a_d(): Int{
+        val intA = A.toInt()
+        val intD = D.toInt()
+        val result = intA + intD
+        A = (result and 0xFF).toByte()
+
+        updateAddOperationFlags(intA, intD, result)
+
+        return CYCLES_4
+    }
+
+    fun add_a_e(): Int{
+        val intA = A.toInt()
+        val intE = E.toInt()
+        val result = intA + intE
+        A = (result and 0xFF).toByte()
+
+        updateAddOperationFlags(intA, intE, result)
+
+        return CYCLES_4
+    }
+
+    fun add_a_h(): Int{
+        val intA = A.toInt()
+        val intH = H.toInt()
+        val result = intA + intH
+        A = (result and 0xFF).toByte()
+
+        updateAddOperationFlags(intA, intH, result)
+
+        return CYCLES_4
+    }
+
+    fun add_a_l(): Int{
+        val intA = A.toInt()
+        val intL = L.toInt()
+        val result = intA + intL
+        A = (result and 0xFF).toByte()
+
+        updateAddOperationFlags(intA, intL, result)
+
+        return CYCLES_4
+    }
+
+    fun add_a_hl(): Int{
+        val address = get_16bit_address(H, L)
+        val value = memory[address].toInt()
+        val intA = A.toInt()
+        val result = intA + value
+        A = (result and 0xFF).toByte()
+
+        updateAddOperationFlags(intA, value, result)
+
+        return CYCLES_8
+    }
+
+    fun add_a_a(): Int{
+        val intA = A.toInt()
+        val result = intA + intA
+        A = (result and 0xFF).toByte()
+
+        updateAddOperationFlags(intA, intA, result)
+
+        return CYCLES_4
+    }
+
+    fun adc_a_b(): Int{
+        val carry = if (flagIsSet(FLAG_C)) 1 else 0
+        val intA = A.toInt()
+        val intB = B.toInt()
+        val result = intA + (intB + carry)
+        A = (result and 0xFF).toByte()
+
+        updateAddOperationFlags(intA, intB + carry, result)
+
+        return CYCLES_4
+    }
+
+    fun adc_a_c(): Int{
+        val carry = if (flagIsSet(FLAG_C)) 1 else 0
+        val intA = A.toInt()
+        val intC = C.toInt()
+        val result = intA + (intC + carry)
+        A = (result and 0xFF).toByte()
+
+        updateAddOperationFlags(intA, intC + carry, result)
+
+        return CYCLES_4
+    }
+
+    fun adc_a_d(): Int{
+        val carry = if (flagIsSet(FLAG_C)) 1 else 0
+        val intA = A.toInt()
+        val intD = D.toInt()
+        val result = intA + (intD + carry)
+        A = (result and 0xFF).toByte()
+
+        updateAddOperationFlags(intA, intD + carry, result)
+
+        return CYCLES_4
+    }
+
+    fun adc_a_e(): Int{
+        val carry = if (flagIsSet(FLAG_C)) 1 else 0
+        val intA = A.toInt()
+        val intE = E.toInt()
+        val result = intA + (intE + carry)
+        A = (result and 0xFF).toByte()
+
+        updateAddOperationFlags(intA, intE + carry, result)
+
+        return CYCLES_4
+    }
+
+    fun adc_a_h(): Int{
+        val carry = if (flagIsSet(FLAG_C)) 1 else 0
+        val intA = A.toInt()
+        val intH = H.toInt()
+        val result = intA + (intH + carry)
+        A = (result and 0xFF).toByte()
+
+        updateAddOperationFlags(intA, intH + carry, result)
+
+        return CYCLES_4
+    }
+
+    fun adc_a_l(): Int{
+        val carry = if (flagIsSet(FLAG_C)) 1 else 0
+        val intA = A.toInt()
+        val intL = L.toInt()
+        val result = intA + (intL + carry)
+        A = (result and 0xFF).toByte()
+
+        updateAddOperationFlags(intA, intL + carry, result)
+
+        return CYCLES_4
+    }
+
+    fun adc_a_hl(): Int{
+        val carry = if (flagIsSet(FLAG_C)) 1 else 0
+        val address = get_16bit_address(H, L)
+        val value = memory[address].toInt()
+
+        val intA = A.toInt()
+        val result = intA + (value + carry)
+        A = (result and 0xFF).toByte()
+
+        updateAddOperationFlags(intA, value + carry, result)
+
+        return CYCLES_8
+    }
+
+    fun adc_a_a(): Int{
+        val carry = if (flagIsSet(FLAG_C)) 1 else 0
+        val intA = A.toInt()
+        val result = intA + (intA + carry)
+        A = (result and 0xFF).toByte()
+
+        updateAddOperationFlags(intA, intA + carry, result)
+
+        return CYCLES_4
+    }
+
+    fun sub_b(): Int{
+        val intA = A.toInt()
+        val intB = B.toInt()
+        val result = intA - intB
+        A = (result and 0xFF).toByte()
+
+        updateSubOperationFlags(intA, intB, result)
+
+        return CYCLES_4
+    }
+
+    fun sub_c(): Int{
+        val intA = A.toInt()
+        val intC = C.toInt()
+        val result = intA - intC
+        A = (result and 0xFF).toByte()
+
+        updateSubOperationFlags(intA, intC, result)
+
+        return CYCLES_4
+    }
+
+    fun sub_d(): Int{
+        val intA = A.toInt()
+        val intD = D.toInt()
+        val result = intA - intD
+        A = (result and 0xFF).toByte()
+
+        updateSubOperationFlags(intA, intD, result)
+
+        return CYCLES_4
+    }
+
+    fun sub_e(): Int{
+        val intA = A.toInt()
+        val intE = E.toInt()
+        val result = intA - intE
+        A = (result and 0xFF).toByte()
+
+        updateSubOperationFlags(intA, intE, result)
+
+        return CYCLES_4
+    }
+
+    fun sub_h(): Int{
+        val intA = A.toInt()
+        val intH = H.toInt()
+        val result = intA - intH
+        A = (result and 0xFF).toByte()
+
+        updateSubOperationFlags(intA, intH, result)
+
+        return CYCLES_4
+    }
+
+    fun sub_l(): Int{
+        val intA = A.toInt()
+        val intL = L.toInt()
+        val result = intA - intL
+        A = (result and 0xFF).toByte()
+
+        updateSubOperationFlags(intA, intL, result)
+
+        return CYCLES_4
+    }
+
+    fun sub_hl(): Int{
+
+        val address = get_16bit_address(H, L)
+
+        val intA = A.toInt()
+        val intMem = memory[address].toInt()
+        val result = intA - intMem
+        A = (result and 0xFF).toByte()
+
+        updateSubOperationFlags(intA, intMem, result)
+
+        return CYCLES_8
+    }
+
+    fun sub_a(): Int{
+        val intA = A.toInt()
+        A = 0x0
+
+        updateSubOperationFlags(intA, intA, 0x0)
+
+        return CYCLES_4
+    }
+
+    fun sbc_a_b(): Int{
+        val carry = if (flagIsSet(FLAG_C)) 1 else 0
+        val intA = A.toInt()
+        val intB = B.toInt()
+        val result = intA - (intB + carry)
+        A = (result and 0xFF).toByte()
+
+        updateSubOperationFlags(intA, intB + carry, result)
+
+        return CYCLES_4
+    }
+
+    fun sbc_a_c(): Int{
+        val carry = if (flagIsSet(FLAG_C)) 1 else 0
+        val intA = A.toInt()
+        val intC = C.toInt()
+        val result = intA - (intC + carry)
+        A = (result and 0xFF).toByte()
+
+        updateSubOperationFlags(intA, intC + carry, result)
+
+        return CYCLES_4
+    }
+
+    fun sbc_a_d(): Int{
+        val carry = if (flagIsSet(FLAG_C)) 1 else 0
+        val intA = A.toInt()
+        val intD = D.toInt()
+        val result = intA - (intD + carry)
+        A = (result and 0xFF).toByte()
+
+        updateSubOperationFlags(intA, intD + carry, result)
+
+        return CYCLES_4
+    }
+
+    fun sbc_a_e(): Int{
+        val carry = if (flagIsSet(FLAG_C)) 1 else 0
+        val intA = A.toInt()
+        val intE = E.toInt()
+        val result = intA - (intE + carry)
+        A = (result and 0xFF).toByte()
+
+        updateSubOperationFlags(intA, intE + carry, result)
+
+        return CYCLES_4
+    }
+
+    fun sbc_a_h(): Int{
+        val carry = if (flagIsSet(FLAG_C)) 1 else 0
+        val intA = A.toInt()
+        val intH = H.toInt()
+        val result = intA - (intH + carry)
+        A = (result and 0xFF).toByte()
+
+        updateSubOperationFlags(intA, intH + carry, result)
+
+        return CYCLES_4
+    }
+
+    fun sbc_a_l(): Int{
+        val carry = if (flagIsSet(FLAG_C)) 1 else 0
+        val intA = A.toInt()
+        val intL = L.toInt()
+        val result = intA - (intL + carry)
+        A = (result and 0xFF).toByte()
+
+        updateSubOperationFlags(intA, intL + carry, result)
 
         return CYCLES_4
     }
