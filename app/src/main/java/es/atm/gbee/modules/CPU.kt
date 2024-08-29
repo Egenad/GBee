@@ -5,7 +5,9 @@ package es.atm.gbee.modules
 const val CYCLES_4 = 4
 const val CYCLES_8 = 8
 const val CYCLES_12 = 12
+const val CYCLES_16 = 16
 const val CYCLES_20 = 20
+const val CYCLES_24 = 24
 
 // Nibble --> 4 Bits
 // Byte --> 8 Bits
@@ -253,9 +255,53 @@ object CPU {
             0x9B -> sbc_a_e()       // SBC A, E
             0x9C -> sbc_a_h()       // SBC A, H
             0x9D -> sbc_a_l()       // SBC A, L
+            0x9E -> sbc_a_hl()      // SBC A, [HL]
+            0x9F -> sbc_a_a()       // SBC A, A
+            0xA0 -> and_b()         // AND B
+            0xA1 -> and_c()         // AND C
+            0xA2 -> and_d()         // AND D
+            0xA3 -> and_e()         // AND E
+            0xA4 -> and_h()         // AND H
+            0xA5 -> and_l()         // AND L
+            0xA6 -> and_hl()        // AND [HL]
+            0xA7 -> and_a()         // AND A
+            0xA8 -> xor_b()         // XOR B
+            0xA9 -> xor_c()         // XOR C
+            0xAA -> xor_d()         // XOR D
+            0xAB -> xor_e()         // XOR E
+            0xAC -> xor_h()         // XOR H
+            0xAD -> xor_l()         // XOR L
+            0xAE -> xor_hl()        // XOR [HL]
+            0xAF -> xor_a()         // XOR A
+            0xB0 -> or_b()          // OR B
+            0xB1 -> or_c()          // OR C
+            0xB2 -> or_d()          // OR D
+            0xB3 -> or_e()          // OR E
+            0xB4 -> or_h()          // OR H
+            0xB5 -> or_l()          // OR L
+            0xB6 -> or_hl()         // OR [HL]
+            0xB7 -> or_a()          // OR A
+            0xB8 -> cp_b()          // CP B
+            0xB9 -> cp_c()          // CP C
+            0xBA -> cp_d()          // CP D
+            0xBB -> cp_e()          // CP E
+            0xBC -> cp_h()          // CP H
+            0xBD -> cp_l()          // CP L
+            0xBE -> cp_hl()         // CP [HL]
+            0xBF -> cp_a()          // CP A
+            0xC0 -> ret_nz()        // RET NZ
+            0xC1 -> pop_bc()        // POP BC
+            0xC2 -> jp_nz_nn()      // JP NZ, NN
+            0xC3 -> jp_nn()         // JP NN
+            0xC4 -> call_nz_nn()    // CALL NZ, NN
+            0xC5 -> push_bc()       // PUSH BC
             else -> throw IllegalArgumentException("Instruction not supported: ${opcode.toInt() and 0xFF}")
         }
     }
+
+    // -------------------------------- //
+    //            UTILS
+    // -------------------------------- //
 
     fun get_16bit_address(high: Byte, low: Byte): Int{
         return (high.toInt() shl 8) or (low.toInt() and 0xFF)
@@ -268,21 +314,17 @@ object CPU {
 
     fun inc_8bit_register(register: Byte): Byte{
         val toReturn = (register.toInt() + 1).toByte()
-
         updateFlag(FLAG_Z, toReturn.toInt() == 0x00)
         clearFlag(FLAG_N)
         updateFlag(FLAG_H, ((register.toInt() and 0xF) + 1) and 0x10 != 0x00)
-
         return toReturn
     }
 
     fun dec_8bit_register(register: Byte): Byte{
         val toReturn = (register.toInt() - 1).toByte()
-
         updateFlag(FLAG_Z, toReturn.toInt() == 0x00)
         setFlag(FLAG_N)
         updateFlag(FLAG_H, (register.toInt() and 0xF == 0x00))
-
         return toReturn
     }
 
@@ -298,6 +340,38 @@ object CPU {
         updateFlag(FLAG_N, true)                                      // Activated (1) because a subtraction was performed.
         updateFlag(FLAG_H, (val1 and 0xF) < (val2 and 0xF))           // Set (1) if there was a carry from the low nibble (the first 4 bits) during the subtraction.
         updateFlag(FLAG_C, (val1 and 0xFF) < (val2 and 0xFF))         // Set (1) if there was a carry during the subtraction from the most significant bit (bit 7).
+    }
+
+    fun executeAndOperation(register: Byte){
+        A = ((A.toInt() and register.toInt()) and 0xFF).toByte()
+        updateFlag(FLAG_Z, (A.toInt() and 0xFF) == 0)
+        clearFlag(FLAG_N)
+        setFlag(FLAG_H)
+        clearFlag(FLAG_C)
+    }
+
+    fun executeXorOrOperation(register: Byte, orOp: Boolean){
+        A = if(orOp)
+            ((A.toInt() or register.toInt()) and 0xFF).toByte()
+        else
+            ((A.toInt() xor register.toInt()) and 0xFF).toByte()
+
+        updateFlag(FLAG_Z, (A.toInt() and 0xFF) == 0)
+        clearFlag(FLAG_N)
+        clearFlag(FLAG_H)
+        clearFlag(FLAG_C)
+    }
+
+    fun executeCpOperation(register: Byte){
+        val intA = A.toInt()
+        val intRegister = register.toInt()
+
+        val result = (intA - intRegister) and 0xFF
+
+        updateFlag(FLAG_Z, result == 0)
+        setFlag(FLAG_N)
+        updateFlag(FLAG_H, (intA and 0xF) < (intRegister and 0xF))
+        updateFlag(FLAG_C, intA < intRegister)
     }
 
     // -------------------------------- //
@@ -1430,9 +1504,10 @@ object CPU {
 
     fun sub_a(): Int{
         val intA = A.toInt()
-        A = 0x0
+        val result = intA - intA        // Should be 0
+        A = (result and 0xFF).toByte()  // A = 0x0
 
-        updateSubOperationFlags(intA, intA, 0x0)
+        updateSubOperationFlags(intA, intA, result)
 
         return CYCLES_4
     }
@@ -1507,5 +1582,256 @@ object CPU {
         updateSubOperationFlags(intA, intL + carry, result)
 
         return CYCLES_4
+    }
+
+    fun sbc_a_hl(): Int{
+        val address = get_16bit_address(H, L)
+        val intMem = memory[address].toInt()
+        val carry = if (flagIsSet(FLAG_C)) 1 else 0
+        val intA = A.toInt()
+        val result = intA - (intMem + carry)
+        A = (result and 0xFF).toByte()
+
+        updateSubOperationFlags(intA, intMem + carry, result)
+
+        return CYCLES_8
+    }
+
+    fun sbc_a_a(): Int{
+        val carry = if (flagIsSet(FLAG_C)) 1 else 0
+        val intA = A.toInt()
+        val result = intA - (intA + carry)
+        A = (result and 0xFF).toByte()
+
+        updateSubOperationFlags(intA, intA + carry, result)
+
+        return CYCLES_4
+    }
+
+    fun and_b(): Int{
+        executeAndOperation(B)
+        return CYCLES_4
+    }
+
+    fun and_c(): Int{
+        executeAndOperation(C)
+        return CYCLES_4
+    }
+
+    fun and_d(): Int{
+        executeAndOperation(D)
+        return CYCLES_4
+    }
+
+    fun and_e(): Int{
+        executeAndOperation(E)
+        return CYCLES_4
+    }
+
+    fun and_h(): Int{
+        executeAndOperation(H)
+        return CYCLES_4
+    }
+
+    fun and_l(): Int{
+        executeAndOperation(L)
+        return CYCLES_4
+    }
+
+    fun and_hl(): Int{
+        val hl = get_16bit_address(H,L)
+        executeAndOperation(memory[hl])
+        return CYCLES_8
+    }
+
+    fun and_a(): Int{
+        executeAndOperation(A)
+        return CYCLES_4
+    }
+
+    fun xor_b(): Int{
+        executeXorOrOperation(B, false)
+        return CYCLES_4
+    }
+
+    fun xor_c(): Int{
+        executeXorOrOperation(C, false)
+        return CYCLES_4
+    }
+
+    fun xor_d(): Int{
+        executeXorOrOperation(D, false)
+        return CYCLES_4
+    }
+
+    fun xor_e(): Int{
+        executeXorOrOperation(E, false)
+        return CYCLES_4
+    }
+
+    fun xor_h(): Int{
+        executeXorOrOperation(H, false)
+        return CYCLES_4
+    }
+
+    fun xor_l(): Int{
+        executeXorOrOperation(L, false)
+        return CYCLES_4
+    }
+
+    fun xor_hl(): Int{
+        val hl = get_16bit_address(H,L)
+        executeXorOrOperation(memory[hl], false)
+        return CYCLES_8
+    }
+
+    fun xor_a(): Int{
+        executeXorOrOperation(A, false)
+        return CYCLES_4
+    }
+
+    fun or_b(): Int{
+        executeXorOrOperation(B, true)
+        return CYCLES_4
+    }
+
+    fun or_c(): Int{
+        executeXorOrOperation(C, true)
+        return CYCLES_4
+    }
+
+    fun or_d(): Int{
+        executeXorOrOperation(D, true)
+        return CYCLES_4
+    }
+
+    fun or_e(): Int{
+        executeXorOrOperation(E, true)
+        return CYCLES_4
+    }
+
+    fun or_h(): Int{
+        executeXorOrOperation(H, true)
+        return CYCLES_4
+    }
+
+    fun or_l(): Int{
+        executeXorOrOperation(L, true)
+        return CYCLES_4
+    }
+
+    fun or_hl(): Int{
+        val hl = get_16bit_address(H,L)
+        executeXorOrOperation(memory[hl], true)
+        return CYCLES_8
+    }
+
+    fun or_a(): Int{
+        executeXorOrOperation(A, true)
+        return CYCLES_4
+    }
+
+    fun cp_b(): Int{
+        executeCpOperation(B)
+        return CYCLES_4
+    }
+
+    fun cp_c(): Int{
+        executeCpOperation(C)
+        return CYCLES_4
+    }
+
+    fun cp_d(): Int{
+        executeCpOperation(D)
+        return CYCLES_4
+    }
+
+    fun cp_e(): Int{
+        executeCpOperation(E)
+        return CYCLES_4
+    }
+
+    fun cp_h(): Int{
+        executeCpOperation(H)
+        return CYCLES_4
+    }
+
+    fun cp_l(): Int{
+        executeCpOperation(L)
+        return CYCLES_4
+    }
+
+    fun cp_hl(): Int{
+        val hl = get_16bit_address(H,L)
+        executeCpOperation(memory[hl])
+        return CYCLES_8
+    }
+
+    fun cp_a(): Int{
+        executeCpOperation(A)
+        return CYCLES_4
+    }
+
+    fun ret_nz(): Int{
+        return if (!flagIsSet(FLAG_Z)) {
+            val low = memory[SP].toInt() and 0xFF
+            SP = (SP + 1) and 0xFFFF
+            val high = memory[SP].toInt() and 0xFF
+            SP = (SP + 1) and 0xFFFF
+
+            PC = (high shl 8) or low
+
+            CYCLES_20
+        } else {
+            CYCLES_8
+        }
+    }
+
+    fun pop_bc(): Int{
+
+        C = memory[SP]
+        SP = (SP + 1) and 0xFFFF
+        B = memory[SP]
+        SP = (SP + 1) and 0xFFFF
+
+        return CYCLES_12
+    }
+
+    fun jp_nz_nn(): Int{
+        val address = fetch16()
+
+        if (!flagIsSet(FLAG_Z)) {
+            PC = address
+            return CYCLES_16
+        }
+
+        return CYCLES_12
+    }
+
+    fun jp_nn(): Int{
+        val address = fetch16()
+        PC = address
+        return CYCLES_16
+    }
+
+    fun call_nz_nn(): Int{
+        val address = fetch16()
+
+        if (!flagIsSet(FLAG_Z)) {
+            SP = (SP - 1) and 0xFFFF
+            memory[SP] = (PC ushr 8).toByte() // low
+            SP = (SP - 1) and 0xFFFF
+            memory[SP] = (PC and 0xFF).toByte() // high
+
+            PC = address
+            return CYCLES_24
+        }
+
+        return CYCLES_12
+    }
+
+    fun push_bc(): Int{
+
+        return CYCLES_16
     }
 }
