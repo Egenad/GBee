@@ -2,16 +2,16 @@ package es.atm.gbee.modules
 
 // These are CLOCK CYCLES, not MACHINE CYCLES
 // 1 Machine Cycle = 4 Clock Cycles
-const val CYCLES_4 = 4
-const val CYCLES_8 = 8
-const val CYCLES_12 = 12
-const val CYCLES_16 = 16
-const val CYCLES_20 = 20
-const val CYCLES_24 = 24
+const val CYCLES_4 = 4      // 1 MC
+const val CYCLES_8 = 8      // 2 MC
+const val CYCLES_12 = 12    // 3 MC
+const val CYCLES_16 = 16    // 4 MC
+const val CYCLES_20 = 20    // 5 MC
+const val CYCLES_24 = 24    // 6 MC
 
-// Nibble --> 4 Bits
-// Byte --> 8 Bits
-// Int --> 32 Bits
+// Nibble   -->  4 Bits
+// Byte     -->  8 Bits
+// Int      --> 32 Bits
 
 object CPU {
 
@@ -84,9 +84,9 @@ object CPU {
     }
 
     fun fetch(): Byte {
-        val opcode = memory[PC]
+        val byte = memory[PC]
         PC = (PC + 1) and 0xFFFF
-        return opcode
+        return byte
     }
 
     fun fetch16(): Int {
@@ -295,6 +295,22 @@ object CPU {
             0xC3 -> jp_nn()         // JP NN
             0xC4 -> call_nz_nn()    // CALL NZ, NN
             0xC5 -> push_bc()       // PUSH BC
+            0xC6 -> add_a_n()       // ADD A, N
+            0xC7 -> rst_00h()       // RST 00H
+            0xC8 -> ret_z()         // RET Z
+            0xC9 -> ret()           // RET
+            0xCA -> jp_z_nn()       // JP Z, NN
+            0xCB -> prefix_cb()     // PREFIX CB
+            0xCC -> call_z_nn()     // CALL Z, NN
+            0xCD -> call()          // CALL
+            0xCE -> adc_a_n()       // ADC A, N
+            0xCF -> rst_08h()       // RST 08H
+            0xD0 -> ret_nc()        // RET NC
+            0xD1 -> pop_de()        // POP DE
+            0xD2 -> jp_nc_nn()      // JP NC, NN
+            0xD4 -> call_nc_nn()    // CALL NC, NN
+            0xD5 -> push_de()       // PUSH DE
+            0xD6 -> sub_n()         // SUB N
             else -> throw IllegalArgumentException("Instruction not supported: ${opcode.toInt() and 0xFF}")
         }
     }
@@ -372,6 +388,41 @@ object CPU {
         setFlag(FLAG_N)
         updateFlag(FLAG_H, (intA and 0xF) < (intRegister and 0xF))
         updateFlag(FLAG_C, intA < intRegister)
+    }
+
+    fun executeRetOperation(){
+        val low = memory[SP].toInt() and 0xFF
+        SP = (SP + 1) and 0xFFFF
+        val high = memory[SP].toInt() and 0xFF
+        SP = (SP + 1) and 0xFFFF
+
+        PC = (high shl 8) or low
+    }
+
+    fun executeRstOperation(address: Int){
+        val returnAddress = PC
+        SP = (SP - 1) and 0xFFFF
+        memory[SP] = (returnAddress ushr 8).toByte()    // high
+        SP = (SP - 1) and 0xFFFF
+        memory[SP] = (returnAddress and 0xFF).toByte()  // low
+
+        PC = address and 0xFFFF
+    }
+
+    fun executeCallOperation(address: Int){
+        SP = (SP - 1) and 0xFFFF
+        memory[SP] = (PC ushr 8).toByte()   // high
+        SP = (SP - 1) and 0xFFFF
+        memory[SP] = (PC and 0xFF).toByte() // low
+
+        PC = address
+    }
+
+    fun uccu_flags(result: Byte, carry: Int){
+        updateFlag(FLAG_Z, result == 0.toByte())
+        clearFlag(FLAG_N)
+        clearFlag(FLAG_H)
+        updateFlag(FLAG_C, carry == 1)
     }
 
     // -------------------------------- //
@@ -1774,13 +1825,7 @@ object CPU {
 
     fun ret_nz(): Int{
         return if (!flagIsSet(FLAG_Z)) {
-            val low = memory[SP].toInt() and 0xFF
-            SP = (SP + 1) and 0xFFFF
-            val high = memory[SP].toInt() and 0xFF
-            SP = (SP + 1) and 0xFFFF
-
-            PC = (high shl 8) or low
-
+            executeRetOperation()
             CYCLES_20
         } else {
             CYCLES_8
@@ -1818,12 +1863,7 @@ object CPU {
         val address = fetch16()
 
         if (!flagIsSet(FLAG_Z)) {
-            SP = (SP - 1) and 0xFFFF
-            memory[SP] = (PC ushr 8).toByte() // low
-            SP = (SP - 1) and 0xFFFF
-            memory[SP] = (PC and 0xFF).toByte() // high
-
-            PC = address
+            executeCallOperation(address)
             return CYCLES_24
         }
 
@@ -1831,7 +1871,245 @@ object CPU {
     }
 
     fun push_bc(): Int{
+        SP = (SP - 1) and 0xFFFF
+        memory[SP] = B              // high
+        SP = (SP - 1) and 0xFFFF
+        memory[SP] = C              // low
 
         return CYCLES_16
     }
+
+    fun add_a_n(): Int{
+        val n8 = fetch()
+        A = ((A.toInt() + n8.toInt()) and 0xFF).toByte()
+
+        return CYCLES_8
+    }
+
+    fun rst_00h(): Int{
+        executeRstOperation(0x0000)
+        return CYCLES_16
+    }
+
+    fun ret_z(): Int{
+        return if (flagIsSet(FLAG_Z)) {
+            executeRetOperation()
+            CYCLES_20
+        } else {
+            CYCLES_8
+        }
+    }
+
+    fun ret(): Int{
+        executeRetOperation()
+        return CYCLES_16
+    }
+
+    fun jp_z_nn(): Int{
+        val address = fetch16()
+
+        if (flagIsSet(FLAG_Z)) {
+            PC = address
+            return CYCLES_16
+        }
+
+        return CYCLES_12
+    }
+
+    fun prefix_cb(): Int{
+
+        val opcode = fetch() // Obtain the next byte
+
+        val cycles = when (opcode.toInt() and 0xFF) {
+            0x00 -> rlc_b()     // RLC B
+            0x01 -> rlc_c()     // RLC C
+            0x02 -> rlc_d()     // RLC D
+            0x03 -> rlc_e()     // RLC E
+            0x04 -> rlc_h()     // RLC H
+            0x05 -> rlc_l()     // RLC L
+            0x06 -> rlc_hl()    // RLC [HL]
+            0x07 -> rlc_a()     // RLC A
+            else -> throw IllegalStateException("Opcode CB $opcode not implemented")
+        }
+
+        return cycles
+    }
+
+    fun call_z_nn(): Int{
+        val address = fetch16()
+
+        if (flagIsSet(FLAG_Z)) {
+            executeCallOperation(address)
+            return CYCLES_24
+        }
+
+        return CYCLES_12
+    }
+
+    fun call(): Int{
+        val address = fetch16()
+        executeCallOperation(address)
+        return CYCLES_24
+    }
+
+    fun adc_a_n(): Int{
+        val carry = if (flagIsSet(FLAG_C)) 1 else 0
+        val intA = A.toInt()
+        val intN = fetch()
+        val result = intA + (intN + carry)
+        A = (result and 0xFF).toByte()
+
+        updateAddOperationFlags(intA, intN + carry, result)
+
+        return CYCLES_8
+    }
+
+    fun rst_08h(): Int{
+        executeRstOperation(0x0008)
+        return CYCLES_16
+    }
+
+    fun ret_nc(): Int{
+        return if (!flagIsSet(FLAG_C)) {
+            executeRetOperation()
+            CYCLES_20
+        } else {
+            CYCLES_8
+        }
+    }
+
+    fun pop_de(): Int{
+
+        E = memory[SP]
+        SP = (SP + 1) and 0xFFFF
+        D = memory[SP]
+        SP = (SP + 1) and 0xFFFF
+
+        return CYCLES_12
+    }
+
+    fun jp_nc_nn(): Int{
+        val address = fetch16()
+
+        if (!flagIsSet(FLAG_C)) {
+            PC = address
+            return CYCLES_16
+        }
+
+        return CYCLES_12
+    }
+
+    fun call_nc_nn(): Int{
+        val address = fetch16()
+
+        if (!flagIsSet(FLAG_C)) {
+            executeCallOperation(address)
+            return CYCLES_24
+        }
+
+        return CYCLES_12
+    }
+
+    fun push_de(): Int{
+        SP = (SP - 1) and 0xFFFF
+        memory[SP] = D              // high
+        SP = (SP - 1) and 0xFFFF
+        memory[SP] = E              // low
+
+        return CYCLES_16
+    }
+
+    fun sub_n(): Int{ // TODO
+        val byte = fetch()
+        val intA = A.toInt()
+        val intB = B.toInt()
+        val result = intA - intB
+        A = (result and 0xFF).toByte()
+
+        updateSubOperationFlags(intA, intB, result)
+
+        return CYCLES_8
+    }
+
+    // TODO: add basic opcodes
+
+
+    // -------------------------------- //
+    //        EXTENDED OPCODES
+    // -------------------------------- //
+
+    fun rlc_b(): Int{
+        val carry = (B.toInt() ushr 7) and 0x1
+        B = ((B.toInt() shl 1) or carry).toByte()
+
+        uccu_flags(B, carry)
+
+        return CYCLES_8
+    }
+
+    fun rlc_c(): Int{
+        val carry = (C.toInt() ushr 7) and 0x1
+        C = ((C.toInt() shl 1) or carry).toByte()
+
+        uccu_flags(C, carry)
+
+        return CYCLES_8
+    }
+
+    fun rlc_d(): Int{
+        val carry = (D.toInt() ushr 7) and 0x1
+        D = ((D.toInt() shl 1) or carry).toByte()
+
+        uccu_flags(D, carry)
+
+        return CYCLES_8
+    }
+
+    fun rlc_e(): Int{
+        val carry = (E.toInt() ushr 7) and 0x1
+        E = ((E.toInt() shl 1) or carry).toByte()
+
+        uccu_flags(E, carry)
+
+        return CYCLES_8
+    }
+
+    fun rlc_h(): Int{
+        val carry = (H.toInt() ushr 7) and 0x1
+        H = ((C.toInt() shl 1) or carry).toByte()
+
+        uccu_flags(H, carry)
+
+        return CYCLES_8
+    }
+
+    fun rlc_l(): Int{
+        val carry = (L.toInt() ushr 7) and 0x1
+        L = ((L.toInt() shl 1) or carry).toByte()
+
+        uccu_flags(L, carry)
+
+        return CYCLES_8
+    }
+
+    fun rlc_hl(): Int{
+        val address = get_16bit_address(H, L)
+        val carry = (memory[address].toInt() ushr 7) and 0x1
+        memory[address] = ((memory[address].toInt() shl 1) or carry).toByte()
+
+        uccu_flags(memory[address], carry)
+
+        return CYCLES_16
+    }
+
+    fun rlc_a(): Int{
+        val carry = (A.toInt() ushr 7) and 0x1
+        A = ((A.toInt() shl 1) or carry).toByte()
+
+        uccu_flags(A, carry)
+
+        return CYCLES_8
+    }
+
+    // TODO: extended opcodes
 }
