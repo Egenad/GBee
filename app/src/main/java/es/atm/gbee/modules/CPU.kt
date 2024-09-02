@@ -44,6 +44,8 @@ object CPU {
     // Total Memory
     val memory = ByteArray(0x10000) // 64KB
 
+    private var cpu_halted = false
+
     init {
         println("CPU inicializada")
     }
@@ -98,219 +100,237 @@ object CPU {
     fun execute(opcode: Byte): Int {
         return when (opcode.toInt() and 0xFF) {
             0x00 -> nop()
-            0x01 -> ld_bc_nn()      // LD BC, nn
-            0x02 -> ld_bc_a()       // LD [BC], A
-            0x03 -> inc_bc()        // INC BC
-            0x04 -> inc_b()         // INC B
-            0x05 -> dec_b()         // DEC B
-            0x06 -> ld_b_n()        // LD B, n
-            0x07 -> rlca()          // RLCA
-            0x08 -> ld_nn_sp()      // LD [nn], SP
-            0x09 -> add_hl_bc()     // ADD HL, BC
-            0x0A -> ld_a_bc()       // LD A, [BC]
-            0x0B -> dec_bc()        // DEC BC
-            0x0C -> inc_c()         // INC C
-            0x0D -> dec_c()         // DEC C
-            0x0E -> ld_c_n()        // LD C, n
-            0x0F -> rrca()          // RRCA
-            0x10 -> stop_0()        // STOP 0
-            0x11 -> ld_de_nn()      // LD DE, nn
-            0x12 -> ld_de_a()       // LD [DE], A
-            0x13 -> inc_de()        // INC DE
-            0x14 -> inc_d()         // INC D
-            0x15 -> dec_d()         // DEC D
-            0x16 -> ld_d_n()        // LD D, n
-            0x17 -> rla()           // RLA
-            0x18 -> jr_n()          // JR n
-            0x19 -> add_hl_de()     // ADD HL, DE
-            0x1A -> ld_a_de()       // LD A, [DE]
-            0x1B -> dec_de()        // DEC DE
-            0x1C -> inc_e()         // INC E
-            0x1D -> dec_e()         // DEC E
-            0x1E -> ld_e_n()        // LD E, n
-            0x1F -> rra()           // RRA
-            0x20 -> jr_nz_n()       // JR NZ, n
-            0x21 -> ld_hl_nn()      // LD HL, nn
-            0x22 -> ldi_hl_a()      // LD [HL+], A
-            0x23 -> inc_hl()        // INC HL
-            0x24 -> inc_h()         // INC H
-            0x25 -> dec_h()         // DEC H
-            0x26 -> ld_h_n()        // LD H, n
-            0x27 -> daa()           // DAA
-            0x28 -> jr_z_n()        // JR Z,N
-            0x29 -> add_hl_hl()     // ADD HL,HL
-            0x2A -> ldi_a_hl()      // LD A,[HL+]
-            0x2B -> dec_hl()        // DEC HL
-            0x2C -> inc_l()         // INC L
-            0x2D -> dec_l()         // DEC L
-            0x2E -> ld_l_n()        // LD L, n
-            0x2F -> cpl()           // CPL
-            0x30 -> jr_nc_n()       // JR NC, n
-            0x31 -> ld_sp_nn()      // LD SP, nn
-            0x32 -> ldd_hl_a()      // LD [HL-], A
-            0x33 -> inc_sp()        // INC SP
-            0x34 -> inc_hl_v()      // INC [HL]
-            0x35 -> dec_hl_v()      // DEC [HL]
-            0x36 -> ld_hl_v_n()     // LD (HL), n
-            0x37 -> scf()           // SCF
-            0x38 -> jr_c_n()        // JR C, n
-            0x39 -> add_hl_sp()     // ADD HL, SP
-            0x3A -> ldd_a_hl()      // LD A, [HL-]
-            0x3B -> dec_sp()        // DEC SP
-            0x3C -> inc_a()         // INC A
-            0x3D -> dec_a()         // DEC A
-            0x3E -> ld_a_n()        // LD A, n
-            0x3F -> ccf()           // CCF
-            0x40 -> ld_b_b()        // LD B, B
-            0x41 -> ld_b_c()        // LD B, C
-            0x42 -> ld_b_d()        // LD B, D
-            0x43 -> ld_b_e()        // LD B, E
-            0x44 -> ld_b_h()        // LD B, H
-            0x45 -> ld_b_l()        // LD B, H
-            0x46 -> ld_b_hl()       // LD B, [HL]
-            0x47 -> ld_b_a()        // LD B, A
-            0x48 -> ld_c_b()        // LD C, B
-            0x49 -> ld_c_c()        // LD C, C
-            0x4A -> ld_c_d()        // LD C, D
-            0x4B -> ld_c_e()        // LD C, E
-            0x4C -> ld_c_h()        // LD C, H
-            0x4D -> ld_c_l()        // LD C, L
-            0x4E -> ld_c_hl()       // LD C, [HL]
-            0x4F -> ld_c_a()        // LD C, A
-            0x50 -> ld_d_b()        // LD D, B
-            0x51 -> ld_d_c()        // LD D, C
-            0x52 -> ld_d_d()        // LD D, D
-            0x53 -> ld_d_e()        // LD D, E
-            0x54 -> ld_d_h()        // LD D, H
-            0x55 -> ld_d_l()        // LD D, L
-            0x56 -> ld_d_hl()       // LD D, [HL]
-            0x57 -> ld_d_a()        // LD D, A
-            0x58 -> ld_e_b()        // LD E, B
-            0x59 -> ld_e_c()        // LD E, C
-            0x5A -> ld_e_d()        // LD E, D
-            0x5B -> ld_e_e()        // LD E, E
-            0x5C -> ld_e_h()        // LD E, H
-            0x5D -> ld_e_l()        // LD E, L
-            0x5E -> ld_e_hl()       // LD E, [HL]
-            0x5F -> ld_e_a()        // LD E, A
-            0x60 -> ld_h_b()        // LD H, B
-            0x61 -> ld_h_c()        // LD H, C
-            0x62 -> ld_h_d()        // LD H, D
-            0x63 -> ld_h_e()        // LD H, E
-            0x64 -> ld_h_h()        // LD H, H
-            0x65 -> ld_h_l()        // LD H, L
-            0x66 -> ld_h_hl()       // LD H, [HL]
-            0x67 -> ld_h_a()        // LD H, A
-            0x68 -> ld_l_b()        // LD L, B
-            0x69 -> ld_l_c()        // LD L, C
-            0x6A -> ld_l_d()        // LD L, D
-            0x6B -> ld_l_e()        // LD L, E
-            0x6C -> ld_l_h()        // LD L, H
-            0x6D -> ld_l_l()        // LD L, L
-            0x6E -> ld_l_hl()       // LD L, [HL]
-            0x6F -> ld_l_a()        // LD L, A
-            0x70 -> ld_hl_b()       // LD [HL], B
-            0x71 -> ld_hl_c()       // LD [HL], C
-            0x72 -> ld_hl_d()       // LD [HL], D
-            0x73 -> ld_hl_e()       // LD [HL], E
-            0x74 -> ld_hl_h()       // LD [HL], H
-            0x75 -> ld_hl_l()       // LD [HL], L
-            0x76 -> halt()          // HALT
-            0x77 -> ld_hl_a()       // LD [HL], A
-            0x78 -> ld_a_b()        // LD A, B
-            0x79 -> ld_a_c()        // LD A, C
-            0x7A -> ld_a_d()        // LD A, D
-            0x7B -> ld_a_e()        // LD A, E
-            0x7C -> ld_a_h()        // LD A, H
-            0x7D -> ld_a_l()        // LD A, L
-            0x7E -> ld_a_hl()       // LD A, [HL]
-            0x7F -> ld_a_a()        // LD A, A
-            0x80 -> add_a_b()       // ADD A, B
-            0x81 -> add_a_c()       // ADD A, C
-            0x82 -> add_a_d()       // ADD A, D
-            0x83 -> add_a_e()       // ADD A, E
-            0x84 -> add_a_h()       // ADD A, H
-            0x85 -> add_a_l()       // ADD A, L
-            0x86 -> add_a_hl()      // ADD A, [HL]
-            0x87 -> add_a_a()       // ADD A, A
-            0x88 -> adc_a_b()       // ADC A, B
-            0x89 -> adc_a_c()       // ADC A, C
-            0x8A -> adc_a_d()       // ADC A, D
-            0x8B -> adc_a_e()       // ADC A, E
-            0x8C -> adc_a_h()       // ADC A, H
-            0x8D -> adc_a_l()       // ADC A, L
-            0x8E -> adc_a_hl()      // ADC A, [HL]
-            0x8F -> adc_a_a()       // ADC A, A
-            0x90 -> sub_b()         // SUB B
-            0x91 -> sub_c()         // SUB C
-            0x92 -> sub_d()         // SUB D
-            0x93 -> sub_e()         // SUB E
-            0x94 -> sub_h()         // SUB H
-            0x95 -> sub_l()         // SUB L
-            0x96 -> sub_hl()        // SUB [HL]
-            0x97 -> sub_a()         // SUB A
-            0x98 -> sbc_a_b()       // SBC A, B
-            0x99 -> sbc_a_c()       // SBC A, C
-            0x9A -> sbc_a_d()       // SBC A, D
-            0x9B -> sbc_a_e()       // SBC A, E
-            0x9C -> sbc_a_h()       // SBC A, H
-            0x9D -> sbc_a_l()       // SBC A, L
-            0x9E -> sbc_a_hl()      // SBC A, [HL]
-            0x9F -> sbc_a_a()       // SBC A, A
-            0xA0 -> and_b()         // AND B
-            0xA1 -> and_c()         // AND C
-            0xA2 -> and_d()         // AND D
-            0xA3 -> and_e()         // AND E
-            0xA4 -> and_h()         // AND H
-            0xA5 -> and_l()         // AND L
-            0xA6 -> and_hl()        // AND [HL]
-            0xA7 -> and_a()         // AND A
-            0xA8 -> xor_b()         // XOR B
-            0xA9 -> xor_c()         // XOR C
-            0xAA -> xor_d()         // XOR D
-            0xAB -> xor_e()         // XOR E
-            0xAC -> xor_h()         // XOR H
-            0xAD -> xor_l()         // XOR L
-            0xAE -> xor_hl()        // XOR [HL]
-            0xAF -> xor_a()         // XOR A
-            0xB0 -> or_b()          // OR B
-            0xB1 -> or_c()          // OR C
-            0xB2 -> or_d()          // OR D
-            0xB3 -> or_e()          // OR E
-            0xB4 -> or_h()          // OR H
-            0xB5 -> or_l()          // OR L
-            0xB6 -> or_hl()         // OR [HL]
-            0xB7 -> or_a()          // OR A
-            0xB8 -> cp_b()          // CP B
-            0xB9 -> cp_c()          // CP C
-            0xBA -> cp_d()          // CP D
-            0xBB -> cp_e()          // CP E
-            0xBC -> cp_h()          // CP H
-            0xBD -> cp_l()          // CP L
-            0xBE -> cp_hl()         // CP [HL]
-            0xBF -> cp_a()          // CP A
-            0xC0 -> ret_nz()        // RET NZ
-            0xC1 -> pop_bc()        // POP BC
-            0xC2 -> jp_nz_nn()      // JP NZ, NN
-            0xC3 -> jp_nn()         // JP NN
-            0xC4 -> call_nz_nn()    // CALL NZ, NN
-            0xC5 -> push_bc()       // PUSH BC
-            0xC6 -> add_a_n()       // ADD A, N
-            0xC7 -> rst_00h()       // RST 00H
-            0xC8 -> ret_z()         // RET Z
-            0xC9 -> ret()           // RET
-            0xCA -> jp_z_nn()       // JP Z, NN
-            0xCB -> prefix_cb()     // PREFIX CB
-            0xCC -> call_z_nn()     // CALL Z, NN
-            0xCD -> call()          // CALL
-            0xCE -> adc_a_n()       // ADC A, N
-            0xCF -> rst_08h()       // RST 08H
-            0xD0 -> ret_nc()        // RET NC
-            0xD1 -> pop_de()        // POP DE
-            0xD2 -> jp_nc_nn()      // JP NC, NN
-            0xD4 -> call_nc_nn()    // CALL NC, NN
-            0xD5 -> push_de()       // PUSH DE
-            0xD6 -> sub_n()         // SUB N
+            0x01 -> ld_bc_nn()              // LD BC, nn
+            0x02 -> ld_bc_a()               // LD [BC], A
+            0x03 -> inc_bc()                // INC BC
+            0x04 -> inc_b()                 // INC B
+            0x05 -> dec_b()                 // DEC B
+            0x06 -> ld_b_n()                // LD B, n
+            0x07 -> rlca()                  // RLCA
+            0x08 -> ld_nn_sp()              // LD [nn], SP
+            0x09 -> add_hl_bc()             // ADD HL, BC
+            0x0A -> ld_a_bc()               // LD A, [BC]
+            0x0B -> dec_bc()                // DEC BC
+            0x0C -> inc_c()                 // INC C
+            0x0D -> dec_c()                 // DEC C
+            0x0E -> ld_c_n()                // LD C, n
+            0x0F -> rrca()                  // RRCA
+            0x10 -> stop_0()                // STOP 0
+            0x11 -> ld_de_nn()              // LD DE, nn
+            0x12 -> ld_de_a()               // LD [DE], A
+            0x13 -> inc_de()                // INC DE
+            0x14 -> inc_d()                 // INC D
+            0x15 -> dec_d()                 // DEC D
+            0x16 -> ld_d_n()                // LD D, n
+            0x17 -> rla()                   // RLA
+            0x18 -> jr_n()                  // JR n
+            0x19 -> add_hl_de()             // ADD HL, DE
+            0x1A -> ld_a_de()               // LD A, [DE]
+            0x1B -> dec_de()                // DEC DE
+            0x1C -> inc_e()                 // INC E
+            0x1D -> dec_e()                 // DEC E
+            0x1E -> ld_e_n()                // LD E, n
+            0x1F -> rra()                   // RRA
+            0x20 -> jr_nz_n()               // JR NZ, n
+            0x21 -> ld_hl_nn()              // LD HL, nn
+            0x22 -> ldi_hl_a()              // LD [HL+], A
+            0x23 -> inc_hl()                // INC HL
+            0x24 -> inc_h()                 // INC H
+            0x25 -> dec_h()                 // DEC H
+            0x26 -> ld_h_n()                // LD H, n
+            0x27 -> daa()                   // DAA
+            0x28 -> jr_z_n()                // JR Z,N
+            0x29 -> add_hl_hl()             // ADD HL,HL
+            0x2A -> ldi_a_hl()              // LD A,[HL+]
+            0x2B -> dec_hl()                // DEC HL
+            0x2C -> inc_l()                 // INC L
+            0x2D -> dec_l()                 // DEC L
+            0x2E -> ld_l_n()                // LD L, n
+            0x2F -> cpl()                   // CPL
+            0x30 -> jr_nc_n()               // JR NC, n
+            0x31 -> ld_sp_nn()              // LD SP, nn
+            0x32 -> ldd_hl_a()              // LD [HL-], A
+            0x33 -> inc_sp()                // INC SP
+            0x34 -> inc_hl_v()              // INC [HL]
+            0x35 -> dec_hl_v()              // DEC [HL]
+            0x36 -> ld_hl_v_n()             // LD (HL), n
+            0x37 -> scf()                   // SCF
+            0x38 -> jr_c_n()                // JR C, n
+            0x39 -> add_hl_sp()             // ADD HL, SP
+            0x3A -> ldd_a_hl()              // LD A, [HL-]
+            0x3B -> dec_sp()                // DEC SP
+            0x3C -> inc_a()                 // INC A
+            0x3D -> dec_a()                 // DEC A
+            0x3E -> ld_a_n()                // LD A, n
+            0x3F -> ccf()                   // CCF
+            0x40 -> ld_b_b()                // LD B, B
+            0x41 -> ld_b_c()                // LD B, C
+            0x42 -> ld_b_d()                // LD B, D
+            0x43 -> ld_b_e()                // LD B, E
+            0x44 -> ld_b_h()                // LD B, H
+            0x45 -> ld_b_l()                // LD B, H
+            0x46 -> ld_b_hl()               // LD B, [HL]
+            0x47 -> ld_b_a()                // LD B, A
+            0x48 -> ld_c_b()                // LD C, B
+            0x49 -> ld_c_c()                // LD C, C
+            0x4A -> ld_c_d()                // LD C, D
+            0x4B -> ld_c_e()                // LD C, E
+            0x4C -> ld_c_h()                // LD C, H
+            0x4D -> ld_c_l()                // LD C, L
+            0x4E -> ld_c_hl()               // LD C, [HL]
+            0x4F -> ld_c_a()                // LD C, A
+            0x50 -> ld_d_b()                // LD D, B
+            0x51 -> ld_d_c()                // LD D, C
+            0x52 -> ld_d_d()                // LD D, D
+            0x53 -> ld_d_e()                // LD D, E
+            0x54 -> ld_d_h()                // LD D, H
+            0x55 -> ld_d_l()                // LD D, L
+            0x56 -> ld_d_hl()               // LD D, [HL]
+            0x57 -> ld_d_a()                // LD D, A
+            0x58 -> ld_e_b()                // LD E, B
+            0x59 -> ld_e_c()                // LD E, C
+            0x5A -> ld_e_d()                // LD E, D
+            0x5B -> ld_e_e()                // LD E, E
+            0x5C -> ld_e_h()                // LD E, H
+            0x5D -> ld_e_l()                // LD E, L
+            0x5E -> ld_e_hl()               // LD E, [HL]
+            0x5F -> ld_e_a()                // LD E, A
+            0x60 -> ld_h_b()                // LD H, B
+            0x61 -> ld_h_c()                // LD H, C
+            0x62 -> ld_h_d()                // LD H, D
+            0x63 -> ld_h_e()                // LD H, E
+            0x64 -> ld_h_h()                // LD H, H
+            0x65 -> ld_h_l()                // LD H, L
+            0x66 -> ld_h_hl()               // LD H, [HL]
+            0x67 -> ld_h_a()                // LD H, A
+            0x68 -> ld_l_b()                // LD L, B
+            0x69 -> ld_l_c()                // LD L, C
+            0x6A -> ld_l_d()                // LD L, D
+            0x6B -> ld_l_e()                // LD L, E
+            0x6C -> ld_l_h()                // LD L, H
+            0x6D -> ld_l_l()                // LD L, L
+            0x6E -> ld_l_hl()               // LD L, [HL]
+            0x6F -> ld_l_a()                // LD L, A
+            0x70 -> ld_hl_b()               // LD [HL], B
+            0x71 -> ld_hl_c()               // LD [HL], C
+            0x72 -> ld_hl_d()               // LD [HL], D
+            0x73 -> ld_hl_e()               // LD [HL], E
+            0x74 -> ld_hl_h()               // LD [HL], H
+            0x75 -> ld_hl_l()               // LD [HL], L
+            0x76 -> halt()                  // HALT
+            0x77 -> ld_hl_a()               // LD [HL], A
+            0x78 -> ld_a_b()                // LD A, B
+            0x79 -> ld_a_c()                // LD A, C
+            0x7A -> ld_a_d()                // LD A, D
+            0x7B -> ld_a_e()                // LD A, E
+            0x7C -> ld_a_h()                // LD A, H
+            0x7D -> ld_a_l()                // LD A, L
+            0x7E -> ld_a_hl()               // LD A, [HL]
+            0x7F -> ld_a_a()                // LD A, A
+            0x80 -> add_a_b()               // ADD A, B
+            0x81 -> add_a_c()               // ADD A, C
+            0x82 -> add_a_d()               // ADD A, D
+            0x83 -> add_a_e()               // ADD A, E
+            0x84 -> add_a_h()               // ADD A, H
+            0x85 -> add_a_l()               // ADD A, L
+            0x86 -> add_a_hl()              // ADD A, [HL]
+            0x87 -> add_a_a()               // ADD A, A
+            0x88 -> adc_a_b()               // ADC A, B
+            0x89 -> adc_a_c()               // ADC A, C
+            0x8A -> adc_a_d()               // ADC A, D
+            0x8B -> adc_a_e()               // ADC A, E
+            0x8C -> adc_a_h()               // ADC A, H
+            0x8D -> adc_a_l()               // ADC A, L
+            0x8E -> adc_a_hl()              // ADC A, [HL]
+            0x8F -> adc_a_a()               // ADC A, A
+            0x90 -> sub_b()                 // SUB B
+            0x91 -> sub_c()                 // SUB C
+            0x92 -> sub_d()                 // SUB D
+            0x93 -> sub_e()                 // SUB E
+            0x94 -> sub_h()                 // SUB H
+            0x95 -> sub_l()                 // SUB L
+            0x96 -> sub_hl()                // SUB [HL]
+            0x97 -> sub_a()                 // SUB A
+            0x98 -> sbc_a_b()               // SBC A, B
+            0x99 -> sbc_a_c()               // SBC A, C
+            0x9A -> sbc_a_d()               // SBC A, D
+            0x9B -> sbc_a_e()               // SBC A, E
+            0x9C -> sbc_a_h()               // SBC A, H
+            0x9D -> sbc_a_l()               // SBC A, L
+            0x9E -> sbc_a_hl()              // SBC A, [HL]
+            0x9F -> sbc_a_a()               // SBC A, A
+            0xA0 -> and_b()                 // AND B
+            0xA1 -> and_c()                 // AND C
+            0xA2 -> and_d()                 // AND D
+            0xA3 -> and_e()                 // AND E
+            0xA4 -> and_h()                 // AND H
+            0xA5 -> and_l()                 // AND L
+            0xA6 -> and_hl()                // AND [HL]
+            0xA7 -> and_a()                 // AND A
+            0xA8 -> xor_b()                 // XOR B
+            0xA9 -> xor_c()                 // XOR C
+            0xAA -> xor_d()                 // XOR D
+            0xAB -> xor_e()                 // XOR E
+            0xAC -> xor_h()                 // XOR H
+            0xAD -> xor_l()                 // XOR L
+            0xAE -> xor_hl()                // XOR [HL]
+            0xAF -> xor_a()                 // XOR A
+            0xB0 -> or_b()                  // OR B
+            0xB1 -> or_c()                  // OR C
+            0xB2 -> or_d()                  // OR D
+            0xB3 -> or_e()                  // OR E
+            0xB4 -> or_h()                  // OR H
+            0xB5 -> or_l()                  // OR L
+            0xB6 -> or_hl()                 // OR [HL]
+            0xB7 -> or_a()                  // OR A
+            0xB8 -> cp_b()                  // CP B
+            0xB9 -> cp_c()                  // CP C
+            0xBA -> cp_d()                  // CP D
+            0xBB -> cp_e()                  // CP E
+            0xBC -> cp_h()                  // CP H
+            0xBD -> cp_l()                  // CP L
+            0xBE -> cp_hl()                 // CP [HL]
+            0xBF -> cp_a()                  // CP A
+            0xC0 -> ret_nz()                // RET NZ
+            0xC1 -> pop_bc()                // POP BC
+            0xC2 -> jp_nz_nn()              // JP NZ, NN
+            0xC3 -> jp_nn()                 // JP NN
+            0xC4 -> call_nz_nn()            // CALL NZ, NN
+            0xC5 -> push_bc()               // PUSH BC
+            0xC6 -> add_a_n()               // ADD A, N
+            0xC7 -> rst(0x0000)      // RST 00H
+            0xC8 -> ret_z()                 // RET Z
+            0xC9 -> ret()                   // RET
+            0xCA -> jp_z_nn()               // JP Z, NN
+            0xCB -> prefix_cb()             // PREFIX CB
+            0xCC -> call_z_nn()             // CALL Z, NN
+            0xCD -> call()                  // CALL
+            0xCE -> adc_a_n()               // ADC A, N
+            0xCF -> rst(0x0008)      // RST 08H
+            0xD0 -> ret_nc()                // RET NC
+            0xD1 -> pop_de()                // POP DE
+            0xD2 -> jp_nc_nn()              // JP NC, NN
+            0xD4 -> call_nc_nn()            // CALL NC, NN
+            0xD5 -> push_de()               // PUSH DE
+            0xD6 -> sub_n()                 // SUB N
+            0xD7 -> rst(0x0010)      // RST 10H
+            0xD8 -> ret_c()                 // RET C
+            0xD9 -> reti()                  // RETI
+            0xDA -> jp_c_nn()               // JP C, NN
+            0xDC -> call_c_nn()             // CALL C, NN
+            0xDE -> sbc_a_n()               // SBC A, N
+            0xDF -> rst(0x0018)      // RST 18H
+            0xE0 -> ldh_n_a()               // LDH [N], A
+            0xE1 -> pop_hl()                // POP HL
+            0xE2 -> ld_cn_a()               // LD [C], A
+            0xE5 -> push_hl()               // PUSH HL
+            0xE6 -> and_n()                 // AND N
+            0xE7 -> rst(0x0020)      // RST 20H
+            0xE8 -> add_sp_n()              // ADD SP, N
+            0xE9 -> jp_hl()                 // JP [HL]
+            0xEA -> ld_nn_a()               // LD NN, A
+            0xEE -> xor_n()                 // XOR N
+            0xEF -> rst(0x0028)      // RST 28H
             else -> throw IllegalArgumentException("Instruction not supported: ${opcode.toInt() and 0xFF}")
         }
     }
@@ -558,6 +578,8 @@ object CPU {
     }
 
     fun stop_0(): Int{
+        // TODO
+        cpu_halted = true
         return CYCLES_4
     }
 
@@ -1240,6 +1262,7 @@ object CPU {
     }
 
     fun halt(): Int{
+        cpu_halted = true
         return CYCLES_4
     }
 
@@ -1886,6 +1909,11 @@ object CPU {
         return CYCLES_8
     }
 
+    fun rst(address: Int): Int{
+        executeRstOperation(address and 0xFFFF)
+        return CYCLES_16
+    }
+
     fun rst_00h(): Int{
         executeRstOperation(0x0000)
         return CYCLES_16
@@ -2019,15 +2047,148 @@ object CPU {
         return CYCLES_16
     }
 
-    fun sub_n(): Int{ // TODO
-        val byte = fetch()
+    fun sub_n(): Int{
+        val byte = fetch().toInt()
         val intA = A.toInt()
-        val intB = B.toInt()
-        val result = intA - intB
+        val result = intA - byte
         A = (result and 0xFF).toByte()
 
-        updateSubOperationFlags(intA, intB, result)
+        updateSubOperationFlags(intA, byte, result)
 
+        return CYCLES_8
+    }
+
+    fun rst_10h(): Int{
+        executeRstOperation(0x0010)
+        return CYCLES_16
+    }
+
+    fun ret_c(): Int{
+        return if (flagIsSet(FLAG_C)) {
+            executeRetOperation()
+            CYCLES_20
+        } else {
+            CYCLES_8
+        }
+    }
+
+    fun reti(): Int{
+        executeRetOperation()
+        Interrupt.enableInterrupts(true)
+        return CYCLES_16
+    }
+
+    fun jp_c_nn(): Int{
+        val address = fetch16()
+
+        if (flagIsSet(FLAG_C)) {
+            PC = address
+            return CYCLES_16
+        }
+
+        return CYCLES_12
+    }
+
+    fun call_c_nn(): Int{
+        val address = fetch16()
+
+        if (flagIsSet(FLAG_C)) {
+            executeCallOperation(address)
+            return CYCLES_24
+        }
+
+        return CYCLES_12
+    }
+
+    fun sbc_a_n(): Int{
+        val byte = fetch().toInt()
+        val carry = if (flagIsSet(FLAG_C)) 1 else 0
+        val intA = A.toInt()
+        val result = intA - (byte + carry)
+        A = (result and 0xFF).toByte()
+
+        updateSubOperationFlags(intA, byte + carry, result)
+
+        return CYCLES_4
+    }
+
+    fun rst_18h(): Int{
+        executeRstOperation(0x0018)
+        return CYCLES_16
+    }
+
+    fun ldh_n_a(): Int{
+
+        val byte = fetch()
+        val address = (0xFF00 + byte) and 0xFFFF
+
+        memory[address] = A
+
+        return CYCLES_12
+    }
+
+    fun pop_hl(): Int{
+
+        L = memory[SP]
+        SP = (SP + 1) and 0xFFFF
+        H = memory[SP]
+        SP = (SP + 1) and 0xFFFF
+
+        return CYCLES_12
+    }
+
+    fun ld_cn_a(): Int{
+        val address = (0xFF00 + C) and 0xFFFF
+        memory[address] = A
+        return CYCLES_8
+    }
+
+    fun push_hl(): Int{
+        SP = (SP - 1) and 0xFFFF
+        memory[SP] = H              // high
+        SP = (SP - 1) and 0xFFFF
+        memory[SP] = L              // low
+
+        return CYCLES_16
+    }
+
+    fun and_n(): Int{
+        val byte = fetch()
+        executeAndOperation(byte)
+        return CYCLES_8
+    }
+
+    fun rst_20h(): Int{
+        executeRstOperation(0x0020)
+        return CYCLES_16
+    }
+
+    fun add_sp_n(): Int{
+        val byte = fetch().toInt()
+        val oldSP = SP
+        SP = (SP + byte) and 0xFFFF
+
+        clearFlag(FLAG_Z)
+        clearFlag(FLAG_N)
+        updateFlag(FLAG_H, (oldSP and 0xF) + (byte and 0xF) > 0xF)
+        updateFlag(FLAG_C, SP > 0xFF)
+
+        return CYCLES_16
+    }
+
+    fun jp_hl(): Int{
+        PC = get_16bit_address(H,L)
+        return CYCLES_4
+    }
+
+    fun ld_nn_a(): Int{
+        val address = fetch16()
+        memory[address] = A
+        return CYCLES_16
+    }
+
+    fun xor_n(): Int{
+        executeXorOrOperation(fetch(), false)
         return CYCLES_8
     }
 
