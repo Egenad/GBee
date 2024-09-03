@@ -298,7 +298,7 @@ object CPU {
             0xC4 -> call_nz_nn()            // CALL NZ, NN
             0xC5 -> push_bc()               // PUSH BC
             0xC6 -> add_a_n()               // ADD A, N
-            0xC7 -> rst(0x0000)      // RST 00H
+            0xC7 -> rst(0x0000)             // RST 00H
             0xC8 -> ret_z()                 // RET Z
             0xC9 -> ret()                   // RET
             0xCA -> jp_z_nn()               // JP Z, NN
@@ -306,31 +306,44 @@ object CPU {
             0xCC -> call_z_nn()             // CALL Z, NN
             0xCD -> call()                  // CALL
             0xCE -> adc_a_n()               // ADC A, N
-            0xCF -> rst(0x0008)      // RST 08H
+            0xCF -> rst(0x0008)             // RST 08H
             0xD0 -> ret_nc()                // RET NC
             0xD1 -> pop_de()                // POP DE
             0xD2 -> jp_nc_nn()              // JP NC, NN
             0xD4 -> call_nc_nn()            // CALL NC, NN
             0xD5 -> push_de()               // PUSH DE
             0xD6 -> sub_n()                 // SUB N
-            0xD7 -> rst(0x0010)      // RST 10H
+            0xD7 -> rst(0x0010)             // RST 10H
             0xD8 -> ret_c()                 // RET C
             0xD9 -> reti()                  // RETI
             0xDA -> jp_c_nn()               // JP C, NN
             0xDC -> call_c_nn()             // CALL C, NN
             0xDE -> sbc_a_n()               // SBC A, N
-            0xDF -> rst(0x0018)      // RST 18H
+            0xDF -> rst(0x0018)             // RST 18H
             0xE0 -> ldh_n_a()               // LDH [N], A
             0xE1 -> pop_hl()                // POP HL
             0xE2 -> ld_cn_a()               // LD [C], A
             0xE5 -> push_hl()               // PUSH HL
             0xE6 -> and_n()                 // AND N
-            0xE7 -> rst(0x0020)      // RST 20H
+            0xE7 -> rst(0x0020)             // RST 20H
             0xE8 -> add_sp_n()              // ADD SP, N
             0xE9 -> jp_hl()                 // JP [HL]
             0xEA -> ld_nn_a()               // LD NN, A
             0xEE -> xor_n()                 // XOR N
-            0xEF -> rst(0x0028)      // RST 28H
+            0xEF -> rst(0x0028)             // RST 28H
+            0xF0 -> ldh_a_n()               // LDH A, [N]
+            0xF1 -> pop_af()                // POP AF
+            0xF2 -> ld_a_cn()               // LD A, [C]
+            0xF3 -> di()                    // DI
+            0xF5 -> push_af()               // PUSH AF
+            0xF6 -> or_n()                  // OR N
+            0xF7 -> rst(0x0030)             // RST 30H
+            0xF8 -> ld_hl_sp_n()            // LD HL, SP+N
+            0xF9 -> ld_sp_hl()              // LD SP, HL
+            0xFA -> ld_a_nn()               // LD A, [NN]
+            0xFB -> ei()                    // EI
+            0xFE -> cp_n()                  // CP N
+            0xFF -> rst(0x0038)             // RST 38H
             else -> throw IllegalArgumentException("Instruction not supported: ${opcode.toInt() and 0xFF}")
         }
     }
@@ -1914,11 +1927,6 @@ object CPU {
         return CYCLES_16
     }
 
-    fun rst_00h(): Int{
-        executeRstOperation(0x0000)
-        return CYCLES_16
-    }
-
     fun ret_z(): Int{
         return if (flagIsSet(FLAG_Z)) {
             executeRetOperation()
@@ -1957,6 +1965,14 @@ object CPU {
             0x05 -> rlc_l()     // RLC L
             0x06 -> rlc_hl()    // RLC [HL]
             0x07 -> rlc_a()     // RLC A
+            0x08 -> rrc_b()     // RRC B
+            0x09 -> rrc_c()     // RRC C
+            0x0A -> rrc_d()     // RRC D
+            0x0B -> rrc_e()     // RRC E
+            0x0C -> rrc_h()     // RRC H
+            0x0D -> rrc_l()     // RRC L
+            0x0E -> rrc_hl()    // RRC [HL]
+            0x0F -> rrc_a()     // RRC A
             else -> throw IllegalStateException("Opcode CB $opcode not implemented")
         }
 
@@ -1990,11 +2006,6 @@ object CPU {
         updateAddOperationFlags(intA, intN + carry, result)
 
         return CYCLES_8
-    }
-
-    fun rst_08h(): Int{
-        executeRstOperation(0x0008)
-        return CYCLES_16
     }
 
     fun ret_nc(): Int{
@@ -2058,11 +2069,6 @@ object CPU {
         return CYCLES_8
     }
 
-    fun rst_10h(): Int{
-        executeRstOperation(0x0010)
-        return CYCLES_16
-    }
-
     fun ret_c(): Int{
         return if (flagIsSet(FLAG_C)) {
             executeRetOperation()
@@ -2112,11 +2118,6 @@ object CPU {
         return CYCLES_4
     }
 
-    fun rst_18h(): Int{
-        executeRstOperation(0x0018)
-        return CYCLES_16
-    }
-
     fun ldh_n_a(): Int{
 
         val byte = fetch()
@@ -2158,11 +2159,6 @@ object CPU {
         return CYCLES_8
     }
 
-    fun rst_20h(): Int{
-        executeRstOperation(0x0020)
-        return CYCLES_16
-    }
-
     fun add_sp_n(): Int{
         val byte = fetch().toInt()
         val oldSP = SP
@@ -2192,8 +2188,94 @@ object CPU {
         return CYCLES_8
     }
 
-    // TODO: add basic opcodes
+    fun ldh_a_n(): Int{
 
+        val byte = fetch()
+        val address = (0xFF00 + byte) and 0xFFFF
+
+        A = memory[address]
+
+        return CYCLES_12
+    }
+
+    fun pop_af(): Int{
+
+        F = memory[SP]
+        SP = (SP + 1) and 0xFFFF
+        A = memory[SP]
+        SP = (SP + 1) and 0xFFFF
+
+        return CYCLES_12
+    }
+
+    fun ld_a_cn(): Int{
+        val address = (0xFF00 + C) and 0xFFFF
+        A = memory[address]
+        return CYCLES_8
+    }
+
+    fun di(): Int{
+        Interrupt.enableInterrupts(false)
+        return CYCLES_4
+    }
+
+    fun push_af(): Int{
+
+        SP = (SP - 1) and 0xFFFF
+        memory[SP] = A              // high
+        SP = (SP - 1) and 0xFFFF
+        memory[SP] = F              // low
+
+        return CYCLES_16
+    }
+
+    fun or_n(): Int{
+        executeXorOrOperation(fetch(), true)
+        return CYCLES_8
+    }
+
+    fun ld_hl_sp_n(): Int{
+
+        val n = fetch().toInt()
+        val sp = SP
+        val result = sp + n
+
+        H = ((result ushr 8) and 0xFF).toByte()
+        L = (result and 0xFF).toByte()
+
+        clearFlag(FLAG_Z)
+        clearFlag(FLAG_N)
+        updateFlag(FLAG_H, ((sp and 0xF) + (n and 0xF)) > 0xF)
+        updateFlag(FLAG_C, ((sp and 0xFF) + (n and 0xFF)) > 0xFF)
+
+        return CYCLES_12
+    }
+
+    fun ld_sp_hl(): Int{
+
+        val intH = H.toInt()
+        val intL = L.toInt()
+
+        SP = (intH shl 8) or intL
+
+        return CYCLES_8
+    }
+
+    fun ld_a_nn(): Int{
+        val address = fetch16()
+        A = memory[address]
+        return CYCLES_16
+    }
+
+    fun ei(): Int{
+        Interrupt.enableInterrupts(true)
+        return CYCLES_4
+    }
+
+    fun cp_n(): Int{
+        executeCpOperation(fetch())
+        return CYCLES_8
+    }
 
     // -------------------------------- //
     //        EXTENDED OPCODES
@@ -2266,6 +2348,87 @@ object CPU {
     fun rlc_a(): Int{
         val carry = (A.toInt() ushr 7) and 0x1
         A = ((A.toInt() shl 1) or carry).toByte()
+
+        uccu_flags(A, carry)
+
+        return CYCLES_8
+    }
+
+    fun rrc_b(): Int{
+
+        val carry = B.toInt() and 0x1
+        B = ((B.toInt() shr 1) or (carry shl 7)).toByte()
+
+        uccu_flags(B, carry)
+
+        return CYCLES_8
+    }
+
+    fun rrc_c(): Int{
+
+        val carry = C.toInt() and 0x1
+        C = ((C.toInt() shr 1) or (carry shl 7)).toByte()
+
+        uccu_flags(C, carry)
+
+        return CYCLES_8
+    }
+
+    fun rrc_d(): Int{
+
+        val carry = D.toInt() and 0x1
+        D = ((D.toInt() shr 1) or (carry shl 7)).toByte()
+
+        uccu_flags(D, carry)
+
+        return CYCLES_8
+    }
+
+    fun rrc_e(): Int{
+
+        val carry = E.toInt() and 0x1
+        E = ((E.toInt() shr 1) or (carry shl 7)).toByte()
+
+        uccu_flags(E, carry)
+
+        return CYCLES_8
+    }
+
+    fun rrc_h(): Int{
+
+        val carry = H.toInt() and 0x1
+        H = ((H.toInt() shr 1) or (carry shl 7)).toByte()
+
+        uccu_flags(H, carry)
+
+        return CYCLES_8
+    }
+
+    fun rrc_l(): Int{
+
+        val carry = L.toInt() and 0x1
+        L = ((L.toInt() shr 1) or (carry shl 7)).toByte()
+
+        uccu_flags(L, carry)
+
+        return CYCLES_8
+    }
+
+    fun rrc_hl(): Int{
+
+        val address = get_16bit_address(H, L)
+        val carry = memory[address].toInt() and 0x1
+        memory[address] = ((memory[address].toInt() shr 1) or (carry shl 7)).toByte()
+
+        uccu_flags(memory[address], carry)
+
+        return CYCLES_8
+    }
+
+    fun rrc_a(): Int{
+
+        val carry = A.toInt() and 0x1
+        A = ((A.toInt() shr 1) or (carry shl 7)).toByte()
 
         uccu_flags(A, carry)
 
