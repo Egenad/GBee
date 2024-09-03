@@ -1973,6 +1973,22 @@ object CPU {
             0x0D -> rrc_l()     // RRC L
             0x0E -> rrc_hl()    // RRC [HL]
             0x0F -> rrc_a()     // RRC A
+            0x10 -> rl_b()      // RL B
+            0x11 -> rl_c()      // RL C
+            0x12 -> rl_d()      // RL D
+            0x13 -> rl_e()      // RL E
+            0x14 -> rl_h()      // RL H
+            0x15 -> rl_l()      // RL L
+            0x16 -> rl_hl()     // RL [HL]
+            0x17 -> rl_a()      // RL A
+            0x18 -> rr_b()      // RR B
+            0x19 -> rr_c()      // RR C
+            0x1A -> rr_d()      // RR D
+            0x1B -> rr_e()      // RR E
+            0x1C -> rr_h()      // RR H
+            0x1D -> rr_l()      // RR L
+            0x1E -> rr_hl()     // RR [HL]
+            0x1F -> rr_a()      // RR A
             else -> throw IllegalStateException("Opcode CB $opcode not implemented")
         }
 
@@ -2422,7 +2438,7 @@ object CPU {
 
         uccu_flags(memory[address], carry)
 
-        return CYCLES_8
+        return CYCLES_16
     }
 
     fun rrc_a(): Int{
@@ -2432,6 +2448,206 @@ object CPU {
 
         uccu_flags(A, carry)
 
+        return CYCLES_8
+    }
+
+    fun rl_b(): Int{
+
+        val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
+        val newCarry = (B.toInt() ushr 7) and 0x1
+
+        B = ((B.toInt() shl 1) or oldCarry).toByte()
+
+        uccu_flags(B, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun rl_c(): Int{
+
+        val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
+        val newCarry = (C.toInt() ushr 7) and 0x1
+
+        C = ((C.toInt() shl 1) or oldCarry).toByte()
+
+        uccu_flags(C, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun rl_d(): Int{
+
+        val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
+        val newCarry = (D.toInt() ushr 7) and 0x1
+
+        D = ((D.toInt() shl 1) or oldCarry).toByte()
+
+        uccu_flags(D, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun rl_e(): Int{
+
+        val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
+        val newCarry = (E.toInt() ushr 7) and 0x1
+
+        E = ((E.toInt() shl 1) or oldCarry).toByte()
+
+        uccu_flags(E, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun rl_h(): Int{
+
+        val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
+        val newCarry = (H.toInt() ushr 7) and 0x1
+
+        H = ((H.toInt() shl 1) or oldCarry).toByte()
+
+        uccu_flags(H, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun rl_l(): Int{
+
+        val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
+        val newCarry = (L.toInt() ushr 7) and 0x1
+
+        L = ((L.toInt() shl 1) or oldCarry).toByte()
+
+        uccu_flags(L, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun rl_hl(): Int{
+        val address = get_16bit_address(H, L)
+        val value = memory[address].toInt()
+        val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
+        val newCarry = (value ushr 7) and 0x1
+
+        memory[address] = ((value shl 1) or oldCarry).toByte()
+
+        uccu_flags(memory[address], newCarry)
+
+        return CYCLES_16
+    }
+
+    fun rl_a(): Int{
+
+        val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
+        val newCarry = (A.toInt() ushr 7) and 0x1
+
+        A = ((A.toInt() shl 1) or oldCarry).toByte()
+
+        uccu_flags(A, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun rr_b(): Int{
+
+        val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
+        val newCarry = (B.toInt() ushr 7) and 0x1
+
+        B = ((B.toInt() shr 1) or (oldCarry shl 7)).toByte()
+
+        uccu_flags(B, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun rr_c(): Int{
+
+        val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
+        val newCarry = (C.toInt() ushr 7) and 0x1
+
+        C = ((C.toInt() shr 1) or (oldCarry shl 7)).toByte()
+
+        uccu_flags(C, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun rr_d(): Int{
+
+        val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
+        val newCarry = (D.toInt() ushr 7) and 0x1
+
+        D = ((D.toInt() shr 1) or (oldCarry shl 7)).toByte()
+
+        uccu_flags(D, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun rr_e(): Int{
+
+        val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
+        val newCarry = (E.toInt() ushr 7) and 0x1
+
+        E = ((E.toInt() shr 1) or (oldCarry shl 7)).toByte()
+
+        uccu_flags(E, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun rr_h(): Int{
+
+        val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
+        val newCarry = (H.toInt() ushr 7) and 0x1
+
+        H = ((H.toInt() shr 1) or (oldCarry shl 7)).toByte()
+
+        uccu_flags(H, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun rr_l(): Int{
+
+        val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
+        val newCarry = (L.toInt() ushr 7) and 0x1
+
+        L = ((L.toInt() shr 1) or (oldCarry shl 7)).toByte()
+
+        uccu_flags(L, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun rr_hl(): Int{
+        val address = get_16bit_address(H, L)
+        val value = memory[address].toInt()
+        val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
+        val newCarry = (value ushr 7) and 0x1
+
+        memory[address] = ((value shr 1) or (oldCarry shl 7)).toByte()
+
+        uccu_flags(memory[address], newCarry)
+
+        return CYCLES_16
+    }
+
+    fun rr_a(): Int{
+
+        val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
+        val newCarry = (A.toInt() ushr 7) and 0x1
+
+        A = ((A.toInt() shr 1) or (oldCarry shl 7)).toByte()
+
+        uccu_flags(A, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun sla_b(): Int{
+
+        
         return CYCLES_8
     }
 
