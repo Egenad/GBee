@@ -61,12 +61,12 @@ object CPU {
     // H = Set to 1 if there was a carry between the low nibble and the high nibble in the last addition or subtraction operation. Specifically, it is set if the sum of the low nibbles produces a carry, i.e., if the result of adding the low nibbles exceeds 0x0F.
     // C = Set to 1 if there was a carry out of the most significant bit in the last addition or subtraction operation, or if there was a borrow in the last subtraction operation.
 
-    // Total Memory
-    val memory = ByteArray(0x10000) // 64KB
-
     private var cpu_halted = false
 
     init {
+        SP = 0xFFFE
+        PC = 0
+        cycles = 0
         println("CPU inicializada")
     }
 
@@ -106,7 +106,7 @@ object CPU {
     }
 
     fun fetch(): Byte {
-        val byte = memory[PC]
+        val byte = Memory.getByteOnAddress(PC)
         PC = (PC + 1) and 0xFFFF
         return byte
     }
@@ -378,7 +378,7 @@ object CPU {
 
     fun set_16bit_address_value(high: Byte, low: Byte, value: Byte){
         val address = (high.toInt() shl 8) or (low.toInt() and 0xFF)
-        memory[address] = value
+        Memory.writeByteOnAddress(address, value)
     }
 
     fun inc_8bit_register(register: Byte): Byte{
@@ -450,9 +450,10 @@ object CPU {
     }
 
     fun executeRetOperation(){
-        val low = memory[SP].toInt() and 0xFF
+
+        val low = Memory.getByteOnAddress(SP).toInt() and 0xFF
         SP = (SP + 1) and 0xFFFF
-        val high = memory[SP].toInt() and 0xFF
+        val high = Memory.getByteOnAddress(SP).toInt() and 0xFF
         SP = (SP + 1) and 0xFFFF
 
         PC = (high shl 8) or low
@@ -461,18 +462,18 @@ object CPU {
     fun executeRstOperation(address: Int){
         val returnAddress = PC
         SP = (SP - 1) and 0xFFFF
-        memory[SP] = (returnAddress ushr 8).toByte()    // high
+        Memory.writeByteOnAddress(SP, (returnAddress ushr 8).toByte()) // high
         SP = (SP - 1) and 0xFFFF
-        memory[SP] = (returnAddress and 0xFF).toByte()  // low
+        Memory.writeByteOnAddress(SP, (returnAddress and 0xFF).toByte())  // low
 
         PC = address and 0xFFFF
     }
 
     fun executeCallOperation(address: Int){
         SP = (SP - 1) and 0xFFFF
-        memory[SP] = (PC ushr 8).toByte()   // high
+        Memory.writeByteOnAddress(SP, (PC ushr 8).toByte()) // high
         SP = (SP - 1) and 0xFFFF
-        memory[SP] = (PC and 0xFF).toByte() // low
+        Memory.writeByteOnAddress(SP, (PC and 0xFF).toByte()) // low
 
         PC = address
     }
@@ -503,7 +504,7 @@ object CPU {
 
     fun ld_bc_a(): Int{
         val address = get_16bit_address(B, C)
-        memory[address] = A
+        Memory.writeByteOnAddress(address, A)
         return CYCLES_8
     }
 
@@ -550,8 +551,8 @@ object CPU {
         val spLow = SP and 0xFF
         val spHigh = (SP shr 8) and 0xFF
 
-        memory[address] = spLow.toByte()
-        memory[address + 1] = spHigh.toByte()
+        Memory.writeByteOnAddress(address, spLow.toByte())
+        Memory.writeByteOnAddress(address + 1, spHigh.toByte())
 
         return CYCLES_20
     }
@@ -574,7 +575,7 @@ object CPU {
 
     fun ld_a_bc(): Int{
         val address = get_16bit_address(B, C)
-        A = memory[address]
+        A = Memory.getByteOnAddress(address)
 
         return CYCLES_8
     }
@@ -633,7 +634,7 @@ object CPU {
 
     fun ld_de_a(): Int{
         val address = ((D.toInt() shl 8) or (E.toInt() and 0xFF)) and 0xFFFF
-        memory[address] = A
+        Memory.writeByteOnAddress(address, A)
 
         return CYCLES_8
     }
@@ -699,7 +700,7 @@ object CPU {
 
     fun ld_a_de(): Int{
         val address = get_16bit_address(D, E)
-        A = memory[address]
+        A = Memory.getByteOnAddress(address)
 
         return CYCLES_8
     }
@@ -763,7 +764,7 @@ object CPU {
 
     fun ldi_hl_a(): Int{
         val hl = get_16bit_address(H, L)
-        memory[hl] = A
+        Memory.writeByteOnAddress(hl, A)
 
         val newHL = (hl + 1) and 0xFFFF
         H = (newHL ushr 8).toByte()
@@ -852,7 +853,7 @@ object CPU {
 
     fun ldi_a_hl(): Int{
         val hl = get_16bit_address(H, L)
-        A = memory[hl]
+        A = Memory.getByteOnAddress(hl)
 
         val newHL = (hl + 1) and 0xFFFF
         H = (newHL ushr 8).toByte()
@@ -915,7 +916,7 @@ object CPU {
 
     fun ldd_hl_a(): Int{
         val hl = get_16bit_address(H, L)
-        memory[hl] = A
+        Memory.writeByteOnAddress(hl, A)
 
         val newHL = (hl - 1) and 0xFFFF
         H = (newHL ushr 8).toByte()
@@ -931,16 +932,16 @@ object CPU {
 
     fun inc_hl_v(): Int{
         val hl = get_16bit_address(H, L)
-
-        memory[hl] = ((memory[hl] + 1) and 0xFF).toByte()
+        val value = ((Memory.getByteOnAddress(hl) + 1) and 0xFF).toByte()
+        Memory.writeByteOnAddress(hl, value)
 
         return CYCLES_12
     }
 
     fun dec_hl_v(): Int{
         val hl = get_16bit_address(H, L)
-
-        memory[hl] = ((memory[hl] - 1) and 0xFF).toByte()
+        val value = ((Memory.getByteOnAddress(hl) - 1) and 0xFF).toByte()
+        Memory.writeByteOnAddress(hl, value)
 
         return CYCLES_12
     }
@@ -987,7 +988,7 @@ object CPU {
 
     fun ldd_a_hl(): Int{
         val hl = get_16bit_address(H, L)
-        A = memory[hl]
+        A = Memory.getByteOnAddress(hl)
 
         val newHL = (hl - 1) and 0xFFFF
         H = (newHL ushr 8).toByte()
@@ -1059,7 +1060,7 @@ object CPU {
 
     fun ld_b_hl(): Int{
         val hl = get_16bit_address(H, L)
-        B = memory[hl]
+        B = Memory.getByteOnAddress(hl)
         return CYCLES_8
     }
 
@@ -1099,7 +1100,7 @@ object CPU {
 
     fun ld_c_hl(): Int{
         val hl = get_16bit_address(H, L)
-        C = memory[hl]
+        C = Memory.getByteOnAddress(hl)
         return CYCLES_8
     }
 
@@ -1139,7 +1140,7 @@ object CPU {
 
     fun ld_d_hl(): Int{
         val hl = get_16bit_address(H, L)
-        D = memory[hl]
+        D = Memory.getByteOnAddress(hl)
         return CYCLES_8
     }
 
@@ -1179,7 +1180,7 @@ object CPU {
 
     fun ld_e_hl(): Int{
         val hl = get_16bit_address(H, L)
-        E = memory[hl]
+        E = Memory.getByteOnAddress(hl)
         return CYCLES_8
     }
 
@@ -1219,7 +1220,7 @@ object CPU {
 
     fun ld_h_hl(): Int{
         val hl = get_16bit_address(H, L)
-        H = memory[hl]
+        H = Memory.getByteOnAddress(hl)
         return CYCLES_8
     }
 
@@ -1259,7 +1260,7 @@ object CPU {
 
     fun ld_l_hl(): Int{
         val hl = get_16bit_address(H, L)
-        L = memory[hl]
+        L = Memory.getByteOnAddress(hl)
         return CYCLES_8
     }
 
@@ -1285,7 +1286,7 @@ object CPU {
 
     fun ld_hl_e(): Int{
         val hl = get_16bit_address(H, L)
-        memory[hl] = E
+        Memory.writeByteOnAddress(hl, E)
 
         return CYCLES_8
     }
@@ -1342,7 +1343,7 @@ object CPU {
 
     fun ld_a_hl(): Int{
         val hl = get_16bit_address(H, L)
-        A = memory[hl]
+        A = Memory.getByteOnAddress(hl)
         return CYCLES_8
     }
 
@@ -1418,7 +1419,7 @@ object CPU {
 
     fun add_a_hl(): Int{
         val address = get_16bit_address(H, L)
-        val value = memory[address].toInt()
+        val value = Memory.getByteOnAddress(address).toInt()
         val intA = A.toInt()
         val result = intA + value
         A = (result and 0xFF).toByte()
@@ -1513,7 +1514,7 @@ object CPU {
     fun adc_a_hl(): Int{
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
         val address = get_16bit_address(H, L)
-        val value = memory[address].toInt()
+        val value = Memory.getByteOnAddress(address).toInt()
 
         val intA = A.toInt()
         val result = intA + (value + carry)
@@ -1606,7 +1607,7 @@ object CPU {
         val address = get_16bit_address(H, L)
 
         val intA = A.toInt()
-        val intMem = memory[address].toInt()
+        val intMem = Memory.getByteOnAddress(address).toInt()
         val result = intA - intMem
         A = (result and 0xFF).toByte()
 
@@ -1699,7 +1700,7 @@ object CPU {
 
     fun sbc_a_hl(): Int{
         val address = get_16bit_address(H, L)
-        val intMem = memory[address].toInt()
+        val intMem = Memory.getByteOnAddress(address).toInt()
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
         val intA = A.toInt()
         val result = intA - (intMem + carry)
@@ -1753,7 +1754,7 @@ object CPU {
 
     fun and_hl(): Int{
         val hl = get_16bit_address(H,L)
-        executeAndOperation(memory[hl])
+        executeAndOperation(Memory.getByteOnAddress(hl))
         return CYCLES_8
     }
 
@@ -1794,7 +1795,7 @@ object CPU {
 
     fun xor_hl(): Int{
         val hl = get_16bit_address(H,L)
-        executeXorOrOperation(memory[hl], false)
+        executeXorOrOperation(Memory.getByteOnAddress(hl), false)
         return CYCLES_8
     }
 
@@ -1835,7 +1836,7 @@ object CPU {
 
     fun or_hl(): Int{
         val hl = get_16bit_address(H,L)
-        executeXorOrOperation(memory[hl], true)
+        executeXorOrOperation(Memory.getByteOnAddress(hl), true)
         return CYCLES_8
     }
 
@@ -1876,7 +1877,7 @@ object CPU {
 
     fun cp_hl(): Int{
         val hl = get_16bit_address(H,L)
-        executeCpOperation(memory[hl])
+        executeCpOperation(Memory.getByteOnAddress(hl))
         return CYCLES_8
     }
 
@@ -1896,9 +1897,9 @@ object CPU {
 
     fun pop_bc(): Int{
 
-        C = memory[SP]
+        C = Memory.getByteOnAddress(SP)
         SP = (SP + 1) and 0xFFFF
-        B = memory[SP]
+        B = Memory.getByteOnAddress(SP)
         SP = (SP + 1) and 0xFFFF
 
         return CYCLES_12
@@ -1934,9 +1935,9 @@ object CPU {
 
     fun push_bc(): Int{
         SP = (SP - 1) and 0xFFFF
-        memory[SP] = B              // high
+        Memory.writeByteOnAddress(SP, B) // high
         SP = (SP - 1) and 0xFFFF
-        memory[SP] = C              // low
+        Memory.writeByteOnAddress(SP, C) // low
 
         return CYCLES_16
     }
@@ -2285,9 +2286,9 @@ object CPU {
 
     fun pop_de(): Int{
 
-        E = memory[SP]
+        E = Memory.getByteOnAddress(SP)
         SP = (SP + 1) and 0xFFFF
-        D = memory[SP]
+        D = Memory.getByteOnAddress(SP)
         SP = (SP + 1) and 0xFFFF
 
         return CYCLES_12
@@ -2317,9 +2318,9 @@ object CPU {
 
     fun push_de(): Int{
         SP = (SP - 1) and 0xFFFF
-        memory[SP] = D              // high
+        Memory.writeByteOnAddress(SP, D)
         SP = (SP - 1) and 0xFFFF
-        memory[SP] = E              // low
+        Memory.writeByteOnAddress(SP, E)
 
         return CYCLES_16
     }
@@ -2388,17 +2389,16 @@ object CPU {
 
         val byte = fetch()
         val address = (0xFF00 + byte) and 0xFFFF
-
-        memory[address] = A
+        Memory.writeByteOnAddress(address, A)
 
         return CYCLES_12
     }
 
     fun pop_hl(): Int{
 
-        L = memory[SP]
+        L = Memory.getByteOnAddress(SP)
         SP = (SP + 1) and 0xFFFF
-        H = memory[SP]
+        H = Memory.getByteOnAddress(SP)
         SP = (SP + 1) and 0xFFFF
 
         return CYCLES_12
@@ -2406,15 +2406,15 @@ object CPU {
 
     fun ld_cn_a(): Int{
         val address = (0xFF00 + C) and 0xFFFF
-        memory[address] = A
+        Memory.writeByteOnAddress(address, A)
         return CYCLES_8
     }
 
     fun push_hl(): Int{
         SP = (SP - 1) and 0xFFFF
-        memory[SP] = H              // high
+        Memory.writeByteOnAddress(SP, H)
         SP = (SP - 1) and 0xFFFF
-        memory[SP] = L              // low
+        Memory.writeByteOnAddress(SP, L)
 
         return CYCLES_16
     }
@@ -2445,7 +2445,7 @@ object CPU {
 
     fun ld_nn_a(): Int{
         val address = fetch16()
-        memory[address] = A
+        Memory.writeByteOnAddress(address, A)
         return CYCLES_16
     }
 
@@ -2459,16 +2459,16 @@ object CPU {
         val byte = fetch()
         val address = (0xFF00 + byte) and 0xFFFF
 
-        A = memory[address]
+        A = Memory.getByteOnAddress(address)
 
         return CYCLES_12
     }
 
     fun pop_af(): Int{
 
-        F = memory[SP]
+        F = Memory.getByteOnAddress(SP)
         SP = (SP + 1) and 0xFFFF
-        A = memory[SP]
+        A = Memory.getByteOnAddress(SP)
         SP = (SP + 1) and 0xFFFF
 
         return CYCLES_12
@@ -2476,7 +2476,7 @@ object CPU {
 
     fun ld_a_cn(): Int{
         val address = (0xFF00 + C) and 0xFFFF
-        A = memory[address]
+        A = Memory.getByteOnAddress(address)
         return CYCLES_8
     }
 
@@ -2488,9 +2488,9 @@ object CPU {
     fun push_af(): Int{
 
         SP = (SP - 1) and 0xFFFF
-        memory[SP] = A              // high
+        Memory.writeByteOnAddress(SP, A)
         SP = (SP - 1) and 0xFFFF
-        memory[SP] = F              // low
+        Memory.writeByteOnAddress(SP, F)
 
         return CYCLES_16
     }
@@ -2529,7 +2529,7 @@ object CPU {
 
     fun ld_a_nn(): Int{
         val address = fetch16()
-        A = memory[address]
+        A = Memory.getByteOnAddress(address)
         return CYCLES_16
     }
 
@@ -2603,10 +2603,12 @@ object CPU {
 
     fun rlc_hl(): Int{
         val address = get_16bit_address(H, L)
-        val carry = (memory[address].toInt() ushr 7) and 0x1
-        memory[address] = ((memory[address].toInt() shl 1) or carry).toByte()
+        val value = Memory.getByteOnAddress(address)
+        val carry = (value.toInt() ushr 7) and 0x1
+        val result = ((value.toInt() shl 1) or carry).toByte()
+        Memory.writeByteOnAddress(address, result)
 
-        uccu_flags(memory[address], carry)
+        uccu_flags(result, carry)
 
         return CYCLES_16
     }
@@ -2683,10 +2685,12 @@ object CPU {
     fun rrc_hl(): Int{
 
         val address = get_16bit_address(H, L)
-        val carry = memory[address].toInt() and 0x1
-        memory[address] = ((memory[address].toInt() shr 1) or (carry shl 7)).toByte()
+        val value = Memory.getByteOnAddress(address)
+        val carry = value.toInt() and 0x1
+        val result = ((value.toInt() shr 1) or (carry shl 7)).toByte()
+        Memory.writeByteOnAddress(address, result)
 
-        uccu_flags(memory[address], carry)
+        uccu_flags(result, carry)
 
         return CYCLES_16
     }
@@ -2775,13 +2779,14 @@ object CPU {
 
     fun rl_hl(): Int{
         val address = get_16bit_address(H, L)
-        val value = memory[address].toInt()
+        val value = Memory.getByteOnAddress(address).toInt()
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
         val newCarry = (value ushr 7) and 0x1
 
-        memory[address] = ((value shl 1) or oldCarry).toByte()
+        val result = ((value shl 1) or oldCarry).toByte()
+        Memory.writeByteOnAddress(address, result)
 
-        uccu_flags(memory[address], newCarry)
+        uccu_flags(result, newCarry)
 
         return CYCLES_16
     }
@@ -2872,13 +2877,14 @@ object CPU {
 
     fun rr_hl(): Int{
         val address = get_16bit_address(H, L)
-        val value = memory[address].toInt()
+        val value = Memory.getByteOnAddress(address).toInt()
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
         val newCarry = (value ushr 7) and 0x1
 
-        memory[address] = ((value shr 1) or (oldCarry shl 7)).toByte()
+        val result = ((value shr 1) or (oldCarry shl 7)).toByte()
+        Memory.writeByteOnAddress(address, result)
 
-        uccu_flags(memory[address], newCarry)
+        uccu_flags(result, newCarry)
 
         return CYCLES_16
     }
@@ -2957,10 +2963,12 @@ object CPU {
 
     fun sla_hl(): Int{
         val address = get_16bit_address(H, L)
-        val newCarry = (memory[address].toInt() ushr 7) and 0x1
-        memory[address] = ((memory[address].toInt() shl 1) and 0xFE).toByte()
+        val value = Memory.getByteOnAddress(address).toInt()
+        val newCarry = (value ushr 7) and 0x1
+        val result = ((value shl 1) and 0xFE).toByte()
+        Memory.writeByteOnAddress(address, result)
 
-        uccu_flags(memory[address], newCarry)
+        uccu_flags(result, newCarry)
 
         return CYCLES_16
     }
@@ -3049,12 +3057,14 @@ object CPU {
 
     fun sra_hl(): Int{
         val address = get_16bit_address(H,L)
-        val oldBit7 = memory[address].toInt() and 0x80
-        val newCarry = memory[address].toInt() and 0x1
+        val value = Memory.getByteOnAddress(address).toInt()
+        val oldBit7 = value and 0x80
+        val newCarry = value and 0x1
 
-        memory[address] = (((memory[address].toInt() and 0xFF) shr 1) or oldBit7).toByte()
+        val result = (((value and 0xFF) shr 1) or oldBit7).toByte()
+        Memory.writeByteOnAddress(address, result)
 
-        uccu_flags(memory[address], newCarry)
+        uccu_flags(result, newCarry)
 
         return CYCLES_16
     }
@@ -3139,11 +3149,13 @@ object CPU {
 
     fun swap_hl(): Int{
         val address = get_16bit_address(H, L)
-        val low = (memory[address].toInt() and 0x0F) shl 4
-        val high = (memory[address].toInt() and 0xF0) shr 4
-        memory[address] = (low or high).toByte()
+        val value = Memory.getByteOnAddress(address).toInt()
+        val low = (value and 0x0F) shl 4
+        val high = (value and 0xF0) shr 4
+        val result = (low or high).toByte()
+        Memory.writeByteOnAddress(address, result)
 
-        uccu_flags(memory[address], 0)
+        uccu_flags(result, 0)
 
         return CYCLES_16
     }
@@ -3221,10 +3233,12 @@ object CPU {
 
     fun srl_hl(): Int{
         val address = get_16bit_address(H, L)
-        val newCarry = memory[address].toInt() and 0x1
-        memory[address] = (((memory[address].toInt() and 0xFF) shr 1) and 0x7F).toByte()
+        val value = Memory.getByteOnAddress(address).toInt()
+        val newCarry = value and 0x1
+        val result = (((value and 0xFF) shr 1) and 0x7F).toByte()
+        Memory.writeByteOnAddress(address, result)
 
-        uccu_flags(memory[address], newCarry)
+        uccu_flags(result, newCarry)
 
         return CYCLES_16
     }
@@ -3257,7 +3271,7 @@ object CPU {
             6 -> bitZero = (L.toInt() and bit) == 0
             7 -> {
                 val address = get_16bit_address(H, L)
-                bitZero = (memory[address].toInt() and bit) == 0
+                bitZero = (Memory.getByteOnAddress(address).toInt() and bit) == 0
                 cyclesToReturn = CYCLES_16
             }
             8 -> bitZero = (A.toInt() and bit) == 0
@@ -3284,7 +3298,8 @@ object CPU {
             6 -> L = (L.toInt() and bit).toByte()
             7 -> {
                 val address = get_16bit_address(H, L)
-                memory[address] = (memory[address].toInt() and bit).toByte()
+                val result = (Memory.getByteOnAddress(address).toInt() and bit).toByte()
+                Memory.writeByteOnAddress(address, result)
                 cyclesToReturn = CYCLES_16
             }
             8 -> A = (A.toInt() and bit).toByte()
@@ -3310,7 +3325,8 @@ object CPU {
             6 -> L = (L.toInt() or bit).toByte()
             7 -> {
                 val address = get_16bit_address(H, L)
-                memory[address] = (memory[address].toInt() or bit).toByte()
+                val result = (Memory.getByteOnAddress(address).toInt() or bit).toByte()
+                Memory.writeByteOnAddress(address, result)
                 cyclesToReturn = CYCLES_16
             }
             8 -> A = (A.toInt() or bit).toByte()

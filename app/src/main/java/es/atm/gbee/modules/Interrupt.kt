@@ -13,9 +13,23 @@ object Interrupt {
         }
     }
 
-    private var interruptEnabled : Boolean = false
+    private var IME : Boolean = false               // Flag that enables or disables all interrupts.
+    private var IF : Int = 0x00                     // Points out which interrupts are requested.
+    private var IE : Int = 0x00                     // Points out which interrupts are enabled.
+
+    fun getPendingInterrupts(): Int{
+        return IF and IE and 0x1F
+    }
 
     fun enableInterrupts(enabled: Boolean){
-        interruptEnabled = enabled
+        IME = enabled
+    }
+
+    fun getInterruptEnabled(): Boolean{
+        return IME
+    }
+
+    fun requestInterrupt(type: InterruptType){
+
     }
 }
