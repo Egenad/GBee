@@ -9,6 +9,24 @@ const val CYCLES_16 = 16    // 4 MC
 const val CYCLES_20 = 20    // 5 MC
 const val CYCLES_24 = 24    // 6 MC
 
+const val B_RG_N    = 1
+const val C_RG_N    = 2
+const val D_RG_N    = 3
+const val E_RG_N    = 4
+const val H_RG_N    = 5
+const val L_RG_N    = 6
+const val HL_RG_N   = 7
+const val A_RG_N    = 8
+
+const val BIT_0     = 0
+const val BIT_1     = 1
+const val BIT_2     = 2
+const val BIT_3     = 3
+const val BIT_4     = 4
+const val BIT_5     = 5
+const val BIT_6     = 6
+const val BIT_7     = 7
+
 // Nibble   -->  4 Bits
 // Byte     -->  8 Bits
 // Int      --> 32 Bits
@@ -17,7 +35,7 @@ object CPU {
 
     // 8 bits registers
     var A: Byte = 0
-    var F: Byte = 0 // Contains the 4 flags (11110000 -> ZNHC0000)
+    var F: Byte = 0             // Contains the 4 flags (11110000 -> ZNHC0000)
     var B: Byte = 0
     var C: Byte = 0
     var D: Byte = 0
@@ -26,14 +44,16 @@ object CPU {
     var L: Byte = 0
 
     // 16 bits registers
-    var SP: Int = 0xFFFE // Stack Pointer
-    var PC: Int = 0 // Program Counter
+    var SP: Int = 0xFFFE        // Stack Pointer
+    var PC: Int = 0             // Program Counter
 
     // Flags --> Booleans
-    private var FLAG_Z = 0x80 // Zero Flag
-    private var FLAG_N = 0x40 // Subtract Flag
-    private var FLAG_H = 0x20 // Half Carry Flag
-    private var FLAG_C = 0x10 // Carry Flag
+    var FLAG_Z = 0x80           // Zero Flag
+    var FLAG_N = 0x40           // Subtract Flag
+    var FLAG_H = 0x20           // Half Carry Flag
+    var FLAG_C = 0x10           // Carry Flag
+
+    private var cycles = 0
 
     // Flags description:
     // Z = Set to 1 if the result of the last operation is zero. Cleared to 0 if the result is not zero.
@@ -52,20 +72,20 @@ object CPU {
 
     fun step() {
         val opcode = fetch()
-        val cycles = execute(opcode)
+        cycles += execute(opcode)
         handleTimers(cycles)
         handleInterrupts()
     }
 
-    private fun setFlag(flag: Int) {
+    fun setFlag(flag: Int) {
         F = (F.toInt() or flag).toByte()
     }
 
-    private fun clearFlag(flag: Int) {
+    fun clearFlag(flag: Int) {
         F = (F.toInt() and flag.inv()).toByte()
     }
 
-    private fun updateFlag(flag: Int, condition: Boolean) {
+    fun updateFlag(flag: Int, condition: Boolean) {
         if (condition) {
             setFlag(flag)
         } else {
@@ -73,7 +93,7 @@ object CPU {
         }
     }
 
-    private fun flagIsSet(flag: Int): Boolean{
+    fun flagIsSet(flag: Int): Boolean{
         return (F.toInt() and flag) != 0
     }
 
@@ -379,7 +399,7 @@ object CPU {
 
     fun updateAddOperationFlags(val1: Int, val2: Int, result: Int){
         updateFlag(FLAG_Z, result == 0)                               // Activated (1) if the result of the operation is 0.
-        clearFlag(FLAG_N)                                                     // Set to 0
+        clearFlag(FLAG_N)                                             // Set to 0
         updateFlag(FLAG_H, (val1 and 0xF) + (val2 and 0xF) > 0xF)     // Set (1) if there was a carry from the low nibble (the first 4 bits) during the operation.
         updateFlag(FLAG_C, result > 0xFF)                             // Set (1) if there was a carry during the addition (greater than 0xFF)
     }
@@ -421,6 +441,12 @@ object CPU {
         setFlag(FLAG_N)
         updateFlag(FLAG_H, (intA and 0xF) < (intRegister and 0xF))
         updateFlag(FLAG_C, intA < intRegister)
+    }
+
+    fun updateBitOperationFlags(result: Boolean){
+        updateFlag(FLAG_Z, result)
+        clearFlag(FLAG_N)
+        setFlag(FLAG_H)
     }
 
     fun executeRetOperation(){
@@ -592,7 +618,7 @@ object CPU {
 
     fun stop_0(): Int{
         // TODO
-        cpu_halted = true
+        //cpu_halted = true
         return CYCLES_4
     }
 
@@ -1954,41 +1980,265 @@ object CPU {
 
     fun prefix_cb(): Int{
 
-        val opcode = fetch() // Obtain the next byte
+        val opcode = fetch()
 
         val cycles = when (opcode.toInt() and 0xFF) {
-            0x00 -> rlc_b()     // RLC B
-            0x01 -> rlc_c()     // RLC C
-            0x02 -> rlc_d()     // RLC D
-            0x03 -> rlc_e()     // RLC E
-            0x04 -> rlc_h()     // RLC H
-            0x05 -> rlc_l()     // RLC L
-            0x06 -> rlc_hl()    // RLC [HL]
-            0x07 -> rlc_a()     // RLC A
-            0x08 -> rrc_b()     // RRC B
-            0x09 -> rrc_c()     // RRC C
-            0x0A -> rrc_d()     // RRC D
-            0x0B -> rrc_e()     // RRC E
-            0x0C -> rrc_h()     // RRC H
-            0x0D -> rrc_l()     // RRC L
-            0x0E -> rrc_hl()    // RRC [HL]
-            0x0F -> rrc_a()     // RRC A
-            0x10 -> rl_b()      // RL B
-            0x11 -> rl_c()      // RL C
-            0x12 -> rl_d()      // RL D
-            0x13 -> rl_e()      // RL E
-            0x14 -> rl_h()      // RL H
-            0x15 -> rl_l()      // RL L
-            0x16 -> rl_hl()     // RL [HL]
-            0x17 -> rl_a()      // RL A
-            0x18 -> rr_b()      // RR B
-            0x19 -> rr_c()      // RR C
-            0x1A -> rr_d()      // RR D
-            0x1B -> rr_e()      // RR E
-            0x1C -> rr_h()      // RR H
-            0x1D -> rr_l()      // RR L
-            0x1E -> rr_hl()     // RR [HL]
-            0x1F -> rr_a()      // RR A
+            0x00 -> rlc_b()                         // RLC B
+            0x01 -> rlc_c()                         // RLC C
+            0x02 -> rlc_d()                         // RLC D
+            0x03 -> rlc_e()                         // RLC E
+            0x04 -> rlc_h()                         // RLC H
+            0x05 -> rlc_l()                         // RLC L
+            0x06 -> rlc_hl()                        // RLC [HL]
+            0x07 -> rlc_a()                         // RLC A
+            0x08 -> rrc_b()                         // RRC B
+            0x09 -> rrc_c()                         // RRC C
+            0x0A -> rrc_d()                         // RRC D
+            0x0B -> rrc_e()                         // RRC E
+            0x0C -> rrc_h()                         // RRC H
+            0x0D -> rrc_l()                         // RRC L
+            0x0E -> rrc_hl()                        // RRC [HL]
+            0x0F -> rrc_a()                         // RRC A
+            0x10 -> rl_b()                          // RL B
+            0x11 -> rl_c()                          // RL C
+            0x12 -> rl_d()                          // RL D
+            0x13 -> rl_e()                          // RL E
+            0x14 -> rl_h()                          // RL H
+            0x15 -> rl_l()                          // RL L
+            0x16 -> rl_hl()                         // RL [HL]
+            0x17 -> rl_a()                          // RL A
+            0x18 -> rr_b()                          // RR B
+            0x19 -> rr_c()                          // RR C
+            0x1A -> rr_d()                          // RR D
+            0x1B -> rr_e()                          // RR E
+            0x1C -> rr_h()                          // RR H
+            0x1D -> rr_l()                          // RR L
+            0x1E -> rr_hl()                         // RR [HL]
+            0x1F -> rr_a()                          // RR A
+            0x20 -> sla_b()                         // SLA B
+            0x21 -> sla_c()                         // SLA C
+            0x22 -> sla_d()                         // SLA D
+            0x23 -> sla_e()                         // SLA E
+            0x24 -> sla_h()                         // SLA H
+            0x25 -> sla_l()                         // SLA L
+            0x26 -> sla_hl()                        // SLA [HL]
+            0x27 -> sla_a()                         // SLA A
+            0x28 -> sra_b()                         // SRA B
+            0x29 -> sra_c()                         // SRA C
+            0x2A -> sra_d()                         // SRA D
+            0x2B -> sra_e()                         // SRA E
+            0x2C -> sra_h()                         // SRA H
+            0x2D -> sra_l()                         // SRA L
+            0x2E -> sra_hl()                        // SRA [HL]
+            0x2F -> sra_a()                         // SRA A
+            0x30 -> swap_b()                        // SWAP B
+            0x31 -> swap_c()                        // SWAP C
+            0x32 -> swap_d()                        // SWAP D
+            0x33 -> swap_e()                        // SWAP E
+            0x34 -> swap_h()                        // SWAP H
+            0x35 -> swap_l()                        // SWAP L
+            0x36 -> swap_hl()                       // SWAP [HL]
+            0x37 -> swap_a()                        // SWAP A
+            0x38 -> srl_b()                         // SRL B
+            0x39 -> srl_c()                         // SRL C
+            0x3A -> srl_d()                         // SRL D
+            0x3B -> srl_e()                         // SRL E
+            0x3C -> srl_h()                         // SRL H
+            0x3D -> srl_l()                         // SRL L
+            0x3E -> srl_hl()                        // SRL [HL]
+            0x3F -> srl_a()                         // SRL A
+            0x40 -> bit_operation(B_RG_N, BIT_0)    // BIT 0, B
+            0x41 -> bit_operation(C_RG_N, BIT_0)    // BIT 0, C
+            0x42 -> bit_operation(D_RG_N, BIT_0)    // BIT 0, D
+            0x43 -> bit_operation(E_RG_N, BIT_0)    // BIT 0, E
+            0x44 -> bit_operation(H_RG_N, BIT_0)    // BIT 0, H
+            0x45 -> bit_operation(L_RG_N, BIT_0)    // BIT 0, L
+            0x46 -> bit_operation(HL_RG_N, BIT_0)   // BIT 0, [HL]
+            0x47 -> bit_operation(A_RG_N, BIT_0)    // BIT 0, A
+            0x48 -> bit_operation(B_RG_N, BIT_1)    // BIT 1, B
+            0x49 -> bit_operation(C_RG_N, BIT_1)    // BIT 1, C
+            0x4A -> bit_operation(D_RG_N, BIT_1)    // BIT 1, D
+            0x4B -> bit_operation(E_RG_N, BIT_1)    // BIT 1, E
+            0x4C -> bit_operation(H_RG_N, BIT_1)    // BIT 1, H
+            0x4D -> bit_operation(L_RG_N, BIT_1)    // BIT 1, L
+            0x4E -> bit_operation(HL_RG_N, BIT_1)   // BIT 1, [HL]
+            0x4F -> bit_operation(A_RG_N, BIT_1)    // BIT 1, A
+            0x50 -> bit_operation(B_RG_N, BIT_2)    // BIT 2, B
+            0x51 -> bit_operation(C_RG_N, BIT_2)    // BIT 2, C
+            0x52 -> bit_operation(D_RG_N, BIT_2)    // BIT 2, D
+            0x53 -> bit_operation(E_RG_N, BIT_2)    // BIT 2, E
+            0x54 -> bit_operation(H_RG_N, BIT_2)    // BIT 2, H
+            0x55 -> bit_operation(L_RG_N, BIT_2)    // BIT 2, L
+            0x56 -> bit_operation(HL_RG_N, BIT_2)   // BIT 2, [HL]
+            0x57 -> bit_operation(A_RG_N, BIT_2)    // BIT 2, A
+            0x58 -> bit_operation(B_RG_N, BIT_3)    // BIT 3, B
+            0x59 -> bit_operation(C_RG_N, BIT_3)    // BIT 3, C
+            0x5A -> bit_operation(D_RG_N, BIT_3)    // BIT 3, D
+            0x5B -> bit_operation(E_RG_N, BIT_3)    // BIT 3, E
+            0x5C -> bit_operation(H_RG_N, BIT_3)    // BIT 3, H
+            0x5D -> bit_operation(L_RG_N, BIT_3)    // BIT 3, L
+            0x5E -> bit_operation(HL_RG_N, BIT_3)   // BIT 3, [HL]
+            0x5F -> bit_operation(A_RG_N, BIT_3)    // BIT 3, A
+            0x60 -> bit_operation(B_RG_N, BIT_4)    // BIT 4, B
+            0x61 -> bit_operation(C_RG_N, BIT_4)    // BIT 4, C
+            0x62 -> bit_operation(D_RG_N, BIT_4)    // BIT 4, D
+            0x63 -> bit_operation(E_RG_N, BIT_4)    // BIT 4, E
+            0x64 -> bit_operation(H_RG_N, BIT_4)    // BIT 4, H
+            0x65 -> bit_operation(L_RG_N, BIT_4)    // BIT 4, L
+            0x66 -> bit_operation(HL_RG_N, BIT_4)   // BIT 4, [HL]
+            0x67 -> bit_operation(A_RG_N, BIT_4)    // BIT 4, A
+            0x68 -> bit_operation(B_RG_N, BIT_5)    // BIT 5, B
+            0x69 -> bit_operation(C_RG_N, BIT_5)    // BIT 5, C
+            0x6A -> bit_operation(D_RG_N, BIT_5)    // BIT 5, D
+            0x6B -> bit_operation(E_RG_N, BIT_5)    // BIT 5, E
+            0x6C -> bit_operation(H_RG_N, BIT_5)    // BIT 5, H
+            0x6D -> bit_operation(L_RG_N, BIT_5)    // BIT 5, L
+            0x6E -> bit_operation(HL_RG_N, BIT_5)   // BIT 5, [HL]
+            0x6F -> bit_operation(A_RG_N, BIT_5)    // BIT 5, A
+            0x70 -> bit_operation(B_RG_N, BIT_6)    // BIT 6, B
+            0x71 -> bit_operation(C_RG_N, BIT_6)    // BIT 6, C
+            0x72 -> bit_operation(D_RG_N, BIT_6)    // BIT 6, D
+            0x73 -> bit_operation(E_RG_N, BIT_6)    // BIT 6, E
+            0x74 -> bit_operation(H_RG_N, BIT_6)    // BIT 6, H
+            0x75 -> bit_operation(L_RG_N, BIT_6)    // BIT 6, L
+            0x76 -> bit_operation(HL_RG_N, BIT_6)   // BIT 6, [HL]
+            0x77 -> bit_operation(A_RG_N, BIT_6)    // BIT 6, A
+            0x78 -> bit_operation(B_RG_N, BIT_7)    // BIT 7, B
+            0x79 -> bit_operation(C_RG_N, BIT_7)    // BIT 7, C
+            0x7A -> bit_operation(D_RG_N, BIT_7)    // BIT 7, D
+            0x7B -> bit_operation(E_RG_N, BIT_7)    // BIT 7, E
+            0x7C -> bit_operation(H_RG_N, BIT_7)    // BIT 7, H
+            0x7D -> bit_operation(L_RG_N, BIT_7)    // BIT 7, L
+            0x7E -> bit_operation(HL_RG_N, BIT_7)   // BIT 7, [HL]
+            0x7F -> bit_operation(A_RG_N, BIT_7)    // BIT 7, A
+            0x80 -> res_operation(B_RG_N, BIT_0)    // RES 0, B
+            0x81 -> res_operation(C_RG_N, BIT_0)    // RES 0, C
+            0x82 -> res_operation(D_RG_N, BIT_0)    // RES 0, D
+            0x83 -> res_operation(E_RG_N, BIT_0)    // RES 0, E
+            0x84 -> res_operation(H_RG_N, BIT_0)    // RES 0, H
+            0x85 -> res_operation(L_RG_N, BIT_0)    // RES 0, L
+            0x86 -> res_operation(HL_RG_N, BIT_0)   // RES 0, [HL]
+            0x87 -> res_operation(A_RG_N, BIT_0)    // RES 0, A
+            0x88 -> res_operation(B_RG_N, BIT_1)    // RES 1, B
+            0x89 -> res_operation(C_RG_N, BIT_1)    // RES 1, C
+            0x8A -> res_operation(D_RG_N, BIT_1)    // RES 1, D
+            0x8B -> res_operation(E_RG_N, BIT_1)    // RES 1, E
+            0x8C -> res_operation(H_RG_N, BIT_1)    // RES 1, H
+            0x8D -> res_operation(L_RG_N, BIT_1)    // RES 1, L
+            0x8E -> res_operation(HL_RG_N, BIT_1)   // RES 1, [HL]
+            0x8F -> res_operation(A_RG_N, BIT_1)    // RES 1, A
+            0x90 -> res_operation(B_RG_N, BIT_2)    // RES 2, B
+            0x91 -> res_operation(C_RG_N, BIT_2)    // RES 2, C
+            0x92 -> res_operation(D_RG_N, BIT_2)    // RES 2, D
+            0x93 -> res_operation(E_RG_N, BIT_2)    // RES 2, E
+            0x94 -> res_operation(H_RG_N, BIT_2)    // RES 2, H
+            0x95 -> res_operation(L_RG_N, BIT_2)    // RES 2, L
+            0x96 -> res_operation(HL_RG_N, BIT_2)   // RES 2, [HL]
+            0x97 -> res_operation(A_RG_N, BIT_2)    // RES 2, A
+            0x98 -> res_operation(B_RG_N, BIT_3)    // RES 3, B
+            0x99 -> res_operation(C_RG_N, BIT_3)    // RES 3, C
+            0x9A -> res_operation(D_RG_N, BIT_3)    // RES 3, D
+            0x9B -> res_operation(E_RG_N, BIT_3)    // RES 3, E
+            0x9C -> res_operation(H_RG_N, BIT_3)    // RES 3, H
+            0x9D -> res_operation(L_RG_N, BIT_3)    // RES 3, L
+            0x9E -> res_operation(HL_RG_N, BIT_3)   // RES 3, [HL]
+            0x9F -> res_operation(A_RG_N, BIT_3)    // RES 3, A
+            0xA0 -> res_operation(B_RG_N, BIT_4)    // RES 4, B
+            0xA1 -> res_operation(C_RG_N, BIT_4)    // RES 4, C
+            0xA2 -> res_operation(D_RG_N, BIT_4)    // RES 4, D
+            0xA3 -> res_operation(E_RG_N, BIT_4)    // RES 4, E
+            0xA4 -> res_operation(H_RG_N, BIT_4)    // RES 4, H
+            0xA5 -> res_operation(L_RG_N, BIT_4)    // RES 4, L
+            0xA6 -> res_operation(HL_RG_N, BIT_4)   // RES 4, [HL]
+            0xA7 -> res_operation(A_RG_N, BIT_4)    // RES 4, A
+            0xA8 -> res_operation(B_RG_N, BIT_5)    // RES 5, B
+            0xA9 -> res_operation(C_RG_N, BIT_5)    // RES 5, C
+            0xAA -> res_operation(D_RG_N, BIT_5)    // RES 5, D
+            0xAB -> res_operation(E_RG_N, BIT_5)    // RES 5, E
+            0xAC -> res_operation(H_RG_N, BIT_5)    // RES 5, H
+            0xAD -> res_operation(L_RG_N, BIT_5)    // RES 5, L
+            0xAE -> res_operation(HL_RG_N, BIT_5)   // RES 5, [HL]
+            0xAF -> res_operation(A_RG_N, BIT_5)    // RES 5, A
+            0xB0 -> res_operation(B_RG_N, BIT_6)    // RES 6, B
+            0xB1 -> res_operation(C_RG_N, BIT_6)    // RES 6, C
+            0xB2 -> res_operation(D_RG_N, BIT_6)    // RES 6, D
+            0xB3 -> res_operation(E_RG_N, BIT_6)    // RES 6, E
+            0xB4 -> res_operation(H_RG_N, BIT_6)    // RES 6, H
+            0xB5 -> res_operation(L_RG_N, BIT_6)    // RES 6, L
+            0xB6 -> res_operation(HL_RG_N, BIT_6)   // RES 6, [HL]
+            0xB7 -> res_operation(A_RG_N, BIT_6)    // RES 6, A
+            0xB8 -> res_operation(B_RG_N, BIT_7)    // RES 7, B
+            0xB9 -> res_operation(C_RG_N, BIT_7)    // RES 7, C
+            0xBA -> res_operation(D_RG_N, BIT_7)    // RES 7, D
+            0xBB -> res_operation(E_RG_N, BIT_7)    // RES 7, E
+            0xBC -> res_operation(H_RG_N, BIT_7)    // RES 7, H
+            0xBD -> res_operation(L_RG_N, BIT_7)    // RES 7, L
+            0xBE -> res_operation(HL_RG_N, BIT_7)   // RES 7, [HL]
+            0xBF -> res_operation(A_RG_N, BIT_7)    // RES 7, A
+            0xC0 -> set_operation(B_RG_N, BIT_0)    // SET 0, B
+            0xC1 -> set_operation(C_RG_N, BIT_0)    // SET 0, C
+            0xC2 -> set_operation(D_RG_N, BIT_0)    // SET 0, D
+            0xC3 -> set_operation(E_RG_N, BIT_0)    // SET 0, E
+            0xC4 -> set_operation(H_RG_N, BIT_0)    // SET 0, H
+            0xC5 -> set_operation(L_RG_N, BIT_0)    // SET 0, L
+            0xC6 -> set_operation(HL_RG_N, BIT_0)   // SET 0, [HL]
+            0xC7 -> set_operation(A_RG_N, BIT_0)    // SET 0, A
+            0xC8 -> set_operation(B_RG_N, BIT_1)    // SET 1, B
+            0xC9 -> set_operation(C_RG_N, BIT_1)    // SET 1, C
+            0xCA -> set_operation(D_RG_N, BIT_1)    // SET 1, D
+            0xCB -> set_operation(E_RG_N, BIT_1)    // SET 1, E
+            0xCC -> set_operation(H_RG_N, BIT_1)    // SET 1, H
+            0xCD -> set_operation(L_RG_N, BIT_1)    // SET 1, L
+            0xCE -> set_operation(HL_RG_N, BIT_1)   // SET 1, [HL]
+            0xCF -> set_operation(A_RG_N, BIT_1)    // SET 1, A
+            0xD0 -> set_operation(B_RG_N, BIT_2)    // SET 2, B
+            0xD1 -> set_operation(C_RG_N, BIT_2)    // SET 2, C
+            0xD2 -> set_operation(D_RG_N, BIT_2)    // SET 2, D
+            0xD3 -> set_operation(E_RG_N, BIT_2)    // SET 2, E
+            0xD4 -> set_operation(H_RG_N, BIT_2)    // SET 2, H
+            0xD5 -> set_operation(L_RG_N, BIT_2)    // SET 2, L
+            0xD6 -> set_operation(HL_RG_N, BIT_2)   // SET 2, [HL]
+            0xD7 -> set_operation(A_RG_N, BIT_2)    // SET 2, A
+            0xD8 -> set_operation(B_RG_N, BIT_3)    // SET 3, B
+            0xD9 -> set_operation(C_RG_N, BIT_3)    // SET 3, C
+            0xDA -> set_operation(D_RG_N, BIT_3)    // SET 3, D
+            0xDB -> set_operation(E_RG_N, BIT_3)    // SET 3, E
+            0xDC -> set_operation(H_RG_N, BIT_3)    // SET 3, H
+            0xDD -> set_operation(L_RG_N, BIT_3)    // SET 3, L
+            0xDE -> set_operation(HL_RG_N, BIT_3)   // SET 3, [HL]
+            0xDF -> set_operation(A_RG_N, BIT_3)    // SET 3, A
+            0xE0 -> set_operation(B_RG_N, BIT_4)    // SET 4, B
+            0xE1 -> set_operation(C_RG_N, BIT_4)    // SET 4, C
+            0xE2 -> set_operation(D_RG_N, BIT_4)    // SET 4, D
+            0xE3 -> set_operation(E_RG_N, BIT_4)    // SET 4, E
+            0xE4 -> set_operation(H_RG_N, BIT_4)    // SET 4, H
+            0xE5 -> set_operation(L_RG_N, BIT_4)    // SET 4, L
+            0xE6 -> set_operation(HL_RG_N, BIT_4)   // SET 4, [HL]
+            0xE7 -> set_operation(A_RG_N, BIT_4)    // SET 4, A
+            0xE8 -> set_operation(B_RG_N, BIT_5)    // SET 5, B
+            0xE9 -> set_operation(C_RG_N, BIT_5)    // SET 5, C
+            0xEA -> set_operation(D_RG_N, BIT_5)    // SET 5, D
+            0xEB -> set_operation(E_RG_N, BIT_5)    // SET 5, E
+            0xEC -> set_operation(H_RG_N, BIT_5)    // SET 5, H
+            0xED -> set_operation(L_RG_N, BIT_5)    // SET 5, L
+            0xEE -> set_operation(HL_RG_N, BIT_5)   // SET 5, [HL]
+            0xEF -> set_operation(A_RG_N, BIT_5)    // SET 5, A
+            0xF0 -> set_operation(B_RG_N, BIT_6)    // SET 6, B
+            0xF1 -> set_operation(C_RG_N, BIT_6)    // SET 6, C
+            0xF2 -> set_operation(D_RG_N, BIT_6)    // SET 6, D
+            0xF3 -> set_operation(E_RG_N, BIT_6)    // SET 6, E
+            0xF4 -> set_operation(H_RG_N, BIT_6)    // SET 6, H
+            0xF5 -> set_operation(L_RG_N, BIT_6)    // SET 6, L
+            0xF6 -> set_operation(HL_RG_N, BIT_6)   // SET 6, [HL]
+            0xF7 -> set_operation(A_RG_N, BIT_6)    // SET 6, A
+            0xF8 -> set_operation(B_RG_N, BIT_7)    // SET 7, B
+            0xF9 -> set_operation(C_RG_N, BIT_7)    // SET 7, C
+            0xFA -> set_operation(D_RG_N, BIT_7)    // SET 7, D
+            0xFB -> set_operation(E_RG_N, BIT_7)    // SET 7, E
+            0xFC -> set_operation(H_RG_N, BIT_7)    // SET 7, H
+            0xFD -> set_operation(L_RG_N, BIT_7)    // SET 7, L
+            0xFE -> set_operation(HL_RG_N, BIT_7)   // SET 7, [HL]
+            0xFF -> set_operation(A_RG_N, BIT_7)    // SET 7, A
             else -> throw IllegalStateException("Opcode CB $opcode not implemented")
         }
 
@@ -2647,9 +2897,428 @@ object CPU {
 
     fun sla_b(): Int{
 
+        val newCarry = (B.toInt() ushr 7) and 0x1
+        B = ((B.toInt() shl 1) and 0xFE).toByte()
+
+        uccu_flags(B, newCarry)
         
         return CYCLES_8
     }
 
+    fun sla_c(): Int{
+
+        val newCarry = (C.toInt() ushr 7) and 0x1
+        C = ((C.toInt() shl 1) and 0xFE).toByte()
+
+        uccu_flags(C, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun sla_d(): Int{
+
+        val newCarry = (D.toInt() ushr 7) and 0x1
+        D = ((D.toInt() shl 1) and 0xFE).toByte()
+
+        uccu_flags(D, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun sla_e(): Int{
+
+        val newCarry = (E.toInt() ushr 7) and 0x1
+        E = ((E.toInt() shl 1) and 0xFE).toByte()
+
+        uccu_flags(E, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun sla_h(): Int{
+
+        val newCarry = (H.toInt() ushr 7) and 0x1
+        H = ((H.toInt() shl 1) and 0xFE).toByte()
+
+        uccu_flags(H, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun sla_l(): Int{
+
+        val newCarry = (L.toInt() ushr 7) and 0x1
+        L = ((L.toInt() shl 1) and 0xFE).toByte()
+
+        uccu_flags(L, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun sla_hl(): Int{
+        val address = get_16bit_address(H, L)
+        val newCarry = (memory[address].toInt() ushr 7) and 0x1
+        memory[address] = ((memory[address].toInt() shl 1) and 0xFE).toByte()
+
+        uccu_flags(memory[address], newCarry)
+
+        return CYCLES_16
+    }
+
+    fun sla_a(): Int{
+
+        val newCarry = (A.toInt() ushr 7) and 0x1
+        A = ((A.toInt() shl 1) and 0xFE).toByte()
+
+        uccu_flags(A, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun sra_b(): Int{
+
+        val oldBit7 = B.toInt() and 0x80
+        val newCarry = B.toInt() and 0x1
+
+        B = (((B.toInt() and 0xFF) shr 1) or oldBit7).toByte()
+
+        uccu_flags(B, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun sra_c(): Int{
+
+        val oldBit7 = C.toInt() and 0x80
+        val newCarry = C.toInt() and 0x1
+
+        C = (((C.toInt() and 0xFF) shr 1) or oldBit7).toByte()
+
+        uccu_flags(C, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun sra_d(): Int{
+
+        val oldBit7 = D.toInt() and 0x80
+        val newCarry = D.toInt() and 0x1
+
+        D = (((C.toInt() and 0xFF) shr 1) or oldBit7).toByte()
+
+        uccu_flags(D, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun sra_e(): Int{
+
+        val oldBit7 = E.toInt() and 0x80
+        val newCarry = E.toInt() and 0x1
+
+        E = (((E.toInt() and 0xFF) shr 1) or oldBit7).toByte()
+
+        uccu_flags(E, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun sra_h(): Int{
+
+        val oldBit7 = H.toInt() and 0x80
+        val newCarry = H.toInt() and 0x1
+
+        H = (((H.toInt() and 0xFF) shr 1) or oldBit7).toByte()
+
+        uccu_flags(H, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun sra_l(): Int{
+
+        val oldBit7 = L.toInt() and 0x80
+        val newCarry = L.toInt() and 0x1
+
+        L = (((L.toInt() and 0xFF) shr 1) or oldBit7).toByte()
+
+        uccu_flags(L, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun sra_hl(): Int{
+        val address = get_16bit_address(H,L)
+        val oldBit7 = memory[address].toInt() and 0x80
+        val newCarry = memory[address].toInt() and 0x1
+
+        memory[address] = (((memory[address].toInt() and 0xFF) shr 1) or oldBit7).toByte()
+
+        uccu_flags(memory[address], newCarry)
+
+        return CYCLES_16
+    }
+
+    fun sra_a(): Int{
+
+        val oldBit7 = A.toInt() and 0x80
+        val newCarry = A.toInt() and 0x1
+
+        A = (((A.toInt() and 0xFF) shr 1) or oldBit7).toByte()
+
+        uccu_flags(A, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun swap_b(): Int{
+
+        val low = (B.toInt() and 0x0F) shl 4
+        val high = (B.toInt() and 0xF0) shr 4
+        B = (low or high).toByte()
+
+        uccu_flags(B, 0)
+
+        return CYCLES_8
+    }
+
+    fun swap_c(): Int{
+
+        val low = (C.toInt() and 0x0F) shl 4
+        val high = (C.toInt() and 0xF0) shr 4
+        C = (low or high).toByte()
+
+        uccu_flags(C, 0)
+
+        return CYCLES_8
+    }
+
+    fun swap_d(): Int{
+
+        val low = (D.toInt() and 0x0F) shl 4
+        val high = (D.toInt() and 0xF0) shr 4
+        D = (low or high).toByte()
+
+        uccu_flags(D, 0)
+
+        return CYCLES_8
+    }
+
+    fun swap_e(): Int{
+
+        val low = (E.toInt() and 0x0F) shl 4
+        val high = (E.toInt() and 0xF0) shr 4
+        E = (low or high).toByte()
+
+        uccu_flags(E, 0)
+
+        return CYCLES_8
+    }
+
+    fun swap_h(): Int{
+
+        val low = (H.toInt() and 0x0F) shl 4
+        val high = (H.toInt() and 0xF0) shr 4
+        H = (low or high).toByte()
+
+        uccu_flags(H, 0)
+
+        return CYCLES_8
+    }
+
+    fun swap_l(): Int{
+
+        val low = (L.toInt() and 0x0F) shl 4
+        val high = (L.toInt() and 0xF0) shr 4
+        L = (low or high).toByte()
+
+        uccu_flags(L, 0)
+
+        return CYCLES_8
+    }
+
+    fun swap_hl(): Int{
+        val address = get_16bit_address(H, L)
+        val low = (memory[address].toInt() and 0x0F) shl 4
+        val high = (memory[address].toInt() and 0xF0) shr 4
+        memory[address] = (low or high).toByte()
+
+        uccu_flags(memory[address], 0)
+
+        return CYCLES_16
+    }
+
+    fun swap_a(): Int{
+
+        val low = (A.toInt() and 0x0F) shl 4
+        val high = (A.toInt() and 0xF0) shr 4
+        A = (low or high).toByte()
+
+        uccu_flags(A, 0)
+
+        return CYCLES_8
+    }
+
+    fun srl_b(): Int{
+
+        val newCarry = B.toInt() and 0x1
+        B = (((B.toInt() and 0xFF) shr 1) and 0x7F).toByte()
+
+        uccu_flags(B, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun srl_c(): Int{
+
+        val newCarry = C.toInt() and 0x1
+        C = (((C.toInt() and 0xFF) shr 1) and 0x7F).toByte()
+
+        uccu_flags(C, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun srl_d(): Int{
+
+        val newCarry = D.toInt() and 0x1
+        D = (((D.toInt() and 0xFF) shr 1) and 0x7F).toByte()
+
+        uccu_flags(D, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun srl_e(): Int{
+
+        val newCarry = E.toInt() and 0x1
+        E = (((E.toInt() and 0xFF) shr 1) and 0x7F).toByte()
+
+        uccu_flags(E, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun srl_h(): Int{
+
+        val newCarry = H.toInt() and 0x1
+        H = (((H.toInt() and 0xFF) shr 1) and 0x7F).toByte()
+
+        uccu_flags(H, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun srl_l(): Int{
+
+        val newCarry = L.toInt() and 0x1
+        L = (((L.toInt() and 0xFF) shr 1) and 0x7F).toByte()
+
+        uccu_flags(L, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun srl_hl(): Int{
+        val address = get_16bit_address(H, L)
+        val newCarry = memory[address].toInt() and 0x1
+        memory[address] = (((memory[address].toInt() and 0xFF) shr 1) and 0x7F).toByte()
+
+        uccu_flags(memory[address], newCarry)
+
+        return CYCLES_16
+    }
+
+    fun srl_a(): Int{
+
+        val newCarry = A.toInt() and 0x1
+        A = (((A.toInt() and 0xFF) shr 1) and 0x7F).toByte()
+
+        uccu_flags(A, newCarry)
+
+        return CYCLES_8
+    }
+
+    fun bit_operation(register: Int, bitNumber: Int): Int{
+
+        require(bitNumber in 0..7) { "Bit must be between 0 and 7" }
+        require(register in 1..8) { "Register must be between 1 and 8" }
+
+        var bitZero = false
+        var cyclesToReturn = CYCLES_8
+        val bit = 0x1 shl bitNumber
+
+        when (register) {
+            1 -> bitZero = (B.toInt() and bit) == 0
+            2 -> bitZero = (C.toInt() and bit) == 0
+            3 -> bitZero = (D.toInt() and bit) == 0
+            4 -> bitZero = (E.toInt() and bit) == 0
+            5 -> bitZero = (H.toInt() and bit) == 0
+            6 -> bitZero = (L.toInt() and bit) == 0
+            7 -> {
+                val address = get_16bit_address(H, L)
+                bitZero = (memory[address].toInt() and bit) == 0
+                cyclesToReturn = CYCLES_16
+            }
+            8 -> bitZero = (A.toInt() and bit) == 0
+        }
+
+        updateBitOperationFlags(bitZero)
+        return cyclesToReturn
+    }
+
+    fun res_operation(register: Int, bitNumber: Int): Int{
+
+        require(bitNumber in 0..7) { "Bit must be between 0 and 7" }
+        require(register in 1..8) { "Register must be between 1 and 8" }
+
+        var cyclesToReturn = CYCLES_8
+        val bit = (0x1 shl bitNumber).inv()
+
+        when (register) {
+            1 -> B = (B.toInt() and bit).toByte()
+            2 -> C = (C.toInt() and bit).toByte()
+            3 -> D = (D.toInt() and bit).toByte()
+            4 -> E = (E.toInt() and bit).toByte()
+            5 -> H = (H.toInt() and bit).toByte()
+            6 -> L = (L.toInt() and bit).toByte()
+            7 -> {
+                val address = get_16bit_address(H, L)
+                memory[address] = (memory[address].toInt() and bit).toByte()
+                cyclesToReturn = CYCLES_16
+            }
+            8 -> A = (A.toInt() and bit).toByte()
+        }
+
+        return cyclesToReturn
+    }
+
+    fun set_operation(register: Int, bitNumber: Int): Int{
+
+        require(bitNumber in 0..7) { "Bit must be between 0 and 7" }
+        require(register in 1..8) { "Register must be between 1 and 8" }
+
+        var cyclesToReturn = CYCLES_8
+        val bit = 0x1 shl bitNumber
+
+        when (register) {
+            1 -> B = (B.toInt() or bit).toByte()
+            2 -> C = (C.toInt() or bit).toByte()
+            3 -> D = (D.toInt() or bit).toByte()
+            4 -> E = (E.toInt() or bit).toByte()
+            5 -> H = (H.toInt() or bit).toByte()
+            6 -> L = (L.toInt() or bit).toByte()
+            7 -> {
+                val address = get_16bit_address(H, L)
+                memory[address] = (memory[address].toInt() or bit).toByte()
+                cyclesToReturn = CYCLES_16
+            }
+            8 -> A = (A.toInt() or bit).toByte()
+        }
+
+        return cyclesToReturn
+    }
+
     // TODO: extended opcodes
+
 }
