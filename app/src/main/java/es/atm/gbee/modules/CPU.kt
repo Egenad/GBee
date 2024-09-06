@@ -67,14 +67,28 @@ object CPU {
         SP = 0xFFFE
         PC = 0
         cycles = 0
-        println("CPU inicializada")
+        println("CPU initialized")
     }
 
-    fun step() {
+    fun step(): Boolean{
+
+        if(cpu_halted){
+            cycles += CYCLES_4
+            return true
+        }
+
         val opcode = fetch()
-        cycles += execute(opcode)
-        handleTimers(cycles)
+
         handleInterrupts()
+        handleTimers(cycles)
+
+        try {
+            cycles += execute(opcode)
+        }catch (ex: IllegalArgumentException){
+            return false
+        }
+
+        return true
     }
 
     fun setFlag(flag: Int) {
@@ -102,7 +116,26 @@ object CPU {
     }
 
     private fun handleInterrupts() {
-        // Maneja interrupciones si están habilitadas
+
+        if(Interrupt.getInterruptEnabled() && Interrupt.getPendingInterrupts() != 0){
+            // Handle the interrupt
+            Interrupt.flush()
+        }
+    }
+
+    fun interruptBegin(address: Int){
+
+        cpu_halted = false
+
+        // PUSH PC TO STACK
+        SP = (SP - 1) and 0xFFFF
+        Memory.writeByteOnAddress(SP, ((PC shr 8) and 0xFF).toByte()) // high
+        SP = (SP - 1) and 0xFFFF
+        Memory.writeByteOnAddress(SP, (PC and 0xFF).toByte()) // low
+
+        PC = address
+
+        cycles += CYCLES_20
     }
 
     fun fetch(): Byte {

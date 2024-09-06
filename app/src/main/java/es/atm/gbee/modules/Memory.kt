@@ -140,6 +140,7 @@ object Memory {
 
     init {
         insertBootstrapToMemory()
+        println("Memory initialized")
     }
 
     fun writeByteOnAddress(address: Int, value: Byte){
