@@ -49,14 +49,19 @@ object Interrupt {
 
         val activeInterrupts = getPendingInterrupts()
 
-        if ((activeInterrupts and InterruptType.VBLANK.getInterruptMask()) != 0) return handleInterrupt(VBLANK_PTR, InterruptType.VBLANK)
+        if ((activeInterrupts and InterruptType.VBLANK.getInterruptMask()) != 0)        return handleInterrupt(VBLANK_PTR, InterruptType.VBLANK)
         else if ((activeInterrupts and InterruptType.LCD_STAT.getInterruptMask()) != 0) return handleInterrupt(LCD_STAT_PTR, InterruptType.LCD_STAT)
-        else if ((activeInterrupts and InterruptType.TIMER.getInterruptMask()) != 0) return handleInterrupt(TIMER_PTR, InterruptType.TIMER)
-        else if ((activeInterrupts and InterruptType.SERIAL.getInterruptMask()) != 0) return handleInterrupt(SERIAL_PTR, InterruptType.SERIAL)
-        else if ((activeInterrupts and InterruptType.JOYPAD.getInterruptMask()) != 0) return handleInterrupt(JOYPAD_PTR, InterruptType.JOYPAD)
+        else if ((activeInterrupts and InterruptType.TIMER.getInterruptMask()) != 0)    return handleInterrupt(TIMER_PTR, InterruptType.TIMER)
+        else if ((activeInterrupts and InterruptType.SERIAL.getInterruptMask()) != 0)   return handleInterrupt(SERIAL_PTR, InterruptType.SERIAL)
+        else if ((activeInterrupts and InterruptType.JOYPAD.getInterruptMask()) != 0)   return handleInterrupt(JOYPAD_PTR, InterruptType.JOYPAD)
     }
 
     fun handleInterrupt(address: Int, type: InterruptType){
-        CPU.interruptBegin(address)
+
+        // Deactivate interrupt
+        val bit = (type.getInterruptMask()).inv()
+        IF = IF and bit
+
+        CPU.executeInterrupt(address)
     }
 }

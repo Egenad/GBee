@@ -61,7 +61,9 @@ object CPU {
     // H = Set to 1 if there was a carry between the low nibble and the high nibble in the last addition or subtraction operation. Specifically, it is set if the sum of the low nibbles produces a carry, i.e., if the result of adding the low nibbles exceeds 0x0F.
     // C = Set to 1 if there was a carry out of the most significant bit in the last addition or subtraction operation, or if there was a borrow in the last subtraction operation.
 
-    private var cpu_halted = false
+    private var cpu_halted      = false
+    private var cpu_halt_bug    = false
+    private var pendingEI       = false
 
     init {
         SP = 0xFFFE
@@ -72,15 +74,22 @@ object CPU {
 
     fun step(): Boolean{
 
+        // Interrupts
+        if(!pendingEI){
+            handleInterrupts()
+        }else{
+            pendingEI = false
+            Interrupt.enableInterrupts(true)
+        }
+
+        // Halt
         if(cpu_halted){
             cycles += CYCLES_4
             return true
         }
 
+        // Opcode execution
         val opcode = fetch()
-
-        handleInterrupts()
-        handleTimers(cycles)
 
         try {
             cycles += execute(opcode)
@@ -111,10 +120,6 @@ object CPU {
         return (F.toInt() and flag) != 0
     }
 
-    private fun handleTimers(cycles: Int) {
-        // Actualiza los temporizadores y otros eventos basados en ciclos
-    }
-
     private fun handleInterrupts() {
 
         if(Interrupt.getInterruptEnabled() && Interrupt.getPendingInterrupts() != 0){
@@ -123,7 +128,7 @@ object CPU {
         }
     }
 
-    fun interruptBegin(address: Int){
+    fun executeInterrupt(address: Int){
 
         cpu_halted = false
 
@@ -140,7 +145,13 @@ object CPU {
 
     fun fetch(): Byte {
         val byte = Memory.getByteOnAddress(PC)
-        PC = (PC + 1) and 0xFFFF
+
+        if(!cpu_halt_bug){
+            PC = (PC + 1) and 0xFFFF
+        }else{
+            cpu_halt_bug = false
+        }
+
         return byte
     }
 
@@ -1335,7 +1346,17 @@ object CPU {
     }
 
     fun halt(): Int{
-        cpu_halted = true
+
+        if(Interrupt.getInterruptEnabled()){
+            cpu_halted = true
+        }else{
+            if(Interrupt.getPendingInterrupts() == 0){
+                cpu_halted = true
+            }else{
+                cpu_halt_bug = true // IME == 0 and Pending != 0 --> Halt Bug
+            }
+        }
+
         return CYCLES_4
     }
 
@@ -2567,7 +2588,7 @@ object CPU {
     }
 
     fun ei(): Int{
-        Interrupt.enableInterrupts(true)
+        pendingEI = true
         return CYCLES_4
     }
 
