@@ -1,11 +1,41 @@
 package es.atm.gbee.modules
 
-const val ROM_START = 0x0000
-const val ROM_END = 0x00FF
+const val ROM_START     = 0x0000
+const val ROM_END       = 0x7FFF
+const val BOOT_END      = 0x00FF
+const val VRAM_START    = 0x8000
+const val VRAM_END      = 0x9FFF
+
+const val MEMORY_SIZE   = 0x10000   // 64 KB
+
+/*  MEMORY MAP --------------
+    Start   End
+    0000	3FFF	16 KiB ROM bank 00	From cartridge, usually a fixed bank
+    4000	7FFF	16 KiB ROM Bank 01–NN	From cartridge, switchable bank via mapper (if any)
+    8000	9FFF	8 KiB Video RAM (VRAM)	In CGB mode, switchable bank 0/1
+    A000	BFFF	8 KiB External RAM	From cartridge, switchable bank if any
+    C000	CFFF	4 KiB Work RAM (WRAM)
+    D000	DFFF	4 KiB Work RAM (WRAM)	In CGB mode, switchable bank 1–7
+    E000	FDFF	Echo RAM (mirror of C000–DDFF)	Nintendo says use of this area is prohibited.
+    FE00	FE9F	Object attribute memory (OAM)
+    FEA0	FEFF	Not Usable	Nintendo says use of this area is prohibited.
+    FF00	FF7F	I/O Registers
+    FF80	FFFE	High RAM (HRAM)
+    FFFF	FFFF	Interrupt Enable register (IE)
+*/
 
 object Memory {
 
-    val bootstrapRom = byteArrayOf(
+    private val nintendoLogo: ByteArray = byteArrayOf(
+        0xCE.toByte(), 0xED.toByte(), 0x66.toByte(), 0x66.toByte(), 0xCC.toByte(), 0x0D.toByte(), 0x00.toByte(), 0x0B.toByte(),
+        0x03.toByte(), 0x73.toByte(), 0x00.toByte(), 0x83.toByte(), 0x00.toByte(), 0x0C.toByte(), 0x00.toByte(), 0x0D.toByte(),
+        0x00.toByte(), 0x08.toByte(), 0x11.toByte(), 0x1F.toByte(), 0x88.toByte(), 0x89.toByte(), 0x00.toByte(), 0x0E.toByte(),
+        0xDC.toByte(), 0xCC.toByte(), 0x6E.toByte(), 0xE6.toByte(), 0xDD.toByte(), 0xDD.toByte(), 0xD9.toByte(), 0x99.toByte(),
+        0xBB.toByte(), 0xBB.toByte(), 0x67.toByte(), 0x63.toByte(), 0x6E.toByte(), 0x0E.toByte(), 0xEC.toByte(), 0xCC.toByte(),
+        0xDD.toByte(), 0xDC.toByte(), 0x99.toByte(), 0x9F.toByte(), 0xBB.toByte(), 0xB9.toByte(), 0x33.toByte(), 0x3E.toByte()
+    )
+
+    private val bootstrapRom = byteArrayOf(
         0x31.toByte(), 0xFE.toByte(), 0xFF.toByte(),    // LD SP, 0xFFFE                ----- Initialize SP -----
         0xAF.toByte(),                                  // XOR A
         0x21.toByte(), 0xFF.toByte(), 0x9F.toByte(),    // LD HL, 0x9FFF
@@ -62,7 +92,7 @@ object Memory {
         0x04.toByte(),                                  // INC B
         0x1E.toByte(), 0x02.toByte(),                   // LD E, 0x02
         0x0E.toByte(), 0x0C.toByte(),                   // LD C, 0x0C
-        0xF0.toByte(), 0x44.toByte(),                   // LDH A, [0xFF00 + 0x44]
+        0xF0.toByte(), 0x44.toByte(),                   // LDH A, [0xFF00 + 0x44]       ----- Wait for V-Blank period -----
         0xFE.toByte(), 0x90.toByte(),                   // CP 0x90
         0x20.toByte(), 0xFA.toByte(),                   // JR NZ, PC + 0xFA
         0x0D.toByte(),                                  // DEC C
@@ -107,12 +137,7 @@ object Memory {
         0x22.toByte(),                                  // LD [HL+], A
         0x23.toByte(),                                  // INC HL
         0xC9.toByte(),                                  // RET
-        0xCE.toByte(), 0xED.toByte(), 0x66.toByte(), 0x66.toByte(), 0xCC.toByte(), 0x0D.toByte(), 0x00.toByte(), 0x0B.toByte(),         // ----- NINTENDO LOGO START -----
-        0x03.toByte(), 0x73.toByte(), 0x00.toByte(), 0x83.toByte(), 0x00.toByte(), 0x0C.toByte(), 0x00.toByte(), 0x0D.toByte(),
-        0x00.toByte(), 0x08.toByte(), 0x11.toByte(), 0x1F.toByte(), 0x88.toByte(), 0x89.toByte(), 0x00.toByte(), 0x0E.toByte(),
-        0xDC.toByte(), 0xCC.toByte(), 0x6E.toByte(), 0xE6.toByte(), 0xDD.toByte(), 0xDD.toByte(), 0xD9.toByte(), 0x99.toByte(),
-        0xBB.toByte(), 0xBB.toByte(), 0x67.toByte(), 0x63.toByte(), 0x6E.toByte(), 0x0E.toByte(), 0xEC.toByte(), 0xCC.toByte(),
-        0xDD.toByte(), 0xDC.toByte(), 0x99.toByte(), 0x9F.toByte(), 0xBB.toByte(), 0xB9.toByte(), 0x33.toByte(), 0x3E.toByte(),         // ----- NINTENDO LOGO END -----
+        *nintendoLogo,                                                                                                                  // ----- NINTENDO LOGO END -----
         0x3C.toByte(), 0x42.toByte(), 0xB9.toByte(), 0xA5.toByte(), 0xB9.toByte(), 0xA5.toByte(), 0x42.toByte(), 0x3C.toByte(),         // ----- More video data (the tile data for ®) -----
         0x21.toByte(), 0x04.toByte(), 0x01.toByte(),                                                                                    // LD HL, 0x0104 -- Point HL to Nintendo logo in cart
         0x11.toByte(), 0xA8.toByte(), 0x00.toByte(),                                                                                    // LD DE, 0x00A8 -- Point DE to Nintendo logo in DMG rom
@@ -136,15 +161,23 @@ object Memory {
         0xE0.toByte(), 0x50.toByte())                   // LDH [0xFF00 + 0x50], A       ----- Turn Off DMG ROM -----
 
     // Total Memory
-    private val memory = ByteArray(0x10000) // 64KB
+    private val memory = ByteArray(MEMORY_SIZE)
 
     init {
         insertBootstrapToMemory()
-        println("Memory initialized")
+        println("Memory initialized - Ready to Boot")
     }
 
     fun writeByteOnAddress(address: Int, value: Byte){
         // TODO LOGICA
+
+        when(address){
+            0xFF50 -> {
+                if((value.toInt() and 0xFF) != 0)
+                    CPU.setBootstrapPending(false)
+            }
+        }
+
         memory[address] = value
     }
 
@@ -195,5 +228,9 @@ object Memory {
             println()
             address += bytesPerLine
         }
+    }
+
+    fun getNintendoLogo() : ByteArray{
+        return nintendoLogo
     }
 }

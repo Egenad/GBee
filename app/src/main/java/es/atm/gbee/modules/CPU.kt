@@ -65,6 +65,8 @@ object CPU {
     private var cpu_halt_bug    = false
     private var pendingEI       = false
 
+    private var pendingBootROM  = true
+
     init {
         SP = 0xFFFE
         PC = 0
@@ -72,6 +74,7 @@ object CPU {
         println("CPU initialized")
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     fun step(): Boolean{
 
         // Interrupts
@@ -90,6 +93,7 @@ object CPU {
 
         // Opcode execution
         val opcode = fetch()
+        val valop = opcode.toHexString(HexFormat.Default)
 
         try {
             cycles += execute(opcode)
@@ -417,11 +421,11 @@ object CPU {
     // -------------------------------- //
 
     fun get_16bit_address(high: Byte, low: Byte): Int{
-        return (high.toInt() shl 8) or (low.toInt() and 0xFF)
+        return ((high.toInt() and 0xFF) shl 8) or (low.toInt() and 0xFF)
     }
 
     fun set_16bit_address_value(high: Byte, low: Byte, value: Byte){
-        val address = (high.toInt() shl 8) or (low.toInt() and 0xFF)
+        val address = ((high.toInt() and 0xFF) shl 8) or (low.toInt() and 0xFF)
         Memory.writeByteOnAddress(address, value)
     }
 
@@ -456,7 +460,7 @@ object CPU {
     }
 
     fun executeAndOperation(register: Byte){
-        A = ((A.toInt() and register.toInt()) and 0xFF).toByte()
+        A = (((A.toInt() and 0xFF) and (register.toInt()) and 0xFF)).toByte()
         updateFlag(FLAG_Z, (A.toInt() and 0xFF) == 0)
         clearFlag(FLAG_N)
         setFlag(FLAG_H)
@@ -465,9 +469,9 @@ object CPU {
 
     fun executeXorOrOperation(register: Byte, orOp: Boolean){
         A = if(orOp)
-            ((A.toInt() or register.toInt()) and 0xFF).toByte()
+            (((A.toInt() and 0xFF) or (register.toInt() and 0xFF))).toByte()
         else
-            ((A.toInt() xor register.toInt()) and 0xFF).toByte()
+            (((A.toInt() and 0xFF) xor (register.toInt()) and 0xFF)).toByte()
 
         updateFlag(FLAG_Z, (A.toInt() and 0xFF) == 0)
         clearFlag(FLAG_N)
@@ -476,8 +480,8 @@ object CPU {
     }
 
     fun executeCpOperation(register: Byte){
-        val intA = A.toInt()
-        val intRegister = register.toInt()
+        val intA = A.toInt() and 0xFF
+        val intRegister = register.toInt() and 0xFF
 
         val result = (intA - intRegister) and 0xFF
 
@@ -527,6 +531,14 @@ object CPU {
         clearFlag(FLAG_N)
         clearFlag(FLAG_H)
         updateFlag(FLAG_C, carry == 1)
+    }
+
+    fun getBootstrapPending(): Boolean{
+        return pendingBootROM
+    }
+
+    fun setBootstrapPending(status: Boolean){
+        pendingBootROM = status
     }
 
     // -------------------------------- //
@@ -778,7 +790,7 @@ object CPU {
         val oldValue = A.toInt() and 0xFF
         val carry = if ((F.toInt() and FLAG_C) != 0) 1 else 0
 
-        A = ((A.toInt() ushr 1) or (carry shl 7)).toByte()
+        A = ((oldValue ushr 1) or (carry shl 7)).toByte()
 
         updateFlag(FLAG_Z, A == 0.toByte())
         clearFlag(FLAG_N)
@@ -1064,7 +1076,7 @@ object CPU {
 
     fun ccf(): Int{
 
-        val newCarry = (F.toInt() and FLAG_C) == 0
+        val newCarry = ((F.toInt() and 0xFF) and FLAG_C) == 0
         updateFlag(FLAG_C, newCarry)
 
         setFlag(FLAG_N)
@@ -1406,8 +1418,8 @@ object CPU {
     }
 
     fun add_a_b(): Int{
-        val intA = A.toInt()
-        val intB = B.toInt()
+        val intA = A.toInt() and 0xFF
+        val intB = B.toInt() and 0xFF
         val result = intA + intB
         A = (result and 0xFF).toByte()
 
@@ -1417,8 +1429,8 @@ object CPU {
     }
 
     fun add_a_c(): Int{
-        val intA = A.toInt()
-        val intC = C.toInt()
+        val intA = A.toInt() and 0xFF
+        val intC = C.toInt() and 0xFF
         val result = intA + intC
         A = (result and 0xFF).toByte()
 
@@ -1428,8 +1440,8 @@ object CPU {
     }
 
     fun add_a_d(): Int{
-        val intA = A.toInt()
-        val intD = D.toInt()
+        val intA = A.toInt() and 0xFF
+        val intD = D.toInt() and 0xFF
         val result = intA + intD
         A = (result and 0xFF).toByte()
 
@@ -1439,8 +1451,8 @@ object CPU {
     }
 
     fun add_a_e(): Int{
-        val intA = A.toInt()
-        val intE = E.toInt()
+        val intA = A.toInt() and 0xFF
+        val intE = E.toInt() and 0xFF
         val result = intA + intE
         A = (result and 0xFF).toByte()
 
@@ -1450,8 +1462,8 @@ object CPU {
     }
 
     fun add_a_h(): Int{
-        val intA = A.toInt()
-        val intH = H.toInt()
+        val intA = A.toInt() and 0xFF
+        val intH = H.toInt() and 0xFF
         val result = intA + intH
         A = (result and 0xFF).toByte()
 
@@ -1461,8 +1473,8 @@ object CPU {
     }
 
     fun add_a_l(): Int{
-        val intA = A.toInt()
-        val intL = L.toInt()
+        val intA = A.toInt() and 0xFF
+        val intL = L.toInt() and 0xFF
         val result = intA + intL
         A = (result and 0xFF).toByte()
 
@@ -1474,7 +1486,7 @@ object CPU {
     fun add_a_hl(): Int{
         val address = get_16bit_address(H, L)
         val value = Memory.getByteOnAddress(address).toInt()
-        val intA = A.toInt()
+        val intA = A.toInt() and 0xFF
         val result = intA + value
         A = (result and 0xFF).toByte()
 
@@ -1484,7 +1496,7 @@ object CPU {
     }
 
     fun add_a_a(): Int{
-        val intA = A.toInt()
+        val intA = A.toInt() and 0xFF
         val result = intA + intA
         A = (result and 0xFF).toByte()
 
@@ -1495,8 +1507,8 @@ object CPU {
 
     fun adc_a_b(): Int{
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
-        val intA = A.toInt()
-        val intB = B.toInt()
+        val intA = A.toInt() and 0xFF
+        val intB = B.toInt() and 0xFF
         val result = intA + (intB + carry)
         A = (result and 0xFF).toByte()
 
@@ -1507,8 +1519,8 @@ object CPU {
 
     fun adc_a_c(): Int{
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
-        val intA = A.toInt()
-        val intC = C.toInt()
+        val intA = A.toInt() and 0xFF
+        val intC = C.toInt() and 0xFF
         val result = intA + (intC + carry)
         A = (result and 0xFF).toByte()
 
@@ -1519,8 +1531,8 @@ object CPU {
 
     fun adc_a_d(): Int{
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
-        val intA = A.toInt()
-        val intD = D.toInt()
+        val intA = A.toInt() and 0xFF
+        val intD = D.toInt() and 0xFF
         val result = intA + (intD + carry)
         A = (result and 0xFF).toByte()
 
@@ -1531,8 +1543,8 @@ object CPU {
 
     fun adc_a_e(): Int{
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
-        val intA = A.toInt()
-        val intE = E.toInt()
+        val intA = A.toInt() and 0xFF
+        val intE = E.toInt() and 0xFF
         val result = intA + (intE + carry)
         A = (result and 0xFF).toByte()
 
@@ -1543,8 +1555,8 @@ object CPU {
 
     fun adc_a_h(): Int{
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
-        val intA = A.toInt()
-        val intH = H.toInt()
+        val intA = A.toInt() and 0xFF
+        val intH = H.toInt() and 0xFF
         val result = intA + (intH + carry)
         A = (result and 0xFF).toByte()
 
@@ -1555,8 +1567,8 @@ object CPU {
 
     fun adc_a_l(): Int{
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
-        val intA = A.toInt()
-        val intL = L.toInt()
+        val intA = A.toInt() and 0xFF
+        val intL = L.toInt() and 0xFF
         val result = intA + (intL + carry)
         A = (result and 0xFF).toByte()
 
@@ -1568,9 +1580,9 @@ object CPU {
     fun adc_a_hl(): Int{
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
         val address = get_16bit_address(H, L)
-        val value = Memory.getByteOnAddress(address).toInt()
+        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
 
-        val intA = A.toInt()
+        val intA = A.toInt() and 0xFF
         val result = intA + (value + carry)
         A = (result and 0xFF).toByte()
 
@@ -1581,7 +1593,7 @@ object CPU {
 
     fun adc_a_a(): Int{
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
-        val intA = A.toInt()
+        val intA = A.toInt() and 0xFF
         val result = intA + (intA + carry)
         A = (result and 0xFF).toByte()
 
@@ -1591,8 +1603,8 @@ object CPU {
     }
 
     fun sub_b(): Int{
-        val intA = A.toInt()
-        val intB = B.toInt()
+        val intA = A.toInt() and 0xFF
+        val intB = B.toInt() and 0xFF
         val result = intA - intB
         A = (result and 0xFF).toByte()
 
@@ -1602,8 +1614,8 @@ object CPU {
     }
 
     fun sub_c(): Int{
-        val intA = A.toInt()
-        val intC = C.toInt()
+        val intA = A.toInt() and 0xFF
+        val intC = C.toInt() and 0xFF
         val result = intA - intC
         A = (result and 0xFF).toByte()
 
@@ -1613,8 +1625,8 @@ object CPU {
     }
 
     fun sub_d(): Int{
-        val intA = A.toInt()
-        val intD = D.toInt()
+        val intA = A.toInt() and 0xFF
+        val intD = D.toInt() and 0xFF
         val result = intA - intD
         A = (result and 0xFF).toByte()
 
@@ -1624,8 +1636,8 @@ object CPU {
     }
 
     fun sub_e(): Int{
-        val intA = A.toInt()
-        val intE = E.toInt()
+        val intA = A.toInt() and 0xFF
+        val intE = E.toInt() and 0xFF
         val result = intA - intE
         A = (result and 0xFF).toByte()
 
@@ -1635,8 +1647,8 @@ object CPU {
     }
 
     fun sub_h(): Int{
-        val intA = A.toInt()
-        val intH = H.toInt()
+        val intA = A.toInt() and 0xFF
+        val intH = H.toInt() and 0xFF
         val result = intA - intH
         A = (result and 0xFF).toByte()
 
@@ -1646,8 +1658,8 @@ object CPU {
     }
 
     fun sub_l(): Int{
-        val intA = A.toInt()
-        val intL = L.toInt()
+        val intA = A.toInt() and 0xFF
+        val intL = L.toInt() and 0xFF
         val result = intA - intL
         A = (result and 0xFF).toByte()
 
@@ -1660,8 +1672,8 @@ object CPU {
 
         val address = get_16bit_address(H, L)
 
-        val intA = A.toInt()
-        val intMem = Memory.getByteOnAddress(address).toInt()
+        val intA = A.toInt() and 0xFF
+        val intMem = Memory.getByteOnAddress(address).toInt() and 0xFF
         val result = intA - intMem
         A = (result and 0xFF).toByte()
 
@@ -1671,7 +1683,7 @@ object CPU {
     }
 
     fun sub_a(): Int{
-        val intA = A.toInt()
+        val intA = A.toInt() and 0xFF
         val result = intA - intA        // Should be 0
         A = (result and 0xFF).toByte()  // A = 0x0
 
@@ -1682,8 +1694,8 @@ object CPU {
 
     fun sbc_a_b(): Int{
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
-        val intA = A.toInt()
-        val intB = B.toInt()
+        val intA = A.toInt() and 0xFF
+        val intB = B.toInt() and 0xFF
         val result = intA - (intB + carry)
         A = (result and 0xFF).toByte()
 
@@ -1694,8 +1706,8 @@ object CPU {
 
     fun sbc_a_c(): Int{
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
-        val intA = A.toInt()
-        val intC = C.toInt()
+        val intA = A.toInt() and 0xFF
+        val intC = C.toInt() and 0xFF
         val result = intA - (intC + carry)
         A = (result and 0xFF).toByte()
 
@@ -1706,8 +1718,8 @@ object CPU {
 
     fun sbc_a_d(): Int{
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
-        val intA = A.toInt()
-        val intD = D.toInt()
+        val intA = A.toInt() and 0xFF
+        val intD = D.toInt() and 0xFF
         val result = intA - (intD + carry)
         A = (result and 0xFF).toByte()
 
@@ -1718,8 +1730,8 @@ object CPU {
 
     fun sbc_a_e(): Int{
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
-        val intA = A.toInt()
-        val intE = E.toInt()
+        val intA = A.toInt() and 0xFF
+        val intE = E.toInt() and 0xFF
         val result = intA - (intE + carry)
         A = (result and 0xFF).toByte()
 
@@ -1730,8 +1742,8 @@ object CPU {
 
     fun sbc_a_h(): Int{
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
-        val intA = A.toInt()
-        val intH = H.toInt()
+        val intA = A.toInt() and 0xFF
+        val intH = H.toInt() and 0xFF
         val result = intA - (intH + carry)
         A = (result and 0xFF).toByte()
 
@@ -1742,8 +1754,8 @@ object CPU {
 
     fun sbc_a_l(): Int{
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
-        val intA = A.toInt()
-        val intL = L.toInt()
+        val intA = A.toInt() and 0xFF
+        val intL = L.toInt() and 0xFF
         val result = intA - (intL + carry)
         A = (result and 0xFF).toByte()
 
@@ -1756,7 +1768,7 @@ object CPU {
         val address = get_16bit_address(H, L)
         val intMem = Memory.getByteOnAddress(address).toInt()
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
-        val intA = A.toInt()
+        val intA = A.toInt() and 0xFF
         val result = intA - (intMem + carry)
         A = (result and 0xFF).toByte()
 
@@ -1767,7 +1779,7 @@ object CPU {
 
     fun sbc_a_a(): Int{
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
-        val intA = A.toInt()
+        val intA = A.toInt() and 0xFF
         val result = intA - (intA + carry)
         A = (result and 0xFF).toByte()
 
@@ -2480,7 +2492,7 @@ object CPU {
     }
 
     fun add_sp_n(): Int{
-        val byte = fetch().toInt()
+        val byte = fetch().toInt() and 0xFF
         val oldSP = SP
         SP = (SP + byte) and 0xFFFF
 
@@ -2602,8 +2614,9 @@ object CPU {
     // -------------------------------- //
 
     fun rlc_b(): Int{
-        val carry = (B.toInt() ushr 7) and 0x1
-        B = ((B.toInt() shl 1) or carry).toByte()
+        val bByte = B.toInt() and 0xFF
+        val carry = (bByte ushr 7) and 0x1
+        B = ((bByte shl 1) or carry).toByte()
 
         uccu_flags(B, carry)
 
@@ -2611,8 +2624,9 @@ object CPU {
     }
 
     fun rlc_c(): Int{
-        val carry = (C.toInt() ushr 7) and 0x1
-        C = ((C.toInt() shl 1) or carry).toByte()
+        val cByte = C.toInt() and 0xFF
+        val carry = (cByte ushr 7) and 0x1
+        C = ((cByte shl 1) or carry).toByte()
 
         uccu_flags(C, carry)
 
@@ -2620,8 +2634,9 @@ object CPU {
     }
 
     fun rlc_d(): Int{
-        val carry = (D.toInt() ushr 7) and 0x1
-        D = ((D.toInt() shl 1) or carry).toByte()
+        val dByte = D.toInt() and 0xFF
+        val carry = (dByte ushr 7) and 0x1
+        D = ((dByte shl 1) or carry).toByte()
 
         uccu_flags(D, carry)
 
@@ -2629,8 +2644,9 @@ object CPU {
     }
 
     fun rlc_e(): Int{
-        val carry = (E.toInt() ushr 7) and 0x1
-        E = ((E.toInt() shl 1) or carry).toByte()
+        val eByte = E.toInt() and 0xFF
+        val carry = (eByte ushr 7) and 0x1
+        E = ((eByte shl 1) or carry).toByte()
 
         uccu_flags(E, carry)
 
@@ -2638,8 +2654,9 @@ object CPU {
     }
 
     fun rlc_h(): Int{
-        val carry = (H.toInt() ushr 7) and 0x1
-        H = ((C.toInt() shl 1) or carry).toByte()
+        val hByte = H.toInt() and 0xFF
+        val carry = (hByte ushr 7) and 0x1
+        H = ((hByte shl 1) or carry).toByte()
 
         uccu_flags(H, carry)
 
@@ -2647,8 +2664,9 @@ object CPU {
     }
 
     fun rlc_l(): Int{
-        val carry = (L.toInt() ushr 7) and 0x1
-        L = ((L.toInt() shl 1) or carry).toByte()
+        val lByte = L.toInt() and 0xFF
+        val carry = (lByte ushr 7) and 0x1
+        L = ((lByte shl 1) or carry).toByte()
 
         uccu_flags(L, carry)
 
@@ -2657,9 +2675,9 @@ object CPU {
 
     fun rlc_hl(): Int{
         val address = get_16bit_address(H, L)
-        val value = Memory.getByteOnAddress(address)
-        val carry = (value.toInt() ushr 7) and 0x1
-        val result = ((value.toInt() shl 1) or carry).toByte()
+        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
+        val carry = (value ushr 7) and 0x1
+        val result = ((value shl 1) or carry).toByte()
         Memory.writeByteOnAddress(address, result)
 
         uccu_flags(result, carry)
@@ -2668,8 +2686,9 @@ object CPU {
     }
 
     fun rlc_a(): Int{
-        val carry = (A.toInt() ushr 7) and 0x1
-        A = ((A.toInt() shl 1) or carry).toByte()
+        val aByte = A.toInt() and 0xFF
+        val carry = (aByte ushr 7) and 0x1
+        A = ((aByte shl 1) or carry).toByte()
 
         uccu_flags(A, carry)
 
@@ -2677,9 +2696,9 @@ object CPU {
     }
 
     fun rrc_b(): Int{
-
-        val carry = B.toInt() and 0x1
-        B = ((B.toInt() shr 1) or (carry shl 7)).toByte()
+        val bByte = B.toInt() and 0xFF
+        val carry = bByte and 0x1
+        B = ((bByte shr 1) or (carry shl 7)).toByte()
 
         uccu_flags(B, carry)
 
@@ -2687,9 +2706,9 @@ object CPU {
     }
 
     fun rrc_c(): Int{
-
-        val carry = C.toInt() and 0x1
-        C = ((C.toInt() shr 1) or (carry shl 7)).toByte()
+        val cByte = C.toInt() and 0xFF
+        val carry = cByte and 0x1
+        C = ((cByte shr 1) or (carry shl 7)).toByte()
 
         uccu_flags(C, carry)
 
@@ -2697,9 +2716,9 @@ object CPU {
     }
 
     fun rrc_d(): Int{
-
-        val carry = D.toInt() and 0x1
-        D = ((D.toInt() shr 1) or (carry shl 7)).toByte()
+        val dByte = D.toInt() and 0xFF
+        val carry = dByte and 0x1
+        D = ((dByte shr 1) or (carry shl 7)).toByte()
 
         uccu_flags(D, carry)
 
@@ -2707,9 +2726,9 @@ object CPU {
     }
 
     fun rrc_e(): Int{
-
-        val carry = E.toInt() and 0x1
-        E = ((E.toInt() shr 1) or (carry shl 7)).toByte()
+        val eByte = E.toInt() and 0xFF
+        val carry = eByte and 0x1
+        E = ((eByte shr 1) or (carry shl 7)).toByte()
 
         uccu_flags(E, carry)
 
@@ -2717,9 +2736,9 @@ object CPU {
     }
 
     fun rrc_h(): Int{
-
-        val carry = H.toInt() and 0x1
-        H = ((H.toInt() shr 1) or (carry shl 7)).toByte()
+        val hByte = H.toInt() and 0xFF
+        val carry = hByte and 0x1
+        H = ((hByte shr 1) or (carry shl 7)).toByte()
 
         uccu_flags(H, carry)
 
@@ -2727,9 +2746,9 @@ object CPU {
     }
 
     fun rrc_l(): Int{
-
-        val carry = L.toInt() and 0x1
-        L = ((L.toInt() shr 1) or (carry shl 7)).toByte()
+        val lByte = L.toInt() and 0xFF
+        val carry = lByte and 0x1
+        L = ((lByte shr 1) or (carry shl 7)).toByte()
 
         uccu_flags(L, carry)
 
@@ -2739,9 +2758,9 @@ object CPU {
     fun rrc_hl(): Int{
 
         val address = get_16bit_address(H, L)
-        val value = Memory.getByteOnAddress(address)
-        val carry = value.toInt() and 0x1
-        val result = ((value.toInt() shr 1) or (carry shl 7)).toByte()
+        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
+        val carry = value and 0x1
+        val result = ((value shr 1) or (carry shl 7)).toByte()
         Memory.writeByteOnAddress(address, result)
 
         uccu_flags(result, carry)
@@ -2750,9 +2769,9 @@ object CPU {
     }
 
     fun rrc_a(): Int{
-
-        val carry = A.toInt() and 0x1
-        A = ((A.toInt() shr 1) or (carry shl 7)).toByte()
+        val aByte = A.toInt() and 0xFF
+        val carry = aByte and 0x1
+        A = ((aByte shr 1) or (carry shl 7)).toByte()
 
         uccu_flags(A, carry)
 
@@ -2760,11 +2779,11 @@ object CPU {
     }
 
     fun rl_b(): Int{
-
+        val bByte = B.toInt() and 0xFF
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
-        val newCarry = (B.toInt() ushr 7) and 0x1
+        val newCarry = (bByte ushr 7) and 0x1
 
-        B = ((B.toInt() shl 1) or oldCarry).toByte()
+        B = ((bByte shl 1) or oldCarry).toByte()
 
         uccu_flags(B, newCarry)
 
@@ -2772,11 +2791,11 @@ object CPU {
     }
 
     fun rl_c(): Int{
-
+        val cByte = C.toInt() and 0xFF
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
-        val newCarry = (C.toInt() ushr 7) and 0x1
+        val newCarry = (cByte ushr 7) and 0x1
 
-        C = ((C.toInt() shl 1) or oldCarry).toByte()
+        C = ((cByte shl 1) or oldCarry).toByte()
 
         uccu_flags(C, newCarry)
 
@@ -2784,11 +2803,11 @@ object CPU {
     }
 
     fun rl_d(): Int{
-
+        val dByte = D.toInt() and 0xFF
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
-        val newCarry = (D.toInt() ushr 7) and 0x1
+        val newCarry = (dByte ushr 7) and 0x1
 
-        D = ((D.toInt() shl 1) or oldCarry).toByte()
+        D = ((dByte shl 1) or oldCarry).toByte()
 
         uccu_flags(D, newCarry)
 
@@ -2796,11 +2815,11 @@ object CPU {
     }
 
     fun rl_e(): Int{
-
+        val eByte = E.toInt() and 0xFF
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
-        val newCarry = (E.toInt() ushr 7) and 0x1
+        val newCarry = (eByte ushr 7) and 0x1
 
-        E = ((E.toInt() shl 1) or oldCarry).toByte()
+        E = ((eByte shl 1) or oldCarry).toByte()
 
         uccu_flags(E, newCarry)
 
@@ -2808,11 +2827,11 @@ object CPU {
     }
 
     fun rl_h(): Int{
-
+        val hByte = H.toInt() and 0xFF
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
-        val newCarry = (H.toInt() ushr 7) and 0x1
+        val newCarry = (hByte ushr 7) and 0x1
 
-        H = ((H.toInt() shl 1) or oldCarry).toByte()
+        H = ((hByte shl 1) or oldCarry).toByte()
 
         uccu_flags(H, newCarry)
 
@@ -2820,11 +2839,11 @@ object CPU {
     }
 
     fun rl_l(): Int{
-
+        val lByte = L.toInt() and 0xFF
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
-        val newCarry = (L.toInt() ushr 7) and 0x1
+        val newCarry = (lByte ushr 7) and 0x1
 
-        L = ((L.toInt() shl 1) or oldCarry).toByte()
+        L = ((lByte shl 1) or oldCarry).toByte()
 
         uccu_flags(L, newCarry)
 
@@ -2833,7 +2852,7 @@ object CPU {
 
     fun rl_hl(): Int{
         val address = get_16bit_address(H, L)
-        val value = Memory.getByteOnAddress(address).toInt()
+        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
         val newCarry = (value ushr 7) and 0x1
 
@@ -2846,11 +2865,11 @@ object CPU {
     }
 
     fun rl_a(): Int{
-
+        val aByte = A.toInt() and 0xFF
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
-        val newCarry = (A.toInt() ushr 7) and 0x1
+        val newCarry = (aByte ushr 7) and 0x1
 
-        A = ((A.toInt() shl 1) or oldCarry).toByte()
+        A = ((aByte shl 1) or oldCarry).toByte()
 
         uccu_flags(A, newCarry)
 
@@ -2858,11 +2877,11 @@ object CPU {
     }
 
     fun rr_b(): Int{
-
+        val bByte = B.toInt() and 0xFF
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
-        val newCarry = (B.toInt() ushr 7) and 0x1
+        val newCarry = (bByte ushr 7) and 0x1
 
-        B = ((B.toInt() shr 1) or (oldCarry shl 7)).toByte()
+        B = ((bByte shr 1) or (oldCarry shl 7)).toByte()
 
         uccu_flags(B, newCarry)
 
@@ -2870,11 +2889,11 @@ object CPU {
     }
 
     fun rr_c(): Int{
-
+        val cByte = C.toInt() and 0xFF
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
-        val newCarry = (C.toInt() ushr 7) and 0x1
+        val newCarry = (cByte ushr 7) and 0x1
 
-        C = ((C.toInt() shr 1) or (oldCarry shl 7)).toByte()
+        C = ((cByte shr 1) or (oldCarry shl 7)).toByte()
 
         uccu_flags(C, newCarry)
 
@@ -2882,11 +2901,11 @@ object CPU {
     }
 
     fun rr_d(): Int{
-
+        val dByte = D.toInt() and 0xFF
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
-        val newCarry = (D.toInt() ushr 7) and 0x1
+        val newCarry = (dByte ushr 7) and 0x1
 
-        D = ((D.toInt() shr 1) or (oldCarry shl 7)).toByte()
+        D = ((dByte shr 1) or (oldCarry shl 7)).toByte()
 
         uccu_flags(D, newCarry)
 
@@ -2894,11 +2913,11 @@ object CPU {
     }
 
     fun rr_e(): Int{
-
+        val eByte = E.toInt() and 0xFF
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
-        val newCarry = (E.toInt() ushr 7) and 0x1
+        val newCarry = (eByte ushr 7) and 0x1
 
-        E = ((E.toInt() shr 1) or (oldCarry shl 7)).toByte()
+        E = ((eByte shr 1) or (oldCarry shl 7)).toByte()
 
         uccu_flags(E, newCarry)
 
@@ -2906,11 +2925,11 @@ object CPU {
     }
 
     fun rr_h(): Int{
-
+        val hByte = H.toInt() and 0xFF
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
-        val newCarry = (H.toInt() ushr 7) and 0x1
+        val newCarry = (hByte ushr 7) and 0x1
 
-        H = ((H.toInt() shr 1) or (oldCarry shl 7)).toByte()
+        H = ((hByte shr 1) or (oldCarry shl 7)).toByte()
 
         uccu_flags(H, newCarry)
 
@@ -2918,11 +2937,11 @@ object CPU {
     }
 
     fun rr_l(): Int{
-
+        val lByte = L.toInt() and 0xFF
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
-        val newCarry = (L.toInt() ushr 7) and 0x1
+        val newCarry = (lByte ushr 7) and 0x1
 
-        L = ((L.toInt() shr 1) or (oldCarry shl 7)).toByte()
+        L = ((lByte shr 1) or (oldCarry shl 7)).toByte()
 
         uccu_flags(L, newCarry)
 
@@ -2931,7 +2950,7 @@ object CPU {
 
     fun rr_hl(): Int{
         val address = get_16bit_address(H, L)
-        val value = Memory.getByteOnAddress(address).toInt()
+        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
         val newCarry = (value ushr 7) and 0x1
 
@@ -2944,11 +2963,11 @@ object CPU {
     }
 
     fun rr_a(): Int{
-
+        val aByte = A.toInt() and 0xFF
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
-        val newCarry = (A.toInt() ushr 7) and 0x1
+        val newCarry = (aByte ushr 7) and 0x1
 
-        A = ((A.toInt() shr 1) or (oldCarry shl 7)).toByte()
+        A = ((aByte shr 1) or (oldCarry shl 7)).toByte()
 
         uccu_flags(A, newCarry)
 
@@ -2956,9 +2975,9 @@ object CPU {
     }
 
     fun sla_b(): Int{
-
-        val newCarry = (B.toInt() ushr 7) and 0x1
-        B = ((B.toInt() shl 1) and 0xFE).toByte()
+        val bByte = B.toInt() and 0xFF
+        val newCarry = (bByte ushr 7) and 0x1
+        B = ((bByte shl 1) and 0xFE).toByte()
 
         uccu_flags(B, newCarry)
         
@@ -2966,9 +2985,9 @@ object CPU {
     }
 
     fun sla_c(): Int{
-
-        val newCarry = (C.toInt() ushr 7) and 0x1
-        C = ((C.toInt() shl 1) and 0xFE).toByte()
+        val cByte = C.toInt() and 0xFF
+        val newCarry = (cByte ushr 7) and 0x1
+        C = ((cByte shl 1) and 0xFE).toByte()
 
         uccu_flags(C, newCarry)
 
@@ -2976,9 +2995,9 @@ object CPU {
     }
 
     fun sla_d(): Int{
-
-        val newCarry = (D.toInt() ushr 7) and 0x1
-        D = ((D.toInt() shl 1) and 0xFE).toByte()
+        val dByte = D.toInt() and 0xFF
+        val newCarry = (dByte ushr 7) and 0x1
+        D = ((dByte shl 1) and 0xFE).toByte()
 
         uccu_flags(D, newCarry)
 
@@ -2986,9 +3005,9 @@ object CPU {
     }
 
     fun sla_e(): Int{
-
-        val newCarry = (E.toInt() ushr 7) and 0x1
-        E = ((E.toInt() shl 1) and 0xFE).toByte()
+        val eByte = E.toInt() and 0xFF
+        val newCarry = (eByte ushr 7) and 0x1
+        E = ((eByte shl 1) and 0xFE).toByte()
 
         uccu_flags(E, newCarry)
 
@@ -2996,9 +3015,9 @@ object CPU {
     }
 
     fun sla_h(): Int{
-
-        val newCarry = (H.toInt() ushr 7) and 0x1
-        H = ((H.toInt() shl 1) and 0xFE).toByte()
+        val hByte = H.toInt() and 0xFF
+        val newCarry = (hByte ushr 7) and 0x1
+        H = ((hByte shl 1) and 0xFE).toByte()
 
         uccu_flags(H, newCarry)
 
@@ -3006,9 +3025,9 @@ object CPU {
     }
 
     fun sla_l(): Int{
-
-        val newCarry = (L.toInt() ushr 7) and 0x1
-        L = ((L.toInt() shl 1) and 0xFE).toByte()
+        val lByte = L.toInt() and 0xFF
+        val newCarry = (lByte ushr 7) and 0x1
+        L = ((lByte shl 1) and 0xFE).toByte()
 
         uccu_flags(L, newCarry)
 
@@ -3017,7 +3036,7 @@ object CPU {
 
     fun sla_hl(): Int{
         val address = get_16bit_address(H, L)
-        val value = Memory.getByteOnAddress(address).toInt()
+        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
         val newCarry = (value ushr 7) and 0x1
         val result = ((value shl 1) and 0xFE).toByte()
         Memory.writeByteOnAddress(address, result)
@@ -3028,9 +3047,9 @@ object CPU {
     }
 
     fun sla_a(): Int{
-
-        val newCarry = (A.toInt() ushr 7) and 0x1
-        A = ((A.toInt() shl 1) and 0xFE).toByte()
+        val aByte = A.toInt() and 0xFF
+        val newCarry = (aByte ushr 7) and 0x1
+        A = ((aByte shl 1) and 0xFE).toByte()
 
         uccu_flags(A, newCarry)
 
@@ -3038,11 +3057,11 @@ object CPU {
     }
 
     fun sra_b(): Int{
+        val bByte = B.toInt() and 0xFF
+        val oldBit7 = bByte and 0x80
+        val newCarry = bByte and 0x1
 
-        val oldBit7 = B.toInt() and 0x80
-        val newCarry = B.toInt() and 0x1
-
-        B = (((B.toInt() and 0xFF) shr 1) or oldBit7).toByte()
+        B = ((bByte shr 1) or oldBit7).toByte()
 
         uccu_flags(B, newCarry)
 
@@ -3050,11 +3069,11 @@ object CPU {
     }
 
     fun sra_c(): Int{
+        val cByte = C.toInt() and 0xFF
+        val oldBit7 = cByte and 0x80
+        val newCarry = cByte and 0x1
 
-        val oldBit7 = C.toInt() and 0x80
-        val newCarry = C.toInt() and 0x1
-
-        C = (((C.toInt() and 0xFF) shr 1) or oldBit7).toByte()
+        C = ((cByte shr 1) or oldBit7).toByte()
 
         uccu_flags(C, newCarry)
 
@@ -3062,11 +3081,11 @@ object CPU {
     }
 
     fun sra_d(): Int{
+        val dByte = D.toInt() and 0xFF
+        val oldBit7 = dByte and 0x80
+        val newCarry = dByte and 0x1
 
-        val oldBit7 = D.toInt() and 0x80
-        val newCarry = D.toInt() and 0x1
-
-        D = (((C.toInt() and 0xFF) shr 1) or oldBit7).toByte()
+        D = ((dByte shr 1) or oldBit7).toByte()
 
         uccu_flags(D, newCarry)
 
@@ -3074,11 +3093,11 @@ object CPU {
     }
 
     fun sra_e(): Int{
+        val eByte = E.toInt() and 0xFF
+        val oldBit7 = eByte and 0x80
+        val newCarry = eByte and 0x1
 
-        val oldBit7 = E.toInt() and 0x80
-        val newCarry = E.toInt() and 0x1
-
-        E = (((E.toInt() and 0xFF) shr 1) or oldBit7).toByte()
+        E = ((eByte shr 1) or oldBit7).toByte()
 
         uccu_flags(E, newCarry)
 
@@ -3086,11 +3105,11 @@ object CPU {
     }
 
     fun sra_h(): Int{
+        val hByte = H.toInt() and 0xFF
+        val oldBit7 = hByte and 0x80
+        val newCarry = hByte and 0x1
 
-        val oldBit7 = H.toInt() and 0x80
-        val newCarry = H.toInt() and 0x1
-
-        H = (((H.toInt() and 0xFF) shr 1) or oldBit7).toByte()
+        H = ((hByte shr 1) or oldBit7).toByte()
 
         uccu_flags(H, newCarry)
 
@@ -3098,11 +3117,11 @@ object CPU {
     }
 
     fun sra_l(): Int{
+        val lByte = L.toInt() and 0xFF
+        val oldBit7 = lByte and 0x80
+        val newCarry = lByte and 0x1
 
-        val oldBit7 = L.toInt() and 0x80
-        val newCarry = L.toInt() and 0x1
-
-        L = (((L.toInt() and 0xFF) shr 1) or oldBit7).toByte()
+        L = ((lByte shr 1) or oldBit7).toByte()
 
         uccu_flags(L, newCarry)
 
@@ -3111,11 +3130,11 @@ object CPU {
 
     fun sra_hl(): Int{
         val address = get_16bit_address(H,L)
-        val value = Memory.getByteOnAddress(address).toInt()
+        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
         val oldBit7 = value and 0x80
         val newCarry = value and 0x1
 
-        val result = (((value and 0xFF) shr 1) or oldBit7).toByte()
+        val result = ((value shr 1) or oldBit7).toByte()
         Memory.writeByteOnAddress(address, result)
 
         uccu_flags(result, newCarry)
@@ -3124,11 +3143,11 @@ object CPU {
     }
 
     fun sra_a(): Int{
+        val aByte = A.toInt() and 0xFF
+        val oldBit7 = aByte and 0x80
+        val newCarry = aByte and 0x1
 
-        val oldBit7 = A.toInt() and 0x80
-        val newCarry = A.toInt() and 0x1
-
-        A = (((A.toInt() and 0xFF) shr 1) or oldBit7).toByte()
+        A = ((aByte shr 1) or oldBit7).toByte()
 
         uccu_flags(A, newCarry)
 
@@ -3136,9 +3155,9 @@ object CPU {
     }
 
     fun swap_b(): Int{
-
-        val low = (B.toInt() and 0x0F) shl 4
-        val high = (B.toInt() and 0xF0) shr 4
+        val bByte = B.toInt() and 0xFF
+        val low = (bByte and 0x0F) shl 4
+        val high = (bByte and 0xF0) shr 4
         B = (low or high).toByte()
 
         uccu_flags(B, 0)
@@ -3147,9 +3166,9 @@ object CPU {
     }
 
     fun swap_c(): Int{
-
-        val low = (C.toInt() and 0x0F) shl 4
-        val high = (C.toInt() and 0xF0) shr 4
+        val cByte = C.toInt() and 0xFF
+        val low = (cByte and 0x0F) shl 4
+        val high = (cByte and 0xF0) shr 4
         C = (low or high).toByte()
 
         uccu_flags(C, 0)
@@ -3158,9 +3177,9 @@ object CPU {
     }
 
     fun swap_d(): Int{
-
-        val low = (D.toInt() and 0x0F) shl 4
-        val high = (D.toInt() and 0xF0) shr 4
+        val dByte = D.toInt() and 0xFF
+        val low = (dByte and 0x0F) shl 4
+        val high = (dByte and 0xF0) shr 4
         D = (low or high).toByte()
 
         uccu_flags(D, 0)
@@ -3169,9 +3188,9 @@ object CPU {
     }
 
     fun swap_e(): Int{
-
-        val low = (E.toInt() and 0x0F) shl 4
-        val high = (E.toInt() and 0xF0) shr 4
+        val eByte = E.toInt() and 0xFF
+        val low = (eByte and 0x0F) shl 4
+        val high = (eByte and 0xF0) shr 4
         E = (low or high).toByte()
 
         uccu_flags(E, 0)
@@ -3180,9 +3199,9 @@ object CPU {
     }
 
     fun swap_h(): Int{
-
-        val low = (H.toInt() and 0x0F) shl 4
-        val high = (H.toInt() and 0xF0) shr 4
+        val hByte = H.toInt() and 0xFF
+        val low = (hByte and 0x0F) shl 4
+        val high = (hByte and 0xF0) shr 4
         H = (low or high).toByte()
 
         uccu_flags(H, 0)
@@ -3191,9 +3210,9 @@ object CPU {
     }
 
     fun swap_l(): Int{
-
-        val low = (L.toInt() and 0x0F) shl 4
-        val high = (L.toInt() and 0xF0) shr 4
+        val lByte = L.toInt() and 0xFF
+        val low = (lByte and 0x0F) shl 4
+        val high = (lByte and 0xF0) shr 4
         L = (low or high).toByte()
 
         uccu_flags(L, 0)
@@ -3203,7 +3222,7 @@ object CPU {
 
     fun swap_hl(): Int{
         val address = get_16bit_address(H, L)
-        val value = Memory.getByteOnAddress(address).toInt()
+        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
         val low = (value and 0x0F) shl 4
         val high = (value and 0xF0) shr 4
         val result = (low or high).toByte()
@@ -3215,9 +3234,9 @@ object CPU {
     }
 
     fun swap_a(): Int{
-
-        val low = (A.toInt() and 0x0F) shl 4
-        val high = (A.toInt() and 0xF0) shr 4
+        val aByte = A.toInt() and 0xFF
+        val low = (aByte and 0x0F) shl 4
+        val high = (aByte and 0xF0) shr 4
         A = (low or high).toByte()
 
         uccu_flags(A, 0)
@@ -3226,9 +3245,9 @@ object CPU {
     }
 
     fun srl_b(): Int{
-
-        val newCarry = B.toInt() and 0x1
-        B = (((B.toInt() and 0xFF) shr 1) and 0x7F).toByte()
+        val bByte = B.toInt() and 0xFF
+        val newCarry = bByte and 0x1
+        B = ((bByte shr 1) and 0x7F).toByte()
 
         uccu_flags(B, newCarry)
 
@@ -3236,9 +3255,9 @@ object CPU {
     }
 
     fun srl_c(): Int{
-
-        val newCarry = C.toInt() and 0x1
-        C = (((C.toInt() and 0xFF) shr 1) and 0x7F).toByte()
+        val cByte = C.toInt() and 0xFF
+        val newCarry = cByte and 0x1
+        C = ((cByte shr 1) and 0x7F).toByte()
 
         uccu_flags(C, newCarry)
 
@@ -3246,9 +3265,9 @@ object CPU {
     }
 
     fun srl_d(): Int{
-
-        val newCarry = D.toInt() and 0x1
-        D = (((D.toInt() and 0xFF) shr 1) and 0x7F).toByte()
+        val dByte = D.toInt() and 0xFF
+        val newCarry = dByte and 0x1
+        D = ((dByte shr 1) and 0x7F).toByte()
 
         uccu_flags(D, newCarry)
 
@@ -3256,9 +3275,9 @@ object CPU {
     }
 
     fun srl_e(): Int{
-
-        val newCarry = E.toInt() and 0x1
-        E = (((E.toInt() and 0xFF) shr 1) and 0x7F).toByte()
+        val eByte = E.toInt() and 0xFF
+        val newCarry = eByte and 0x1
+        E = ((eByte shr 1) and 0x7F).toByte()
 
         uccu_flags(E, newCarry)
 
@@ -3266,9 +3285,9 @@ object CPU {
     }
 
     fun srl_h(): Int{
-
-        val newCarry = H.toInt() and 0x1
-        H = (((H.toInt() and 0xFF) shr 1) and 0x7F).toByte()
+        val hByte = H.toInt() and 0xFF
+        val newCarry = hByte and 0x1
+        H = ((hByte shr 1) and 0x7F).toByte()
 
         uccu_flags(H, newCarry)
 
@@ -3276,9 +3295,9 @@ object CPU {
     }
 
     fun srl_l(): Int{
-
-        val newCarry = L.toInt() and 0x1
-        L = (((L.toInt() and 0xFF) shr 1) and 0x7F).toByte()
+        val lByte = L.toInt() and 0xFF
+        val newCarry = lByte and 0x1
+        L = ((lByte shr 1) and 0x7F).toByte()
 
         uccu_flags(L, newCarry)
 
@@ -3287,9 +3306,9 @@ object CPU {
 
     fun srl_hl(): Int{
         val address = get_16bit_address(H, L)
-        val value = Memory.getByteOnAddress(address).toInt()
+        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
         val newCarry = value and 0x1
-        val result = (((value and 0xFF) shr 1) and 0x7F).toByte()
+        val result = ((value shr 1) and 0x7F).toByte()
         Memory.writeByteOnAddress(address, result)
 
         uccu_flags(result, newCarry)
@@ -3298,9 +3317,9 @@ object CPU {
     }
 
     fun srl_a(): Int{
-
-        val newCarry = A.toInt() and 0x1
-        A = (((A.toInt() and 0xFF) shr 1) and 0x7F).toByte()
+        val aByte = A.toInt() and 0xFF
+        val newCarry = aByte and 0x1
+        A = ((aByte shr 1) and 0x7F).toByte()
 
         uccu_flags(A, newCarry)
 
@@ -3317,18 +3336,18 @@ object CPU {
         val bit = 0x1 shl bitNumber
 
         when (register) {
-            1 -> bitZero = (B.toInt() and bit) == 0
-            2 -> bitZero = (C.toInt() and bit) == 0
-            3 -> bitZero = (D.toInt() and bit) == 0
-            4 -> bitZero = (E.toInt() and bit) == 0
-            5 -> bitZero = (H.toInt() and bit) == 0
-            6 -> bitZero = (L.toInt() and bit) == 0
+            1 -> bitZero = ((B.toInt() and 0xFF) and bit) == 0
+            2 -> bitZero = ((C.toInt() and 0xFF) and bit) == 0
+            3 -> bitZero = ((D.toInt() and 0xFF) and bit) == 0
+            4 -> bitZero = ((E.toInt() and 0xFF) and bit) == 0
+            5 -> bitZero = ((H.toInt() and 0xFF) and bit) == 0
+            6 -> bitZero = ((L.toInt() and 0xFF) and bit) == 0
             7 -> {
                 val address = get_16bit_address(H, L)
-                bitZero = (Memory.getByteOnAddress(address).toInt() and bit) == 0
+                bitZero = ((Memory.getByteOnAddress(address).toInt() and 0xFF) and bit) == 0
                 cyclesToReturn = CYCLES_16
             }
-            8 -> bitZero = (A.toInt() and bit) == 0
+            8 -> bitZero = ((A.toInt() and 0xFF) and bit) == 0
         }
 
         updateBitOperationFlags(bitZero)
@@ -3344,19 +3363,19 @@ object CPU {
         val bit = (0x1 shl bitNumber).inv()
 
         when (register) {
-            1 -> B = (B.toInt() and bit).toByte()
-            2 -> C = (C.toInt() and bit).toByte()
-            3 -> D = (D.toInt() and bit).toByte()
-            4 -> E = (E.toInt() and bit).toByte()
-            5 -> H = (H.toInt() and bit).toByte()
-            6 -> L = (L.toInt() and bit).toByte()
+            1 -> B = ((B.toInt() and 0xFF) and bit).toByte()
+            2 -> C = ((C.toInt() and 0xFF) and bit).toByte()
+            3 -> D = ((D.toInt() and 0xFF) and bit).toByte()
+            4 -> E = ((E.toInt() and 0xFF) and bit).toByte()
+            5 -> H = ((H.toInt() and 0xFF) and bit).toByte()
+            6 -> L = ((L.toInt() and 0xFF) and bit).toByte()
             7 -> {
                 val address = get_16bit_address(H, L)
-                val result = (Memory.getByteOnAddress(address).toInt() and bit).toByte()
+                val result = ((Memory.getByteOnAddress(address).toInt() and 0xFF) and bit).toByte()
                 Memory.writeByteOnAddress(address, result)
                 cyclesToReturn = CYCLES_16
             }
-            8 -> A = (A.toInt() and bit).toByte()
+            8 -> A = ((A.toInt() and 0xFF) and bit).toByte()
         }
 
         return cyclesToReturn
@@ -3371,19 +3390,19 @@ object CPU {
         val bit = 0x1 shl bitNumber
 
         when (register) {
-            1 -> B = (B.toInt() or bit).toByte()
-            2 -> C = (C.toInt() or bit).toByte()
-            3 -> D = (D.toInt() or bit).toByte()
-            4 -> E = (E.toInt() or bit).toByte()
-            5 -> H = (H.toInt() or bit).toByte()
-            6 -> L = (L.toInt() or bit).toByte()
+            1 -> B = ((B.toInt() and 0xFF) or bit).toByte()
+            2 -> C = ((C.toInt() and 0xFF) or bit).toByte()
+            3 -> D = ((D.toInt() and 0xFF) or bit).toByte()
+            4 -> E = ((E.toInt() and 0xFF) or bit).toByte()
+            5 -> H = ((H.toInt() and 0xFF) or bit).toByte()
+            6 -> L = ((L.toInt() and 0xFF) or bit).toByte()
             7 -> {
                 val address = get_16bit_address(H, L)
-                val result = (Memory.getByteOnAddress(address).toInt() or bit).toByte()
+                val result = ((Memory.getByteOnAddress(address).toInt() and 0xFF) or bit).toByte()
                 Memory.writeByteOnAddress(address, result)
                 cyclesToReturn = CYCLES_16
             }
-            8 -> A = (A.toInt() or bit).toByte()
+            8 -> A = ((A.toInt() and 0xFF) or bit).toByte()
         }
 
         return cyclesToReturn
