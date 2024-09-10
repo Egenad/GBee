@@ -101,6 +101,8 @@ object CPU {
             return false
         }
 
+        handleTimers()
+
         return true
     }
 
@@ -130,6 +132,10 @@ object CPU {
             // Handle the interrupt
             Interrupt.flush()
         }
+    }
+
+    private fun handleTimers(){
+
     }
 
     fun executeInterrupt(address: Int){
@@ -539,6 +545,10 @@ object CPU {
 
     fun setBootstrapPending(status: Boolean){
         pendingBootROM = status
+    }
+
+    fun getCPUCycles() : Int{
+        return cycles
     }
 
     // -------------------------------- //
