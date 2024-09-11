@@ -172,7 +172,10 @@ object Memory {
         // TODO LOGICA
 
         when(address){
-            0xFF50 -> {
+            0xFF0F -> { // IF Memory Address - Interrupt Request
+                Interrupt.requestInterrupt(value)
+            }
+            0xFF50 -> { // Boot Process End Flag
                 if((value.toInt() and 0xFF) != 0)
                     CPU.setBootstrapPending(false)
             }

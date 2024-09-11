@@ -39,8 +39,8 @@ object Interrupt {
         return IME
     }
 
-    fun requestInterrupt(type: InterruptType){
-        val result = ((Memory.getByteOnAddress(IF).toInt() or type.getInterruptMask()) and 0xFF).toByte()
+    fun requestInterrupt(byte: Byte){
+        val result = ((Memory.getByteOnAddress(IF).toInt() and 0xFF) or (byte.toInt() and 0xFF)).toByte()
         Memory.writeByteOnAddress(IF, result)
     }
 

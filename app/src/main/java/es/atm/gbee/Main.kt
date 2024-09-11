@@ -29,7 +29,7 @@ fun main(args: Array<String>){
 
     Memory.dumpMemory(VRAM_START, VRAM_END) // Print Memory
 
-    exitProcess(0)
+    exitProcess(0) // TEST
 
     // LOAD GAME ROM
     if(!ROM.load_rom("D:/test_rom.gb"/*args[0]*/)){
