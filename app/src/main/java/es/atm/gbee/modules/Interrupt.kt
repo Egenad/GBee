@@ -17,6 +17,10 @@ object Interrupt {
         fun getInterruptMask(): Int {
             return 1 shl interruptBit
         }
+
+        fun getByteMask(): Byte{
+            return getInterruptMask().toByte()
+        }
     }
 
     private var IME : Boolean = false               // Flag that enables or disables all interrupts. (Interrupt Master Enable)
