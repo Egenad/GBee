@@ -75,7 +75,7 @@ object CPU {
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    fun step(): Boolean{
+    fun tick(): Boolean{
 
         // Interrupts
         if(!pendingEI){

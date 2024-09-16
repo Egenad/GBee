@@ -69,7 +69,7 @@ enum class StatObj(val shift: Int, val mask: Int) {
 
 object PPU {
 
-    fun updatePPU(){
+    fun tick(){
 
 
     }

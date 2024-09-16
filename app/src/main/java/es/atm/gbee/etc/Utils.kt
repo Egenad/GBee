@@ -11,9 +11,16 @@ fun memcmp(b1: ByteArray, b2: ByteArray, sz: Int): Int {
     return 0
 }
 
-fun extractByteArray(original: ByteArray, start: Int, end: Int): ByteArray {
+fun extractByteArray(original: ByteArray, start: Int, end: Int, inclusive: Boolean): ByteArray {
     if (start < 0 || end > original.size || start > end) {
         throw IllegalArgumentException("Out of bounds")
     }
-    return original.copyOfRange(start, end)
+    return original.copyOfRange(start, if (inclusive) end + 1 else end)
+}
+
+fun extractByte(original: ByteArray, byteAddres: Int): Byte {
+    if (byteAddres < 0 || byteAddres > original.size) {
+        throw IllegalArgumentException("Out of bounds")
+    }
+    return original[byteAddres]
 }

@@ -17,11 +17,11 @@ fun main(args: Array<String>){
         return
     }*/
 
-    Memory.dumpMemory(ROM_START, ROM_END) // Print Memory
+    /*Memory.dumpMemory(ROM_START, ROM_END) // Print Memory
 
     // BOOTSTRAP
     while(CPU.getBootstrapPending()){
-        if(!CPU.step()){
+        if(!CPU.tick()){
             System.err.println("An error on the boot process has occurred. Program must exit.")
             exitProcess(0)
         }
@@ -38,8 +38,17 @@ fun main(args: Array<String>){
     }
 
     while(true){
-        if(!CPU.step()){
+        if(!CPU.tick()){
             break
         }
-    }
+    }*/
+
+    //ROM.load_rom("D:/test_rom.gb")
+    //ROM.load_rom("D:/test_rom_2.gb")
+    //ROM.load_rom("D:/test_rom_3.gb")
+    //ROM.load_rom("D:/test_rom_4.gbc")
+    //ROM.load_rom("D:/test_rom_5.gbc")
+    //ROM.load_rom("D:/test_rom_6.gb")
+    ROM.load_rom("D:/Git/GBee/roms/GoldenSacra.gb")
+
 }
