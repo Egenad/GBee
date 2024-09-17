@@ -4,8 +4,6 @@ const val TM_1_START : Int  = 0x9800 // TileMap 1 Start Address
 const val TM_1_END : Int    = 0x9BFF // TileMap 1 End Address
 const val TM_2_START : Int  = 0x9C00 // TileMap 2 Start Address
 const val TM_2_END : Int    = 0x9FFF // TileMap 2 End Address
-const val OAM_START : Int   = 0xFE00 // OAM Start Address
-const val OAM_END : Int     = 0xFE9F // OAM End Address
 const val LCD_STAT : Int    = 0xFF41 // LCD STATUS
 const val LCDC_ADDR : Int   = 0xFF40 // LCDC - LCD Control
 const val LY_ADDR : Int     = 0xFF44
@@ -84,5 +82,21 @@ object PPU {
         if(lyc == ly && StatObj.COINCIDENCE_INTERRUPT.get(stat) != 0){
             Interrupt.requestInterrupt(Interrupt.InterruptType.LCD_STAT.getByteMask())
         }
+    }
+
+    fun readFromVRAM(address: Int) : Byte{
+        return 0 // TODO
+    }
+
+    fun writeToVRAM(address: Int, value: Byte){
+
+    }
+
+    fun readFromOAM(address: Int) : Byte{
+        return 0 // TODO
+    }
+
+    fun writeToOAM(address: Int, value: Byte){
+
     }
 }

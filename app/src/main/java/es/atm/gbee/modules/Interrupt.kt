@@ -6,6 +6,9 @@ const val TIMER_PTR     = 0x0050
 const val SERIAL_PTR    = 0x0048
 const val JOYPAD_PTR    = 0x0060
 
+const val IF            = 0xFF0F // Points out which interrupts are requested.
+const val IE            = 0xFFFF // Points out which interrupts are enabled.
+
 object Interrupt {
     enum class InterruptType(val interruptBit: Int) {
         VBLANK(0),
@@ -24,8 +27,6 @@ object Interrupt {
     }
 
     private var IME : Boolean = false               // Flag that enables or disables all interrupts. (Interrupt Master Enable)
-    private var IF : Int = 0xFF0F                   // Points out which interrupts are requested.
-    private var IE : Int = 0xFFFF                   // Points out which interrupts are enabled.
 
     fun getPendingInterrupts(): Int{
 
@@ -64,7 +65,8 @@ object Interrupt {
 
         // Deactivate interrupt
         val bit = (type.getInterruptMask()).inv()
-        IF = IF and bit
+        val IFValue = (Memory.getByteOnAddress(IF).toInt() and 0xFF)
+        Memory.writeByteOnAddress(IF, ((IFValue and bit) and 0xFF).toByte())
 
         CPU.executeInterrupt(address)
     }

@@ -69,7 +69,7 @@ object CPU {
 
     init {
         SP = 0xFFFE
-        PC = 0
+        PC = 0 // Jumps to 0x100 after boot
         cycles = 0
         println("CPU initialized")
     }
@@ -87,13 +87,15 @@ object CPU {
 
         // Halt
         if(cpu_halted){
+            println("CPU - Halted")
             cycles += CYCLES_4
             return true
         }
 
         // Opcode execution
         val opcode = fetch()
-        val valop = opcode.toHexString(HexFormat.Default)
+
+        println("CPU - Executing Instruction: " + opcode.toHexString(HexFormat.Default) + " - PC Address: " + (PC - 1))
 
         try {
             cycles += execute(opcode)

@@ -1,5 +1,6 @@
 package es.atm.gbee
 
+import es.atm.gbee.etc.printROM
 import es.atm.gbee.modules.BOOT_END
 import es.atm.gbee.modules.CPU
 import es.atm.gbee.modules.Memory
@@ -48,7 +49,10 @@ fun main(args: Array<String>){
     //ROM.load_rom("D:/test_rom_3.gb")
     //ROM.load_rom("D:/test_rom_4.gbc")
     //ROM.load_rom("D:/test_rom_5.gbc")
-    //ROM.load_rom("D:/test_rom_6.gb")
-    ROM.load_rom("D:/Git/GBee/roms/GoldenSacra.gb")
+    ROM.load_rom("D:/test_rom_6.gb")
+    //ROM.load_rom("D:/Git/GBee/roms/GoldenSacra.gb")
+    //ROM.load_rom("D:/tetris.gb")
 
+
+    printROM()
 }

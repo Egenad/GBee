@@ -24,7 +24,7 @@ object Emulator {
         }
 
         // LOAD GAME ROM
-        if(!ROM.load_rom("D:/test_rom.gb"/*args[0]*/)){
+        if(!ROM.load_rom(args[0])){
             System.err.println("Failed to load ROM: ${args[0]} <rom>")
             return
         }

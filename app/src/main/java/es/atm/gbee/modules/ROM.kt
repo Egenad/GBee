@@ -45,15 +45,27 @@ const val HEADER_CHECKSUM : Int         = 0x14D
 const val GLOBAL_CHECKSUM_START : Int   = 0x14E
 const val GLOBAL_CHECKSUM_END : Int     = 0x14F
 
+const val NEW_LICENSE_CODE : Int        = 0x33
+
 object ROM {
 
     private var cartTitle : String      = "Unknown"
     private var licenseCode : String    = "None"
-    private var cartType : String       = "ROM ONLY"
+    private var cartType : Int          = -1
     private var romSize : Int           = -1
     private var ramSize : Int           = -1
+    private var romVersion : Int        = -1
+    private var checkSum : Boolean      = false
 
-    val licenseCodes: Map<String, String> = mapOf(
+    private var ramEnabled: Boolean     = false
+    private var ramBanking: Boolean     = false
+
+    private var ramBanks                = Array(16){ByteArray(8 * 1024)} // MBC1 = 4 Banks Max. -- MBC3 / MBC5 = 16 Banks Max.
+    private var currentBank             = ramBanks[0]
+
+    private var battery: Boolean        = false
+
+    val newLicenseCodes: Map<String, String> = mapOf(
         "00" to "None",
         "01" to "Nintendo R&D1",
         "08" to "Capcom",
@@ -117,6 +129,156 @@ object ROM {
         "A4" to "Konami (Yu-Gi-Oh!)",
     )
 
+    val oldLicenseCodes : Map<Int, String> = mapOf(
+        0x00 to "None",
+        0x01 to "Nintendo",
+        0x08 to "Capcom",
+        0x09 to "HOT-B",
+        0x0B to "Coconuts Japan",
+        0x0C to "Elite Systems",
+        0x13 to "EA (Electronic Arts)",
+        0x18 to "Hudson Soft",
+        0x19 to "ITC Entertainment",
+        0x1A to "Yanoman",
+        0x1D to "Japan Clary",
+        0x1F to "Virgin Games Ltd.",
+        0x24 to "PCM Complete",
+        0x25 to "San-X",
+        0x28 to "Kemco",
+        0x29 to "SETA Corporation",
+        0x30 to "Infogrames",
+        0x31 to "Nintendo",
+        0x32 to "Bandai",
+        0x34 to "Konami",
+        0x35 to "HectorSoft",
+        0x38 to "Capcom",
+        0x39 to "Banpresto",
+        0x3C to ".Entertainment i",
+        0x3E to "Gremlin",
+        0x41 to "Ubi Soft",
+        0x42 to "Atlus",
+        0x44 to "Malibu Interactive",
+        0x46 to "Angel",
+        0x47 to "Spectrum Holoby",
+        0x49 to "Irem",
+        0x4A to "Virgin Games Ltd.",
+        0x4D to "Malibu Interactive",
+        0x4F to "U.S. Gold",
+        0x50 to "Absolute",
+        0x51 to "Acclaim Entertainment",
+        0x52 to "Activision",
+        0x53 to "Sammy USA Corporation",
+        0x54 to "GameTek",
+        0x55 to "Park Place",
+        0x56 to "LJN",
+        0x57 to "Matchbox",
+        0x59 to "Milton Bradley Company",
+        0x5A to "Mindscape",
+        0x5B to "Romstar",
+        0x5C to "Naxat Soft",
+        0x5D to "Tradewest",
+        0x60 to "Titus Interactive",
+        0x61 to "Virgin Games Ltd.",
+        0x67 to "Ocean Software",
+        0x69 to "EA (Electronic Arts)",
+        0x6E to "Elite Systems",
+        0x6F to "Electro Brain",
+        0x70 to "Infogrames5",
+        0x71 to "Interplay Entertainment",
+        0x72 to "Broderbund",
+        0x73 to "Sculptured Software",
+        0x75 to "The Sales Curve Limited",
+        0x78 to "THQ",
+        0x79 to "Accolade",
+        0x7A to "Triffix Entertainment",
+        0x7C to "Microprose",
+        0x7F to "Kemco",
+        0x80 to "Misawa Entertainment",
+        0x83 to "Lozc",
+        0x86 to "Tokuma Shoten",
+        0x8B to "Bullet-Proof Software",
+        0x8C to "Vic Tokai",
+        0x8E to "Ape",
+        0x8F to "I’Max",
+        0x91 to "Chunsoft Co.",
+        0x92 to "Video System",
+        0x93 to "Tsubaraya Productions",
+        0x95 to "Varie",
+        0x96 to "Yonezawa/S’Pal",
+        0x97 to "Kemco",
+        0x99 to "Arc",
+        0x9A to "Nihon Bussan",
+        0x9B to "Tecmo",
+        0x9C to "Imagineer",
+        0x9D to "Banpresto",
+        0x9F to "Nova",
+        0xA1 to "Hori Electric",
+        0xA2 to "Bandai",
+        0xA4 to "Konami",
+        0xA6 to "Kawada",
+        0xA7 to "Takara",
+        0xA9 to "Technos Japan",
+        0xAA to "Broderbund",
+        0xAC to "Toei Animation",
+        0xAD to "Toho",
+        0xAF to "Namco",
+        0xB0 to "Acclaim Entertainment",
+        0xB1 to "ASCII Corporation or Nexsoft",
+        0xB2 to "Bandai",
+        0xB4 to "Square Enix",
+        0xB6 to "HAL Laboratory",
+        0xB7 to "SNK",
+        0xB9 to "Pony Canyon",
+        0xBA to "Culture Brain",
+        0xBB to "Sunsoft",
+        0xBD to "Sony Imagesoft",
+        0xBF to "Sammy Corporation",
+        0xC0 to "Taito",
+        0xC2 to "Kemco",
+        0xC3 to "Square",
+        0xC4 to "Tokuma Shoten",
+        0xC5 to "Data East",
+        0xC6 to "Tonkinhouse",
+        0xC8 to "Koei",
+        0xC9 to "UFL",
+        0xCA to "Ultra",
+        0xCB to "Vap",
+        0xCC to "Use Corporation",
+        0xCD to "Meldac",
+        0xCE to "Pony Canyon",
+        0xCF to "Angel",
+        0xD0 to "Taito",
+        0xD1 to "Sofel",
+        0xD2 to "Quest",
+        0xD3 to "Sigma Enterprises",
+        0xD4 to "ASK Kodansha Co.",
+        0xD6 to "Naxat Soft13",
+        0xD7 to "Copya System",
+        0xD9 to "Banpresto",
+        0xDA to "Tomy",
+        0xDB to "LJN",
+        0xDD to "NCS",
+        0xDE to "Human",
+        0xDF to "Altron",
+        0xE0 to "Jaleco",
+        0xE1 to "Towa Chiki",
+        0xE2 to "Yutaka",
+        0xE3 to "Varie",
+        0xE5 to "Epcoh",
+        0xE7 to "Athena",
+        0xE8 to "Asmik Ace Entertainment",
+        0xE9 to "Natsume",
+        0xEA to "King Records",
+        0xEB to "Atlus",
+        0xEC to "Epic/Sony Records",
+        0xEE to "IGS",
+        0xF0 to "A Wave",
+        0xF3 to "Extreme Entertainment",
+        0xFF to "LJN"
+    )
+
+    // MBC = Memory Bank Controller
+
     val cartTypes : Map<Int, String> = mapOf(
         0x00 to "ROM ONLY",
         0x01 to "MBC1",
@@ -148,12 +310,33 @@ object ROM {
         0xFF to "HuC1+RAM+BATTERY"
     )
 
-    fun getLicenseName(code: String): String {
-        return licenseCodes[code] ?: "Unknown"
+    val ramSizes : Map<Int, Int> = mapOf(
+        0x00 to 0, // KiB
+        0x01 to 2,
+        0x02 to 8,
+        0x03 to 32,
+        0x04 to 128,
+        0x05 to 64
+    )
+
+    fun getNewLicenseNameFromIndex(code: String): String {
+        return newLicenseCodes[code] ?: "Unknown"
     }
 
-    fun getRomType(index: Int): String {
+    fun getOldLicenseNameFromIndex(code: Int): String {
+        return oldLicenseCodes[code] ?: "Unknown"
+    }
+
+    fun getRomTypeFromIndex(index: Int): String {
        return cartTypes[index] ?: "Unknown"
+    }
+
+    fun cartTypeIsMBC(): Boolean{
+        return getRomTypeFromIndex(cartType).contains("MBC")
+    }
+
+    fun getRamSizeFromIndex(index: Int): Int {
+        return ramSizes[index] ?: 0
     }
 
     fun load_rom(fileName: String): Boolean{
@@ -166,7 +349,7 @@ object ROM {
                 val cartSize = min(romBytes.size, ROM_END - ROM_START + 1)
 
                 for (i in 0 until cartSize) {
-                    Memory.writeByteOnAddress(ROM_START + 1, romBytes[i])
+                    Memory.writeByteOnAddress(ROM_START + i, romBytes[i])
                 }
 
                 return rom_init(romBytes)
@@ -193,13 +376,83 @@ object ROM {
             return false
         }
 
-        println("ROM Loaded Successfully!")
-
         cartTitle   = convertBytesToString(extractByteArray(romBytes, TITLE_START, TITLE_END, true))
-        licenseCode = getLicenseName(convertBytesToString(extractByteArray(romBytes, LCNS_CODE_START, LCNS_CODE_END, true)))
-        cartType    = getRomType(extractByte(romBytes, CART_TYPE).toInt() and 0xFF)
-        romSize     = 32 * (1 shl extractByte(romBytes, ROM_SIZE).toInt() and 0xFF) // Value in KiB
 
+        licenseCode = if((extractByte(romBytes, OLD_LCNS_CODE).toInt() and 0xFF) == NEW_LICENSE_CODE){
+            getNewLicenseNameFromIndex(convertBytesToString(extractByteArray(romBytes, LCNS_CODE_START, LCNS_CODE_END, true)))
+        }else{
+            getOldLicenseNameFromIndex(extractByte(romBytes, OLD_LCNS_CODE).toInt() and 0xFF)
+        }
+
+        cartType    = extractByte(romBytes, CART_TYPE).toInt() and 0xFF
+        romSize     = 32 * (1 shl extractByte(romBytes, ROM_SIZE).toInt() and 0xFF) // Value in KiB
+        ramSize     = extractByte(romBytes, RAM_SIZE).toInt() and 0xFF
+        romVersion  = extractByte(romBytes, ROM_V_NUM).toInt() and 0xFF
+
+        // Checksum. Has to match with 0x14D value
+        var checksum: Byte = 0
+
+        for (address in 0x0134..0x014C){
+            val byte = Memory.getByteOnAddress(address)
+            checksum = ((checksum - byte - 0x1) and 0xFF).toByte()
+        }
+
+        if(extractByte(romBytes, HEADER_CHECKSUM) != checksum) return false
+        checkSum = true
+
+        println("ROM Loaded Successfully!")
         return true
+    }
+
+    fun readFromROM(address: Int): Byte{
+
+        // Check if fixed ROM
+        if(!cartTypeIsMBC() || address < ROM_SW_START){
+            return Memory.read(address)
+        }
+
+        if((address and 0xE000) == 0xA000){
+            if (!ramEnabled || !ramBanking){
+                return 0xFF.toByte()
+            }
+
+        }
+
+        return 0 // TODO
+    }
+
+    fun writeToROM(address: Int, value: Byte){
+
+        // Check for MBC's
+
+        Memory.write(address, value)
+    }
+
+    fun getCartTitle() : String{
+        return cartTitle
+    }
+
+    fun getLicenseCode(): String{
+        return licenseCode
+    }
+
+    fun getCartType(): Int{
+        return cartType
+    }
+
+    fun getRomSize(): Int{
+        return romSize
+    }
+
+    fun getRamSize(): Int{
+        return ramSize
+    }
+
+    fun getRomVersion(): Int{
+        return romVersion
+    }
+
+    fun getCheckSum(): Boolean{
+        return checkSum
     }
 }
