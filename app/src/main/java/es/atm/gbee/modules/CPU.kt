@@ -103,7 +103,7 @@ object CPU {
             return false
         }
 
-        handleTimers()
+        //handleTimers()
 
         return true
     }
@@ -134,10 +134,6 @@ object CPU {
             // Handle the interrupt
             Interrupt.flush()
         }
-    }
-
-    private fun handleTimers(){
-
     }
 
     fun executeInterrupt(address: Int){
@@ -2061,7 +2057,7 @@ object CPU {
 
         val opcode = fetch()
 
-        val cycles = when (opcode.toInt() and 0xFF) {
+        return when (opcode.toInt() and 0xFF) {
             0x00 -> rlc_b()                         // RLC B
             0x01 -> rlc_c()                         // RLC C
             0x02 -> rlc_d()                         // RLC D
@@ -2320,8 +2316,6 @@ object CPU {
             0xFF -> set_operation(A_RG_N, BIT_7)    // SET 7, A
             else -> throw IllegalStateException("Opcode CB $opcode not implemented")
         }
-
-        return cycles
     }
 
     fun call_z_nn(): Int{

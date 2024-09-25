@@ -26,7 +26,7 @@ class CPUTest {
         Memory.writeByteOnAddress(0x1, 0xFF.toByte())
         Memory.writeByteOnAddress(0x2, 0xF0.toByte())
 
-        val result = CPU.step()
+        val result = CPU.tick()
 
         assertEquals(0xF0.toByte(), CPU.B)
         assertEquals(0xFF.toByte(), CPU.C)
@@ -52,9 +52,9 @@ class CPUTest {
         CPU.add_a_b()
 
         assertEquals(0x30.toByte(), CPU.A)
-        assertFalse(CPU.flagIsSet(CPU.FLAG_Z))
-        assertFalse(CPU.flagIsSet(CPU.FLAG_N))
-        assertFalse(CPU.flagIsSet(CPU.FLAG_H))
-        assertFalse(CPU.flagIsSet(CPU.FLAG_C))
+        assertFalse(CPU.flagIsSet(FLAG_Z))
+        assertFalse(CPU.flagIsSet(FLAG_N))
+        assertFalse(CPU.flagIsSet(FLAG_H))
+        assertFalse(CPU.flagIsSet(FLAG_C))
     }
 }

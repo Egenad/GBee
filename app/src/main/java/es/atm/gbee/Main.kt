@@ -49,8 +49,8 @@ fun main(args: Array<String>){
     //ROM.load_rom("D:/test_rom_3.gb")
     //ROM.load_rom("D:/test_rom_4.gbc")
     //ROM.load_rom("D:/test_rom_5.gbc")
-    ROM.load_rom("D:/test_rom_6.gb")
-    //ROM.load_rom("D:/Git/GBee/roms/GoldenSacra.gb")
+    //ROM.load_rom("D:/test_rom_6.gb")
+    ROM.load_rom("/Users/angelterol/Documents/Git/Android/GBee/roms/GoldenSacra.gb")
     //ROM.load_rom("D:/tetris.gb")
 
 

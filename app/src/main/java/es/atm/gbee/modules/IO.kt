@@ -50,6 +50,10 @@ object IO {
             Interrupt.set_IF(value.toInt())
         }
 
+        if(address == DMA_RGSTR){
+            DMA.start(value)
+        }
+
         println("IO - Unkown write on address: $address")
     }
 }

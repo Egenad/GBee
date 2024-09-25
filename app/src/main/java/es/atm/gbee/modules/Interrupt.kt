@@ -60,7 +60,7 @@ object Interrupt {
         else if ((activeInterrupts and InterruptType.JOYPAD.getInterruptMask()) != 0)   return handleInterrupt(JOYPAD_PTR, InterruptType.JOYPAD)
     }
 
-    fun handleInterrupt(address: Int, type: InterruptType){
+    private fun handleInterrupt(address: Int, type: InterruptType){
 
         enableInterrupts(false)       // IME gets disabled to prevent other interruptions from happening
 
