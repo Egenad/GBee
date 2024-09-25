@@ -50,7 +50,6 @@ object Interrupt {
     }
 
     fun flush(){
-        enableInterrupts(false)       // IME gets disabled to prevent other interruptions from happening
 
         val activeInterrupts = getPendingInterrupts()
 
@@ -63,11 +62,18 @@ object Interrupt {
 
     fun handleInterrupt(address: Int, type: InterruptType){
 
+        enableInterrupts(false)       // IME gets disabled to prevent other interruptions from happening
+
         // Deactivate interrupt
         val bit = (type.getInterruptMask()).inv()
-        val IFValue = (Memory.getByteOnAddress(IF).toInt() and 0xFF)
-        Memory.writeByteOnAddress(IF, ((IFValue and bit) and 0xFF).toByte())
+        val ifValue = (Memory.getByteOnAddress(IF).toInt() and 0xFF)
+        set_IF(ifValue and bit)
 
         CPU.executeInterrupt(address)
+    }
+
+    fun set_IF(value: Int){
+        val newValue = ((value or 0xE0) and 0xFF).toByte()
+        Memory.writeByteOnAddress(IF, newValue)
     }
 }

@@ -65,7 +65,34 @@ enum class StatObj(val shift: Int, val mask: Int) {
     }
 }
 
+enum class PPUMode(val number: Int){
+    HBlank(0),
+    VBlank(1),
+    OAM(2),
+    DRAW_LCD(3)
+}
+
+data class OAMObj(
+    val x: Byte,
+    val y: Byte,
+    val tile: Byte,
+    val flags: Byte
+)
+
+/*   OAM Obj Flags:
+*    Bit 7 - Priority: 0 = No, 1 = BG and Window colors 1–3 are drawn over this OBJ
+*    Bit 6 - Y flip: 0 = Normal, 1 = Entire OBJ is vertically mirrored
+*    Bit 5 - X flip: 0 = Normal, 1 = Entire OBJ is horizontally mirrored
+*    Bit 4 - DMG palette [Non CGB Mode only]: 0 = OBP0, 1 = OBP1
+*    Bit 3 - Bank [CGB Mode Only]: 0 = Fetch tile from VRAM bank 0, 1 = Fetch tile from VRAM bank 1
+*    Bits 2, 1, 0 - CGB palette [CGB Mode Only]: Which of OBP0–7 to use
+*/
+
 object PPU {
+
+    private var currentFrame : Int = 0
+    private var oamRam: ByteArray = ByteArray(40 * 4) // Max number: 40 OAM Objs * 4 Bytes
+    private var vRam : ByteArray = ByteArray(2000)
 
     fun tick(){
 
@@ -73,9 +100,9 @@ object PPU {
     }
 
     fun compare_LY_LYC(){
-        val lyc = Memory.getByteOnAddress(LYC_ADDR)
-        val ly = Memory.getByteOnAddress(LY_ADDR)
-        val stat = Memory.getByteOnAddress(LCD_STAT)
+        val lyc     = Memory.getByteOnAddress(LYC_ADDR)
+        val ly      = Memory.getByteOnAddress(LY_ADDR)
+        val stat    = Memory.getByteOnAddress(LCD_STAT)
 
         StatObj.COINCIDENCE_FLAG.set(stat, if (lyc == ly) 0x1 else 0x0)
 
@@ -84,19 +111,33 @@ object PPU {
         }
     }
 
-    fun readFromVRAM(address: Int) : Byte{
-        return 0 // TODO
-    }
-
-    fun writeToVRAM(address: Int, value: Byte){
-
-    }
-
     fun readFromOAM(address: Int) : Byte{
-        return 0 // TODO
+        var arrayAddress = address and 0xFFFF
+
+        if(address >= OAM_START){
+            arrayAddress -= 0xFE00
+        }
+
+        return oamRam[arrayAddress]
     }
 
     fun writeToOAM(address: Int, value: Byte){
 
+        var arrayAddress = address and 0xFFFF
+
+        if(address >= OAM_START){
+            arrayAddress -= 0xFE00
+        }
+
+        oamRam[arrayAddress] = value
+        Memory.write(address, value)
+    }
+
+    fun readFromVRAM(address: Int) : Byte{
+        return vRam[address - VRAM_START]
+    }
+
+    fun writeToVRAM(address: Int, value: Byte){
+        vRam[address - VRAM_START] = value
     }
 }

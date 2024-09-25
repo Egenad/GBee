@@ -2,8 +2,8 @@ package es.atm.gbee.modules
 
 // These are CLOCK CYCLES, not MACHINE CYCLES
 // 1 Machine Cycle = 4 Clock Cycles
-const val CYCLES_4 = 4      // 1 MC
-const val CYCLES_8 = 8      // 2 MC
+const val CYCLES_4  = 4     // 1 MC
+const val CYCLES_8  = 8     // 2 MC
 const val CYCLES_12 = 12    // 3 MC
 const val CYCLES_16 = 16    // 4 MC
 const val CYCLES_20 = 20    // 5 MC
@@ -27,6 +27,12 @@ const val BIT_5     = 5
 const val BIT_6     = 6
 const val BIT_7     = 7
 
+// Flags --> Booleans
+const val FLAG_Z = 0x80           // Zero Flag
+const val FLAG_N = 0x40           // Subtract Flag
+const val FLAG_H = 0x20           // Half Carry Flag
+const val FLAG_C = 0x10           // Carry Flag
+
 // Nibble   -->  4 Bits
 // Byte     -->  8 Bits
 // Int      --> 32 Bits
@@ -46,12 +52,6 @@ object CPU {
     // 16 bits registers
     var SP: Int = 0xFFFE        // Stack Pointer
     var PC: Int = 0             // Program Counter
-
-    // Flags --> Booleans
-    var FLAG_Z = 0x80           // Zero Flag
-    var FLAG_N = 0x40           // Subtract Flag
-    var FLAG_H = 0x20           // Half Carry Flag
-    var FLAG_C = 0x10           // Carry Flag
 
     private var cycles = 0
 
@@ -146,9 +146,9 @@ object CPU {
 
         // PUSH PC TO STACK
         SP = (SP - 1) and 0xFFFF
-        Memory.writeByteOnAddress(SP, ((PC shr 8) and 0xFF).toByte()) // high
+        Memory.writeByteOnAddress(SP, ((PC shr 8) and 0xFF).toByte())   // high
         SP = (SP - 1) and 0xFFFF
-        Memory.writeByteOnAddress(SP, (PC and 0xFF).toByte()) // low
+        Memory.writeByteOnAddress(SP, (PC and 0xFF).toByte())           // low
 
         PC = address
 
@@ -168,9 +168,9 @@ object CPU {
     }
 
     fun fetch16(): Int {
-        val low = fetch().toInt() and 0xFF
-        val high = fetch().toInt() and 0xFF
-        return (high shl 8) or low
+        val low = fetch()
+        val high = fetch()
+        return get_16bit_address(high, low)
     }
 
     fun execute(opcode: Byte): Int {
@@ -433,7 +433,7 @@ object CPU {
     }
 
     fun set_16bit_address_value(high: Byte, low: Byte, value: Byte){
-        val address = ((high.toInt() and 0xFF) shl 8) or (low.toInt() and 0xFF)
+        val address = get_16bit_address(high, low)
         Memory.writeByteOnAddress(address, value)
     }
 

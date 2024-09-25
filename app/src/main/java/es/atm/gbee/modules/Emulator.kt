@@ -15,6 +15,8 @@ object Emulator {
             return
         }
 
+        Timer.init_timers()
+
         // BOOTSTRAP
         while(CPU.getBootstrapPending()){
             if(!CPU.tick()){

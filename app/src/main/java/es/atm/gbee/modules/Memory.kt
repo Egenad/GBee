@@ -177,7 +177,6 @@ object Memory {
     }
 
     fun writeByteOnAddress(address: Int, value: Byte){
-
         if(address < VRAM_START) {                  // ROM DATA
             ROM.writeToROM(address, value)
         }else if(address < EXTERNAL_RAM_START) {    // VRAM DATA
@@ -197,22 +196,9 @@ object Memory {
         }else if(address == IE){                    // IE FLAG DATA
             write(address, value)
         }
-
-        /*when(address){
-            0xFF0F -> { // IF Memory Address - Interrupt Request
-                Interrupt.requestInterrupt(value)
-            }
-            0xFF50 -> { // Boot Process End Flag
-                if((value.toInt() and 0xFF) != 0)
-                    CPU.setBootstrapPending(false)
-            }
-        }
-
-        memory[address] = value*/
     }
 
     fun getByteOnAddress(address: Int): Byte{
-
         if(address < VRAM_START) {                  // ROM DATA
             return ROM.readFromROM(address)
         }else if(address < EXTERNAL_RAM_START) {    // VRAM DATA
