@@ -8,6 +8,7 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import es.atm.gbee.modules.Memory
 import es.atm.gbee.modules.VRAM_START
 
 const val ROW_NUMBER = 24
@@ -24,7 +25,7 @@ class GameSurfaceView @JvmOverloads constructor(
 
     private val debugMode = true
 
-    val tileColors : LongArray = longArrayOf(0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000)
+    private val tileColors : IntArray = intArrayOf(0xFFFFFFFF.toInt(), 0xFFAAAAAA.toInt(), 0xFF555555.toInt(), 0xFF000000.toInt())
 
     private var gameThread: GameThread? = null
 
@@ -78,7 +79,6 @@ class GameSurfaceView @JvmOverloads constructor(
         if(debugMode){
             for (y in 0 until ROW_NUMBER) {
                 for(x in 0 until COL_NUMBER){
-                    /**/
                     displayTile(canvas, VRAM_START, tileNum, xDraw + (x * scale), yDraw + (y * scale))
                     xDraw += (8 * scale)
                     tileNum++
@@ -91,17 +91,27 @@ class GameSurfaceView @JvmOverloads constructor(
 
     fun displayTile(canvas: Canvas, startLocation: Int, tileNumber: Int, x: Int, y: Int){
 
-        for(tileY in 0 until 16){
-            
-        }
+        val paint = Paint()
 
-        canvas.drawRect(
-            x * gameBoyWidth.toFloat(),
-            y * gameBoyHeight.toFloat(),
-            (x + 1) * gameBoyWidth.toFloat(),
-            (y + 1) * gameBoyHeight.toFloat(),
-            Paint().apply { color = Color.WHITE }
-        )
+        for(tileY in 0 until 16){
+            val b1 = Memory.read(startLocation + (tileNumber * 16) + tileY)
+            val b2 = Memory.read(startLocation + (tileNumber * 16) + tileY + 1)
+
+            for(bit in 7 downTo  0){
+                val high = if (((b1.toInt() and 0xFF) and (1 shl bit)) != 0) 0b10 else 0
+                val low = if (((b2.toInt() and 0xFF) and (1 shl bit)) != 0) 0b01 else 0
+
+                val color = tileColors[high or low]
+                paint.color = color
+
+                val left = x + ((7 - bit) * scale)
+                val top = y + (tileY / 2 * scale)
+                val right = left + scale
+                val bottom = top + scale
+
+                canvas.drawRect(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat(), paint)
+            }
+        }
     }
 }
 
