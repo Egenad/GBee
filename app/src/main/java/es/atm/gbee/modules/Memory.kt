@@ -186,7 +186,8 @@ object Memory {
         }else if(address < OAM_START) {             // ECHO RAM -- CANT BE USED !
             return
         }else if(address < RESERVED_MEM_START) {    // OAM DATA
-            PPU.writeToOAM(address, value)
+            if(!DMA.transferring())
+                PPU.writeToOAM(address, value)
         }else if(address < IO_START) {              // RESERVED MEMORY - CANT BE USED !
             return
         }else if(address < HRAM_START) {            // IO DATA
@@ -208,6 +209,7 @@ object Memory {
         }else if(address < OAM_START) {             // ECHO RAM -- CANT BE USED !
             return 0
         }else if(address < RESERVED_MEM_START) {    // OAM DATA
+            if(DMA.transferring()) return 0xFF.toByte()
             return PPU.readFromOAM(address)
         }else if(address < IO_START) {              // RESERVED MEMORY - CANT BE USED !
             return 0

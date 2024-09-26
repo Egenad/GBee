@@ -44,14 +44,21 @@ object IO {
 
         if(address in DIV..TAC){
             Timer.writeToTimer(address, value)
+            return
         }
 
         if(address == IF){
             Interrupt.set_IF(value.toInt())
+            return
         }
 
         if(address == DMA_RGSTR){
             DMA.start(value)
+            return
+        }
+
+        if(address == LY_ADDR){
+
         }
 
         println("IO - Unkown write on address: $address")
