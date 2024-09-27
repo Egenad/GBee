@@ -50,6 +50,19 @@ const val NEW_LICENSE_CODE : Int        = 0x33
 
 object ROM {
 
+    enum class CONSOLE_TYPE(val value : Int){
+        DMG(0),
+        DMG_CGB(0x80),
+        CGB(0xC0),
+        UNKNOWN(-1);
+
+        companion object {
+            fun fromValue(value: Int): CONSOLE_TYPE {
+                return entries.find { it.value == value } ?: UNKNOWN
+            }
+        }
+    }
+
     private var cartTitle : String      = "Unknown"
     private var licenseCode : String    = "None"
     private var cartType : Int          = -1
@@ -57,6 +70,7 @@ object ROM {
     private var ramSize : Int           = -1
     private var romVersion : Int        = -1
     private var checkSum : Boolean      = false
+    private var console: CONSOLE_TYPE   = CONSOLE_TYPE.UNKNOWN
 
     private var ramEnabled: Boolean     = false
     private var ramBanking: Boolean     = false
@@ -389,6 +403,7 @@ object ROM {
         romSize     = 32 * (1 shl extractByte(romBytes, ROM_SIZE).toInt() and 0xFF) // Value in KiB
         ramSize     = extractByte(romBytes, RAM_SIZE).toInt() and 0xFF
         romVersion  = extractByte(romBytes, ROM_V_NUM).toInt() and 0xFF
+        console     = CONSOLE_TYPE.fromValue(extractByte(romBytes, TITLE_END).toInt() and 0xFF)
 
         // Checksum. Has to match with 0x14D value
         var checksum: Byte = 0
@@ -457,5 +472,9 @@ object ROM {
 
     fun getCheckSum(): Boolean{
         return checkSum
+    }
+
+    fun getConsole(): CONSOLE_TYPE{
+        return console
     }
 }

@@ -3,6 +3,7 @@ package es.atm.gbee.modules
 const val JOYPAD    = 0xFF00 // Joy Pad information and System Type
 const val SB        = 0xFF01 // Serial Transfer Data
 const val SC        = 0xFF02 // Serial Transfer Control
+
 enum class GamePadBits(val bit: Int) {
     A_BUTTON(0),
     RIGHT_PAD(0),
@@ -42,8 +43,8 @@ object IO {
             return Timer.readFromTimer(address)
         }
 
-        if(address == IF){
-            return Memory.read(IF)
+        if(address == IF || address in LCDC_ADDR..WX){
+            return Memory.read(address)
         }
 
         println("IO - Unsupported read on address: $address")
@@ -84,8 +85,8 @@ object IO {
             return
         }
 
-        if(address == LY_ADDR){
-
+        if(address in LCDC_ADDR..WX){
+            PPU.writeToLCD(address, value)
             return
         }
 
@@ -93,17 +94,12 @@ object IO {
     }
 
     fun readJoyPad(): Byte{
-        var toReturn: Int = 0xCF
-        val joyVal = Memory.read(JOYPAD)
-
-        if(GamePadBits.SELECT_DPAD.get(joyVal) == 0){
-
-        }
-
-        return toReturn.toByte()
+        return Memory.read(JOYPAD)
     }
 
     fun writeToJoyPad(value: Byte){
-
+        val oldJoyPad = Memory.read(JOYPAD)
+        val newJoyPad = ((oldJoyPad.toInt() and 0xFF) or (value.toInt() and 0x30)).toByte() // Write only to selectors (Bits 4-5)
+        Memory.write(JOYPAD, newJoyPad)
     }
 }

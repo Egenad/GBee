@@ -11,4 +11,5 @@ fun printROM(){
     println("ROM Version Number: " + ROM.getRomVersion())
     println("RAM Size: " + ROM.getRamSize())
     println("Checksum Passed: " + ROM.getCheckSum())
+    println("Console Type: " + ROM.getConsole())
 }

@@ -18,6 +18,11 @@ const val BGP : Int         = 0xFF47 // Background Palette - Non-CGB
 const val OBP0 : Int        = 0xFF48 // Object Palette 0 - Non-CGB
 const val OBP1 : Int        = 0xFF49 // Object Palette 1 - Non-CGB
 
+const val C_BGP_INDEX : Int = 0xFF68 // Background Palette INDEX - CGB
+const val C_BGP_DATA : Int  = 0xFF69 // Background Palette DATA - CGB
+const val C_BGP_OCPS : Int  = 0xFF68 // Not Used - Reserved
+const val C_BGP_OBPI : Int  = 0xFF68 // Not Used - Reserved
+
 const val OAM_CYCLES            = 80
 const val PIXEL_TRANSFER_CYCLES = 172
 const val HBLANK_CYCLES         = 204
@@ -94,6 +99,42 @@ object PPU {
     private var oamRam: ByteArray = ByteArray(40 * 4) // Max number: 40 OAM Objs * 4 Bytes
     private var vRam : ByteArray = ByteArray(2000)
 
+    enum class PALETTE_TYPE(){
+        BASIC_PL,
+        GREENER_PL,
+        C_DEFAULT_PL,
+        C_RED_PL,
+        C_BROWN_PL,
+        C_BLUE_PL,
+        C_GRAY_PL,
+        C_PINK_PL,
+        C_ORANGE_PL,
+        C_YELLOW_PL,
+        C_TEAL_PL,
+        C_REDGREEN_PL,
+        C_BLUERED_PL,
+        C_MONOCHRMGRAY_PL,
+        C_MONOCHRMYELLOW_PL
+    }
+
+    private val palettes: HashMap<PALETTE_TYPE, IntArray> = hashMapOf(
+        Pair(PALETTE_TYPE.BASIC_PL, intArrayOf(0xFFFFFFFF.toInt(), 0xFFAAAAAA.toInt(), 0xFF555555.toInt(), 0xFF000000.toInt())),
+        Pair(PALETTE_TYPE.GREENER_PL, intArrayOf(0xFFE0F8D0.toInt(), 0xFF88C070.toInt(), 0xFF346856.toInt(), 0xFF081820.toInt())),
+        Pair(PALETTE_TYPE.C_DEFAULT_PL, intArrayOf(0xFF000000.toInt(), 0xFF00A800.toInt(), 0xFF54FC54.toInt(), 0xFFFFFFFF.toInt())),
+        Pair(PALETTE_TYPE.C_RED_PL, intArrayOf(0xFF000000.toInt(), 0xFFB80000.toInt(), 0xFFFF3030.toInt(), 0xFFFFFFFF.toInt())),
+        Pair(PALETTE_TYPE.C_BROWN_PL, intArrayOf(0xFF000000.toInt(), 0xFF785000.toInt(), 0xFFD0A060.toInt(), 0xFFFFFFFF.toInt())),
+        Pair(PALETTE_TYPE.C_BLUE_PL, intArrayOf(0xFF000000.toInt(), 0xFF0000B8.toInt(), 0xFF3030FF.toInt(), 0xFFFFFFFF.toInt())),
+        Pair(PALETTE_TYPE.C_GRAY_PL, intArrayOf(0xFF000000.toInt(), 0xFF555555.toInt(), 0xFFAAAAAA.toInt(), 0xFFFFFFFF.toInt())),
+        Pair(PALETTE_TYPE.C_PINK_PL, intArrayOf(0xFF000000.toInt(), 0xFFB800B8.toInt(), 0xFFFF54FF.toInt(), 0xFFFFFFFF.toInt())),
+        Pair(PALETTE_TYPE.C_ORANGE_PL, intArrayOf(0xFF000000.toInt(), 0xFFB85400.toInt(), 0xFFFFAA30.toInt(), 0xFFFFFFFF.toInt())),
+        Pair(PALETTE_TYPE.C_YELLOW_PL, intArrayOf(0xFF000000.toInt(), 0xFFB8B800.toInt(), 0xFFFFFF54.toInt(), 0xFFFFFFFF.toInt())),
+        Pair(PALETTE_TYPE.C_TEAL_PL, intArrayOf(0xFF000000.toInt(), 0xFF00B8B8.toInt(), 0xFF54FFFF.toInt(), 0xFFFFFFFF.toInt())),
+        Pair(PALETTE_TYPE.C_REDGREEN_PL, intArrayOf(0xFF000000.toInt(), 0xFF00B800.toInt(), 0xFFFF54FF.toInt(), 0xFFFFFFFF.toInt())),
+        Pair(PALETTE_TYPE.C_BLUERED_PL, intArrayOf(0xFF000000.toInt(), 0xFF0000B8.toInt(), 0xFFFF3030.toInt(), 0xFFFFFFFF.toInt())),
+        Pair(PALETTE_TYPE.C_MONOCHRMGRAY_PL, intArrayOf(0xFF000000.toInt(), 0xFF555555.toInt(), 0xFFAAAAAA.toInt(), 0xFFFFFFFF.toInt())),
+        Pair(PALETTE_TYPE.C_MONOCHRMYELLOW_PL, intArrayOf(0xFF000000.toInt(), 0xFFB8B800.toInt(), 0xFFFFFF54.toInt(), 0xFFFFFFFF.toInt()))
+    )
+
     fun tick(){
 
 
@@ -133,11 +174,28 @@ object PPU {
         Memory.write(address, value)
     }
 
+    fun writeToLCD(address: Int, value: Byte){
+        if(address == BGP){
+            Memory.write(address, value)
+        }
+        if(address in OBP0 .. OBP1){
+            Memory.write(address, ((value.toInt() and 0xFF) and 0b11111100).toByte())
+        }
+    }
+
     fun readFromVRAM(address: Int) : Byte{
         return vRam[address - VRAM_START]
     }
 
     fun writeToVRAM(address: Int, value: Byte){
         vRam[address - VRAM_START] = value
+    }
+
+    fun getPaletteColors(palette: PALETTE_TYPE) : IntArray{
+        return palettes[palette]!!
+    }
+
+    fun getSelectedPalette(): IntArray{
+        Memory.read()
     }
 }

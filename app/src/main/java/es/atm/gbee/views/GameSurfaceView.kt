@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import es.atm.gbee.modules.Memory
+import es.atm.gbee.modules.PPU
 import es.atm.gbee.modules.VRAM_START
 
 const val ROW_NUMBER = 24
@@ -24,8 +25,6 @@ class GameSurfaceView @JvmOverloads constructor(
     private var scale : Float = 0f
 
     private val debugMode = true
-
-    private val tileColors : IntArray = intArrayOf(0xFFFFFFFF.toInt(), 0xFFAAAAAA.toInt(), 0xFF555555.toInt(), 0xFF000000.toInt())
 
     private var gameThread: GameThread? = null
 
@@ -102,6 +101,8 @@ class GameSurfaceView @JvmOverloads constructor(
             for(bit in 7 downTo  0){
                 val high = if (((b1.toInt() and 0xFF) and (1 shl bit)) != 0) 0b10 else 0
                 val low = if (((b2.toInt() and 0xFF) and (1 shl bit)) != 0) 0b01 else 0
+
+                val tileColors = PPU.getPaletteColors(PPU.PALETTE_TYPE.BASIC_PL) // TODO: Make it configurable
 
                 val color = tileColors[high or low]
                 paint.color = color
