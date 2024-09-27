@@ -21,7 +21,7 @@ class GameSurfaceView @JvmOverloads constructor(
 
     private val gameBoyWidth = 160
     private val gameBoyHeight = 144
-    private var scale = 0
+    private var scale : Float = 0f
 
     private val debugMode = true
 
@@ -47,20 +47,22 @@ class GameSurfaceView @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val width = MeasureSpec.getSize(widthMeasureSpec)
-        val height = MeasureSpec.getSize(heightMeasureSpec)
+        val width = MeasureSpec.getSize(widthMeasureSpec) // Android phone total width
+        val height = MeasureSpec.getSize(heightMeasureSpec)  // Android phone total height
 
-        val aspectRatio = gameBoyWidth.toFloat() / gameBoyHeight.toFloat()
-        scale = aspectRatio.toInt()
+        val aspectRatio = gameBoyWidth.toFloat() / gameBoyHeight.toFloat() // GB Aspect Ratio
+
         val newWidth: Int
         val newHeight: Int
 
-        if (width / height > aspectRatio) {
+        if (width / height > aspectRatio) { // Landscape
             newWidth = (height * aspectRatio).toInt()
             newHeight = height
-        } else {
+            scale = height / gameBoyHeight.toFloat()
+        } else { // Straight
             newWidth = width
             newHeight = (width / aspectRatio).toInt()
+            scale = width / gameBoyWidth.toFloat()
         }
 
         setMeasuredDimension(newWidth, newHeight)
@@ -72,8 +74,8 @@ class GameSurfaceView @JvmOverloads constructor(
     fun render(canvas: Canvas) {
         canvas.drawColor(Color.BLACK) // Background
 
-        var xDraw = 0
-        var yDraw = 0
+        var xDraw = 0f
+        var yDraw = 0f
         var tileNum = 0
 
         if(debugMode){
@@ -84,12 +86,12 @@ class GameSurfaceView @JvmOverloads constructor(
                     tileNum++
                 }
                 yDraw += (8 * scale)
-                xDraw = 0
+                xDraw = 0f
             }
         }
     }
 
-    fun displayTile(canvas: Canvas, startLocation: Int, tileNumber: Int, x: Int, y: Int){
+    private fun displayTile(canvas: Canvas, startLocation: Int, tileNumber: Int, x: Float, y: Float){
 
         val paint = Paint()
 
@@ -109,7 +111,7 @@ class GameSurfaceView @JvmOverloads constructor(
                 val right = left + scale
                 val bottom = top + scale
 
-                canvas.drawRect(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat(), paint)
+                canvas.drawRect(left, top, right, bottom, paint)
             }
         }
     }

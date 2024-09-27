@@ -7,12 +7,16 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import es.atm.gbee.R
 import es.atm.gbee.databinding.ActivityEmuBinding
+import es.atm.gbee.modules.Emulator
+import es.atm.gbee.modules.ROM
 import es.atm.gbee.views.GameSurfaceView
 
 class EmuActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityEmuBinding
     private lateinit var gameSurfaceView: GameSurfaceView
+
+    private val Emulator = Emulator()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +33,6 @@ class EmuActivity : AppCompatActivity() {
             insets
         }
 
-
+        ROM.load_rom("/Users/angelterol/Documents/Git/Android/GBee/roms/GoldenSacra.gb")
     }
 }

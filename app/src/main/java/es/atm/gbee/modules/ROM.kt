@@ -3,6 +3,7 @@ package es.atm.gbee.modules
 import es.atm.gbee.etc.extractByte
 import es.atm.gbee.etc.extractByteArray
 import es.atm.gbee.etc.memcmp
+import es.atm.gbee.etc.printROM
 import java.io.File
 import kotlin.math.min
 
@@ -401,6 +402,8 @@ object ROM {
         checkSum = true
 
         println("ROM Loaded Successfully!")
+        printROM()
+
         return true
     }
 

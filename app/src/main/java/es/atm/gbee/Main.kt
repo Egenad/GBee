@@ -3,12 +3,14 @@ package es.atm.gbee
 import es.atm.gbee.etc.printROM
 import es.atm.gbee.modules.BOOT_END
 import es.atm.gbee.modules.CPU
+import es.atm.gbee.modules.Emulator
 import es.atm.gbee.modules.Memory
 import es.atm.gbee.modules.ROM
 import es.atm.gbee.modules.ROM_END
 import es.atm.gbee.modules.ROM_START
 import es.atm.gbee.modules.VRAM_END
 import es.atm.gbee.modules.VRAM_START
+import kotlinx.coroutines.delay
 import kotlin.system.exitProcess
 
 fun main(args: Array<String>){
@@ -50,9 +52,21 @@ fun main(args: Array<String>){
     //ROM.load_rom("D:/test_rom_4.gbc")
     //ROM.load_rom("D:/test_rom_5.gbc")
     //ROM.load_rom("D:/test_rom_6.gb")
-    ROM.load_rom("/Users/angelterol/Documents/Git/Android/GBee/roms/GoldenSacra.gb")
+    //ROM.load_rom("/Users/angelterol/Documents/Git/Android/GBee/roms/GoldenSacra.gb")
+    //ROM.load_rom("/Users/angelterol/Documents/Git/Android/GBee/roms/mem_timing.gb")
     //ROM.load_rom("D:/tetris.gb")
 
 
-    printROM()
+    //printROM()
+
+    val emu = Emulator()
+    CPU.PC = 0x100
+    emu.run(arrayOf("/Users/angelterol/Documents/Git/Android/GBee/roms/mem_timing.gb"))
+    while(true){
+        if(!CPU.tick()){
+            System.err.println("CPU Error")
+            break
+        }
+        emu.updateEmuCycles()
+    }
 }

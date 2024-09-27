@@ -5,7 +5,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
-object Emulator {
+class Emulator {
     private var running : Boolean = true
     private var paused : Boolean = false
     private var lastCpuCycles : Int = 0
@@ -18,13 +18,13 @@ object Emulator {
         }
 
         // BOOTSTRAP
-        while(CPU.getBootstrapPending()){
+        /*while(CPU.getBootstrapPending()){
             if(!CPU.tick()){
                 System.err.println("An error on the boot process has occurred. Program must exit.")
                 exitProcess(0)
             }
             updateEmuCycles()
-        }
+        }*/
 
         // LOAD GAME ROM
         if(!ROM.load_rom(args[0])){
