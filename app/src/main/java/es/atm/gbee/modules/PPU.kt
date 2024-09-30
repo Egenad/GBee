@@ -6,11 +6,11 @@ const val TM_2_START : Int  = 0x9C00 // TileMap 2 Start Address
 const val TM_2_END : Int    = 0x9FFF // TileMap 2 End Address
 const val LCD_STAT : Int    = 0xFF41 // LCD STATUS
 const val LCDC_ADDR : Int   = 0xFF40 // LCDC - LCD Control
-const val LY_ADDR : Int     = 0xFF44
-const val LYC_ADDR : Int    = 0xFF45
+const val LY_ADDR : Int     = 0xFF44 // LCD Y Coordinate, values from 0 to 153. 144 to 153 = VBlank
+const val LYC_ADDR : Int    = 0xFF45 // LY Comparation
 
-const val SCY : Int         = 0xFF42 // Background Viewport Y Position
-const val SCX : Int         = 0xFF43 // Background Viewport X Position
+const val SCY : Int         = 0xFF42 // Scroll Y Position
+const val SCX : Int         = 0xFF43 // Scroll X Position
 const val WY : Int          = 0xFF4A // Window Y Position
 const val WX : Int          = 0xFF4B // Window X Position
 
@@ -38,8 +38,8 @@ enum class LCDCObj(val shift: Int) {
     BG_AREA(3),         // Similar to bit 6. If 0, the BG uses the tilemap in 9800, otherwise 9C00
     ADDRESS_MODE(4),    // Controls addressing mode for the BG and Window
     WINDOW_ENABLE(5),   // Controls whether the Window shall be displayed
-    BG_TILEMAP(6),      // Controls which bg map the Window uses. 0 = 9800–9BFF; 1 = 9C
-    LCDC_ENABLE(7);      // Controls whether the LCD is on and the PPU active
+    BG_TILEMAP(6),      // Controls which bg map the Window uses. 0 = 9800–9BFF; 1 = 9C00-9FFF
+    LCDC_ENABLE(7);     // Controls whether the LCD is on and the PPU active
 
     fun get(value: Byte): Int {
         return (value.toInt() shr shift) and 0b1
@@ -97,7 +97,7 @@ object PPU {
 
     private var currentFrame : Int = 0
     private var oamRam: ByteArray = ByteArray(40 * 4) // Max number: 40 OAM Objs * 4 Bytes
-    private var vRam : ByteArray = ByteArray(2000)
+    private var vRam : ByteArray = ByteArray((VRAM_END - VRAM_START) + 1)
 
     enum class PALETTE_TYPE(){
         BASIC_PL,
@@ -117,6 +117,14 @@ object PPU {
         C_MONOCHRMYELLOW_PL
     }
 
+    enum class COLOR_INDEX(){
+        WHITE,
+        LIGHT_GRAY,
+        DARK_GRAY,
+        BLACK
+    }
+
+    // Colors follows as: White - Light Gray - Dark Gray - Black
     private val palettes: HashMap<PALETTE_TYPE, IntArray> = hashMapOf(
         Pair(PALETTE_TYPE.BASIC_PL, intArrayOf(0xFFFFFFFF.toInt(), 0xFFAAAAAA.toInt(), 0xFF555555.toInt(), 0xFF000000.toInt())),
         Pair(PALETTE_TYPE.GREENER_PL, intArrayOf(0xFFE0F8D0.toInt(), 0xFF88C070.toInt(), 0xFF346856.toInt(), 0xFF081820.toInt())),
@@ -134,6 +142,25 @@ object PPU {
         Pair(PALETTE_TYPE.C_MONOCHRMGRAY_PL, intArrayOf(0xFF000000.toInt(), 0xFF555555.toInt(), 0xFFAAAAAA.toInt(), 0xFFFFFFFF.toInt())),
         Pair(PALETTE_TYPE.C_MONOCHRMYELLOW_PL, intArrayOf(0xFF000000.toInt(), 0xFFB8B800.toInt(), 0xFFFFFF54.toInt(), 0xFFFFFFFF.toInt()))
     )
+
+    fun init() {
+        Memory.write(LCDC_ADDR, 0x91.toByte())
+        Memory.write(SCY, 0)
+        Memory.write(SCX, 0)
+        Memory.write(LY_ADDR, 0)
+        Memory.write(LYC_ADDR, 0)
+        Memory.write(WY, 0)
+        Memory.write(WX, 0)
+        val consoleType = ROM.getConsole()
+
+        if(consoleType == ROM.CONSOLE_TYPE.DMG || consoleType == ROM.CONSOLE_TYPE.DMG_CGB) {
+            Memory.write(BGP, 0xFC.toByte())
+            Memory.write(OBP0, 0xFF.toByte())
+            Memory.write(OBP1, 0xFF.toByte())
+        }else{
+            //TODO - CGB
+        }
+    }
 
     fun tick(){
 
@@ -175,11 +202,16 @@ object PPU {
     }
 
     fun writeToLCD(address: Int, value: Byte){
-        if(address == BGP){
-            Memory.write(address, value)
-        }
-        if(address in OBP0 .. OBP1){
-            Memory.write(address, ((value.toInt() and 0xFF) and 0b11111100).toByte())
+        when (address) {
+            DMA_RGSTR -> {
+                DMA.start(value)
+            }
+            BGP -> {
+                Memory.write(address, value)
+            }
+            in OBP0 .. OBP1 -> {
+                Memory.write(address, ((value.toInt() and 0xFF) and 0b11111100).toByte())
+            }
         }
     }
 
@@ -193,9 +225,5 @@ object PPU {
 
     fun getPaletteColors(palette: PALETTE_TYPE) : IntArray{
         return palettes[palette]!!
-    }
-
-    fun getSelectedPalette(): IntArray{
-        Memory.read()
     }
 }

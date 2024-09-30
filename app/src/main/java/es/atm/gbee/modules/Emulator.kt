@@ -10,25 +10,27 @@ class Emulator {
     private var paused : Boolean = false
     private var lastCpuCycles : Int = 0
 
-    fun run(args: Array<String>){
+    fun run(path: String){
 
-        if(args.isEmpty()){
+        if(path.isEmpty()){
             System.err.println("No file was selected / passed through input")
             return
         }
 
+        PPU.init()
+
         // BOOTSTRAP
-        /*while(CPU.getBootstrapPending()){
+        while(CPU.getBootstrapPending()){
             if(!CPU.tick()){
                 System.err.println("An error on the boot process has occurred. Program must exit.")
                 exitProcess(0)
             }
             updateEmuCycles()
-        }*/
+        }
 
         // LOAD GAME ROM
-        if(!ROM.load_rom(args[0])){
-            System.err.println("Failed to load ROM: ${args[0]} <rom>")
+        if(!ROM.load_rom(path)){
+            System.err.println("Failed to load ROM: ${path} <rom>")
             return
         }
 

@@ -26,6 +26,8 @@ class GameSurfaceView @JvmOverloads constructor(
 
     private val debugMode = true
 
+    private var selectedPalette = PPU.PALETTE_TYPE.BASIC_PL
+
     private var gameThread: GameThread? = null
 
     init {
@@ -102,7 +104,7 @@ class GameSurfaceView @JvmOverloads constructor(
                 val high = if (((b1.toInt() and 0xFF) and (1 shl bit)) != 0) 0b10 else 0
                 val low = if (((b2.toInt() and 0xFF) and (1 shl bit)) != 0) 0b01 else 0
 
-                val tileColors = PPU.getPaletteColors(PPU.PALETTE_TYPE.BASIC_PL) // TODO: Make it configurable
+                val tileColors = PPU.getPaletteColors(selectedPalette)
 
                 val color = tileColors[high or low]
                 paint.color = color

@@ -16,7 +16,7 @@ class EmuActivity : AppCompatActivity() {
     private lateinit var binding : ActivityEmuBinding
     private lateinit var gameSurfaceView: GameSurfaceView
 
-    private val Emulator = Emulator()
+    private val emulator = Emulator()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +33,6 @@ class EmuActivity : AppCompatActivity() {
             insets
         }
 
-        ROM.load_rom("/Users/angelterol/Documents/Git/Android/GBee/roms/GoldenSacra.gb")
+        emulator.run("/Users/angelterol/Documents/Git/Android/GBee/roms/GoldenSacra.gb")
     }
 }

@@ -8,8 +8,6 @@ object DMA {
     private var value : Byte = 0
     private var startDelay : Byte = 0
 
-    private var transferring : Boolean = false
-
     fun start(value: Byte){
         println("DMA - Started")
         active = true

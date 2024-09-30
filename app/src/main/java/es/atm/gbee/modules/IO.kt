@@ -80,11 +80,6 @@ object IO {
             return
         }
 
-        if(address == DMA_RGSTR){
-            DMA.start(value)
-            return
-        }
-
         if(address in LCDC_ADDR..WX){
             PPU.writeToLCD(address, value)
             return

@@ -53,7 +53,7 @@ fun main(args: Array<String>){
     //ROM.load_rom("D:/test_rom_5.gbc")
     //ROM.load_rom("D:/test_rom_6.gb")
     //ROM.load_rom("/Users/angelterol/Documents/Git/Android/GBee/roms/GoldenSacra.gb")
-    ROM.load_rom("D:/Git/GBee/roms/GoldenSacra.gb")
+    //ROM.load_rom("D:/Git/GBee/roms/GoldenSacra.gb")
     //ROM.load_rom("/Users/angelterol/Documents/Git/Android/GBee/roms/mem_timing.gb")
     //ROM.load_rom("D:/tetris.gb")
 
@@ -67,4 +67,7 @@ fun main(args: Array<String>){
         }
         emu.updateEmuCycles()
     }*/
+
+    val emu = Emulator()
+    emu.run("/Users/angelterol/Documents/Git/Android/GBee/roms/GoldenSacra.gb")
 }
