@@ -8,6 +8,8 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import es.atm.gbee.modules.GB_X_RESOLUTION
+import es.atm.gbee.modules.GB_Y_RESOLUTION
 import es.atm.gbee.modules.Memory
 import es.atm.gbee.modules.PPU
 import es.atm.gbee.modules.VRAM_START
@@ -20,8 +22,6 @@ class GameSurfaceView @JvmOverloads constructor(
     attrs: AttributeSet? = null
 ) : SurfaceView(context, attrs), SurfaceHolder.Callback {
 
-    private val gameBoyWidth = 160
-    private val gameBoyHeight = 144
     private var scale : Float = 0f
 
     private val debugMode = true
@@ -51,7 +51,7 @@ class GameSurfaceView @JvmOverloads constructor(
         val width = MeasureSpec.getSize(widthMeasureSpec) // Android phone total width
         val height = MeasureSpec.getSize(heightMeasureSpec)  // Android phone total height
 
-        val aspectRatio = gameBoyWidth.toFloat() / gameBoyHeight.toFloat() // GB Aspect Ratio
+        val aspectRatio = GB_X_RESOLUTION.toFloat() / GB_Y_RESOLUTION.toFloat() // GB Aspect Ratio
 
         val newWidth: Int
         val newHeight: Int
@@ -59,11 +59,11 @@ class GameSurfaceView @JvmOverloads constructor(
         if (width / height > aspectRatio) { // Landscape
             newWidth = (height * aspectRatio).toInt()
             newHeight = height
-            scale = height / gameBoyHeight.toFloat()
+            scale = height / GB_Y_RESOLUTION.toFloat()
         } else { // Straight
             newWidth = width
             newHeight = (width / aspectRatio).toInt()
-            scale = width / gameBoyWidth.toFloat()
+            scale = width / GB_X_RESOLUTION.toFloat()
         }
 
         setMeasuredDimension(newWidth, newHeight)

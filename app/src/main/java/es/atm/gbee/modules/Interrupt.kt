@@ -74,6 +74,6 @@ object Interrupt {
 
     fun set_IF(value: Int){
         val newValue = ((value or 0xE0) and 0xFF).toByte()
-        Memory.writeByteOnAddress(IF, newValue)
+        Memory.write(IF, newValue)
     }
 }

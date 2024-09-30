@@ -1,5 +1,10 @@
 package es.atm.gbee.modules
 
+import android.os.SystemClock
+import kotlinx.coroutines.delay
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+
 const val TM_1_START : Int  = 0x9800 // TileMap 1 Start Address
 const val TM_1_END : Int    = 0x9BFF // TileMap 1 End Address
 const val TM_2_START : Int  = 0x9C00 // TileMap 2 Start Address
@@ -24,11 +29,16 @@ const val C_BGP_OCPS : Int  = 0xFF68 // Not Used - Reserved
 const val C_BGP_OBPI : Int  = 0xFF68 // Not Used - Reserved
 
 const val OAM_CYCLES            = 80
-const val PIXEL_TRANSFER_CYCLES = 172
+const val PIXEL_TRANSFER_CYCLES = 172 // TODO: Penalties Algorithm
 const val HBLANK_CYCLES         = 204
-const val VBLANK_CYCLES         = 456
+const val LINE_TOTAL_TICKS      = 456
 
 const val TOTAL_LINES           = 154
+
+const val GB_X_RESOLUTION       = 160
+const val GB_Y_RESOLUTION       = 144
+
+const val GB_FPS                = 1000 / 60
 
 // --- LCDC Bit Masks (0xFF40) ---
 enum class LCDCObj(val shift: Int) {
@@ -95,9 +105,16 @@ data class OAMObj(
 
 object PPU {
 
-    private var currentFrame : Int = 0
-    private var oamRam: ByteArray = ByteArray(40 * 4) // Max number: 40 OAM Objs * 4 Bytes
+    private var currentFrame : Int      = 0
+    private var frameCount : Int        = 0
+    private var lineTicks : Int         = 0
+    private var prevFrameTime : Long    = 0
+    private var startTimer : Long       = 0
+
+    val videoBuffer: ByteArray = ByteArray(GB_Y_RESOLUTION * GB_X_RESOLUTION * 4) { 0 }
+    private var oamRam: ByteArray = ByteArray(40 * 4) { 0 } // Max number: 40 OAM Objs * 4 Bytes
     private var vRam : ByteArray = ByteArray((VRAM_END - VRAM_START) + 1)
+
 
     enum class PALETTE_TYPE(){
         BASIC_PL,
@@ -117,11 +134,11 @@ object PPU {
         C_MONOCHRMYELLOW_PL
     }
 
-    enum class COLOR_INDEX(){
-        WHITE,
-        LIGHT_GRAY,
-        DARK_GRAY,
-        BLACK
+    enum class COLOR_INDEX(number: Int){
+        WHITE(0),
+        LIGHT_GRAY(1),
+        DARK_GRAY(2),
+        BLACK(3)
     }
 
     // Colors follows as: White - Light Gray - Dark Gray - Black
@@ -144,6 +161,7 @@ object PPU {
     )
 
     fun init() {
+        Memory.write(LCD_STAT, 0x81.toByte())
         Memory.write(LCDC_ADDR, 0x91.toByte())
         Memory.write(SCY, 0)
         Memory.write(SCX, 0)
@@ -164,7 +182,85 @@ object PPU {
 
     fun tick(){
 
+        lineTicks++
+        val stat = Memory.getByteOnAddress(LCD_STAT)
 
+        when (StatObj.PPU_MODE.get(stat)){
+            PPUMode.HBlank.number -> hBlankMode(stat)
+            PPUMode.VBlank.number -> vBlankMode(stat)
+            PPUMode.OAM.number -> oamMode(stat)
+            PPUMode.DRAW_LCD.number -> drawLCDMode(stat)
+        }
+    }
+
+    fun oamMode(stat: Byte){
+        if(lineTicks >= OAM_CYCLES){ // ENTER DRAWING PIXELS MODE
+            Memory.write(LCD_STAT, StatObj.PPU_MODE.set(stat, PPUMode.DRAW_LCD.number))
+        }
+    }
+
+    fun drawLCDMode(stat: Byte){
+        if(lineTicks >= OAM_CYCLES + PIXEL_TRANSFER_CYCLES){ // ENTER HBLANK MODE
+            Memory.write(LCD_STAT, StatObj.PPU_MODE.set(stat, PPUMode.HBlank.number))
+
+            if(StatObj.HBLANK_INTERRUPT.get(stat) != 0)
+                Interrupt.requestInterrupt(Interrupt.InterruptType.LCD_STAT.getByteMask()) // ASK FOR LCD STAT INTERRUPT IF LCD_STAT HAS THE HBLANK BIT ACTIVATED
+        }
+    }
+
+    fun hBlankMode(stat: Byte){
+        if(lineTicks >= LINE_TOTAL_TICKS){
+            increment_LY()
+
+            val ly = (Memory.getByteOnAddress(LY_ADDR).toInt()) and 0xFF
+
+            if(ly >= GB_Y_RESOLUTION){ // ENTER VBLANK MODE
+                Memory.write(LCD_STAT, StatObj.PPU_MODE.set(stat, PPUMode.VBlank.number))
+
+                Interrupt.requestInterrupt(Interrupt.InterruptType.VBLANK.getByteMask()) // ASK FOR VBLANK INTERRUPT
+
+                if(StatObj.VBLANK_INTERRUPT.get(stat) != 0)
+                    Interrupt.requestInterrupt(Interrupt.InterruptType.LCD_STAT.getByteMask()) // ASK FOR LCD STAT INTERRUPT IF LCD_STAT HAS THE VBLANK BIT ACTIVATED
+
+                currentFrame++
+
+                calculateFPS()
+
+            }else{ // RETURN TO OAM MODE
+                Memory.write(LCD_STAT, StatObj.PPU_MODE.set(stat, PPUMode.OAM.number))
+
+                if(StatObj.OAM_INTERRUPT.get(stat) != 0)
+                    Interrupt.requestInterrupt(Interrupt.InterruptType.LCD_STAT.getByteMask()) // ASK FOR LCD STAT INTERRUPT IF LCD_STAT HAS THE OAM BIT ACTIVATED
+            }
+
+            lineTicks = 0
+        }
+    }
+
+    fun vBlankMode(stat: Byte){
+        if(lineTicks >= LINE_TOTAL_TICKS){
+            increment_LY()
+
+            val ly = (Memory.getByteOnAddress(LY_ADDR).toInt()) and 0xFF
+
+            if(ly >= TOTAL_LINES){ // RETURN TO OAM MODE
+                Memory.write(LCD_STAT, StatObj.PPU_MODE.set(stat, PPUMode.OAM.number))
+                Memory.write(LY_ADDR, 0)
+
+                if(StatObj.OAM_INTERRUPT.get(stat) != 0)
+                    Interrupt.requestInterrupt(Interrupt.InterruptType.LCD_STAT.getByteMask()) // ASK FOR LCD STAT INTERRUPT IF LCD_STAT HAS THE OAM BIT ACTIVATED
+            }
+
+            lineTicks = 0
+        }
+    }
+
+    fun increment_LY(){
+        val ly = Memory.getByteOnAddress(LY_ADDR)
+        val newLY = ((ly.toInt() and 0xFF) + 1).toByte()
+        Memory.write(LY_ADDR, newLY)
+
+        compare_LY_LYC()
     }
 
     fun compare_LY_LYC(){
@@ -172,7 +268,7 @@ object PPU {
         val ly      = Memory.getByteOnAddress(LY_ADDR)
         val stat    = Memory.getByteOnAddress(LCD_STAT)
 
-        StatObj.COINCIDENCE_FLAG.set(stat, if (lyc == ly) 0x1 else 0x0)
+        Memory.write(LCD_STAT, StatObj.COINCIDENCE_FLAG.set(stat, if (lyc == ly) 0x1 else 0x0))
 
         if(lyc == ly && StatObj.COINCIDENCE_INTERRUPT.get(stat) != 0){
             Interrupt.requestInterrupt(Interrupt.InterruptType.LCD_STAT.getByteMask())
@@ -225,5 +321,26 @@ object PPU {
 
     fun getPaletteColors(palette: PALETTE_TYPE) : IntArray{
         return palettes[palette]!!
+    }
+
+    private fun calculateFPS(){
+        val now = SystemClock.currentThreadTimeMillis()
+        val frameTime = now - prevFrameTime
+
+        if(frameTime < GB_FPS){
+            Thread.sleep(GB_FPS - frameTime)
+            //delay(GB_FPS - frameTime)
+        }
+
+        if(now - startTimer >= 1000){
+            val fps = frameCount
+            startTimer = now
+            frameCount = 0
+
+            println("PPU - FPS: $fps")
+        }
+
+        frameCount++
+        prevFrameTime = SystemClock.currentThreadTimeMillis()
     }
 }

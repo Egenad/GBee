@@ -95,7 +95,10 @@ object CPU {
         // Opcode execution
         val opcode = fetch()
 
-        println("CPU - Executing Instruction: " + opcode.toHexString(HexFormat.Default) + " - PC Address: " + (PC - 1))
+        val hlAddr = get_16bit_address(H, L)
+        val deAddr = get_16bit_address(D, E)
+        val bcAddr = get_16bit_address(B, C)
+        println("CPU - Executing Instruction: " + opcode.toHexString(HexFormat.Default) + " - PC Address: " + (PC - 1) + " - HL Address: " + hlAddr.toHexString(HexFormat.Default) + " - DE Address: " + deAddr.toHexString(HexFormat.Default) + " - BC Address: " + bcAddr.toHexString(HexFormat.Default) + " - A: " + A.toHexString(HexFormat.Default))
 
         try {
             cycles += execute(opcode)
