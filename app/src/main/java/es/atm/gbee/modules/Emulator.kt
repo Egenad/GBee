@@ -19,6 +19,12 @@ class Emulator {
 
         PPU.init()
 
+        // LOAD GAME ROM
+        if(!ROM.load_rom(path)){
+            System.err.println("Failed to load ROM: ${path} <rom>")
+            return
+        }
+
         // BOOTSTRAP
         while(CPU.getBootstrapPending()){
             if(!CPU.tick()){
@@ -28,11 +34,8 @@ class Emulator {
             updateEmuCycles()
         }
 
-        // LOAD GAME ROM
-        if(!ROM.load_rom(path)){
-            System.err.println("Failed to load ROM: ${path} <rom>")
-            return
-        }
+        println("ROM - Reload Boot Portion")
+        ROM.reloadBootPortion()
 
         //TODO: Init Graphics Framework
 

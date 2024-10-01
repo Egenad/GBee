@@ -63,6 +63,8 @@ object ROM {
         }
     }
 
+    private var bootSection = ByteArray(0xFF)
+
     private var cartTitle : String      = "Unknown"
     private var licenseCode : String    = "None"
     private var cartType : Int          = -1
@@ -369,7 +371,9 @@ object ROM {
 
                 return rom_init(romBytes)
             }
-        }catch (_: Exception){}
+        }catch (ex: Exception){
+            println("Error loading ROM: $ex")
+        }
 
         return false
     }
@@ -419,7 +423,15 @@ object ROM {
         println("ROM Loaded Successfully!")
         printROM()
 
+        bootSection = extractByteArray(romBytes, 0x00, 0xFF, true) // Save portion of code where the boot is going to load
+
         return true
+    }
+
+    fun reloadBootPortion(){
+        for (address in 0x00..0xFF){
+            Memory.writeByteOnAddress(address, bootSection[address])
+        }
     }
 
     fun readFromROM(address: Int): Byte{
@@ -476,5 +488,9 @@ object ROM {
 
     fun getConsole(): CONSOLE_TYPE{
         return console
+    }
+
+    fun isCGB(): Boolean{
+        return console == CONSOLE_TYPE.CGB
     }
 }

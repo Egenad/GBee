@@ -57,4 +57,24 @@ class CPUTest {
         assertFalse(CPU.flagIsSet(FLAG_H))
         assertFalse(CPU.flagIsSet(FLAG_C))
     }
+
+    @Test
+    fun push_pop_BC(){
+        CPU.B = 0x04.toByte()
+        CPU.C = 0xCE.toByte()
+
+        CPU.push_bc()
+
+        val pushedC = Memory.read(CPU.SP)
+
+        assertEquals(0xCE.toByte(), pushedC)
+
+        CPU.B = 0x00.toByte()
+        CPU.C = 0x00.toByte()
+
+        CPU.pop_bc()
+
+        assertEquals(0x04.toByte(), CPU.B)
+        assertEquals(0xCE.toByte(), CPU.C)
+    }
 }

@@ -1,8 +1,10 @@
 package es.atm.gbee.modules
 
-const val JOYPAD    = 0xFF00 // Joy Pad information and System Type
-const val SB        = 0xFF01 // Serial Transfer Data
-const val SC        = 0xFF02 // Serial Transfer Control
+const val JOYPAD        = 0xFF00 // Joy Pad information and System Type
+const val SB            = 0xFF01 // Serial Transfer Data
+const val SC            = 0xFF02 // Serial Transfer Control
+
+const val DISABLE_ROM   = 0xFF50
 
 enum class GamePadBits(val bit: Int) {
     A_BUTTON(0),
@@ -82,6 +84,14 @@ object IO {
 
         if(address in LCDC_ADDR..WX){
             PPU.writeToLCD(address, value)
+            return
+        }
+
+        if(address == DISABLE_ROM){
+            Memory.write(address, value)
+            if(value == 0x1.toByte()){
+                CPU.setBootstrapPending(false)
+            }
             return
         }
 

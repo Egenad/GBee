@@ -24,13 +24,17 @@ const val VRAM_START            = 0x8000
 const val VRAM_END              = 0x9FFF
 const val EXTERNAL_RAM_START    = 0xA000
 const val WRAM_START            = 0xC000
+const val FIXED_WRAM_END        = 0xCFFF
+const val SWITCHABLE_WRAM_START = 0xD000
 const val ECHO_RAM_START        = 0xE000
 const val OAM_START             = 0xFE00
 const val RESERVED_MEM_START    = 0xFEA0
 const val IO_START              = 0xFF00
 const val HRAM_START            = 0xFF80
+const val HRAM_END              = 0xFFFE
 
 const val MEMORY_SIZE   = 0x10000   // 64 KB
+const val BOOT_SIZE     = 0xFF
 
 object Memory {
 
@@ -152,7 +156,7 @@ object Memory {
         0x1A.toByte(),                                  // LD A, [DE]
         0x13.toByte(),                                  // INC DE
         0xBE.toByte(),                                  // CP [HL]                      ----- Compare logo data in cart to DMG rom -----
-        0x20.toByte(), 0xFE.toByte(),                   // JR NZ, PC + 0x0FE            ----- If not a match, lock up here -----
+        0x20.toByte(), 0xFE.toByte(),                   // JR NZ, PC + 0xFE             ----- If not a match, lock up here -----
         0x23.toByte(),                                  // INC HL
         0x7D.toByte(),                                  // LD A, L
         0xFE.toByte(), 0x34.toByte(),                   // CP 0x34
@@ -164,7 +168,7 @@ object Memory {
         0x05.toByte(),                                  // DEC B
         0x20.toByte(), 0xFB.toByte(),                   // JR NZ, PC + 0xFB
         0x86.toByte(),                                  // ADD A, [HL]
-        0x20.toByte(), 0xFE.toByte(),                   // JR NZ, PC + 0xFE
+        0x20.toByte(), 0xFE.toByte(),                   // JR NZ, 0xFE
         0x3E.toByte(), 0x01.toByte(),                   // LD A, 0x01
         0xE0.toByte(), 0x50.toByte())                   // LDH [0xFF00 + 0x50], A       ----- Turn Off DMG ROM -----
 
@@ -227,6 +231,11 @@ object Memory {
     private fun insertBootstrapToMemory(){
         for (i in bootstrapRom.indices) {
             memory[ROM_START + i] = bootstrapRom[i]
+        }
+
+        // Copy Nintendo Logo to 0x104
+        for (i in nintendoLogo.indices) {
+            memory[N_LOGO_START + i] = nintendoLogo[i]
         }
     }
 

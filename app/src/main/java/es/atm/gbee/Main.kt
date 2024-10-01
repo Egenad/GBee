@@ -1,17 +1,7 @@
 package es.atm.gbee
 
-import es.atm.gbee.etc.printROM
-import es.atm.gbee.modules.BOOT_END
-import es.atm.gbee.modules.CPU
-import es.atm.gbee.modules.Emulator
 import es.atm.gbee.modules.Memory
 import es.atm.gbee.modules.ROM
-import es.atm.gbee.modules.ROM_END
-import es.atm.gbee.modules.ROM_START
-import es.atm.gbee.modules.VRAM_END
-import es.atm.gbee.modules.VRAM_START
-import kotlinx.coroutines.delay
-import kotlin.system.exitProcess
 
 fun main(args: Array<String>){
 
@@ -68,6 +58,9 @@ fun main(args: Array<String>){
         emu.updateEmuCycles()
     }*/
 
-    val emu = Emulator()
-    emu.run("/Users/angelterol/Documents/Git/Android/GBee/roms/GoldenSacra.gb")
+    //val emu = Emulator()
+    //emu.run("/Users/angelterol/Documents/Git/Android/GBee/roms/GoldenSacra.gb")
+
+    ROM.load_rom("D:/Git/GBee/roms/GoldenSacra.gb")
+    Memory.dumpMemory(0x0000, 0x0500)
 }
