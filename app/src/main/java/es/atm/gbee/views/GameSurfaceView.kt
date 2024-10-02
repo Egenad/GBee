@@ -97,8 +97,8 @@ class GameSurfaceView @JvmOverloads constructor(
         val paint = Paint()
 
         for(tileY in 0 until 16){
-            val b1 = Memory.read(startLocation + (tileNumber * 16) + tileY)
-            val b2 = Memory.read(startLocation + (tileNumber * 16) + tileY + 1)
+            val b1 = Memory.getByteOnAddress(startLocation + (tileNumber * 16) + tileY)
+            val b2 = Memory.getByteOnAddress(startLocation + (tileNumber * 16) + tileY + 1)
 
             for(bit in 7 downTo  0){
                 val high = if (((b1.toInt() and 0xFF) and (1 shl bit)) != 0) 0b10 else 0

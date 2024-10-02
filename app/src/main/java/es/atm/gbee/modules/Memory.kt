@@ -175,11 +175,6 @@ object Memory {
     // Total Memory
     private val memory = ByteArray(MEMORY_SIZE)
 
-    init {
-        insertBootstrapToMemory()
-        println("Memory initialized - Ready to Boot")
-    }
-
     fun writeByteOnAddress(address: Int, value: Byte){
         if(address < VRAM_START) {                  // ROM DATA
             ROM.writeToROM(address, value)
@@ -228,14 +223,9 @@ object Memory {
         throw IllegalArgumentException("Not implemented") // TODO
     }
 
-    private fun insertBootstrapToMemory(){
+    fun insertBootstrapToMemory(){
         for (i in bootstrapRom.indices) {
             memory[ROM_START + i] = bootstrapRom[i]
-        }
-
-        // Copy Nintendo Logo to 0x104
-        for (i in nintendoLogo.indices) {
-            memory[N_LOGO_START + i] = nintendoLogo[i]
         }
     }
 

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">GBee</string>
+    <string name="select_rom">Select ROM</string>
 </resources>

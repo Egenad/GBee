@@ -71,14 +71,13 @@ object ROM {
     private var romSize : Int           = -1
     private var ramSize : Int           = -1
     private var romVersion : Int        = -1
-    private var checkSum : Boolean      = false
     private var console: CONSOLE_TYPE   = CONSOLE_TYPE.UNKNOWN
 
     private var ramEnabled: Boolean     = false
     private var ramBanking: Boolean     = false
 
     private var ramBanks                = Array(16){ByteArray(8 * 1024)} // MBC1 = 4 Banks Max. -- MBC3 / MBC5 = 16 Banks Max.
-    private var currentBank             = ramBanks[0]
+    private var currentBank             = -1
 
     private var battery: Boolean        = false
 
@@ -356,17 +355,24 @@ object ROM {
         return ramSizes[index] ?: 0
     }
 
-    fun load_rom(fileName: String): Boolean{
+    fun load_rom_from_path(path: String){
+        try {
+            val file = File(path)
+            val bytes = file.readBytes()
+            load_rom(bytes)
+        }catch (ex: Exception){
+            println("Error loading ROM: $ex")
+        }
+    }
+
+    fun load_rom(romBytes: ByteArray): Boolean{
 
         try {
-            val romFile = File(fileName)
-            val romBytes = romFile.readBytes()
-
             if(romBytes.isNotEmpty()){
                 val cartSize = min(romBytes.size, ROM_END - ROM_START + 1)
 
                 for (i in 0 until cartSize) {
-                    Memory.writeByteOnAddress(ROM_START + i, romBytes[i])
+                    Memory.write(ROM_START + i, romBytes[i])
                 }
 
                 return rom_init(romBytes)
@@ -409,17 +415,6 @@ object ROM {
         romVersion  = extractByte(romBytes, ROM_V_NUM).toInt() and 0xFF
         console     = CONSOLE_TYPE.fromValue(extractByte(romBytes, TITLE_END).toInt() and 0xFF)
 
-        // Checksum. Has to match with 0x14D value
-        var checksum: Byte = 0
-
-        for (address in 0x0134..0x014C){
-            val byte = Memory.getByteOnAddress(address)
-            checksum = ((checksum - byte - 0x1) and 0xFF).toByte()
-        }
-
-        if(extractByte(romBytes, HEADER_CHECKSUM) != checksum) return false
-        checkSum = true
-
         println("ROM Loaded Successfully!")
         printROM()
 
@@ -430,7 +425,7 @@ object ROM {
 
     fun reloadBootPortion(){
         for (address in 0x00..0xFF){
-            Memory.writeByteOnAddress(address, bootSection[address])
+            Memory.write(address, bootSection[address])
         }
     }
 
@@ -446,14 +441,20 @@ object ROM {
                 return 0xFF.toByte()
             }
 
+            if(currentBank < 0 || currentBank >= ramBanks.size){
+                return 0xFF.toByte()
+            }
+
+            return ramBanks[currentBank][address - EXTERNAL_RAM_START]
         }
 
         return 0 // TODO
     }
 
     fun writeToROM(address: Int, value: Byte){
-
-        // Check for MBC's
+        if(!cartTypeIsMBC()){
+            return
+        }
 
         Memory.write(address, value)
     }
@@ -480,10 +481,6 @@ object ROM {
 
     fun getRomVersion(): Int{
         return romVersion
-    }
-
-    fun getCheckSum(): Boolean{
-        return checkSum
     }
 
     fun getConsole(): CONSOLE_TYPE{

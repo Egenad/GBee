@@ -1,5 +1,6 @@
 package es.atm.gbee.modules
 
+import es.atm.gbee.modules.Memory.insertBootstrapToMemory
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -10,20 +11,30 @@ class Emulator {
     private var paused : Boolean = false
     private var lastCpuCycles : Int = 0
 
-    fun run(path: String){
+    fun run(bytes : ByteArray?){
 
-        if(path.isEmpty()){
+        if(bytes == null || bytes.isEmpty()){
             System.err.println("No file was selected / passed through input")
             return
         }
 
+        GlobalScope.launch {
+            runCpu(bytes)
+        }
+    }
+
+    suspend fun runCpu(bytes: ByteArray){
+
         PPU.init()
 
         // LOAD GAME ROM
-        if(!ROM.load_rom(path)){
-            System.err.println("Failed to load ROM: ${path} <rom>")
+        if(!ROM.load_rom(bytes)){
+            System.err.println("Failed to load ROM. Program must exit.")
             return
         }
+
+        insertBootstrapToMemory()
+        println("Memory initialized - Ready to Boot")
 
         // BOOTSTRAP
         while(CPU.getBootstrapPending()){
@@ -37,14 +48,8 @@ class Emulator {
         println("ROM - Reload Boot Portion")
         ROM.reloadBootPortion()
 
-        //TODO: Init Graphics Framework
+        Memory.dumpMemory()
 
-        GlobalScope.launch {
-            runCpu()
-        }
-    }
-
-    suspend fun runCpu(){
         while(running){
             if(paused){
                 delay(10)
@@ -54,11 +59,14 @@ class Emulator {
                 System.err.println("CPU Error")
                 break
             }
+
+            delay(1000)
+
             updateEmuCycles()
         }
     }
 
-    fun updateEmuCycles(){
+    private fun updateEmuCycles(){
         val currentCpuCycles = CPU.getCPUCycles()
         val cpuCycles = currentCpuCycles - lastCpuCycles
         lastCpuCycles = currentCpuCycles

@@ -2465,7 +2465,7 @@ object CPU {
 
     fun ldh_n_a(): Int{
 
-        val byte = fetch()
+        val byte = fetch().toInt() and 0xFF
         val address = (0xFF00 + byte) and 0xFFFF
         Memory.writeByteOnAddress(address, A)
 
@@ -2483,7 +2483,7 @@ object CPU {
     }
 
     fun ld_cn_a(): Int{
-        val address = (0xFF00 + C) and 0xFFFF
+        val address = (0xFF00 + (C.toInt() and 0xFF)) and 0xFFFF
         Memory.writeByteOnAddress(address, A)
         return CYCLES_8
     }
@@ -2534,7 +2534,7 @@ object CPU {
 
     fun ldh_a_n(): Int{
 
-        val byte = fetch()
+        val byte = fetch().toInt() and 0xFF
         val address = (0xFF00 + byte) and 0xFFFF
 
         A = Memory.getByteOnAddress(address)
@@ -2553,7 +2553,7 @@ object CPU {
     }
 
     fun ld_a_cn(): Int{
-        val address = (0xFF00 + C) and 0xFFFF
+        val address = (0xFF00 + (C.toInt() and 0xFF)) and 0xFFFF
         A = Memory.getByteOnAddress(address)
         return CYCLES_8
     }

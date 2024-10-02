@@ -61,6 +61,6 @@ fun main(args: Array<String>){
     //val emu = Emulator()
     //emu.run("/Users/angelterol/Documents/Git/Android/GBee/roms/GoldenSacra.gb")
 
-    ROM.load_rom("D:/Git/GBee/roms/GoldenSacra.gb")
+    ROM.load_rom_from_path("D:/Git/GBee/roms/GoldenSacra.gb")
     Memory.dumpMemory(0x0000, 0x0500)
 }

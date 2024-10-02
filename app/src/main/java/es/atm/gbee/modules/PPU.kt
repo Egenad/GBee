@@ -181,7 +181,6 @@ object PPU {
     }
 
     fun tick(){
-
         lineTicks++
         val stat = Memory.getByteOnAddress(LCD_STAT)
 
@@ -312,11 +311,19 @@ object PPU {
     }
 
     fun readFromVRAM(address: Int) : Byte{
-        return vRam[address - VRAM_START]
+        return if(!ROM.isCGB()){
+            Memory.read(address)
+        }else{
+            vRam[address - VRAM_START]
+        }
     }
 
     fun writeToVRAM(address: Int, value: Byte){
-        vRam[address - VRAM_START] = value
+        if(!ROM.isCGB()){
+            Memory.write(address, value)
+        }else{
+            vRam[address - VRAM_START] = value
+        }
     }
 
     fun getPaletteColors(palette: PALETTE_TYPE) : IntArray{
