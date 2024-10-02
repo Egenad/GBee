@@ -60,8 +60,6 @@ class Emulator {
                 break
             }
 
-            delay(1000)
-
             updateEmuCycles()
         }
     }

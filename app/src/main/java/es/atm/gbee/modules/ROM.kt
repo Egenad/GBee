@@ -5,6 +5,8 @@ import es.atm.gbee.etc.extractByteArray
 import es.atm.gbee.etc.memcmp
 import es.atm.gbee.etc.printROM
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import kotlin.math.min
 
 // --- CARTRIDGE HEADER ---
@@ -48,6 +50,12 @@ const val GLOBAL_CHECKSUM_END : Int     = 0x14F
 
 const val NEW_LICENSE_CODE : Int        = 0x33
 
+const val ENABLE_RAM_END : Int          = 0x1FFF
+const val ROM_BANK_NUMBER_END : Int     = 0x3FFF
+const val RAM_BANK_NUMBER_END : Int     = 0x5FFF
+const val RAM_BANK_MODE_END : Int       = 0x7FFF
+
+
 object ROM {
 
     enum class CONSOLE_TYPE(val value : Int){
@@ -77,9 +85,10 @@ object ROM {
     private var ramBanking: Boolean     = false
 
     private var ramBanks                = Array(16){ByteArray(8 * 1024)} // MBC1 = 4 Banks Max. -- MBC3 / MBC5 = 16 Banks Max.
-    private var currentBank             = -1
+    private var currentRamBank : Int    = -1
+    private var currentRomBank : Int    = -1
 
-    private var battery: Boolean        = false
+    private var saveNeeded: Boolean     = false
 
     val newLicenseCodes: Map<String, String> = mapOf(
         "00" to "None",
@@ -351,6 +360,12 @@ object ROM {
         return getRomTypeFromIndex(cartType).contains("MBC")
     }
 
+    fun getCartTypeIndex(): Int{
+        val regex = """\d+""".toRegex()
+        val matchResult = regex.find(getRomTypeFromIndex(cartType))
+        return matchResult?.value?.toInt() ?: 0
+    }
+
     fun getRamSizeFromIndex(index: Int): Int {
         return ramSizes[index] ?: 0
     }
@@ -436,27 +451,85 @@ object ROM {
             return Memory.read(address)
         }
 
-        if((address and 0xE000) == 0xA000){
-            if (!ramEnabled || !ramBanking){
+        if(address in EXTERNAL_RAM_START..< WRAM_START){
+            if (!ramEnabled || !ramBanking || currentRamBank < 0 || currentRamBank >= ramBanks.size){
                 return 0xFF.toByte()
             }
 
-            if(currentBank < 0 || currentBank >= ramBanks.size){
-                return 0xFF.toByte()
-            }
-
-            return ramBanks[currentBank][address - EXTERNAL_RAM_START]
+            return ramBanks[currentRamBank][address - EXTERNAL_RAM_START]
         }
 
-        return 0 // TODO
+        return Memory.read(address)
     }
 
     fun writeToROM(address: Int, value: Byte){
+
         if(!cartTypeIsMBC()){
             return
         }
 
-        Memory.write(address, value)
+        when(getCartTypeIndex()){
+            1 -> writeMBC1(address, value)
+        }
+
+    }
+
+    private fun writeMBC1(address: Int, value: Byte){
+        val valueInt = value.toInt() and 0xFF
+        var valueVar = valueInt
+
+        if(address <= ENABLE_RAM_END){
+            ramEnabled = valueInt and 0xF == 0xA
+        }
+
+        if(address in (ENABLE_RAM_END + 1)..ROM_BANK_NUMBER_END){ // ROM BANK SELECTION
+            if(valueVar == 0) valueVar = 1
+            currentRomBank = valueVar and 0b11111
+        }
+
+        if(address in (ROM_BANK_NUMBER_END + 1)..RAM_BANK_NUMBER_END){ // RAM BANK SELECTION
+            if(ramBanking && saveNeeded){
+                saveBattery()
+            }
+            currentRamBank = valueVar and 0b11
+        }
+
+        if(address in (RAM_BANK_NUMBER_END + 1)..RAM_BANK_MODE_END){ //
+            ramBanking = valueVar and 1 != 0
+
+            if(ramBanking && saveNeeded){
+                saveBattery()
+            }
+        }
+
+        if(address in EXTERNAL_RAM_START..< WRAM_START){
+            if(ramEnabled && ramBanking){
+                ramBanks[currentRamBank][address - EXTERNAL_RAM_START] = value
+
+                if(cartHasBattery()) saveNeeded = true
+            }
+        }
+    }
+
+    private fun saveBattery(){
+        if(currentRamBank >= 0){
+            val batteryFilename = "$cartTitle.battery"
+
+            try {
+                val file = File(batteryFilename)
+                val outputStream = FileOutputStream(file)
+
+                // Write RAM data to file
+                outputStream.write(ramBanks[currentRamBank], 0, 0x2000)
+                outputStream.close()
+            } catch (e: IOException) {
+                System.err.println("FAILED TO OPEN OR WRITE: $batteryFilename")
+            }
+        }
+    }
+
+    private fun cartHasBattery() : Boolean{
+        return getRomTypeFromIndex(cartType).contains("BATTERY")
     }
 
     fun getCartTitle() : String{

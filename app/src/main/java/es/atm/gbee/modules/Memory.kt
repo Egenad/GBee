@@ -181,6 +181,8 @@ object Memory {
         }else if(address < EXTERNAL_RAM_START) {    // VRAM DATA
             PPU.writeToVRAM(address, value)
         }else if(address < WRAM_START) {            // EXTERNAL / CARTRIDGE RAM DATA
+            ROM.writeToROM(address, value)
+        }else if(address < ECHO_RAM_START){         // WRAM
             RAM.writeToWRAM(address, value)
         }else if(address < OAM_START) {             // ECHO RAM -- CANT BE USED !
             return
@@ -204,6 +206,8 @@ object Memory {
         }else if(address < EXTERNAL_RAM_START) {    // VRAM DATA
             return PPU.readFromVRAM(address)
         }else if(address < WRAM_START) {            // EXTERNAL / CARTRIDGE RAM DATA
+            return ROM.readFromROM(address)
+        }else if(address < ECHO_RAM_START){         // WRAM
             return RAM.readFromWRAM(address)
         }else if(address < OAM_START) {             // ECHO RAM -- CANT BE USED !
             return 0

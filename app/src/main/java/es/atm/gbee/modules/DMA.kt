@@ -19,7 +19,9 @@ object DMA {
     fun tick(){
         if (active){
             if(startDelay.toInt() == 0){
-                PPU.writeToOAM(address.toInt() and 0xFF, Memory.getByteOnAddress((value * 0x100) + address))
+                val noSignAddress = address.toInt() and 0xFFFF
+                val noSignVal = value.toInt() and 0xFF
+                PPU.writeToOAM(noSignAddress, Memory.getByteOnAddress((noSignVal * 0x100) + noSignAddress))
                 address++
                 active = (address.toInt() and 0xFF) < 0xA0
             }else{
