@@ -1,29 +1,35 @@
 package es.atm.gbee.modules
 
-const val DMA_RGSTR : Int = 0xFF46
+const val DMA_RGSTR : Int           = 0xFF46
+const val TOTAL_BYTES_TO_COPY : Int = 0xA0
+
 object DMA {
 
     private var active : Boolean = false
-    private var address : Byte = 0
-    private var value : Byte = 0
+    private var offset : Int = 0
+    private var startAddress : Int = 0
     private var startDelay : Byte = 0
 
-    fun start(value: Byte){
+    fun start(value: Byte){                             // Value: Indicates range (0xXX00 - 0xXX9F)
         println("DMA - Started")
         active = true
-        address = 0
+        offset = 0
         startDelay = 2
-        this.value = value
+        startAddress = (value.toInt() and 0xFF) shl 8   // If value is 0xC0, startAddress will be 0xC000
+        Interrupt.enableInterrupts(false)               // Disable interrupts while copying
+
     }
 
     fun tick(){
         if (active){
             if(startDelay.toInt() == 0){
-                val noSignAddress = address.toInt() and 0xFFFF
-                val noSignVal = value.toInt() and 0xFF
-                PPU.writeToOAM(noSignAddress, Memory.getByteOnAddress((noSignVal * 0x100) + noSignAddress))
-                address++
-                active = (address.toInt() and 0xFF) < 0xA0
+                val address = startAddress + offset
+                PPU.writeToOAM(address, startAddress, Memory.getByteOnAddress(address))
+                offset++
+                active = (offset and 0xFF) < TOTAL_BYTES_TO_COPY
+
+                if(!active)
+                    Interrupt.enableInterrupts(true)
             }else{
                 startDelay--
             }

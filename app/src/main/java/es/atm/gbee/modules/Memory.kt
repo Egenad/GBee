@@ -188,7 +188,7 @@ object Memory {
             return
         }else if(address < RESERVED_MEM_START) {    // OAM DATA
             if(!DMA.transferring())
-                PPU.writeToOAM(address, value)
+                PPU.writeToOAM(address, -1, value)
         }else if(address < IO_START) {              // RESERVED MEMORY - CANT BE USED !
             return
         }else if(address < HRAM_START) {            // IO DATA
@@ -224,7 +224,7 @@ object Memory {
             return read(IE)
         }
 
-        throw IllegalArgumentException("Not implemented") // TODO
+        throw IllegalArgumentException("Not implemented $address") // TODO
     }
 
     fun insertBootstrapToMemory(){

@@ -87,9 +87,10 @@ object CPU {
             Interrupt.enableInterrupts(true)
         }
 
-        // Halt
-        if(cpu_halted){
-            println("CPU - Halted")
+        // Halt or DMA transferring
+        if(cpu_halted || DMA.transferring()){
+            if(cpu_halted) println("CPU - Halted") // TODO DELETE PRINT
+            if(DMA.transferring()) println("CPU - DMA is active") // TODO DELETE PRINT
             cycles += CYCLES_4
             return true
         }
@@ -97,6 +98,7 @@ object CPU {
         // Opcode execution
         val opcode = fetch()
 
+        // TODO DELETE PRINT
         val hlAddr = get_16bit_address(H, L)
         val deAddr = get_16bit_address(D, E)
         val bcAddr = get_16bit_address(B, C)
@@ -107,8 +109,6 @@ object CPU {
         }catch (ex: IllegalArgumentException){
             return false
         }
-
-        //handleTimers()
 
         return true
     }

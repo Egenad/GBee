@@ -48,7 +48,7 @@ class Emulator {
         println("ROM - Reload Boot Portion")
         ROM.reloadBootPortion()
 
-        Memory.dumpMemory()
+        //Memory.dumpMemory(0xC000, 0xDFFF)
 
         while(running){
             if(paused){

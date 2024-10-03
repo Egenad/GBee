@@ -1,9 +1,7 @@
 package es.atm.gbee.modules
 
 import android.os.SystemClock
-import kotlinx.coroutines.delay
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
+import kotlin.io.encoding.Base64
 
 const val TM_1_START : Int  = 0x9800 // TileMap 1 Start Address
 const val TM_1_END : Int    = 0x9BFF // TileMap 1 End Address
@@ -45,10 +43,10 @@ enum class LCDCObj(val shift: Int) {
     MASTER_ENABLE(0),   // Non-CGB: If 0, both BG and Window become white. OBJ are still displayed. CGB: BG and Window lose their priority. OBJs are always displayed on top.
     OBJ_ENABLE(1),      // If OBJs should be displayed
     OBJ_SIZE(2),        // OBJ size. 0 = 8x8, 1 = 8x16 pixels
-    BG_AREA(3),         // Similar to bit 6. If 0, the BG uses the tilemap in 9800, otherwise 9C00
-    ADDRESS_MODE(4),    // Controls addressing mode for the BG and Window
+    BG_TILEMAP(3),      // Similar to bit 6. If 0, the BG uses the tilemap in 9800, otherwise 9C00
+    ADDRESS_MODE(4),    // Controls addressing mode for the BG and Window. 0 = 8800–97FF; 1 = 8000–8FFF
     WINDOW_ENABLE(5),   // Controls whether the Window shall be displayed
-    BG_TILEMAP(6),      // Controls which bg map the Window uses. 0 = 9800–9BFF; 1 = 9C00-9FFF
+    WIN_TILEMAP(6),     // Controls which bg map the Window uses. 0 = 9800–9BFF; 1 = 9C00-9FFF
     LCDC_ENABLE(7);     // Controls whether the LCD is on and the PPU active
 
     fun get(value: Byte): Int {
@@ -87,13 +85,6 @@ enum class PPUMode(val number: Int){
     DRAW_LCD(3)
 }
 
-data class OAMObj(
-    val x: Byte,
-    val y: Byte,
-    val tile: Byte,
-    val flags: Byte
-)
-
 /*   OAM Obj Flags:
 *    Bit 7 - Priority: 0 = No, 1 = BG and Window colors 1–3 are drawn over this OBJ
 *    Bit 6 - Y flip: 0 = Normal, 1 = Entire OBJ is vertically mirrored
@@ -102,6 +93,12 @@ data class OAMObj(
 *    Bit 3 - Bank [CGB Mode Only]: 0 = Fetch tile from VRAM bank 0, 1 = Fetch tile from VRAM bank 1
 *    Bits 2, 1, 0 - CGB palette [CGB Mode Only]: Which of OBP0–7 to use
 */
+data class OAMObj(
+    val x: Byte,
+    val y: Byte,
+    val tile: Byte,
+    val flags: Byte
+)
 
 object PPU {
 
@@ -111,10 +108,21 @@ object PPU {
     private var prevFrameTime : Long    = 0
     private var startTimer : Long       = 0
 
-    val videoBuffer: ByteArray = ByteArray(GB_Y_RESOLUTION * GB_X_RESOLUTION * 4) { 0 }
-    private var oamRam: ByteArray = ByteArray(40 * 4) { 0 } // Max number: 40 OAM Objs * 4 Bytes
-    private var vRam : ByteArray = ByteArray((VRAM_END - VRAM_START) + 1)
+    val videoBuffer: ByteArray      = ByteArray(GB_Y_RESOLUTION * GB_X_RESOLUTION * 4) { 0 }
+    private var oamRam: ByteArray   = ByteArray(40 * 4) { 0 } // Max number: 40 OAM Objs * 4 Bytes
+    private var vRam : ByteArray    = ByteArray((VRAM_END - VRAM_START) + 1)
 
+    private var ppuEnabled : Boolean        = true          // Bit 7
+    private var lcdEnabled : Boolean        = true
+    private var winTilemapAddr : Int        = TM_1_START    // Bit 6
+    private var enabledWindow : Boolean     = false         // Bit 5
+    private var addrModeAddr : Int          = VRAM_START    // Bit 4
+    private var bgTilemapAddr : Int         = TM_1_START    // Bit 3
+    private var objSize : Int               = 8             // Bit 2
+    private var objEnabled : Boolean        = false         // Bit 1
+    private var bgWinEnabled : Boolean      = true          // Bit 0
+
+    private val fifoFetcher : FifoFetcher = FifoFetcher()
 
     enum class PALETTE_TYPE(){
         BASIC_PL,
@@ -178,23 +186,34 @@ object PPU {
         }else{
             //TODO - CGB
         }
+
+        handleLCDC(0x91.toByte())
     }
 
     fun tick(){
-        lineTicks++
-        val stat = Memory.getByteOnAddress(LCD_STAT)
+        if(moduleIsActive()) {
+            lineTicks++
+            val stat = Memory.getByteOnAddress(LCD_STAT)
 
-        when (StatObj.PPU_MODE.get(stat)){
-            PPUMode.HBlank.number -> hBlankMode(stat)
-            PPUMode.VBlank.number -> vBlankMode(stat)
-            PPUMode.OAM.number -> oamMode(stat)
-            PPUMode.DRAW_LCD.number -> drawLCDMode(stat)
+            when (StatObj.PPU_MODE.get(stat)) {
+                PPUMode.HBlank.number -> hBlankMode(stat)
+                PPUMode.VBlank.number -> vBlankMode(stat)
+                PPUMode.OAM.number -> oamMode(stat)
+                PPUMode.DRAW_LCD.number -> drawLCDMode(stat)
+            }
         }
     }
 
     fun oamMode(stat: Byte){
         if(lineTicks >= OAM_CYCLES){ // ENTER DRAWING PIXELS MODE
             Memory.write(LCD_STAT, StatObj.PPU_MODE.set(stat, PPUMode.DRAW_LCD.number))
+
+            // Reset FIFO Fetcher
+            fifoFetcher.setState(FetcherState.OBTAIN_TILE)
+            fifoFetcher.setLineX(0)
+            fifoFetcher.setActualTile(0)
+            fifoFetcher.setPushedPixels(0)
+            fifoFetcher.setFifoPixels(0)
         }
     }
 
@@ -284,13 +303,14 @@ object PPU {
         return oamRam[arrayAddress]
     }
 
-    fun writeToOAM(address: Int, value: Byte){
+    fun writeToOAM(address: Int, startAddress: Int, value: Byte){
 
         var arrayAddress = address and 0xFFFF
 
-        if(address >= OAM_START){
+        if(startAddress != -1)
+            arrayAddress -= startAddress
+        else if(address >= OAM_START)
             arrayAddress -= 0xFE00
-        }
 
         oamRam[arrayAddress] = value
         Memory.write(address, value)
@@ -301,13 +321,46 @@ object PPU {
             DMA_RGSTR -> {
                 DMA.start(value)
             }
-            BGP -> {
+            LCDC_ADDR -> {
                 Memory.write(address, value)
+                handleLCDC(value)
             }
             in OBP0 .. OBP1 -> {
                 Memory.write(address, ((value.toInt() and 0xFF) and 0b11111100).toByte())
             }
+            else -> {
+                Memory.write(address, value)
+            }
         }
+    }
+
+    private fun handleLCDC(value: Byte){
+
+        // Bit 7
+        ppuEnabled = LCDCObj.LCDC_ENABLE.get(value) != 0
+        lcdEnabled = ppuEnabled
+
+        // Bit 6
+        winTilemapAddr = if(LCDCObj.WIN_TILEMAP.get(value) == 0) TM_1_START else TM_2_START
+
+        // Bit 5
+        enabledWindow = LCDCObj.WINDOW_ENABLE.get(value) != 0
+
+        // Bit 4
+        addrModeAddr = if(LCDCObj.ADDRESS_MODE.get(value) == 0) 0x8800 else VRAM_START
+
+        // Bit 3
+        bgTilemapAddr = if(LCDCObj.BG_TILEMAP.get(value) == 0) TM_1_START else TM_2_START
+
+        // Bit 2
+        objSize = if(LCDCObj.OBJ_SIZE.get(value) == 0) 8 else 16
+
+        // Bit 1
+        objEnabled = LCDCObj.OBJ_ENABLE.get(value) != 0
+
+        // Bit 0
+        bgWinEnabled = LCDCObj.MASTER_ENABLE.get(value) != 0
+
     }
 
     fun readFromVRAM(address: Int) : Byte{
@@ -349,5 +402,17 @@ object PPU {
 
         frameCount++
         prevFrameTime = SystemClock.currentThreadTimeMillis()
+    }
+
+    private fun moduleIsActive(): Boolean{
+        return ppuEnabled
+    }
+
+    fun lcdIsEnabled(): Boolean{
+        return lcdEnabled
+    }
+
+    fun windowIsEnabled(): Boolean{
+        return enabledWindow
     }
 }
