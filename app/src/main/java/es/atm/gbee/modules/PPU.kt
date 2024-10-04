@@ -3,6 +3,8 @@ package es.atm.gbee.modules
 import android.os.SystemClock
 import kotlin.io.encoding.Base64
 
+const val SIGNED_TILE_REGION : Int = 0x8800
+
 const val TM_1_START : Int  = 0x9800 // TileMap 1 Start Address
 const val TM_1_END : Int    = 0x9BFF // TileMap 1 End Address
 const val TM_2_START : Int  = 0x9C00 // TileMap 2 Start Address
@@ -102,22 +104,21 @@ data class OAMObj(
 
 object PPU {
 
-    private var currentFrame : Int      = 0
-    private var frameCount : Int        = 0
-    private var lineTicks : Int         = 0
-    private var prevFrameTime : Long    = 0
-    private var startTimer : Long       = 0
+    private var currentFrame : Int          = 0
+    private var frameCount : Int            = 0
+    private var lineTicks : Int             = 0
+    private var prevFrameTime : Long        = 0
+    private var startTimer : Long           = 0
 
-    val videoBuffer: ByteArray      = ByteArray(GB_Y_RESOLUTION * GB_X_RESOLUTION * 4) { 0 }
-    private var oamRam: ByteArray   = ByteArray(40 * 4) { 0 } // Max number: 40 OAM Objs * 4 Bytes
-    private var vRam : ByteArray    = ByteArray((VRAM_END - VRAM_START) + 1)
+    private var oamRam: ByteArray           = ByteArray(40 * 4) { 0 } // Max number: 40 OAM Objs * 4 Bytes each
+    private var vRam : ByteArray            = ByteArray((VRAM_END - VRAM_START) + 1)
 
     private var ppuEnabled : Boolean        = true          // Bit 7
     private var lcdEnabled : Boolean        = true
     private var winTilemapAddr : Int        = TM_1_START    // Bit 6
     private var enabledWindow : Boolean     = false         // Bit 5
-    private var addrModeAddr : Int          = VRAM_START    // Bit 4
-    private var bgTilemapAddr : Int         = TM_1_START    // Bit 3
+    private var addrModeAddr : Int          = VRAM_START    // Bit 4 - Where the tiles are stored - 0 = 8800–97FF; 1 = 8000–8FFF
+    private var bgTilemapAddr : Int         = TM_1_START    // Bit 3 - Where the BG TileMap is stored - 0 = 9800–9BFF; 1 = 9C00-9FFF
     private var objSize : Int               = 8             // Bit 2
     private var objEnabled : Boolean        = false         // Bit 1
     private var bgWinEnabled : Boolean      = true          // Bit 0
@@ -211,7 +212,7 @@ object PPU {
             // Reset FIFO Fetcher
             fifoFetcher.setState(FetcherState.OBTAIN_TILE)
             fifoFetcher.setLineX(0)
-            fifoFetcher.setActualTile(0)
+            fifoFetcher.setFetchX(0)
             fifoFetcher.setPushedPixels(0)
             fifoFetcher.setFifoPixels(0)
         }
@@ -353,7 +354,7 @@ object PPU {
         enabledWindow = LCDCObj.WINDOW_ENABLE.get(value) != 0
 
         // Bit 4
-        addrModeAddr = if(LCDCObj.ADDRESS_MODE.get(value) == 0) 0x8800 else VRAM_START
+        addrModeAddr = if(LCDCObj.ADDRESS_MODE.get(value) == 0) SIGNED_TILE_REGION else VRAM_START
 
         // Bit 3
         bgTilemapAddr = if(LCDCObj.BG_TILEMAP.get(value) == 0) TM_1_START else TM_2_START
@@ -420,5 +421,21 @@ object PPU {
 
     fun windowIsEnabled(): Boolean{
         return enabledWindow
+    }
+
+    fun getLineTicks(): Int{
+        return lineTicks
+    }
+
+    fun getBGTilemapAddr(): Int{
+        return bgTilemapAddr
+    }
+
+    fun getWinTilemapAddr(): Int{
+        return winTilemapAddr
+    }
+
+    fun getAddrModeAddr(): Int{
+        return addrModeAddr
     }
 }
