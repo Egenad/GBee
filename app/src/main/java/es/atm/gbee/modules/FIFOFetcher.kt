@@ -15,9 +15,9 @@ class Fifo {
     private var tail: FifoEntry? = null
     private var size: Int = 0
 
-    fun enqueue(value: Int) {
+    fun push(value: Int) {
         val newEntry = FifoEntry(value)
-        if (tail == null) {
+        if (tail == null) { // First Entry
             head = newEntry
             tail = newEntry
         } else {
@@ -27,7 +27,7 @@ class Fifo {
         size++
     }
 
-    fun dequeue(): Int? {
+    fun pop(): Int? {
         if (head == null)
             return null
 
@@ -59,6 +59,15 @@ class FifoFetcher {
 
     private var fifo : Fifo = Fifo()
 
+    private var mapY: Byte = 0
+    private var mapX: Byte = 0
+
+    fun process(){
+        mapY = ((Memory.getByteOnAddress(SCY).toInt() and 0xFF) + (Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF)).toByte()
+        mapY = ((Memory.getByteOnAddress(SCX).toInt() and 0xFF) + actualTile).toByte()
+
+    }
+
     private fun fetch_getTile(){
         val tilemapBaseAddress = if (isWindowTile()) 0x9C00 else 0x9800
 
@@ -82,23 +91,49 @@ class FifoFetcher {
         return PPU.windowIsEnabled() && wx >= 0 && wx < GB_X_RESOLUTION && wy > 0
     }
 
+    fun clear(){
+        while(!fifo.isEmpty()){
+            fifo.pop()
+        }
+    }
+
     fun setState(state: FetcherState){
         this.state = state
+    }
+
+    fun getState(): FetcherState{
+        return state
     }
 
     fun setLineX(x: Int){
         lineX = x
     }
 
+    fun getLineX(): Int{
+        return lineX
+    }
+
     fun setActualTile(x: Int){
         actualTile = x
+    }
+
+    fun getActualTile(): Int{
+        return actualTile
     }
 
     fun setPushedPixels(x: Int){
         pushedPixels = x
     }
 
+    fun getPushedPixels(): Int{
+        return pushedPixels
+    }
+
     fun setFifoPixels(x: Int){
         fifoPixels = x
+    }
+
+    fun getFifoPixels(): Int{
+        return fifoPixels
     }
 }

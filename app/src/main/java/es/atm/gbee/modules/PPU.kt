@@ -9,10 +9,10 @@ const val TM_2_START : Int  = 0x9C00 // TileMap 2 Start Address
 const val TM_2_END : Int    = 0x9FFF // TileMap 2 End Address
 const val LCD_STAT : Int    = 0xFF41 // LCD STATUS
 const val LCDC_ADDR : Int   = 0xFF40 // LCDC - LCD Control
-const val LY_ADDR : Int     = 0xFF44 // LCD Y Coordinate, values from 0 to 153. 144 to 153 = VBlank
+const val LY_ADDR : Int     = 0xFF44 // LCD Y Coordinate, values range [0 - 153]. 144 to 153 = VBlank
 const val LYC_ADDR : Int    = 0xFF45 // LY Comparation
 
-const val SCY : Int         = 0xFF42 // Scroll Y Position
+const val SCY : Int         = 0xFF42 // Scroll Y Position - Values Range: [0 - 255]
 const val SCX : Int         = 0xFF43 // Scroll X Position
 const val WY : Int          = 0xFF4A // Window Y Position
 const val WX : Int          = 0xFF4B // Window X Position
@@ -218,7 +218,13 @@ object PPU {
     }
 
     fun drawLCDMode(stat: Byte){
-        if(lineTicks >= OAM_CYCLES + PIXEL_TRANSFER_CYCLES){ // ENTER HBLANK MODE
+
+        fifoFetcher.process()
+
+        if(fifoFetcher.getPushedPixels() >= GB_X_RESOLUTION){ // ENTER HBLANK MODE
+
+            fifoFetcher.clear()
+
             Memory.write(LCD_STAT, StatObj.PPU_MODE.set(stat, PPUMode.HBlank.number))
 
             if(StatObj.HBLANK_INTERRUPT.get(stat) != 0)
