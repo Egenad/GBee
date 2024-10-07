@@ -3,15 +3,16 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {5.1}{\ignorespaces Especificaciones técnicas de la Game Boy.}}{11}{table.5.1}%
-\contentsline {table}{\numberline {5.2}{\ignorespaces Mapa de memoria de Game Boy}}{11}{table.caption.12}%
-\contentsline {table}{\numberline {5.3}{\ignorespaces Comparación de opcodes entre Z80 y Sharp LR35902}}{14}{table.caption.13}%
-\contentsline {table}{\numberline {5.4}{\ignorespaces Función de los bits del registro F o Flags}}{15}{table.caption.14}%
-\contentsline {table}{\numberline {5.5}{\ignorespaces Resumen de las variaciones de las secuencias de arranque}}{20}{table.caption.17}%
-\contentsline {table}{\numberline {5.6}{\ignorespaces Código de licencia y su editor.}}{25}{table.5.6}%
-\contentsline {table}{\numberline {5.7}{\ignorespaces Tipos de mapeadores (MBC) y sus códigos}}{26}{table.5.7}%
-\contentsline {table}{\numberline {5.8}{\ignorespaces Tamaño y número de bancos de ROM según el valor especificado.}}{26}{table.caption.19}%
-\contentsline {table}{\numberline {5.9}{\ignorespaces Tamaño de SRAM según el código del cartucho.}}{26}{table.caption.20}%
-\contentsline {table}{\numberline {5.10}{\ignorespaces Antiguos códigos de licencia y su editor.}}{30}{table.5.10}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {6.1}{\ignorespaces Especificaciones técnicas de la Game Boy.}}{13}{table.6.1}%
+\contentsline {table}{\numberline {6.2}{\ignorespaces Mapa de memoria de Game Boy}}{13}{table.caption.12}%
+\contentsline {table}{\numberline {6.3}{\ignorespaces Comparación de opcodes entre Z80 y Sharp LR35902}}{16}{table.caption.13}%
+\contentsline {table}{\numberline {6.4}{\ignorespaces Función de los bits del registro F o Flags}}{17}{table.caption.14}%
+\contentsline {table}{\numberline {6.5}{\ignorespaces Resumen de las variaciones de las secuencias de arranque}}{22}{table.caption.17}%
+\contentsline {table}{\numberline {6.6}{\ignorespaces Código de licencia y su editor.}}{27}{table.6.6}%
+\contentsline {table}{\numberline {6.7}{\ignorespaces Tipos de mapeadores (MBC) y sus códigos}}{28}{table.6.7}%
+\contentsline {table}{\numberline {6.8}{\ignorespaces Tamaño y número de bancos de ROM según el valor especificado.}}{28}{table.caption.19}%
+\contentsline {table}{\numberline {6.9}{\ignorespaces Tamaño de SRAM según el código del cartucho.}}{28}{table.caption.20}%
+\contentsline {table}{\numberline {6.10}{\ignorespaces Antiguos códigos de licencia y su editor.}}{32}{table.6.10}%
 \addvspace {10\p@ }
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

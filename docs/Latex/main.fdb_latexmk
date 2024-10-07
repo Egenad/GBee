@@ -1,10 +1,10 @@
 # Fdb version 4
-["xdvipdfmx"] 1728312070.28541 "main.xdv" "main.pdf" "main" 1728312072.72867 0
-  "main.xdv" 1728312069 1879728 fb12a12308b6b2cd1ed6f0175b4bbb59 "xelatex"
+["xdvipdfmx"] 1728314503.36105 "main.xdv" "main.pdf" "main" 1728314505.80051 0
+  "main.xdv" 1728314502 1884668 6458cc9acb9d0d0d7d8af42f8469c857 "xelatex"
   (generated)
   "main.pdf"
   (rewritten before read)
-["xelatex"] 1728312051.16507 "d:/Git/GBee/docs/Latex/main.tex" "main.xdv" "main" 1728312072.7147 0
+["xelatex"] 1728314483.54724 "d:/Git/GBee/docs/Latex/main.tex" "main.xdv" "main" 1728314505.78451 0
   "C:/Users/Ángel/AppData/Local/MiKTeX/miktex/data/le/xetex/xelatex.fmt" 1718896583 37546110 5e6f60f0412bcf35be53a776eba57d9a ""
   "C:/Users/Ángel/AppData/Local/Programs/MiKTeX/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136768654 1528 7e12f4c0fcf5a072cebdcfbfc610f54c ""
   "C:/Users/Ángel/AppData/Local/Programs/MiKTeX/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1233951848 1004 54797486969f23fa377b128694d548df ""
@@ -277,11 +277,12 @@
   "C:/Users/Ángel/AppData/Local/Programs/MiKTeX/tex/latex/xstring/xstring.sty" 1693735632 123 a302f2c651a95033260db60e51527ae8 ""
   "C:/Users/Ángel/AppData/Local/Programs/MiKTeX/tex/latex/zref/zref-abspage.sty" 1695383086 2269 4fe6fb3396214c91f164d45faf9bec45 ""
   "C:/Users/Ángel/AppData/Local/Programs/MiKTeX/tex/latex/zref/zref-base.sty" 1695383086 20785 f7d1133a287929598a897c93f8f4c44b ""
+  "capitulos/Design.tex" 1728314396 91 7e38c7cf8b6cf47c65384ff0359bda4e ""
   "capitulos/Develop.tex" 1728300583 68237 c79bb04601b273e45d39158e85330658 ""
-  "capitulos/Historia.tex" 1728291388 44752 3331e9e5cff9f6d37a67d47df19662d7 ""
+  "capitulos/Historia.tex" 1728313939 44751 62748f5bc7dff50bcb6f41f4fbecf3fc ""
   "capitulos/Introduccion.tex" 1728291388 11497 7331bdb4f8ae27d8ad31daea12a4bd5a ""
   "capitulos/preliminaresconagradecimientos.tex" 1728291388 2468 297c4100e633b85c315cb00117316e46 ""
-  "d:/Git/GBee/docs/Latex/main.tex" 1728291388 1162 ddbb12598fdf6c4210397d874836cb2f ""
+  "d:/Git/GBee/docs/Latex/main.tex" 1728314445 1191 a30b4bca3f56e7076738c70f61858d7d ""
   "include/config.tex" 1728291388 813 019c58aa7837627aad2783a35fd0ea60 ""
   "include/estiloscodigoprogramacion.tex" 1728291388 3647 4588c76f91d723512f4cffd47bcacc5b ""
   "include/images/dibujado_logo_n.jpg" 1728291390 105121 c1c82e7d7095270c1b1a2d9acc7ae477 ""
@@ -299,13 +300,13 @@
   "include/logos/LogoUANegro.eps" 1728291390 1009498 74c513e4cdbe4ba04b0a85f5f8385afd ""
   "include/portada/portada_bn.tex" 1728291388 2133 f67834f73300b2f6bd239dc98c8f79f9 ""
   "include/portada/portada_color.tex" 1728291388 3889 0003bc41872bc2f58b53fcbb09b87dad ""
-  "main.aux" 1728312069 24980 7aa4265541464a2c26bd1f2f4732232f "xelatex"
-  "main.lof" 1728312069 977 77505678de943702a37d9644170f0fdc "xelatex"
-  "main.lol" 1728312069 4419 04c16645eb764da97531124ade983f65 "xelatex"
-  "main.lot" 1728312069 1401 9b19067411d8f1e9fb2aa5b30e764093 "xelatex"
-  "main.out" 1728312057 0 d41d8cd98f00b204e9800998ecf8427e "xelatex"
-  "main.tex" 1728291388 1162 ddbb12598fdf6c4210397d874836cb2f ""
-  "main.toc" 1728312069 6495 4c40f01aa7d8f8a63811255e066890b1 "xelatex"
+  "main.aux" 1728314502 25481 f703bf3792463c7e3460ae51207b9bef "xelatex"
+  "main.lof" 1728314502 998 af143159d20e0c019f33a47ff60eb6a1 "xelatex"
+  "main.lol" 1728314502 4439 726b8ecfad4cd47847b4e55634c76108 "xelatex"
+  "main.lot" 1728314502 1421 77b71c2fe7e620cd9d1064480f2634c9 "xelatex"
+  "main.out" 1728314489 0 d41d8cd98f00b204e9800998ecf8427e "xelatex"
+  "main.tex" 1728314445 1191 a30b4bca3f56e7076738c70f61858d7d ""
+  "main.toc" 1728314502 6709 e0c82950d97081eaec2ff1d371c22adc "xelatex"
   (generated)
   "main.aux"
   "main.lof"
