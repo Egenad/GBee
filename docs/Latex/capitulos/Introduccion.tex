@@ -1,0 +1,135 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Golden Sacra - Memoria
+% Escuela Politécnica Superior de la Universidad de Alicante
+% Realizado por: Ángel Jesús Terol Martínez
+% Contacto: jtm37@alu.ua.es
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Resumen}
+\label{resumen}
+\textbf{GBee} es una aplicación que funciona como \textbf{emulador de Game Boy}, desarrollado específicamente de forma nativa para dispositivos \textbf{Android}. Los usuarios podrán cargar sus ROMs, guardar el estado de sus partidas, y configurar a su gusto la interfaz gráfica.
+\\\\
+El proyecto nace de la curiosidad por entender los aspectos técnicos y arquitectónicos de una consola, y cómo estos pueden ser emulados en un entorno moderno. A lo largo del trabajo, se abordan temas clave como la gestión de la Unidad Central de Procesamiento (CPU), la Unidad de Procesamiento de Gráficos (PPU), y la sincronización de ciclos para garantizar una emulación precisa.
+{\let\clearpage\relax\chapter*{Abstract}}
+
+\textbf{GBee} is an application that functions as a \textbf{Game Boy emulator}, developed natively for \textbf{Android} devices. Users can load their ROMs, save their game states, and customize the graphical interface to their liking.
+\\\\
+The project stems from a curiosity to understand the technical and architectural aspects of a console, and how these can be emulated in a modern environment. Throughout the development, key topics such as the management of the Central Processing Unit (CPU), the Graphics Processing Unit (PPU), and cycle synchronization are addressed to ensure accurate emulation.
+\cleardoublepage
+
+\chapter{Objetivos}
+\label{objetivos}
+
+Un \textbf{ingeniero} debe ser capaz en todo momento de \textbf{resolver los problemas} que se le planteen por si mismo y no basarse en buscar la solución de alguien anónimo.\\ \\
+Las arquitecturas de las máquinas actuales son \textbf{complejas y muy potentes} para que una persona les pueda sacar todo el potencial en un corto período de tiempo. Por ello, lo ideal es empezar por una consola más antigua como punto de partida, como lo puede ser la propia \textbf{Game Boy}.\\ \\
+La razón de escogerla como la consola sobre la que desarrollar este proyecto ha sido \textbf{subjetiva} debido al afecto que le tengo. Perfectamente podría haber escogido cualquier otra como la \textit{NES} o la \textit{Master System}. Por otro lado, con la documentación de esta memoria pretendo \textbf{ser de ayuda para más personas} que se propongan en un futuro realizar un juego para dicha consola.\\ \\
+A grandes rasgos, los objetivos serían los siguientes:\\
+\begin{itemize}
+    \item \textbf{Entender y replicar el funcionamiento interno de la consola Game Boy.}
+    \item \textbf{Desarrollar una aplicación nativa en Android.}
+    \item \textbf{Analizar librerías y frameworks existentes.}
+    \item \textbf{Comprender y aplicar la integración de un emulador con las interfaces gráficas de Android.}
+\end{itemize}
+
+Objetivos secundarios:
+
+\begin{itemize}
+	\item \textbf{Publicar la aplicación en la Play Store.}
+\end{itemize}
+
+\cleardoublepage
+
+\chapter{Terminología}
+\label{terminologia}
+A lo largo del documento se van a utilizar varias nomenclaturas para hacer la lectura más sencilla:
+\begin{itemize}
+	\item \textbf{GB:} Game Boy.
+    \item \textbf{GBC:} Game Boy Color.
+    \item \textbf{CGB:} Forma alternativa de referirse a la Game Boy Color.
+    \item \textbf{SNES:} Super Nintendo Entertainment System.
+    \item \textbf{SGB:} Super Game Boy. Accesorio para la SNES.
+    \item \textbf{SGB2:} Versión mejorada de la Super Game Boy.
+    \item \textbf{MGB:} Mini Game Boy. Forma alternativa de referirse a la Game Boy Pocket.
+    \item \textbf{GBL:} Game Boy Light.
+    \item \textbf{DMG:} Dot Matrix Game. Abreviatura oficial del modelo original de la Game Boy. Hace referencia a la pantalla de matriz de puntos que utilizaba la consola.
+    \item \textbf{AGB:} Game Boy Advance.
+    \item \textbf{AGS:} Game Boy Advance SP.
+    \item \textbf{N64:} Nintendo 64.
+	\item \textbf{Bit:} Unidad mínima de información empleada en informática.
+    \item \textbf{MSB:} Most Significant Bit. El bit de mayor valor en un número binario. Es el bit 7, que representa el valor más alto (128 en decimal).
+    \item \textbf{LSB:} Least Significant Bit. El bit de menor valor en un número binario. Es el bit 0, que representa el valor más bajo (1 en decimal).
+    \item \textbf{Nibble:} Unidad de información equivalente a la mitad de un byte (4 bits).
+	\item \textbf{Byte:} Unidad de información equivalente a 8 bits.
+    \item \textbf{KiB:} Unidad de información conocida como Kibibyte, equivalente a $2^{10}$ bytes.
+	\item \textbf{CPU:} Central Processing Unit. Hardware que interpreta las instrucciones del programa.
+	\item \textbf{GPU:} Graphics Processing Unit. Hardware dedicado al procesamiento de gráficos.
+    \item \textbf{PPU:} Picture Processing Unit. Otra manera de nombrar la GPU.
+	\item \textbf{RAM:} Random-Access Memory. Memoria de trabajo donde almacenamos nuestras variables.
+    \item \textbf{SRAM:} Static Random-Access Memory.
+    \item \textbf{ROM:} Read Only Memory. Zona de memoria donde se almacena el código del programa.
+    \item \textbf{APU:} Unidad de Procesamiento de Audio.
+	\item \textbf{VRAM:} Video RAM. Zona de memoria utilizada por el controlador gráfico para representar información de manera visual por pantalla.
+	\item \textbf{HRAM:} High RAM. Zona de memoria accesible en el proceso DMA. 
+    \item \textbf{DMA:} Direct Memory Access. Característica de ciertos sistemas informáticos que permite acceder a RAM a un subsistema, indepentientemente de la CPU.
+    \item \textbf{OAM:} Object Attribute Memory. Espacio de memoria en el que se almacenan los atributos de los sprites.
+    \item \textbf{PC:} Program Counter. Almacena la dirección de la próxima instrucción a ejecutar.
+    \item \textbf{SP:} Stack Pointer. Apunta a la última dirección usada en la pila.
+    \item \textbf{Sprite:} Elemento visual activo en pantalla.
+	\item \textbf{Tile:} Conjunto de pixeles de tamaño 8x8.
+    \item \textbf{MBC:} Memory Bank Controller. Circuito que permite gestionar la memoria de los cartuchos de Game Boy.
+    \item \textbf{Opcode:} Instrucción de máquina que indica la operación que debe realizar el procesador.
+    \item \textbf{Activity:} Componente de Android que representa una pantalla con la que los usuarios pueden interactuar.
+    \item \textbf{BCD:} Binary-Coded Decimal. Sistema de representación numérica que utiliza cuatro bits para codificar cada dígito decimal, permitiendo así que los números decimales se almacenen y manipulen de manera más sencilla en sistemas digitales.
+    \item \textbf{FIFO:} First In, First Out. Estructura de datos que organiza elementos de manera que el primero en entrar es el primero en salir, garantizando un orden de procesamiento basado en la secuencia de llegada.
+    \item \textbf{URI:} Uniform Resource Identifier. Es una cadena de carácteres que identifican un recurso online o local.
+    \item \textbf{Intent:} objeto en Android que se utiliza para comunicar componentes.
+\end{itemize}
+
+\cleardoublepage
+
+\chapter{Metodología y Planificación}
+\label{planificacion}
+\section{Metodología Aplicada}
+La metodología adoptada para la planificación del proyecto es ágil, un enfoque que, si bien es comúnmente utilizado en proyectos colaborativos, resulta igualmente eficaz en proyectos individuales. La clave de esta metodología radica en la gestión eficiente del tiempo, permitiendo que cada tarea sea ejecutada dentro de un plazo bien definido, con el objetivo de maximizar los resultados y cumplir con los plazos establecidos.
+\section{Estructura del Proyecto}
+El proyecto está dividido en distintas etapas o iteraciones, cada una de las cuales ofrece la oportunidad de aprender y aplicar nuevos conocimientos relacionados con la emulación y el desarrollo. Al final de cada iteración, se lleva a cabo una revisión exhaustiva del progreso, lo que permite identificar áreas de mejora o posibles errores, minimizando así el tiempo perdido en futuras fases del desarrollo.
+\\\\
+Durante el proceso de desarrollo, las tareas y objetivos están en constante evolución, dado que se parte de una base de conocimientos limitada que se incrementa a medida que avanza el proyecto. Este enfoque implica que, en muchas ocasiones, lo que en un inicio parecía correctamente implementado debe ser revisado o incluso reestructurado, conforme se adquiere una comprensión más profunda de los desafíos técnicos involucrados.
+\\\\
+El proyecto se ha dividido en las siguientes etapas/iteraciones:
+
+\begin{itemize}
+	\item \textbf{Diseño}
+	
+	Antes de iniciar el desarrollo del emulador, es fundamental tener claridad sobre los objetivos y el alcance del proyecto. Se realizará un análisis preliminar de diversos emuladores existentes, lo cual permitirá obtener una visión más sólida y concreta de las funcionalidades y desafíos que se enfrentarán durante la implementación.
+
+	\item \textbf{Aprendizaje}
+	
+	En esta fase inicial, el enfoque será comprender en profundidad las especificaciones técnicas de la consola Game Boy, desde su CPU y PPU hasta la gestión de ciclos y sus interacciones con los componentes de hardware. Se realizarán pruebas exploratorias, cuyo propósito será construir una base sólida para el desarrollo posterior del emulador.
+	
+	\item \textbf{Desarrollo}
+	
+	Esta es la etapa central y más intensiva del proyecto. Durante el desarrollo del emulador, se implementarán las funcionalidades principales como la emulación de la CPU, la gestión de gráficos, la sincronización de ciclos, y la integración con las interfaces gráficas en Android. Al mismo tiempo, se generará la documentación técnica detallada para acompañar el progreso y justificar las decisiones tomadas durante la implementación.
+	
+	\item \textbf{Revisión y Maquetación}
+	
+	La fase final se centrará en la revisión exhaustiva tanto del emulador como de la documentación. Se corregirán posibles errores detectados, se optimizará el rendimiento del emulador, y se pulirá la maquetación de la memoria, asegurando que todo el trabajo cumpla con los estándares de calidad requeridos.
+	
+\end{itemize}
+
+Las \textbf{herramientas principales} que se van a utilizar son \textbf{Trello y Toggl}. Además, como herramienta de \textbf{control de versiones}, se va a hacer uso de \textbf{Git}.
+\\ \\
+En Trello se ha creado una tabla con la que poder visualizar de manera sencilla qué tareas están pendientes de realizar, tanto del producto como de la memoria. Todas estas tareas pasarán a la fase de revisión y, una vez dado el visto bueno, terminarán en el estado de finalizado.
+
+\begin{figure}[h]
+\centering
+%\includegraphics[width=1\textwidth]{include/images/gdd/trello.png}
+\caption{Tabla Trello - Iteración 0}
+\label{figure:trello}
+\end{figure}
+	
+\section{Mínimo Producto Viable}
+
+Lo normal en todo proyecto es que ocurran imprevistos que hagan al programador perder más tiempo en una tarea o incluso paralizar por completo el proyecto. Además, esto se junta con el hecho de que aquí no hay nadie que pueda ocupar nuestro puesto mientras ese problema se soluciona. Por esta razón, es importante tener en mente un \textbf{producto mínimo viable}, con el cual obtener un producto usable de en el tiempo disponible.
+	
+\cleardoublepage

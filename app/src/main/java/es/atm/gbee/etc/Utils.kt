@@ -24,3 +24,8 @@ fun extractByte(original: ByteArray, byteAddres: Int): Byte {
     }
     return original[byteAddres]
 }
+
+fun convertBytesToString(bytes: ByteArray): String {
+    val title = bytes.takeWhile { it != 0.toByte() && it.toInt() in 32..126 } // Filter only ASCII characters
+    return String(title.toByteArray(), Charsets.US_ASCII)
+}

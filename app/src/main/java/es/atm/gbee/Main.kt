@@ -36,11 +36,11 @@ fun main(args: Array<String>){
         }
     }*/
 
-    //ROM.load_rom("D:/test_rom.gb")
-    //ROM.load_rom("D:/test_rom_2.gb")
-    //ROM.load_rom("D:/test_rom_3.gb")
+    //ROM.load_rom_from_path("D:/test_rom.gb")
+    //ROM.load_rom_from_path("D:/test_rom_2.gb")
+    //ROM.load_rom_from_path("D:/test_rom_3.gb")
     //ROM.load_rom("D:/test_rom_4.gbc")
-    //ROM.load_rom("D:/test_rom_5.gbc")
+    ROM.load_rom_from_path("D:/harry.gbc")
     //ROM.load_rom("D:/test_rom_6.gb")
     //ROM.load_rom("/Users/angelterol/Documents/Git/Android/GBee/roms/GoldenSacra.gb")
     //ROM.load_rom("D:/Git/GBee/roms/GoldenSacra.gb")
@@ -61,6 +61,6 @@ fun main(args: Array<String>){
     //val emu = Emulator()
     //emu.run("/Users/angelterol/Documents/Git/Android/GBee/roms/GoldenSacra.gb")
 
-    ROM.load_rom_from_path("D:/Git/GBee/roms/GoldenSacra.gb")
+    //ROM.load_rom_from_path("D:/Git/GBee/roms/GoldenSacra.gb")
     Memory.dumpMemory(0x0000, 0x0500)
 }

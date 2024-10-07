@@ -1,0 +1,783 @@
+\chapter{Estado del Arte}
+\label{gb}
+
+\section{Game Boy}
+La \textbf{Game Boy} es una consola portátil de \textbf{8 bits} desarrollada y fabricada por Nintendo, lanzada al mercado el \textbf{21 de abril de 1989 en Japón}, tres meses después en América y el 28 de septiembre de 1990 en Europa. Fue la segunda consola portátil de la compañía, sucesora de la familia Game \& Watch. \\
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.15\textwidth]{include/images/gb.jpg}
+\caption{Game Boy}
+\label{figure:gb}
+\end{figure}
+
+Entre sus características técnicas, la Game Boy incluía un procesador Z80, una pantalla LCD monocromática con ajuste de contraste, un pad direccional de 8 direcciones, dos botones de acción (A y B) y dos botones de control (Start y Select).
+\\\\
+A pesar de recibir críticas por el tamaño de su pantalla y su limitada paleta de colores, la Game Boy logró un rotundo éxito comercial. Su éxito se atribuye principalmente a su bajo consumo energético, ya que funcionaba con cuatro pilas AA que ofrecían una gran autonomía en comparación con consolas rivales, como la Game Gear de SEGA. Además, la consola fue lanzada junto al exitoso juego Tetris, lo que contribuyó a su popularidad tanto entre niños como entre adultos.
+\\\\
+La longevidad de la Game Boy en el mercado se debe en gran parte al modelo de negocio que Nintendo continúa aplicando hoy en día, basado en la introducción de revisiones compatibles con versiones anteriores en lugar de lanzar consolas completamente nuevas. Entre estas revisiones destacan la Game Boy Pocket en 1996, así como la Game Boy Light y la Game Boy Color en 1998.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{include/images/gbs.jpg}
+\caption{Versiones DMG, MGB, GBL y CGB de Game Boy}
+\label{figure:v_gameboy}
+\end{figure}
+
+\subsection{Especificaciones Técnicas}
+
+Cuando pensamos en programar un emulador que simule una máquina en concreto lo primero que debemos hacer es conocer exáctamente \textbf{cómo es por dentro y cómo funciona}. En la siguiente tabla quedan reflejadas todas las \textbf{características técnicas de la Game Boy}: \\
+
+\begin{longtable}{|m{3cm}|m{2.5cm}|m{3cm}|m{2.5cm}|m{2.5cm}|}
+\hline
+\textbf{Características} & \textbf{Game Boy (DMG)} & \textbf{Game Boy Pocket (MGB)} & \textbf{Super Game Boy (SGB)} & \textbf{Game Boy Color (CGB)} \\
+\hline
+\endfirsthead
+\multicolumn{5}{c}%
+{\tablename\ \thetable\ -- \textit{Continúa de la página anterior}} \\
+\hline
+\textbf{Características} & \textbf{Game Boy (DMG)} & \textbf{Game Boy Pocket (MGB)} & \textbf{Super Game Boy (SGB)} & \textbf{Game Boy Color (CGB)} \\
+\hline
+\endhead
+\hline \multicolumn{5}{|r|}{\textit{Continúa en la siguiente página}} \\
+\endfoot
+\hline
+\endlastfoot
+
+\textbf{CPU} & \multicolumn{4}{c|}{8-bit 8080-like Sharp CPU (speculated to be a SM83 core)}  \\
+\hline
+\textbf{Frecuencia CPU} & \multicolumn{2}{c|}{4.194304 MHz} & Depende de la revisión & Hasta 8.388608 MHz \\
+\hline
+\textbf{Work RAM} & \multicolumn{3}{c|}{8 KiB} & 32 KiB (4 + 7 × 4 KiB)  \\
+\hline
+\textbf{Video RAM} & \multicolumn{3}{c|}{8 KiB} & 16 KiB (2 × 8 KiB) \\
+\hline
+\textbf{Pantalla} & LCD 4.7 × 4.3 cm & LCD 4.8 × 4.4 cm & CRT TV & TFT 4.4 × 4 cm \\
+\hline
+\textbf{Resolución} & \multicolumn{2}{c|}{160 × 144} & 160 × 144 dentro de 256 × 224 border & 160 × 144 \\
+\hline
+\textbf{Sprites (OBJ)} & \multicolumn{4}{c|}{8×8 o 8×16; máximo 40 por pantalla, 10 por línea} \\
+\hline
+\textbf{Paletas} & \multicolumn{2}{c|}{BG: 1 × 4, OBJ: 2 × 3} & BG/OBJ: 1 + 4 × 3, border: 4 × 15 & BG: 8 × 4, OBJ: 8 × 33 \\
+\hline
+\textbf{Colores} & 4 tonos de verde & 4 tonos de gris & \multicolumn{2}{c|}{32768 colores (15-bit RGB)} \\
+\hline
+\textbf{Sincronización horizontal} & \multicolumn{2}{c|}{9.198 KHz} & Complicado\footnotemark[1] & 9.198 KHz \\
+\hline
+\textbf{Sincronización vertical} & \multicolumn{2}{c|}{59.73 Hz} & Complicado\footnotemark[1] & 59.73 Hz \\
+\hline
+\textbf{Sonido} & \multicolumn{2}{p{5cm}|}{4 canales con salida estéreo} & 4 canales GB + audio SNES & 4 canales con salida estéreo \\
+\hline
+\textbf{Energía} & DC 6V, 0.7 W & DC 3V, 0.7 W & Alimentado por SNES & DC 3V, 0.6 W \\
+\hline
+
+\caption{Especificaciones técnicas de la Game Boy.}
+\label{table:1}
+\end{longtable}
+
+\footnotetext[1]{La SGB ejecuta dos consolas de forma simultánea: la Game Boy dentro del cartucho y la SNES. La SNES captura y muestra los gráficos de la Game Boy, pero las velocidades de fotogramas de ambas no se sincronizan completamente, lo que provoca duplicados y/o eliminados}
+
+\subsection{Mapa de Memoria}
+
+La Game Boy dispone de 64 Kb de memoria y utiliza direcciones de memoria de 16 bits, lo que le da la posibilidad de utilizar el rango de 0x0000 hasta 0xFFFF (65.535 bytes en total). Además, esta memoria se organiza en diferentes áreas para que el procesador pueda acceder a recursos clave como el código del juego, la memoria de video, la RAM y los registros de control. Cada una de estas áreas tiene una función específica, y algunas de ellas están sujetas a restricciones o condiciones de acceso durante la ejecución del sistema.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Inicio} & \textbf{Fin} & \textbf{Descripción} \\ \hline
+0000 & 3FFF & 16 KiB Banco ROM 00 \\ \hline
+4000 & 7FFF & 16 KiB Banco ROM 01–NN \\ \hline
+8000 & 9FFF & 8 KiB RAM de Vídeo (VRAM) \\ \hline
+A000 & BFFF & 8 KiB RAM Externa \\ \hline
+C000 & CFFF & 4 KiB Work RAM (WRAM) \\ \hline
+D000 & DFFF & 4 KiB Work RAM (WRAM) \\ \hline
+E000 & FDFF & Echo RAM (espejo de C000–DDFF) \\ \hline
+FE00 & FE9F & Memoria de atributos de objetos (OAM) \\ \hline
+FEA0 & FEFF & No usable \\ \hline
+FF00 & FF7F & Registros de entrada/salida (I/O) \\ \hline
+FF80 & FFFE & High RAM (HRAM) \\ \hline
+FFFF & FFFF & Registro de habilitación de interrupciones (IE) \\ \hline
+\end{tabular}
+\caption{Mapa de memoria de Game Boy}
+\end{table}
+
+\subsubsection{ROM: [0x0000 - 0x7FFF]}
+En las primeras direcciones del mapa de memoria (0x0000–0x7FFF) se encuentran los bancos de memoria ROM, que almacenan el código del juego cargado desde el cartucho. La sección entre 0x0000 y 0x3FFF es el banco fijo de 16 KiB que se carga automáticamente al encender la consola. Por último, la sección entre 0x4000 y 0x7FFF corresponde a bancos de ROM adicionales que pueden ser intercambiados (si el tipo de cartucho lo permite) para ofrecer acceso a más de 32 KiB de memoria.
+
+\subsubsection{VRAM: [0x8000 - 0x9FFF]}
+La VRAM es una memoria de 8 KiB que se utiliza para almacenar datos gráficos, como los sprites y tiles que se dibujan en pantalla. En los modelos CGB, esta sección de la memoria tiene dos bancos, con la posibilidad de intercambiarlos entre ellos y almacenar gráficos adicionales.
+
+\subsubsection{RAM Externa: [0xA000 - 0xBFFF]}
+Algunos cartuchos incluyen RAM adicional que se usa principalmente para guardar datos o estados del juego, como partidas guardadas. Esta RAM externa, que varía en tamaño según el cartucho, se puede acceder a través de esta región de memoria.
+
+\subsubsection{Work RAM: [0xC000 - 0xDFFF]}
+La WRAM es un área de memoria utilizada por el sistema para almacenar variables temporales, datos en proceso, y otra información necesaria para la ejecución de los programas. Está dividida en dos secciones de 4 KiB cada una. En los modelos CGB, la segunda parte (0xD000–0xDFFF) también puede ser conmutada entre diferentes bancos para aumentar la capacidad de almacenamiento.
+
+\subsubsection{Echo RAM: [0xE000 - 0xFDFF]}
+Esta es una copia exacta de la WRAM en las direcciones 0xC000–0xDDFF. Aunque se puede acceder a ella de la misma forma que la RAM original, Nintendo prohíbe su uso, ya que podría causar errores de sincronización o conflictos de acceso.
+
+\subsubsection{OAM: [0xFE00 - 0xFE9F]}
+La OAM es un pequeño bloque de memoria dedicado a almacenar información sobre los sprites que aparecen en pantalla, como su posición, prioridad y patrones de color. Puede contener hasta un total de 40 sprites, cada uno de 8x8 u 8x16 píxeles. Sin embargo, por limitaciones de hardware, solamente se pueden mostrar 10 sprites por scanline.
+
+\subsubsection{No utilizable: [0xFEA0 - 0xFEFF]}
+Esta pequeña área de memoria no se utiliza y está reservada. Cualquier intento de leer o escribir en esta región puede provocar comportamientos inesperados en el sistema.
+\\\\
+Si se intenta acceder a la región, devolverá un valor 0xFF cuando el OAM está bloqueado, y de lo contrario, dependerá de la revisión del hardware:
+
+\begin{itemize}
+    \item En DMG, MGB, SGB y SGB2, las lecturas durante el bloqueo de OAM provocan corrupción de OAM. De otra forma devolverán 0x00.
+    \item En la revisión E de CGB, y los modelos AGB, AGS y GBP, devuelve el nibble alto del byte de la dirección inferior dos veces; por ejemplo, 0xFFA0 devuelve 0xAA, 0xFFB1 devuelve 0xBB, y así sucesivamente.
+    \item En el resto de revisiones de CGB (0-D), la región es una sección de RAM única, pero enmascarada con un valor específico.
+\end{itemize}
+
+\subsubsection{I/O: [0xFEA0 - 0xFEFF]}
+Estos registros se utilizan para controlar diferentes aspectos del hardware de la Game Boy, como la pantalla, los botones de entrada, el sonido y otros componentes del sistema. Acceder a estos registros permite al software interactuar directamente con el hardware.
+
+\subsubsection{HRAM: [0xFF80 - 0xFFFE]}
+La HRAM es un pequeño bloque de memoria de alta velocidad que contiene datos críticos que el procesador necesita acceder de manera rápida y frecuente.
+
+\subsubsection{IE: 0xFFFF}
+Registro de habilitación de interrupciones (Interrupt Enable), que permite activar o desactivar interrupciones específicas del sistema, cruciales para el manejo de eventos como temporizadores o actualizaciones gráficas.
+
+\subsection{CPU}
+
+También conocida como la Unidad Central de Procesamiento, que constituye el núcleo principal del sistema. Es la encargada de ejecutar los opcodes, que definen el comportamiento del software en la consola original.
+
+\subsubsection{Diferencias}
+
+LA Game Boy cuenta con un procesador único conocido como Sharp LR35902 y, como viene indicado en su nombre, fue desarrollado por la empresa Sharp Corporation. Esta CPU era una mezcla entre la conocida Zilog Z80 y el Intel 8080, a la cual se añadieron y eliminaron distintas instrucciones. Una diferencia importante, es que la Sharp no tiene instrucciones propias de I/O, a diferencia de las otras dos. En este caso, se puede acceder a los puertos de entrada/salida mediante comandos simples de carga (LD).
+\\\\
+A continuación se muestra una tabla con las diferencias existentes en el abanico de instrucciones:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        \textbf{Opcode} & \textbf{Z80} & \textbf{Sharp LR35902} \\
+        \hline
+        08 & EX AF,AF & LD (nn),SP \\ \hline
+        10 & DJNZ PC+dd & STOP \\ \hline
+        22 & LD (nn),HL & LDI (HL),A \\ \hline
+        2A & LD HL,(nn) & LDI A,(HL) \\ \hline
+        32 & LD (nn),A & LDD (HL),A \\ \hline
+        3A & LD A,(nn) & LDD A,(HL) \\ \hline
+        D3 & OUT (n),A & - \\ \hline
+        D9 & EXX & RETI \\ \hline
+        DB & IN A,(n) & - \\ \hline
+        DD & \textless IX\textgreater prefix & - \\ \hline
+        E0 & RET PO & LD (FF00+n),A \\ \hline
+        E2 & JP PO,nn & LD (FF00+C),A \\ \hline
+        E3 & EX (SP),HL & - \\ \hline
+        E4 & CALL P0,nn & - \\ \hline
+        E8 & RET PE & ADD SP,dd \\ \hline
+        EA & JP PE,nn & LD (nn),A \\ \hline
+        EB & EX DE,HL & - \\ \hline
+        EC & CALL PE,nn & - \\ \hline
+        ED & \textless prefix\textgreater & - \\ \hline
+        F0 & RET P & LD A,(FF00+n) \\ \hline
+        F2 & JP P,nn & LD A,(FF00+C) \\ \hline
+        F4 & CALL P,nn & - \\ \hline
+        F8 & RET M & LD HL,SP+dd \\ \hline
+        FA & JP M,nn & LD A,(nn) \\ \hline
+        FC & CALL M,nn & - \\ \hline
+        FD & \textless IY\textgreater prefix & - \\ \hline
+        CB 3X & SLL r/(HL) & SWAP r/(HL) \\
+        \hline
+    \end{tabular}
+    \caption{Comparación de opcodes entre Z80 y Sharp LR35902}
+\end{table}
+
+Los opcodes que se indican con un "-" significan que han sido eliminados. Si intentáramos utilizar los originales, la Game Boy simplemente se congelaría y habría que reiniciar el sistema.
+
+\subsubsection{Registros}
+
+Un registro es una pequeña unidad de almacenamiento en un procesador utilizada para guardar temporalmente datos o instrucciones durante la ejecución de operaciones. Los registros que se emplean son: A, F, B, C, D, E, H y L, cada uno capaz de almacenar 1 byte de información. Estos registros también pueden agruparse en pares para manejar 2 bytes: AF, BC, DE y HL. Adicionalmente, los registros SP (Stack Pointer) y PC (Program Counter) desempeñan funciones específicas dentro de la CPU.
+\\\\
+El primer registro a destacar es el registro A, conocido como el Acumulador, donde se almacena la mayoría de los datos procesados por la CPU. Es un registro al que se le pueden asignar valores de forma directa, al igual que ocurre con los registros B, C, D, E, H y L.
+\\\\
+Los registros B y C son comúnmente utilizados como contadores, mientras que los registros D y E se suelen emplear en pares para almacenar direcciones de memoria, facilitando operaciones de copia de datos. Sin embargo, el uso de estos registros no está limitado a estos propósitos; su aplicación depende de las necesidades y la conveniencia del programador.
+\\\\
+El registro F o Flags es responsable de almacenar el estado actual del procesador, y es de solo lectura. Aunque no se puede modificar directamente, su combinación con el registro A es clave para realizar diversas operaciones. Su principal utilidad radica en la evaluación de los resultados de la instrucción anterior, siendo esencial para la toma de decisiones en la ejecución del programa.
+\\\\
+En la siguiente tabla podemos ver el desglose del valor atribuido a cada bit del registro F:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|>{\centering\arraybackslash}p{9cm}|}
+        \hline
+        \textbf{Bit} & \textbf{Nombre} & \textbf{Definición} \\
+        \hline
+        7 & Z & Zero: indica si el resultado de la operación previa ha dado como resultado 0. \\
+        \hline
+        6 & N & Substraction: indica si la operación previa ha sido una resta. \\
+        \hline
+        5 & H & Semi-Carry: indica si se ha producido un acarreo desde el nibble bajo al alto en la operación de suma o resta anterior. \\
+        \hline
+        4 & C o CY & Carry: indica si se ha producido un acarreo en el bit más significativo, es decir, el resultado ha sido mayor de 0xFF. \\
+        \hline
+        3-0 & - & No se utilizan. \\
+        \hline
+    \end{tabular}
+    \caption{Función de los bits del registro F o Flags}
+\end{table}
+
+Por su parte, los registros H y L se utilizan para el acceso indirecto a una dirección de memoria. Este acceso indirecto se refiere al valor de 16 bits contenido en la pareja de registros HL, y resulta especialmente útil para recorrer arrays o acceder secuencialmente a posiciones de memoria.
+\\\\
+El registro SP (Stack Pointer) señala la posición de memoria que se utiliza durante las llamadas a subrutinas. Al ejecutar una instrucción call, la pila aumenta, y al realizar un ret, la pila disminuye, permitiendo mantener el control del flujo de ejecución.
+\\\\
+Finalmente, el registro PC (Program Counter) indica la dirección de memoria donde se encuentra la próxima instrucción que será ejecutada por la CPU, siendo esencial para el flujo de control del programa.
+
+\subsubsection{Opcodes}
+
+Los opcodes (códigos de operación) son las instrucciones que un procesador entiende y ejecuta directamente. Representan la parte de una instrucción de máquina que especifica la operación a realizar, como cargar datos en un registro, realizar una operación matemática o mover datos entre la memoria y el procesador. Cada opcode tiene un formato específico y puede estar compuesto por varios bytes que definen tanto la operación como los operandos involucrados.
+
+\paragraph{Categorías}
+
+En total, existen 510 instrucciones diferentes, las cuales pueden ser agrupadas en las siguientes categorías:
+\begin{itemize}
+  \item \textbf{Operaciones de carga (LD)}
+  \begin{itemize}
+  \item LD A, (HL): Carga el valor de la dirección de memoria en el registro A.
+  \item LD (HL), B: Carga el valor del registro B en la memoria apuntada por HL.
+  \end{itemize}
+  \item \textbf{Operaciones aritméticas y lógicas}
+  \begin{itemize}
+  \item ADD A, B: Suma el contenido de B al registro A.
+  \item AND A: Realiza una operación lógica AND en el registro A.
+  \item SUB A, B: Resta el valor de B del registro A.
+  \item XOR A: Realiza una operación XOR entre el registro A consigo mismo, lo que siempre da como resultado 0. Este comando se utiliza para limpiar o reiniciar el registro A.
+  \item OR A: Realiza una operación OR del registro A consigo mismo, dejando el valor de A sin cambios. No afecta el valor, pero puede modificar los flags.
+  \item CP A: Compara el valor del registro A con el valor de otro registro o inmediato, estableciendo los flags según el resultado de la comparación. La operación es similar a una resta (A - valor) y no modifica el contenido de A.
+  \item CPL: Complementa el valor del registro A, invirtiendo todos sus bits. Esta operación afecta el flag de medio acarreo (H) y establece el flag de negativo (N).
+  \item CCF: Cambia el estado del flag de acarreo (C). Si el flag de acarreo está establecido, se limpia; si está limpio, se establece. Esta operación no afecta a los demás flags.
+  \item DAA: Ajusta el contenido del registro A para que represente un valor decimal válido, teniendo en cuenta el estado de los flags de acarreo (C) y medio acarreo (H). Esta operación es útil después de realizar operaciones aritméticas en el modo BCD.
+  \item SCF: Establece el flag de acarreo (C) y limpia el flag de acarreo (H). Esta operación no afecta a los demás flags y es útil para preparar operaciones que requieren un estado de acarreo conocido.
+  \end{itemize}
+  \item \textbf{Operaciones de control de flujo}
+  \begin{itemize}
+  \item JP nn: Salta a la dirección de memoria nn.
+  \item CALL nn: Llama a una subrutina en la dirección nn.
+  \item RET: Retorna de una subrutina.
+  \end{itemize}
+  \item \textbf{Operaciones de rotación y desplazamiento}
+  \begin{itemize}
+  \item RL A: Rota los bits del registro A hacia la izquierda a través del carry.
+  \item SLA B: Desplaza los bits de B hacia la izquierda.
+  \item RR A: Rota los bits del registro A hacia la derecha a través del carry, trasladando el bit menos significativo al carry y el carry al bit más significativo.
+  \item RLC A: Rota los bits del registro A hacia la izquierda, desplazando el bit más significativo al carry y reiniciando el bit más significativo con el valor original del carry.
+  \item RRC A: Rota los bits del registro A hacia la derecha, moviendo el bit menos significativo al carry y llenando el bit más significativo con el valor del carry.
+  \item SRA B: Desplaza los bits de B hacia la derecha, manteniendo el bit más significativo (signo) constante y colocando el bit menos significativo en el carry.
+  \item SWAP B: Intercambia los cuatro bits más significativos con los cuatro menos significativos del registro B.
+  \item SRL B: Desplaza los bits de B hacia la derecha, moviendo el bit menos significativo al carry y rellenando el bit más significativo con 0.
+  \end{itemize}
+  \item \textbf{Operaciones de manipulación de bits}
+  \begin{itemize}
+  \item BIT 0, A: Prueba si el bit 0 de A está establecido.
+  \item SET 1, (HL): Establece el bit 1 en la dirección de memoria HL.
+  \item RES 0, A: Reinicia (pone a 0) el LSB del registro A, dejando los demás bits sin cambios.
+  \end{itemize}
+  \item \textbf{Operaciones especiales de sistema}
+  \begin{itemize}
+  \item NOP: No realiza ninguna operación.
+  \item DI: Deshabilita interrupciones.
+  \item EI: Habilita interrupciones.
+  \end{itemize}
+  \item \textbf{Operaciones con pila}
+  \begin{itemize}
+  \item PUSH BC: Empuja el contenido del registro BC en la pila.
+  \item POP AF: Restaura el contenido de AF desde la pila.
+  \end{itemize}
+  \item \textbf{Operaciones I/O}
+  \begin{itemize}
+  \item LD (FF00+n), A: Carga el valor de A en la dirección de I/O FF00+n.
+  \item LD A, (FF00+C): Carga el valor de la dirección FF00+C en A.
+  \end{itemize}
+\end{itemize}
+
+\paragraph{Listado}
+Para poder empezar a implementar todos los opcodes, debemos hacer uso de la documentación (oficial o no) que nos indique qué Byte hace referencia a qué opcode. Las siguientes tablas suelen ser de gran ayuda para verlo de forma clara y concisa:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{include/images/opcodes_1.jpg}
+\caption{Set de Instrucciones}
+\label{figure:opcodes_1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{include/images/opcodes_2.jpg}
+\caption{Set de Instrucciones Extendidas}
+\label{figure:opcodes_2}
+\end{figure}
+
+Con estas tablas obtenemos las siguientes características de cada instrucción:
+\begin{itemize}
+    \item \textbf{Byte} asignado.
+    \item \textbf{Ciclos} de reloj.
+    \item \textbf{Flags} a ignorar, actualizar o resetear.
+    \item \textbf{Categoría}, agrupados por colores.
+    \item \textbf{Longitud}, es decir, los bytes que la instrucción va a ocupar en memoria.
+\end{itemize}
+
+\subsubsection{Ciclos}
+
+Los ciclos de CPU son unidades de tiempo en las que se realizan instrucciones. Son utilizadas para saber con exactitud cuánto tiempo dura la ejecución de una instrucción concreta en el hardware original. Hay dos conceptos distintos en este contexto: ciclos de máquina y ciclos de reloj.
+\\\\
+Cada componente, como la CPU, la memoria, el PPU y el APU, opera en función de los ciclos de reloj. La coordinación precisa entre estos módulos asegura que las instrucciones se ejecuten en el momento adecuado y que los datos se transfieran de manera eficiente.
+\\\\
+Por ejemplo, el procesador necesita esperar que el PPU complete la renderización de un cuadro antes de actualizar la pantalla, lo que implica un control cuidadoso del tiempo. Si un módulo se desincroniza, puede resultar en fallos gráficos, sonido entrecortado o un rendimiento general deficiente. Por lo tanto, la medición de ciclos de reloj permite establecer un ritmo de operación coherente, asegurando que todos los componentes funcionen armónicamente, lo que es fundamental para la experiencia de juego fluida y efectiva que caracteriza a la Game Boy.
+\\\\
+Para la Game Boy, 1 ciclo de máquina equivale a 4 ciclos de reloj.
+
+\paragraph{Ciclos de Máquina}
+Los ciclos de máquina se refieren a la cantidad de ciclos de CPU necesarios para ejecutar una instrucción específica. Cada instrucción puede requerir un número diferente de ciclos de máquina, dependiendo de su complejidad.
+
+\paragraph{Ciclos de Reloj}
+Los ciclos de reloj, por otro lado, son las unidades de tiempo que marcan el ritmo del funcionamiento del procesador. Cada ciclo de reloj representa un pulso generado por un oscilador interno en el procesador, que sincroniza las operaciones del mismo. La frecuencia del reloj, medida en hertzios (Hz), determina cuántos ciclos de reloj se producen por segundo.
+
+\subsection{Secuencia de Arranque}
+
+Existe una secuencia de arranque, conocido como \textbf{Boot ROM}, guardado dentro de la propia CPU. Esta secuencia de arranque comienza su ejecución en la dirección de memoria 0x000, y no en la oficial de 0x100. Este programa es responsable de la animación de arranque que se reproduce antes de que el control sea transferido a la ROM del cartucho, además de inicializar distintos registros y direcciones de memoria.
+\\\\
+Existen en total 9 programas de boot (conocidos hasta la fecha):
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Nombre} & \textbf{Tamaño (bytes)} \\ \hline
+DMG0 & 256 \\ \hline
+DMG  & 256 \\ \hline
+MGB  & 256 \\ \hline
+SGB  & 256 \\ \hline
+SGB2 & 256 \\ \hline
+CGB0 & 256 + 1792 \\ \hline
+CGB  & 256 + 1792 \\ \hline
+AGB0 & 256 + 1792 \\ \hline
+AGB  & 256 + 1792 \\ \hline
+\end{tabular}
+\caption{Resumen de las variaciones de las secuencias de arranque}
+\end{table}
+
+\subsubsection{DMG / MGB}
+Lo primero que hacen es leer el logo desde el cartucho, descomprimirlo en VRAM y comenzar a desplazarlo lentamente hacia abajo. Dado que las lecturas de un cartucho ausente generalmente devuelven 0xFF, esto explica por qué, al encender la consola sin un cartucho, aparece un cuadro negro desplazándose. Además, conexiones defectuosas o sucias pueden hacer que los datos leídos se corrompan, lo que resulta en un logo desordenado.
+\\\\
+Una vez que el logo ha terminado de desplazarse, la boot ROM reproduce el famoso sonido \textit{"ba-ding!”} y vuelve a leer el logo, esta vez comparándolo con una copia almacenada en ROM. También calcula el checksum del encabezado y lo compara con el checksum almacenado en el encabezado. Si alguna de estas verificaciones falla, la boot ROM se bloquea y nunca se transfiere el control a la ROM del cartucho.
+\\\\
+Finalmente, la boot ROM escribe en el registro BANK en 0xFF50, lo que desasigna la boot ROM.
+\\\\
+Las diferencias con DMG0 (algunos primeros modelos de DMG), es que al fallar el checksum, la pantalla empieza a parpadear a la hora de bloquear la ROM, y que el logo de Nintendo no tiene el símbolo ®.
+
+\subsubsection{CGB / AGB}
+
+Estas secuencias de arranque son mucho más complejas, en especial por su comportamiento de retro-compatibilidad.
+\\\\
+La ROM de arranque es más grande. Aún debe ser mapeada comenzando en 0x0000, ya que es donde comienza la CPU, pero también debe acceder al encabezado del cartucho en 0x0100-0x014F. Por lo tanto, la ROM de arranque se divide en dos partes: una de 0x0000-0x00FF y otra de 0x0200-0x08FF.
+\\\\
+Primero, las ROMs de arranque descomponen el logo de Nintendo en VRAM, al igual que los modelos antiguos, y copian el logo a un búfer en HRAM al mismo tiempo.
+\\\\
+Luego, el logo se lee y descomprime nuevamente, pero sin redimensionamiento, lo que produce un logo mucho más pequeño colocado debajo del gran \textit{"GAME BOY"}. La ROM de arranque luego configura las paletas de compatibilidad, como se describe más adelante, y reproduce la animación del logo con el sonido de \textit{"ba-ding!"}.
+\\\\
+Durante la animación del logo, se permite al usuario elegir una paleta para anular la seleccionada para compatibilidad (con distintas secuencias de botones). Cada nueva elección evita que la animación termine durante 30 fotogramas, lo que retrasa el checksum y la transición final.
+\\\\
+Finalmente, la ROM de arranque desvanece todas las paletas de Background a blanco y establece el hardware en modo de compatibilidad (recordemos que existen juegos como Pokémon Oro/Plata que son de GBC pero se pueden jugar en DMG). En función del valor del byte de compatibilidad CGB, los valores a insertar en distintos registros de CGB variarán.
+
+\subsection{Cabecera del Cartucho}
+
+Todos los cartuchos de Game Boy contienen una cabecera ubicada en el rango de direcciones 0x100-0x14F. Esta cabecera contiene información esencial para el funcionamiento del juego y del sistema, permitiendo a los desarrolladores configurar diversos parámetros que describen las características del cartucho. Entre estos parámetros se incluyen el título del juego, el código de licencia, el tipo de cartucho (que define si utiliza RAM, batería, o expansión como MBC), y otros datos relevantes. A continuación, se detallan los registros presentes en este rango de direcciones:
+
+\subsubsection{0x0100 - 0x0103: Punto de entrada}
+Después de mostrar el logotipo de Nintendo, el PC salta a la dirección 0x0100, para a posterior saltar al inicio del programa del juego. La mayoría de los desarrolladores llenan esta área de 4 bytes con una instrucción NOP seguida de un JP 0x0150.
+
+\subsubsection{0x0104 - 0x0133: Nintendo logo}
+Esta área contiene una imagen en mapa de bits que se muestra cuando se enciende la consola. Debe coincidir con el siguiente volcado (en hexadecimal); de lo contrario, la ROM de arranque no permitirá que el juego se ejecute:
+
+\begin{lstlisting}[language=Kotlin, caption={Nintendo Logo - Mapa de Bits}, label={code:nintendologobits}]
+    CE ED 66 66 CC 0D 00 0B 03 73 00 83 00 0C 00 0D
+    00 08 11 1F 88 89 00 0E DC CC 6E E6 DD DD D9 99
+    BB BB 67 63 6E 0E EC CC DD DC 99 9F BB B9 33 3E
+\end{lstlisting}
+
+La forma en la que estos bytes se decodifican es la siguiente:
+\begin{itemize}
+    \item Los bytes en el rango 0x104-0x011B representan la mitad superior del logo, mientras que los del rango 0x11C-0x133 representan la mitad inferior.
+    \item Por cada byte, cada nibble codifica 4 píxeles. Un pixel está encendido si su bit correspondiente tiene un valor de 1.
+    \item Cada dos bytes componen un grupo, el cual representa una parte (inferior o superior) de una letra del logo.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{include/images/dibujado_logo_n.jpg}
+\caption{Decodificación del logo de Nintendo}
+\label{figure:decodednlogo}
+\end{figure}
+
+El procedimiento de arranque de la Game Boy primero muestra el logo y luego verifica que coincida con el volcado anterior (conocido como \textit{checksum}). Si no coincide, la ROM de arranque se bloquea.
+\\\\
+Los modelos a partir del CGB solo verifican la mitad superior (los primeros 18 bytes).
+
+\subsubsection{0x0134 - 0x0143: Título}
+Esta región de bytes contienen el título del juego, con carácteres ASCII y completamente en mayúsculas. Si el título tiene menos de 16 carácteres, el resto de bytes deberán rellenarse con 0x00's. 
+\\\\
+En versiones posteriores de los cartuchos, partes de esta área tienen un significado diferente, lo que reduce el tamaño real a 15 u 11 carácteres (siempre empezando en la dirección 0x134).
+
+\subsubsection{0x013F - 0x0142: Código de fabricante}
+
+En los cartuchos más antiguos, estos bytes formaban parte del título. En los cartuchos más nuevos, contienen un código de fabricante de 4 caracteres (en mayúsculas ASCII). Se desconoce su propósito.
+
+\subsubsection{0x0143: CGB Flag}
+Este byte, al igual que con el código de fabricante, formaba parte del título. Los modelos CGB y posteriores lo interpretan para decidir si habilitan el modo Color ("Modo CGB") o si retroceden al modo de compatibilidad monocromático ("Modo no CGB").
+\\\\
+Los valores más típicos son: 
+\begin{itemize}
+    \item 0x00: No indicaría nada realmente, lo que implica que el juego solamente funciona en modelos DMG/MGB.
+    \item 0x80: Indica que el juego admite mejoras propias del modelo CGB, pero es retro-compatible con modelos anteriores (DMG, MGB, etc...).
+    \item 0xC0: El juego solamente funciona en CGB.
+\end{itemize}
+
+Valores que tengan activados los bits 7, 3 o 2, activarán un estado poco utilizado, conocido como "Modo PGB" (Pseudo Game Boy Mode). Es una especie de modo intermedio que brinda compatibilidad con juegos diseñados para el Game Boy Color cuando se ejecutan en un Game Boy original o en un Super Game Boy, pero con mejoras visuales muy limitadas en comparación con el modo CGB completo.
+\\\\
+Hay poca información al respecto de este modo y varias fuentes agradecen su estudio y documentación.
+
+\subsubsection{0x0144 – 0x0145: Nuevo código de licencia}
+Esta región contiene un código representado por dos carácteres ASCII, el cual indica el editor/desarrollador del juego. Solamente se utiliza en caso de que el antiguo código de licencia tenga un valor de 0x33 (suele ser el caso para los juegos publicados después de la salida de SGB).
+\\\\
+Los códigos son los siguientes:
+\begin{longtable}{|c|l|}
+\hline
+\textbf{Código} & \textbf{Editor} \\ \hline
+00              & Ninguno                        \\ \hline
+01              & Nintendo Research \& Development 1 \\ \hline
+08              & Capcom                         \\ \hline
+13              & EA (Electronic Arts)           \\ \hline
+18              & Hudson Soft                    \\ \hline
+19              & B-AI                           \\ \hline
+20              & KSS                            \\ \hline
+22              & Oficina de Planificación WADA  \\ \hline
+24              & PCM Complete                   \\ \hline
+25              & San-X                          \\ \hline
+28              & Kemco                          \\ \hline
+29              & SETA Corporation               \\ \hline
+30              & Viacom                         \\ \hline
+31              & Nintendo                       \\ \hline
+32              & Bandai                         \\ \hline
+33              & Ocean Software/Acclaim Entertainment \\ \hline
+34              & Konami                         \\ \hline
+35              & HectorSoft                     \\ \hline
+37              & Taito                          \\ \hline
+38              & Hudson Soft                    \\ \hline
+39              & Banpresto                      \\ \hline
+41              & Ubi Soft                       \\ \hline
+42              & Atlus                          \\ \hline
+44              & Malibu Interactive             \\ \hline
+46              & Angel                          \\ \hline
+47              & Bullet-Proof Software          \\ \hline
+49              & Irem                           \\ \hline
+50              & Absolute                       \\ \hline
+51              & Acclaim Entertainment          \\ \hline
+52              & Activision                     \\ \hline
+53              & Sammy USA Corporation          \\ \hline
+54              & Konami                         \\ \hline
+55              & Hi Tech Expressions            \\ \hline
+56              & LJN                            \\ \hline
+57              & Matchbox                       \\ \hline
+58              & Mattel                         \\ \hline
+59              & Milton Bradley Company         \\ \hline
+60              & Titus Interactive              \\ \hline
+61              & Virgin Games Ltd.              \\ \hline
+64              & Lucasfilm Games                \\ \hline
+67              & Ocean Software                 \\ \hline
+69              & EA (Electronic Arts)           \\ \hline
+70              & Infogrames                     \\ \hline
+71              & Interplay Entertainment        \\ \hline
+72              & Broderbund                     \\ \hline
+73              & Sculptured Software            \\ \hline
+75              & The Sales Curve Limited        \\ \hline
+78              & THQ                            \\ \hline
+79              & Accolade                       \\ \hline
+80              & Misawa Entertainment           \\ \hline
+83              & lozc                           \\ \hline
+86              & Tokuma Shoten                  \\ \hline
+87              & Tsukuda Original               \\ \hline
+91              & Chunsoft Co.                   \\ \hline
+92              & Video System                   \\ \hline
+93              & Ocean Software/Acclaim Entertainment \\ \hline
+95              & Varie                          \\ \hline
+96              & Yonezawa/s’pal                 \\ \hline
+97              & Kaneko                         \\ \hline
+99              & Pack-In-Video                  \\ \hline
+9H              & Bottom Up                      \\ \hline
+A4              & Konami (Yu-Gi-Oh!)             \\ \hline
+BL              & MTO                            \\ \hline
+DK              & Kodansha                       \\ \hline
+\caption{Código de licencia y su editor.} \\
+\end{longtable}
+
+\subsubsection{0x0146: SGB Flag}
+Especifica si el juego es compatible con funciones del modelo SGB. El SGB ignorará cualquier transferencia de datos si el valor de este byte no es 0x03.
+
+\subsubsection{0x0147: Tipo de cartucho}
+Especifica qué tipo de hardware está presente en el cartucho (para ser más especifico, su \textit{mapper}).
+\\\\
+Los mappers son los siguientes:
+\begin{longtable}{|c|l|}
+\hline
+\textbf{Código} & \textbf{Tipo} \\
+\hline
+0x00 & ROM ONLY \\ \hline
+0x01 & MBC1 \\ \hline
+0x02 & MBC1+RAM \\ \hline
+0x03 & MBC1+RAM+BATTERY \\ \hline
+0x05 & MBC2 \\ \hline
+0x06 & MBC2+BATTERY \\ \hline
+0x08 & ROM+RAM \\ \hline
+0x09 & ROM+RAM+BATTERY \\ \hline
+0x0B & MMM01 \\ \hline
+0x0C & MMM01+RAM \\ \hline
+0x0D & MMM01+RAM+BATTERY \\ \hline
+0x0F & MBC3+TIMER+BATTERY \\ \hline
+0x10 & MBC3+TIMER+RAM+BATTERY \\ \hline
+0x11 & MBC3 \\ \hline
+0x12 & MBC3+RAM \\ \hline
+0x13 & MBC3+RAM+BATTERY \\ \hline
+0x19 & MBC5 \\ \hline
+0x1A & MBC5+RAM \\ \hline
+0x1B & MBC5+RAM+BATTERY \\ \hline
+0x1C & MBC5+RUMBLE \\ \hline
+0x1D & MBC5+RUMBLE+RAM \\ \hline
+0x1E & MBC5+RUMBLE+RAM+BATTERY \\ \hline
+0x20 & MBC6 \\ \hline
+0x22 & MBC7+SENSOR+RUMBLE+RAM+BATTERY \\ \hline
+0xFC & POCKET CAMERA \\ \hline
+0xFD & BANDAI TAMA5 \\ \hline
+0xFE & HuC3 \\ \hline
+0xFF & HuC1+RAM+BATTERY \\ \hline
+\caption{Tipos de mapeadores (MBC) y sus códigos} \\
+\end{longtable}
+
+\subsubsection{0x0148: Tamaño de ROM}
+Indica el tamaño de ROM en el cartucho. En la mayoría de casos, se calcula como $32 KiB * (1 << valor)$. Los valores conocidos son:
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        \textbf{Valor} & \textbf{Tamaño} & \textbf{Número de bancos} \\
+        \hline
+        0x00 & 32 KiB & 2 \\ \hline
+        0x01 & 64 KiB & 4 \\ \hline
+        0x02 & 128 KiB & 8 \\ \hline
+        0x03 & 256 KiB & 16 \\ \hline
+        0x04 & 512 KiB & 32 \\ \hline
+        0x05 & 1 MiB & 64 \\ \hline
+        0x06 & 2 MiB & 128 \\ \hline
+        0x07 & 4 MiB & 256 \\ \hline
+        0x08 & 8 MiB & 512 \\ \hline
+    \end{tabular}
+    \caption{Tamaño y número de bancos de ROM según el valor especificado.}
+    \label{tab:rom_size_banks}
+\end{table}
+
+\subsubsection{0x0149: Tamaño de RAM}
+Indica el tamaño de RAM (si lo hay). Si el tipo de cartucho no incluye "RAM" en su nombre, el valor de este registro debe ser 0x00. 
+\\\\
+Los posibles tamaños son los siguientes:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|l|}
+        \hline
+        \textbf{Código} & \textbf{Tamaño de SRAM} & \textbf{Comentario} \\ \hline
+        0x00 & 0 & Sin RAM \\ \hline
+        0x01 & – & No utilizado \\ \hline
+        0x02 & 8 KiB & 1 banco \\ \hline
+        0x03 & 32 KiB & 4 bancos de 8 KiB cada uno \\ \hline
+        0x04 & 128 KiB & 16 bancos de 8 KiB cada uno \\ \hline
+        0x05 & 64 KiB & 8 bancos de 8 KiB cada uno \\ \hline
+    \end{tabular}
+    \caption{Tamaño de SRAM según el código del cartucho.}
+    \label{tab:sram_size}
+\end{table}
+
+El valor 0x01 aparece en algunos documentos no oficiales con un tamaño de 2KiB. Sin embargo, jamás se llegó a utilizar un chip de RAM con este tamaño. Algunas ROMs de dominio público utilizan este valor, aunque en su código no hacen uso de ningún tipo de RAM de cartucho.
+
+\subsubsection{0x014A: Destino}
+Especifica si el juego está destinado a ser vendido en Japón o en cualquier otro lugar del mundo. Existen dos posibles valores:
+
+\begin{itemize}
+    \item 0x00: Japón. Se puede vender en el extranjero.
+    \item 0x01: Solamente en el extranjero.
+\end{itemize}
+
+\subsubsection{0x014B: Antiguo código de licencia}
+Utilizado en cartuchos anteriores al lanzamiento del SGB. Al igual que el nuevo (0x0144-0x0145), especifica el editor/publisher. Si el valor es 0x33, se deberán utilizar los nuevos códigos.
+\\\\
+A continuación la lista de códigos y sus editores:
+\begin{longtable}{|c|l|}
+\hline
+\textbf{Código} & \textbf{Editor} \\ \hline
+00 & Ninguno \\\hline
+01 & Nintendo \\\hline
+08 & Capcom \\\hline
+09 & HOT-B \\\hline
+0A & Jaleco \\\hline
+0B & Coconuts Japan \\\hline
+0C & Elite Systems \\\hline
+13 & EA (Electronic Arts) \\\hline
+18 & Hudson Soft \\\hline
+19 & ITC Entertainment \\\hline
+1A & Yanoman \\\hline
+1D & Japan Clary \\\hline
+1F & Virgin Games Ltd.3 \\\hline
+24 & PCM Complete \\\hline
+25 & San-X \\\hline
+28 & Kemco \\\hline
+29 & SETA Corporation \\\hline
+30 & Infogrames5 \\\hline
+31 & Nintendo \\\hline
+32 & Bandai \\\hline
+33 & Se debe usar el nuevo código de licencia. \\\hline
+34 & Konami \\\hline
+35 & HectorSoft \\\hline
+38 & Capcom \\\hline
+39 & Banpresto \\\hline
+3C & Entertainment Interactive (stub) \\\hline
+3E & Gremlin \\\hline
+41 & Ubi Soft1 \\\hline
+42 & Atlus \\\hline
+44 & Malibu Interactive \\\hline
+46 & Angel \\\hline
+47 & Spectrum HoloByte \\\hline
+49 & Irem \\\hline
+4A & Virgin Games Ltd.3 \\\hline
+4D & Malibu Interactive \\\hline
+4F & U.S. Gold \\\hline
+50 & Absolute \\\hline
+51 & Acclaim Entertainment \\\hline
+52 & Activision \\\hline
+53 & Sammy USA Corporation \\\hline
+54 & GameTek \\\hline
+55 & Park Place13 \\\hline
+56 & LJN \\\hline
+57 & Matchbox \\\hline
+59 & Milton Bradley Company \\\hline
+5A & Mindscape \\\hline
+5B & Romstar \\\hline
+5C & Naxat Soft14 \\\hline
+5D & Tradewest \\\hline
+60 & Titus Interactive \\\hline
+61 & Virgin Games Ltd.3 \\\hline
+67 & Ocean Software \\\hline
+69 & EA (Electronic Arts) \\\hline
+6E & Elite Systems \\\hline
+6F & Electro Brain \\\hline
+70 & Infogrames5 \\\hline
+71 & Interplay Entertainment \\\hline
+72 & Broderbund \\\hline
+73 & Sculptured Software6 \\\hline
+75 & The Sales Curve Limited7 \\\hline
+78 & THQ \\\hline
+79 & Accolade15 \\\hline
+7A & Triffix Entertainment \\\hline
+7C & MicroProse \\\hline
+7F & Kemco \\\hline
+80 & Misawa Entertainment \\\hline
+83 & LOZC G. \\\hline
+86 & Tokuma Shoten \\\hline
+8B & Bullet-Proof Software2 \\\hline
+8C & Vic Tokai Corp.16 \\\hline
+8E & Ape Inc.17 \\\hline
+8F & I’Max18 \\\hline
+91 & Chunsoft Co.8 \\\hline
+92 & Video System \\\hline
+93 & Tsubaraya Productions \\\hline
+95 & Varie \\\hline
+96 & Yonezawa19/S’Pal \\\hline
+97 & Kemco \\\hline
+99 & Arc \\\hline
+9A & Nihon Bussan \\\hline
+9B & Tecmo \\\hline
+9C & Imagineer \\\hline
+9D & Banpresto \\\hline
+9F & Nova \\\hline
+A1 & Hori Electric \\\hline
+A2 & Bandai \\\hline
+A4 & Konami \\\hline
+A6 & Kawada \\\hline
+A7 & Takara \\\hline
+A9 & Technos Japan \\\hline
+AA & Broderbund \\\hline
+AC & Toei Animation \\\hline
+AD & Toho \\\hline
+AF & Namco \\\hline
+B0 & Acclaim Entertainment \\\hline
+B1 & ASCII Corporation or Nexsoft \\\hline
+B2 & Bandai \\\hline
+B4 & Square Enix \\\hline
+B6 & HAL Laboratory \\\hline
+B7 & SNK \\\hline
+B9 & Pony Canyon \\\hline
+BA & Culture Brain \\\hline
+BB & Sunsoft \\\hline
+BD & Sony Imagesoft \\\hline
+BF & Sammy Corporation \\\hline
+C0 & Taito \\\hline
+C2 & Kemco \\\hline
+C3 & Square \\\hline
+C4 & Tokuma Shoten \\\hline
+C5 & Data East \\\hline
+C6 & Tonkin House \\\hline
+C8 & Koei \\\hline
+C9 & UFL \\\hline
+CA & Ultra Games \\\hline
+CB & VAP, Inc. \\\hline
+CC & Use Corporation \\\hline
+CD & Meldac \\\hline
+CE & Pony Canyon \\\hline
+CF & Angel \\\hline
+D0 & Taito \\\hline
+D1 & SOFEL (Software Engineering Lab) \\\hline
+D2 & Quest \\\hline
+D3 & Sigma Enterprises \\\hline
+D4 & ASK Kodansha Co. \\\hline
+D6 & Naxat Soft14 \\\hline
+D7 & Copya System \\\hline
+D9 & Banpresto \\\hline
+DA & Tomy \\\hline
+DB & LJN \\\hline
+DD & Nippon Computer Systems \\\hline
+DE & Human Ent. \\\hline
+DF & Altron \\\hline
+E0 & Jaleco \\\hline
+E1 & Towa Chiki \\\hline
+E2 & Yutaka \\\hline
+E3 & Varie \\\hline
+E5 & Epoch \\\hline
+E7 & Athena \\\hline
+E8 & Asmik Ace Entertainment \\\hline
+E9 & Natsume \\\hline
+EA & King Records \\\hline
+EB & Atlus \\\hline
+EC & Epic/Sony Records \\\hline
+EE & IGS \\\hline
+F0 & A Wave \\\hline
+F3 & Extreme Entertainment \\\hline
+FF & LJN \\\hline
+\caption{Antiguos códigos de licencia y su editor.}
+\end{longtable}
+
+\subsubsection{0x014C: Número de versión de ROM}
+Este byte especifica el número de versión del juego. Generalmente es 0x00. Puede ser útil para los desarrolladores y emuladores, por ejemplo, para aplicar parches o actualizaciones específicas que se hayan diseñado para esa versión (importante en juegos que recibieron revisiones).
+
+\subsubsection{0x014D: Checksum}
+Este byte contiene una suma de verificación de 8 bits calculada a partir de los bytes de cabecera del cartucho 0x0134–0x014C. Si el byte en este registro no coincide con los 8 bits inferiores de la suma de verificación, la ROM de arranque se bloqueará y el programa en el cartucho no se ejecutará.
+
+\subsubsection{0x014E - 0x014F: Checksum global}
+Estos bytes contienen una suma de verificación de 16 bits que se calcula simplemente como la suma de todos los bytes de la ROM del cartucho (excepto estos dos bytes).
+\\\\
+Solamente se ha llegado a utilizar en Pokémon Stadium (N64) para detectar errores del Transfer Pak con los Pokémon Verde/Rojo/Azul/Amarillo (DMG) y Plata/Oro/Cristal (CGB).
+
+\subsection{MBCs}
+
+\cleardoublepage

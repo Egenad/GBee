@@ -1,0 +1,45 @@
+\def\OptimizaTikZ{1}
+
+\input{include/init}
+
+% Título y subtítulo
+\newcommand{\titulo}{GBee}
+\newcommand{\subtitulo}{Emulador de GameBoy para dispositivos Android}
+\newcommand{\miNombre}{Ángel Jesús Terol Martínez}
+\newcommand{\miEmail}{jtm37@alu.ua.es}
+\newcommand{\miTutor}{Luis Lucas Ibáñez}
+\newcommand{\departamentoTutor}{Tecnología Informática y Computación}
+\newcommand{\miFacultad}{Escuela Politécnica Superior}
+\newcommand{\miFacultadCorto}{EPS UA}
+\newcommand{\miUniversidad}{\protect{Universidad de Alicante}}
+\newcommand{\miUbicacion}{Alicante}
+
+\input{include/config}
+
+\hypersetup{
+pdfauthor = {\miNombre~(\miEmail)},
+pdftitle = {\titulo},
+}
+
+\setlength {\marginparwidth }{2cm}
+
+\begin{document}
+
+\input{include/portada/portada_color} % Portada Color
+\input{include/portada/portada_bn} % Portada B/N
+
+\input{capitulos/preliminaresconagradecimientos}
+
+\tableofcontents	% Índice
+\listoffigures		% Índice de figuras
+\listoftables		% Índice de tablas
+\lstlistoflistings	% Índice de códigos
+
+% Inicia la numeración habitual.
+\mainmatter
+
+\input{capitulos/Introduccion}
+\input{capitulos/Historia}
+\input{capitulos/Develop}
+
+\end{document}
