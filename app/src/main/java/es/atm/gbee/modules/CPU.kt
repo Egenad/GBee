@@ -1092,7 +1092,6 @@ object CPU {
 
         val newCarry = ((F.toInt() and 0xFF) and FLAG_C) == 0
         updateFlag(FLAG_C, newCarry)
-
         setFlag(FLAG_N)
         setFlag(FLAG_H)
 
@@ -3419,7 +3418,4 @@ object CPU {
 
         return cyclesToReturn
     }
-
-    // TODO: extended opcodes
-
 }
