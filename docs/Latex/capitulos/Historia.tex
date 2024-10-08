@@ -140,11 +140,11 @@ La HRAM es un pequeño bloque de memoria de alta velocidad que contiene datos cr
 \subsubsection{IE: 0xFFFF}
 Registro de habilitación de interrupciones (Interrupt Enable), que permite activar o desactivar interrupciones específicas del sistema, cruciales para el manejo de eventos como temporizadores o actualizaciones gráficas.
 
-\subsection{CPU}
+\section{CPU}
 
 También conocida como la Unidad Central de Procesamiento, que constituye el núcleo principal del sistema. Es la encargada de ejecutar los opcodes, que definen el comportamiento del software en la consola original.
 
-\subsubsection{Diferencias}
+\subsection{Diferencias}
 
 LA Game Boy cuenta con un procesador único conocido como Sharp LR35902 y, como viene indicado en su nombre, fue desarrollado por la empresa Sharp Corporation. Esta CPU era una mezcla entre la conocida Zilog Z80 y el Intel 8080, a la cual se añadieron y eliminaron distintas instrucciones. Una diferencia importante, es que la Sharp no tiene instrucciones propias de I/O, a diferencia de las otras dos. En este caso, se puede acceder a los puertos de entrada/salida mediante comandos simples de carga (LD).
 \\\\
@@ -190,7 +190,7 @@ A continuación se muestra una tabla con las diferencias existentes en el abanic
 
 Los opcodes que se indican con un "-" significan que han sido eliminados. Si intentáramos utilizar los originales, la Game Boy simplemente se congelaría y habría que reiniciar el sistema.
 
-\subsubsection{Registros}
+\subsection{Registros}
 
 Un registro es una pequeña unidad de almacenamiento en un procesador utilizada para guardar temporalmente datos o instrucciones durante la ejecución de operaciones. Los registros que se emplean son: A, F, B, C, D, E, H y L, cada uno capaz de almacenar 1 byte de información. Estos registros también pueden agruparse en pares para manejar 2 bytes: AF, BC, DE y HL. Adicionalmente, los registros SP (Stack Pointer) y PC (Program Counter) desempeñan funciones específicas dentro de la CPU.
 \\\\
@@ -228,11 +228,11 @@ El registro SP (Stack Pointer) señala la posición de memoria que se utiliza du
 \\\\
 Finalmente, el registro PC (Program Counter) indica la dirección de memoria donde se encuentra la próxima instrucción que será ejecutada por la CPU, siendo esencial para el flujo de control del programa.
 
-\subsubsection{Opcodes}
+\subsection{Opcodes}
 
 Los opcodes (códigos de operación) son las instrucciones que un procesador entiende y ejecuta directamente. Representan la parte de una instrucción de máquina que especifica la operación a realizar, como cargar datos en un registro, realizar una operación matemática o mover datos entre la memoria y el procesador. Cada opcode tiene un formato específico y puede estar compuesto por varios bytes que definen tanto la operación como los operandos involucrados.
 
-\paragraph{Categorías}
+\subsubsection{Categorías}
 
 En total, existen 510 instrucciones diferentes, las cuales pueden ser agrupadas en las siguientes categorías:
 \begin{itemize}
@@ -295,7 +295,7 @@ En total, existen 510 instrucciones diferentes, las cuales pueden ser agrupadas 
   \end{itemize}
 \end{itemize}
 
-\paragraph{Listado}
+\subsubsection{Listado}
 Para poder empezar a implementar todos los opcodes, debemos hacer uso de la documentación (oficial o no) que nos indique qué Byte hace referencia a qué opcode. Las siguientes tablas suelen ser de gran ayuda para verlo de forma clara y concisa:
 
 \begin{figure}[H]
@@ -321,7 +321,7 @@ Con estas tablas obtenemos las siguientes características de cada instrucción:
     \item \textbf{Longitud}, es decir, los bytes que la instrucción va a ocupar en memoria.
 \end{itemize}
 
-\subsubsection{Ciclos}
+\subsection{Ciclos}
 
 Los ciclos de CPU son unidades de tiempo en las que se realizan instrucciones. Son utilizadas para saber con exactitud cuánto tiempo dura la ejecución de una instrucción concreta en el hardware original. Hay dos conceptos distintos en este contexto: ciclos de máquina y ciclos de reloj.
 \\\\
@@ -331,12 +331,13 @@ Por ejemplo, el procesador necesita esperar que el PPU complete la renderizació
 \\\\
 Para la Game Boy, 1 ciclo de máquina equivale a 4 ciclos de reloj.
 
-\paragraph{Ciclos de Máquina}
+\subsubsection{Ciclos de Máquina}
 Los ciclos de máquina se refieren a la cantidad de ciclos de CPU necesarios para ejecutar una instrucción específica. Cada instrucción puede requerir un número diferente de ciclos de máquina, dependiendo de su complejidad.
 
-\paragraph{Ciclos de Reloj}
+\subsubsection{Ciclos de Reloj}
 Los ciclos de reloj, por otro lado, son las unidades de tiempo que marcan el ritmo del funcionamiento del procesador. Cada ciclo de reloj representa un pulso generado por un oscilador interno en el procesador, que sincroniza las operaciones del mismo. La frecuencia del reloj, medida en hertzios (Hz), determina cuántos ciclos de reloj se producen por segundo.
 
+\section{ROM}
 \subsection{Secuencia de Arranque}
 
 Existe una secuencia de arranque, conocido como \textbf{Boot ROM}, guardado dentro de la propia CPU. Esta secuencia de arranque comienza su ejecución en la dirección de memoria 0x000, y no en la oficial de 0x100. Este programa es responsable de la animación de arranque que se reproduce antes de que el control sea transferido a la ROM del cartucho, además de inicializar distintos registros y direcciones de memoria.
@@ -370,7 +371,6 @@ Finalmente, la boot ROM escribe en el registro BANK en 0xFF50, lo que desasigna 
 Las diferencias con DMG0 (algunos primeros modelos de DMG), es que al fallar el checksum, la pantalla empieza a parpadear a la hora de bloquear la ROM, y que el logo de Nintendo no tiene el símbolo ®.
 
 \subsubsection{CGB / AGB}
-
 Estas secuencias de arranque son mucho más complejas, en especial por su comportamiento de retro-compatibilidad.
 \\\\
 La ROM de arranque es más grande. Aún debe ser mapeada comenzando en 0x0000, ya que es donde comienza la CPU, pero también debe acceder al encabezado del cartucho en 0x0100-0x014F. Por lo tanto, la ROM de arranque se divide en dos partes: una de 0x0000-0x00FF y otra de 0x0200-0x08FF.
@@ -774,12 +774,41 @@ Este byte especifica el número de versión del juego. Generalmente es 0x00. Pue
 Este byte contiene una suma de verificación de 8 bits calculada a partir de los bytes de cabecera del cartucho 0x0134–0x014C. Si el byte en este registro no coincide con los 8 bits inferiores de la suma de verificación, la ROM de arranque se bloqueará y el programa en el cartucho no se ejecutará.
 
 \subsubsection{0x014E - 0x014F: Checksum global}
-Estos bytes contienen una suma de verificación de 16 bits que se calcula simplemente como la suma de todos los bytes de la ROM del cartucho (excepto estos dos bytes).
-\\\\
+Estos bytes contienen una suma de verificación de 16 bits que se calcula simplemente como la suma de todos los bytes de la ROM del cartucho (excepto estos dos bytes).\\\\
 Solamente se ha llegado a utilizar en Pokémon Stadium (N64) para detectar errores del Transfer Pak con los Pokémon Verde/Rojo/Azul/Amarillo (DMG) y Plata/Oro/Cristal (CGB).
 
-\subsection{MBCs}
+\section{MBCs}
 
+Los MBCs se utilizan para expandir la memoria limitada de la Game Boy, tanto en términos de ROM como de RAM. Estos controladores son chips que se encuentran en el cartucho del juego, no en la consola misma. El MBC1 es el chip más antiguo, lanzado en 1989 junto a la propia consola. En contraste, el MBC7 es el más reciente, con un lanzamiento estimado en 1997 junto a la Game Boy Color.
+\\
+Cada juego especifica qué tipo de controlador utiliza mediante el registro 0x0147, como se ha visto en el apartado anterior.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{include/images/cart.jpg}
+    \caption{Cartucho de Game Boy MBC5}
+    \label{figure:cart_gameboy}
+\end{figure}
+
+\subsection{No MBC: 0x00} Los juegos pequeños, que tienen un tamaño de ROM de hasta 32 KiB, no necesitan un utilizar bancos de memoria. En su lugar, la ROM se coloca directamente en la memoria en el rango de direcciones 0x0000-0x7FFF. Además, si se requiere RAM adicional (hasta 8 KiB), se puede conectar en el rango 0xA000-0xBFFF utilizando un circuito lógico.
+
+\subsection{MBC1: 0x01-0x03} Es el modelo de chip más antiguo. Pese a ello, trabaja de forma muy similar a los más recientes, lo que facilitó la actualización de los juegos o la posibilidad de hacerlos retro-compatibles.
+\\\\
+En la configuración predeterminada (valor 0x00) el MBC1 soporta hasta 512KiB de ROM y un total de 32KiB de RAM mediante el uso de bancos. Esta configuración puede cambiar, por ejemplo para utilizar la parte de RAM como ROM, aumentando esta última hasta 2MiBs. Es importante tener en cuenta que la memoria en el rango de direcciones 0x0000–0x7FFF se usa tanto para leer desde la ROM como para escribir en los registros de control del MBC.
+
+\subsubsection{Memoria}
+
+\paragraph{Banco de ROM 0x00: 0x0000-0x3FFF}
+Esta región usualmente contiene los primeros 16KiB de ROM del cartucho (suele ser fija, es decir, no cambia).
+
+\paragraph{Bancos de ROM 0x01-0x7F: 0x4000-0x7FFF}
+Esta región puede contener cualquiera de los bancos de 16KiB posibles. La elección del banco se realiza a través del registro 0x2000-0x3FFF.
+
+\paragraph{Banco de RAM 0x00-0x03: 0xA000-0xBFFF}
+Esta región se utiliza para leer o escribir en la RAM externa presente en algunos cartuchos (generalmente de tipo 0x02 o 0x03). El acceso a esta RAM solo es posible si está activada mediante la escritura en los registros de control del MBC; de lo contrario, las lecturas devolverán un valor indefinido (comúnmente 0xFF) y las escrituras serán ignoradas.
+\\\\
+Los tamaños disponibles de RAM son 8 KiB (que cubre toda la región mapeada) o 32 KiB, distribuidos en 4 bancos de 8 KiB cada uno. La segunda opción solo está disponible en cartuchos con ROM de hasta 512 KiB.
+\\\\
+La RAM externa suele estar alimentada por una batería, lo que permite el almacenamiento de datos incluso cuando la consola está apagada. Esta batería, normalmente una celda de botón soldada en la placa del cartucho, garantiza la persistencia de los datos. Además, dado que la velocidad de la RAM externa es comparable a la RAM interna de la Game Boy, algunos desarrolladores la utilizan como memoria de trabajo adicional (WRAM), aunque esto puede limitar el espacio disponible para el almacenamiento de datos.
 
 \cleardoublepage
