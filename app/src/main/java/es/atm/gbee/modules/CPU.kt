@@ -1,7 +1,5 @@
 package es.atm.gbee.modules
 
-import kotlin.system.exitProcess
-
 // These are CLOCK CYCLES, not MACHINE CYCLES
 // 1 Machine Cycle = 4 Clock Cycles
 const val CYCLES_4  = 4     // 1 MC
@@ -76,7 +74,6 @@ object CPU {
         println("CPU initialized")
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     fun tick(): Boolean{
 
         // Interrupts
@@ -89,8 +86,8 @@ object CPU {
 
         // Halt or DMA transferring
         if(cpu_halted || DMA.transferring()){
-            if(cpu_halted) println("CPU - Halted") // TODO DELETE PRINT
-            if(DMA.transferring()) println("CPU - DMA is active") // TODO DELETE PRINT
+            //if(cpu_halted) println("CPU - Halted")
+            //if(DMA.transferring()) println("CPU - DMA is active")
             cycles += CYCLES_4
             return true
         }
@@ -98,12 +95,12 @@ object CPU {
         // Opcode execution
         val opcode = fetch()
 
-        // TODO DELETE PRINT
+        /*
         val hlAddr = get_16bit_address(H, L)
         val deAddr = get_16bit_address(D, E)
         val bcAddr = get_16bit_address(B, C)
         println("CPU - Executing Instruction: " + opcode.toHexString(HexFormat.Default) + " - PC Address: " + (PC - 1).toHexString(HexFormat.Default) + " - SP Address: " + SP.toHexString(HexFormat.Default) + " - HL Address: " + hlAddr.toHexString(HexFormat.Default) + " - DE Address: " + deAddr.toHexString(HexFormat.Default) + " - BC Address: " + bcAddr.toHexString(HexFormat.Default) + " - A: " + A.toHexString(HexFormat.Default))
-
+        */
         try {
             cycles += execute(opcode)
         }catch (ex: IllegalArgumentException){

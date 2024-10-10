@@ -169,6 +169,8 @@ object PPU {
         Pair(PALETTE_TYPE.C_MONOCHRMYELLOW_PL, intArrayOf(0xFF000000.toInt(), 0xFFB8B800.toInt(), 0xFFFFFF54.toInt(), 0xFFFFFFFF.toInt()))
     )
 
+    private var selectedPalette = PALETTE_TYPE.BASIC_PL
+
     fun init() {
         Memory.write(LCD_STAT, 0x81.toByte())
         Memory.write(LCDC_ADDR, 0x91.toByte())
@@ -210,11 +212,7 @@ object PPU {
             Memory.write(LCD_STAT, StatObj.PPU_MODE.set(stat, PPUMode.DRAW_LCD.number))
 
             // Reset FIFO Fetcher
-            fifoFetcher.setState(FetcherState.OBTAIN_TILE)
-            fifoFetcher.setLineX(0)
-            fifoFetcher.setFetchX(0)
-            fifoFetcher.setPushedPixels(0)
-            fifoFetcher.setFifoPixels(0)
+            fifoFetcher.resetParams()
         }
     }
 
@@ -280,7 +278,7 @@ object PPU {
         }
     }
 
-    fun increment_LY(){
+    private fun increment_LY(){
         val ly = Memory.getByteOnAddress(LY_ADDR)
         val newLY = ((ly.toInt() and 0xFF) + 1).toByte()
         Memory.write(LY_ADDR, newLY)
@@ -288,7 +286,7 @@ object PPU {
         compare_LY_LYC()
     }
 
-    fun compare_LY_LYC(){
+    private fun compare_LY_LYC(){
         val lyc     = Memory.getByteOnAddress(LYC_ADDR)
         val ly      = Memory.getByteOnAddress(LY_ADDR)
         val stat    = Memory.getByteOnAddress(LCD_STAT)
@@ -396,7 +394,6 @@ object PPU {
 
         if(frameTime < GB_FPS){
             Thread.sleep(GB_FPS - frameTime)
-            //delay(GB_FPS - frameTime)
         }
 
         if(now - startTimer >= 1000){
@@ -437,5 +434,14 @@ object PPU {
 
     fun getAddrModeAddr(): Int{
         return addrModeAddr
+    }
+
+    fun getColorIndex(index: Int): Int{
+        val tileColors = getPaletteColors(selectedPalette)
+        return tileColors[index]
+    }
+
+    fun getBufferPixelFromIndex(index: Int): Int{
+        return fifoFetcher.getValueFromVideoBuffer(index)
     }
 }

@@ -2,6 +2,7 @@ package es.atm.gbee.activities
 
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -17,6 +18,10 @@ class EmuActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityEmuBinding
     private lateinit var gameSurfaceView: GameSurfaceView
+    private lateinit var dbgButton: Button
+
+    private val debugMode = true
+    private var tilemap = true
 
     private val emulator = Emulator()
 
@@ -28,6 +33,16 @@ class EmuActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         gameSurfaceView = binding.gameSurface
+        dbgButton = binding.switchButton
+
+        if(!debugMode){
+            dbgButton.visibility = Button.GONE
+        }
+
+        dbgButton.setOnClickListener {
+            gameSurfaceView.debugMode = tilemap
+            tilemap = !tilemap
+        }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -44,7 +59,5 @@ class EmuActivity : AppCompatActivity() {
 
             emulator.run(romBytes)
         }
-
-        //emulator.run("D:/Git/GBee/roms/GoldenSacra.gb")
     }
 }

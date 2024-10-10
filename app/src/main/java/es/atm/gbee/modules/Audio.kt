@@ -25,5 +25,5 @@ const val MASTER_CONTROL : Int      = 0xFF26
 const val WAVE_PATTERN_START : Int  = 0xFF30
 const val WAVE_PATTERN_END : Int    = 0xFF3F
 
-object Audio {
+class Audio {
 }

@@ -11,6 +11,8 @@ class Emulator {
     private var paused : Boolean = false
     private var lastCpuCycles : Int = 0
 
+    private val audioSys: Audio = Audio()
+
     fun run(bytes : ByteArray?){
 
         if(bytes == null || bytes.isEmpty()){

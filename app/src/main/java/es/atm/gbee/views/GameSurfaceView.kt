@@ -23,11 +23,7 @@ class GameSurfaceView @JvmOverloads constructor(
 ) : SurfaceView(context, attrs), SurfaceHolder.Callback {
 
     private var scale : Float = 0f
-
-    private val debugMode = true
-
-    private var selectedPalette = PPU.PALETTE_TYPE.BASIC_PL
-
+    var debugMode = false
     private var gameThread: GameThread? = null
 
     init {
@@ -59,11 +55,11 @@ class GameSurfaceView @JvmOverloads constructor(
         if (width / height > aspectRatio) { // Landscape
             newWidth = (height * aspectRatio).toInt()
             newHeight = height
-            scale = height / GB_Y_RESOLUTION.toFloat()
+            scale = Math.round(height / GB_Y_RESOLUTION.toFloat()).toFloat()
         } else { // Straight
             newWidth = width
             newHeight = (width / aspectRatio).toInt()
-            scale = width / GB_X_RESOLUTION.toFloat()
+            scale = Math.round(width / GB_X_RESOLUTION.toFloat()).toFloat()
         }
 
         setMeasuredDimension(newWidth, newHeight)
@@ -73,22 +69,47 @@ class GameSurfaceView @JvmOverloads constructor(
     }
 
     fun render(canvas: Canvas) {
-        canvas.drawColor(Color.BLACK) // Background
+        canvas.drawColor(Color.WHITE) // Background
+
+        if(debugMode){
+            renderTileMemory(canvas)
+        }else{
+            renderVRam(canvas)
+        }
+    }
+
+    fun renderVRam(canvas: Canvas){
+        val paint = Paint()
+
+        for (lineNum in 0 until GB_Y_RESOLUTION) {
+            for (x in 0 until GB_X_RESOLUTION) {
+                val left = x * scale
+                val top = lineNum * scale
+                val right = left + scale
+                val bottom = top + scale
+
+                val color = PPU.getBufferPixelFromIndex(x + (lineNum * GB_X_RESOLUTION))
+                paint.color = color
+
+                canvas.drawRect(left, top, right, bottom, paint)
+            }
+        }
+    }
+
+    fun renderTileMemory(canvas: Canvas){
 
         var xDraw = 0f
         var yDraw = 0f
         var tileNum = 0
 
-        if(debugMode){
-            for (y in 0 until ROW_NUMBER) {
-                for(x in 0 until COL_NUMBER){
-                    displayTile(canvas, VRAM_START, tileNum, xDraw + (x * scale), yDraw + (y * scale))
-                    xDraw += (8 * scale)
-                    tileNum++
-                }
-                yDraw += (8 * scale)
-                xDraw = 0f
+        for (y in 0 until ROW_NUMBER) {
+            for(x in 0 until COL_NUMBER){
+                displayTile(canvas, VRAM_START, tileNum, xDraw + (x * scale), yDraw + (y * scale))
+                xDraw += (8 * scale)
+                tileNum++
             }
+            yDraw += (8 * scale)
+            xDraw = 0f
         }
     }
 
@@ -104,9 +125,7 @@ class GameSurfaceView @JvmOverloads constructor(
                 val high = if (((b1.toInt() and 0xFF) and (1 shl bit)) != 0) 0b10 else 0
                 val low = if (((b2.toInt() and 0xFF) and (1 shl bit)) != 0) 0b01 else 0
 
-                val tileColors = PPU.getPaletteColors(selectedPalette)
-
-                val color = tileColors[high or low]
+                val color = PPU.getColorIndex(high or low)
                 paint.color = color
 
                 val left = x + ((7 - bit) * scale)
