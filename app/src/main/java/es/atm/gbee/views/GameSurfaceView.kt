@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -13,6 +12,7 @@ import es.atm.gbee.modules.GB_Y_RESOLUTION
 import es.atm.gbee.modules.Memory
 import es.atm.gbee.modules.PPU
 import es.atm.gbee.modules.VRAM_START
+import kotlin.math.ceil
 
 const val ROW_NUMBER = 24
 const val COL_NUMBER = 16
@@ -55,11 +55,11 @@ class GameSurfaceView @JvmOverloads constructor(
         if (width / height > aspectRatio) { // Landscape
             newWidth = (height * aspectRatio).toInt()
             newHeight = height
-            scale = Math.round(height / GB_Y_RESOLUTION.toFloat()).toFloat()
+            scale = height / GB_Y_RESOLUTION.toFloat()
         } else { // Straight
             newWidth = width
             newHeight = (width / aspectRatio).toInt()
-            scale = Math.round(width / GB_X_RESOLUTION.toFloat()).toFloat()
+            scale = width / GB_X_RESOLUTION.toFloat()
         }
 
         setMeasuredDimension(newWidth, newHeight)
@@ -78,15 +78,15 @@ class GameSurfaceView @JvmOverloads constructor(
         }
     }
 
-    fun renderVRam(canvas: Canvas){
+    private fun renderVRam(canvas: Canvas){
         val paint = Paint()
 
         for (lineNum in 0 until GB_Y_RESOLUTION) {
             for (x in 0 until GB_X_RESOLUTION) {
-                val left = x * scale
-                val top = lineNum * scale
-                val right = left + scale
-                val bottom = top + scale
+                val left = Math.round(x * scale).toFloat()
+                val top = Math.round(lineNum * scale).toFloat()
+                val right = left + ceil(scale.toDouble()).toFloat()
+                val bottom = top + ceil(scale.toDouble()).toFloat()
 
                 val color = PPU.getBufferPixelFromIndex(x + (lineNum * GB_X_RESOLUTION))
                 paint.color = color
@@ -96,8 +96,7 @@ class GameSurfaceView @JvmOverloads constructor(
         }
     }
 
-    fun renderTileMemory(canvas: Canvas){
-
+    private fun renderTileMemory(canvas: Canvas){
         var xDraw = 0f
         var yDraw = 0f
         var tileNum = 0
