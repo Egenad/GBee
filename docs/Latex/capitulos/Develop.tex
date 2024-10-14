@@ -1301,6 +1301,8 @@ Además, se puede observar que la ROM se ha cargado correctamente en nuestra mem
 \end{lstlisting}
 
 \subsection{Lectura/Escritura en ROM}
-
+Para implementar las acciones de leer o escribir en ROM, deberemos fijarnos en detalle cómo cada MBC gestiona de forma particular las regiones de memoria y qué registros tiene (acudir al apartado \ref{history_mbcs}).
+\\\\
+Para poder conseguir un emulador completo, se deben implementar todos los tipos de controladores (es decir, desde el MBC1 hasta el MBC7 y el resto de controladores especiales). En este apartado solamente vamos a ver cómo implementar el primero, que abarca un amplio repertorio de juegos como \textit{Tetris DX} o \textit{Mario \& Yoshi}.
 
 \cleardoublepage

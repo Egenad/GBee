@@ -12,65 +12,143 @@ El emulador es altamente valorado por su interfaz intuitiva y las múltiples opc
 \\\\
 Sin embargo, tiene algunas limitaciones. Por ejemplo, puede generar archivos de guardado duplicados, carece de un sistema de autoguardado periódico y no ha recibido actualizaciones recientes para las versiones más nuevas de Android, lo que puede afectar su compatibilidad en dispositivos más modernos.
 
-\begin{figure}[H]
+\begin{figure}[h]
     \centering
-    \includegraphics[width=0.3\textwidth]{include/images/myoldboy.png}
+    \includegraphics[width=0.4\textwidth]{include/images/myoldboy.png}
     \caption{My OldBoy! - Logotipo.}
     \label{figure:oldboylogo}
 \end{figure}
+
+\clearpage
 
 La pantalla principal de la aplicación presenta un explorador de archivos que muestra, en formato de lista, los documentos almacenados en la carpeta especificada de la memoria interna del dispositivo. Los archivos se organizan automáticamente por orden alfabético, ofreciendo una visualización clara y estructurada para facilitar su navegación y selección. Dispone de dos botones, uno para recargar la carpeta actual y otro para acceder a los ajustes de sistema. 
 \\\\
 En los ajustes, podremos modificar distintos aspectos agrupados en las categorías de video, audio, datos de entrada, disposición, varios y avanzado. En vídeo, por ejemplo, podremos modificar el tamaño de la pantalla de juego, la orientación predeterminada de la aplicación, o la paleta de colores.
 
-\begin{figure}[H]
+\begin{figure}[h]
     \centering
-    \includegraphics[width=0.6\textwidth]{include/images/myoldboy2.jpg}
+    \includegraphics[width=0.65\textwidth]{include/images/myoldboy2.jpg}
     \caption{My OldBoy! - Menú de inicio y pantalla de ajustes.}
     \label{figure:oldboy2}
 \end{figure}
 
-\begin{figure}[H]
+\clearpage
+
+La pantalla de juego presenta un diseño más simplificado en comparación con otros emuladores destacados. Su principal ventaja radica en la facilidad para ajustar la posición y tamaño de los botones, permitiendo al usuario personalizar su experiencia de juego. Sin embargo, algunos usuarios consideran que, dado que se trata de una aplicación de pago, el aspecto gráfico podría beneficiarse de mejoras adicionales para estar a la altura de sus competidores.
+
+\begin{figure}[h]
     \centering
-    \includegraphics[width=0.6\textwidth]{include/images/myoldboy3.jpg}
+    \includegraphics[width=0.65\textwidth]{include/images/myoldboy3.jpg}
     \caption{My OldBoy! - Pantalla y opciones de juego.}
     \label{figure:oldboy3}
 \end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{include/images/myoldboyportrait.jpg}
+    \caption{My OldBoy! - Pantalla de juego en orientación horizontal.}
+    \label{figure:oldboy4}
+\end{figure}
 
+\clearpage
 
 \subsubsection{GBCC}
+GBCC es un emulador multiplataforma de Game Boy y Game Boy Color desarrollado en lenguaje C. Está disponible en Linux, Windows, Android y macOS.
+\\\\
+Entre sus funcionalidades se incluyen soporte para GUIs basadas en SDL y GTK, paletas personalizadas para juegos DMG, estados de guardado automáticos, y una función de turbo ajustable. También soporta shaders como Dot-Matrix y Subpixel, los cuales permiten una reproducción precisa de los colores en CGB. Además, ofrece integración con hardware como el Rumble Pak, acelerómetros y la Game Boy Printer, aunque algunos periféricos como el IR Port y el Pocket Sonar no están implementados.
+\\\\
+También soporta diversos controladores de memoria: MBC1, MBC2, MBC3 y MBC5, pero aún carece de soporte para MBC6 y MBC7, entre otros. Además, el emulador tiene la capacidad de simular el cable link, aunque es una conexión \textit{fake} consigo mismo.
+\\\\
+El proyecto se destaca por su compatibilidad con shaders y la posibilidad de visualizar los datos de VRAM en una ventana separada, lo cual es útil para desarrolladores y aficionados que quieran inspeccionar los gráficos en detalle.
 
-\begin{figure}[H]
+\begin{figure}[h]
     \centering
     \includegraphics[width=0.6\textwidth]{include/images/gbcclogo.png}
     \caption{GBCC - Logotipo.}
     \label{figure:gbcclogo}
 \end{figure}
 
+La pantalla de juego se caracteriza por su diseño minimalista y adaptable. Dependiendo de si se carga una ROM de Game Boy (DMG) o de Game Boy Color (CGB), la interfaz ajusta su apariencia para emular de manera más fiel las características visuales de la consola correspondiente. El diseño de los controles también se adapta dinámicamente a las dimensiones del dispositivo: en modo vertical, la separación entre los botones y la escala de la pantalla gráfica varían según el ancho y el alto disponibles. En el modo horizontal, el diseño se ajusta automáticamente, manteniendo la proporción y los colores, sin perder la coherencia visual. Además, se pueden observar características adicionales como el botón de turbo y la aplicación de shaders como el Dot-Matrix para mejorar la experiencia visual.
+\\\\
+Por último, GBCC permite personalizar el fondo de pantalla que simula la consola original, brindando la opción de cambiar el color según las preferencias del usuario, lo que añade un toque personal a la experiencia de emulación. Esta característica es muy apreciada por quienes buscan una mayor personalización en la interfaz.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{include/images/gbccgame.png}
+    \caption{GBCC - Pantalla de juego.}
+    \label{figure:gbccgame}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{include/images/gbccgameportrait.png}
+    \caption{GBCC - Pantalla de juego en orientación horizontal.}
+    \label{figure:gbccgameportrait}
+\end{figure}
+
+\clearpage
+
 \subsubsection{iGBA}
 
-\begin{figure}[H]
+El emulador iGBA fue una aplicación diseñada para dispositivos iOS, disponible brevemente en la App Store antes de ser retirada en abril de 2024. Permitía a los usuarios emular juegos de Game Boy, Game Boy Color y Game Boy Advance en sus iPhones, ofreciendo características como guardado de estado, avance rápido y soporte para ROMs legalmente adquiridas.
+\\\\
+Entre sus características principales destacaban la capacidad de guardar estados de juego, permitiendo a los usuarios guardar y retomar partidas en cualquier momento, además de la función de avance rápido (igual que GBCC), que permitía saltar rápidamente escenas o partes lentas del juego. Sin embargo, un detalle a mejorar era que esta velocidad del avance era excesivamente rápida y no permitía ajustes más finos.
+
+\begin{figure}[h]
     \centering
-    \includegraphics[width=0.4\textwidth]{include/images/igbalogo.png}
+    \includegraphics[width=0.3\textwidth]{include/images/igbalogo.png}
     \caption{iGBA - Logotipo.}
     \label{figure:igbalogo}
 \end{figure}
 
+La interfaz era sencilla, con un diseño limpio que simulaba los botones de las consolas originales. Sin embargo, generó controversia por dos razones: incluir anuncios que interrumpían la experiencia de juego y ser una copia no autorizada de GBA4iOS, un emulador desarrollado por \textit{Riley Testut}. Este conflicto con el código de GBA4iOS, junto con la preocupación por la privacidad y la recopilación de datos de los usuarios, llevó a críticas dentro de la comunidad de emuladores​.
+\\\\
+Los controles virtuales incluían botones de hombro para los juegos de Game Boy Advance, aunque algunos usuarios mencionaron que estos botones eran algo pequeños. Además, ofrecía un menú de opciones en la esquina inferior izquierda con funciones como guardado rápido, carga de estados, códigos de trucos y avance rápido.
+\\\\
+A pesar de sus problemas, algunos usuarios apreciaron lo fácil que era configurarlo y su capacidad para emular juegos retro sin retrasos significativos.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.25\textwidth]{include/images/igbasettings.PNG}
+    \caption{iGBA - Ajustes de juego.}
+    \label{figure:igbasettings}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.65\textwidth]{include/images/iGBAgame.png}
+    \caption{iGBA - Pantalla de juego.}
+    \label{figure:igbagame}
+\end{figure}
+
+\clearpage
+
 \section{Mockup}
 
-\begin{figure}[H]
+La aplicación seguirá un diseño minimalista, tomando como referencia principal el emulador GBCC. En su versión inicial, el menú principal presentará una lista en formato de cuadrícula que mostrará todas las ROMs agregadas por el usuario. Cada uno de los elementos de la cuadrícula contará con una imagen predeterminada, representando la consola original, ya sea DMG o CGB, junto con el nombre de la ROM. Estas se ordenarán alfabéticamente para facilitar la navegación. Este enfoque busca mantener una interfaz limpia y funcional, con un acceso directo a los juegos.
+\\\\
+En la barra de navegación se mostrarán dos íconos. El primero, representado por un símbolo de suma ("+"), permitirá al usuario agregar nuevas ROMs a la aplicación. El segundo ícono, con la forma de un engranaje, brindará acceso a la configuración general del emulador, que incluirá opciones relacionadas con el video, audio, disposición de controles, entre otros. Estas configuraciones tendrán un impacto en todos los juegos de manera uniforme.
+\\\\
+La imagen de cada juego podrá ser personalizada por el usuario a través de un gesto táctil de "hold". Al realizar este gesto sobre una cuadrícula específica, el usuario tendrá la capacidad de acceder a los ajustes individuales del juego, donde podrá reemplazar la imagen predeterminada por una de su elección o modificar el nombre del juego.
+
+\begin{figure}[h]
     \centering
     \includegraphics[width=0.4\textwidth]{include/images/mockup_menu.jpg}
     \caption{Menú de inicio.}
     \label{figure:mockupmenu}
 \end{figure}
 
-\begin{figure}[H]
+En cuanto a la pantalla de juego, se busca crear un diseño que evoque la estética de la consola original. Se incluirá un botón que brindará acceso a los ajustes del juego, el cual se ubicará, de manera provisional, en la parte superior izquierda de la pantalla. El layout será minimalista, permitiendo a los usuarios ajustar el tamaño, color y disposición de los botones según sus preferencias. La imagen de fondo tendrá un color amarillo por defecto, pero los usuarios también podrán personalizarla a su gusto. Además, se ofrecerá la opción de subir imágenes propias para reemplazar los botones o el fondo, lo que facilitará una experiencia de juego más personalizada y adaptada a los gustos individuales.
+\\\\
+Aunque no se representa en los mockups, se planea implementar un shader Dot-Matrix, similar al utilizado en GBCC. Esta función podrá desactivarse desde los ajustes generales de la aplicación.
+
+\begin{figure}[h]
     \centering
     \includegraphics[width=0.6\textwidth]{include/images/mockgame.jpg}
     \caption{Pantalla de juego.}
     \label{figure:mockupgame}
 \end{figure}
+
+\clearpage
 
 \section{Diagrama de casos de uso}
 

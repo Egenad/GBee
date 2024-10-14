@@ -1,0 +1,315 @@
+\begin{thebibliography}{}
+
+\bibitem [\protect \citeauthoryear {%
+{Antonio Niño Díaz}%
+}{%
+{Antonio Niño Díaz}%
+}{%
+{\protect \APACyear {2015}}%
+}]{%
+cycleaccurate}
+\APACinsertmetastar {%
+cycleaccurate}%
+\begin{APACrefauthors}%
+{Antonio Niño Díaz}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2015}{}{}.
+\newblock
+\APACrefbtitle {{The Cycle-Accurate Game Boy Docs}.} {{The Cycle-Accurate Game
+  Boy Docs}.}
+\newblock
+\APAChowpublished
+  {\url{https://raw.githubusercontent.com/geaz/emu-gameboy/master/docs/The%20Cycle-Accurate%20Game%20Boy%20Docs.pdf}}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{Computing History}%
+}{%
+{Computing History}%
+}{%
+{\protect \APACyear {2013}}%
+}]{%
+ch}
+\APACinsertmetastar {%
+ch}%
+\begin{APACrefauthors}%
+{Computing History}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2013}{}{}.
+\newblock
+\APACrefbtitle {{Nintendo Game Boy}.} {{Nintendo Game Boy}.}
+\newblock
+\APAChowpublished
+  {\url{http://www.computinghistory.org.uk/det/4033/Nintendo-Game-Boy/}}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{Gekkio}%
+}{%
+{Gekkio}%
+}{%
+{\protect \APACyear {2024}}%
+}]{%
+hardwaredatabase}
+\APACinsertmetastar {%
+hardwaredatabase}%
+\begin{APACrefauthors}%
+{Gekkio}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2024}{}{}.
+\newblock
+\APACrefbtitle {{Game Boy hardware database}.} {{Game Boy hardware database}.}
+\newblock
+\APAChowpublished {\url{https://gbhwdb.gekkio.fi/}}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{Low Level Devel}%
+}{%
+{Low Level Devel}%
+}{%
+{\protect \APACyear {2021}}%
+}]{%
+lld}
+\APACinsertmetastar {%
+lld}%
+\begin{APACrefauthors}%
+{Low Level Devel}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2021}{}{}.
+\newblock
+\APACrefbtitle {{Gameboy Emulator Development}.} {{Gameboy Emulator
+  Development}.}
+\newblock
+\APAChowpublished
+  {\url{https://www.youtube.com/watch?v=e87qKixKFME&list=PLVxiWMqQvhg_yk4qy2cSC3457wZJga_e5&index=2}}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Marat~Fayzullin%
+\ \BBA {} Korth%
+}{%
+Marat~Fayzullin%
+\ \BBA {} Korth%
+}{%
+{\protect \APACyear {1998}}%
+}]{%
+pandocs}
+\APACinsertmetastar {%
+pandocs}%
+\begin{APACrefauthors}%
+Marat~Fayzullin, P\BPBI R., Pascal~Felber%
+\BCBT {}\ \BBA {} Korth, M.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{1998}{}{}.
+\newblock
+\APACrefbtitle {{Pan Docs}.} {{Pan Docs}.}
+\newblock
+\APAChowpublished {\url{http://bgb.bircd.org/pandocs.htm}}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{Marc Rawer}%
+}{%
+{Marc Rawer}%
+}{%
+{\protect \APACyear {1999}}%
+}]{%
+cpudocs}
+\APACinsertmetastar {%
+cpudocs}%
+\begin{APACrefauthors}%
+{Marc Rawer}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{1999}{}{}.
+\newblock
+\APACrefbtitle {{Game Boy CPU Manual}.} {{Game Boy CPU Manual}.}
+\newblock
+\APAChowpublished {\url{http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf}}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+\APACcitebtitle {{New Pan Docs}}}{%
+\APACcitebtitle {{New Pan Docs}}}{%
+{\protect \APACyear {2020}}%
+}]{%
+newpandocs}
+\APACinsertmetastar {%
+newpandocs}%
+\APACrefbtitle {{New Pan Docs}.} {{New Pan Docs}.}
+\newblock
+\APACrefYearMonthDay{2020}{}{}.
+\newblock
+\APAChowpublished {\url{https://github.com/zid/gameboy}}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Nintendo%
+}{%
+Nintendo%
+}{%
+{\protect \APACyear {1999}}%
+}]{%
+ninty}
+\APACinsertmetastar {%
+ninty}%
+\begin{APACrefauthors}%
+Nintendo.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{1999}{}{}.
+\newblock
+\APACrefbtitle {{Manual Oficial de Programación para Game Boy}.} {{Manual
+  Oficial de Programación para Game Boy}.}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{nitro2k01}%
+}{%
+{nitro2k01}%
+}{%
+{\protect \APACyear {2008}}%
+}]{%
+gbwiki}
+\APACinsertmetastar {%
+gbwiki}%
+\begin{APACrefauthors}%
+{nitro2k01}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2008}{}{}.
+\newblock
+\APACrefbtitle {{Game Boy Development Wiki}.} {{Game Boy Development Wiki}.}
+\newblock
+\APAChowpublished {\url{https://gbdev.gg8.se/wiki/articles/Main_Page}}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{Pastraiser}%
+}{%
+{Pastraiser}%
+}{%
+{\protect \APACyear {{\protect \bibnodate {}}}}%
+}]{%
+opcodes}
+\APACinsertmetastar {%
+opcodes}%
+\begin{APACrefauthors}%
+{Pastraiser}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{{\protect \bibnodate {}}}{}{}.
+\newblock
+\APACrefbtitle {{Gameboy CPU (LR35902) instruction set}.} {{Gameboy CPU
+  (LR35902) instruction set}.}
+\newblock
+\APAChowpublished {\url{http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf}}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{Peter Johnson}%
+}{%
+{Peter Johnson}%
+}{%
+{\protect \APACyear {2022}}%
+}]{%
+zid}
+\APACinsertmetastar {%
+zid}%
+\begin{APACrefauthors}%
+{Peter Johnson}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2022}{}{}.
+\newblock
+\APACrefbtitle {{C Game Boy Emulator}.} {{C Game Boy Emulator}.}
+\newblock
+\APAChowpublished {\url{https://github.com/zid/gameboy}}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{Ryan Levick}%
+}{%
+{Ryan Levick}%
+}{%
+{\protect \APACyear {2020}}%
+}]{%
+howto}
+\APACinsertmetastar {%
+howto}%
+\begin{APACrefauthors}%
+{Ryan Levick}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2020}{}{}.
+\newblock
+\APACrefbtitle {{DMG-01: How to Emulate a Game Boy}.} {{DMG-01: How to Emulate
+  a Game Boy}.}
+\newblock
+\APAChowpublished
+  {\url{https://rylev.github.io/DMG-01/public/book/introduction.html}}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{System of Levers}%
+}{%
+{System of Levers}%
+}{%
+{\protect \APACyear {2023}}%
+}]{%
+howwindow}
+\APACinsertmetastar {%
+howwindow}%
+\begin{APACrefauthors}%
+{System of Levers}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2023}{}{}.
+\newblock
+\APACrefbtitle {{The Window Layer - How GameBoy Graphics Work}.} {{The Window
+  Layer - How GameBoy Graphics Work}.}
+\newblock
+\APAChowpublished {\url{https://www.youtube.com/watch?v=8TVgN16DrEU}}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{Wikiguru}%
+}{%
+{Wikiguru}%
+}{%
+{\protect \APACyear {2007}}%
+}]{%
+wikigbf}
+\APACinsertmetastar {%
+wikigbf}%
+\begin{APACrefauthors}%
+{Wikiguru}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2007}{}{}.
+\newblock
+\APACrefbtitle {{z80 Heaven}.} {{z80 Heaven}.}
+\newblock
+\APAChowpublished {\url{http://z80-heaven.wikidot.com/}}.
+\PrintBackRefs{\CurrentBib}
+
+\end{thebibliography}

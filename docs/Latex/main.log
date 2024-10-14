@@ -1,10 +1,9 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex 2024.6.20)  11 OCT 2024 13:53
+This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex 2024.6.20)  14 OCT 2024 17:32
 entering extended mode
  restricted \write18 enabled.
- file:line:error style messages enabled.
  %&-line parsing enabled.
-**d:/Git/GBee/docs/Latex/main.tex
-(d:/Git/GBee/docs/Latex/main.tex
+**./main.tex
+(main.tex
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
 (include/init.tex
@@ -2252,15 +2251,11 @@ LaTeX Info: Redefining \ttfamily on input line 1.
  [11
 
 
-]
-Underfull \vbox (badness 1917) has occurred while \output is active []
-
- [12])
+] [12])
 \tf@toc=\write5
 \openout5 = `main.toc'.
 
-
-[13] [14
+ [13] [14
 
 
 ]
@@ -2286,12 +2281,11 @@ Package tocbasic Info: character protrusion at lot deactivated on input line 35
 ]
 Package tocbasic Info: character protrusion at lol deactivated on input line 36
 .
- (main.lol)
+ (main.lol [19])
 \tf@lol=\write8
 \openout8 = `main.lol'.
 
- [19] [20]
-(capitulos/Introduccion.tex
+ [20] (capitulos/Introduccion.tex
 chapter 1.
 
 Underfull \hbox (badness 10000) in paragraph at lines 10--13
@@ -2356,17 +2350,19 @@ Underfull \hbox (badness 10000) in paragraph at lines 95--100
 
  []
 
-[7
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [7
 
 
 
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 120--123
+[8] [9] [10
 
- []
 
-[8]) (capitulos/Design.tex
+]) (capitulos/Design.tex
 chapter 5.
 
 Underfull \hbox (badness 10000) in paragraph at lines 9--14
@@ -2380,43 +2376,116 @@ Underfull \hbox (badness 10000) in paragraph at lines 9--14
 
 File: include/images/myoldboy.png Graphic file (type bmp)
 <include/images/myoldboy.png>
-
-Underfull \hbox (badness 10000) in paragraph at lines 22--25
-
- []
-
-[9
-
-
+[11
 
 
 ]
+Underfull \hbox (badness 10000) in paragraph at lines 24--27
+
+ []
+
 File: include/images/myoldboy2.jpg Graphic file (type bmp)
 <include/images/myoldboy2.jpg>
+[12
+
+]
 File: include/images/myoldboy3.jpg Graphic file (type bmp)
 <include/images/myoldboy3.jpg>
+File: include/images/myoldboyportrait.jpg Graphic file (type bmp)
+<include/images/myoldboyportrait.jpg>
+ [13
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+]
+Underfull \hbox (badness 10000) in paragraph at lines 55--62
 
- [10]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 55--62
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 55--62
+
+ []
+
 File: include/images/gbcclogo.png Graphic file (type bmp)
 <include/images/gbcclogo.png>
+
+Underfull \hbox (badness 10000) in paragraph at lines 70--73
+
+ []
+
+File: include/images/gbccgame.png Graphic file (type bmp)
+<include/images/gbccgame.png>
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+File: include/images/gbccgameportrait.png Graphic file (type bmp)
+<include/images/gbccgameportrait.png>
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[14
+
+] [15]
+Underfull \hbox (badness 10000) in paragraph at lines 92--95
+
+ []
+
 File: include/images/igbalogo.png Graphic file (type bmp)
 <include/images/igbalogo.png>
+Missing character: There is no ​ in font [lmroman10-regular]:mapping=tex-text;!
+
+Underfull \hbox (badness 10000) in paragraph at lines 103--108
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 103--108
+
+ []
+
+File: include/images/igbasettings.PNG Graphic file (type bmp)
+<include/images/igbasettings.PNG>
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+File: include/images/iGBAgame.png Graphic file (type bmp)
+<include/images/iGBAgame.png>
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[16
+
+] [17]
+Underfull \hbox (badness 10000) in paragraph at lines 127--132
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 127--132
+
+ []
+
+File: include/images/mockup_menu.jpg Graphic file (type bmp)
+<include/images/mockup_menu.jpg>
+
+Underfull \hbox (badness 10000) in paragraph at lines 140--143
+
+ []
+
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [11]
-File: include/images/mockup_menu.jpg Graphic file (type bmp)
-<include/images/mockup_menu.jpg>
+ [18
+
+]
 File: include/images/mockgame.jpg Graphic file (type bmp)
 <include/images/mockgame.jpg>
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [12]
-[13] [14
-
+[19] [20
 
 ]) (capitulos/Historia.tex
 chapter 6.
@@ -2442,7 +2511,9 @@ File: include/images/gbs.jpg Graphic file (type bmp)
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [15
+ [21
+
+
 
 
 ]
@@ -2535,17 +2606,17 @@ Overfull \hbox (5.4944pt too wide) in alignment at lines 45--76
  [] [] [] [] [] 
  []
 
-[16] [17]
+[22] [23]
 Underfull \hbox (badness 10000) in paragraph at lines 124--127
 
  []
 
-[18]
+[24]
 Underfull \hbox (badness 10000) in paragraph at lines 149--152
 
  []
 
-[19]
+[25]
 Underfull \hbox (badness 10000) in paragraph at lines 195--204
 
  []
@@ -2565,7 +2636,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 195--204
 
  []
 
-[20]
+[26]
 Underfull \hbox (badness 10000) in paragraph at lines 225--230
 
  []
@@ -2578,13 +2649,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 225--230
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [21]
-[22] [23]
+ [27]
+[28] [29]
 File: include/images/opcodes_1.jpg Graphic file (type bmp)
 <include/images/opcodes_1.jpg>
 File: include/images/opcodes_2.jpg Graphic file (type bmp)
 <include/images/opcodes_2.jpg>
- [24]
+ [30]
 Underfull \hbox (badness 10000) in paragraph at lines 326--333
 
  []
@@ -2604,7 +2675,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 343--363
 
  []
 
-[25]
+[31]
 Underfull \hbox (badness 10000) in paragraph at lines 365--372
 
  []
@@ -2644,14 +2715,14 @@ Underfull \hbox (badness 10000) in paragraph at lines 374--385
 
  []
 
-[26]
+[32]
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
 nput line 396.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `lmtt' (encoding: TU).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
- [27]
+ [33]
 File: include/images/dibujado_logo_n.jpg Graphic file (type bmp)
 <include/images/dibujado_logo_n.jpg>
 
@@ -2664,7 +2735,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 421--424
 
  []
 
-[28]
+[34]
 Underfull \hbox (badness 10000) in paragraph at lines 430--433
 
  []
@@ -2679,12 +2750,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 444--447
 
  []
 
-[29] [30]
+[35] [36]
 Underfull \hbox (badness 10000) in paragraph at lines 521--524
 
  []
 
-[31]
+[37]
 Underfull \hbox (badness 10000) in paragraph at lines 583--586
 
  []
@@ -2692,12 +2763,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 583--586
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [32]
+ [38]
 Underfull \hbox (badness 10000) in paragraph at lines 614--617
 
  []
 
-[33] [34] [35] [36]
+[39] [40] [41] [42]
 Underfull \hbox (badness 10000) in paragraph at lines 777--779
 
  []
@@ -2707,22 +2778,22 @@ File: include/images/cart.jpg Graphic file (type bmp)
 
 Underfull \vbox (badness 2662) has occurred while \output is active []
 
- [37]
-Underfull \hbox (badness 10000) in paragraph at lines 795--798
+ [43]
+Underfull \hbox (badness 10000) in paragraph at lines 796--799
 
  []
 
-[38]
-Underfull \hbox (badness 10000) in paragraph at lines 808--813
+[44]
+Underfull \hbox (badness 10000) in paragraph at lines 809--814
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 808--813
+Underfull \hbox (badness 10000) in paragraph at lines 809--814
 
  []
 
-[39] [40
+[45] [46
 
 
 ]) (capitulos/Develop.tex
@@ -2732,16 +2803,16 @@ Underfull \hbox (badness 10000) in paragraph at lines 4--7
 
  []
 
-[41
+[47
 
 
 ]
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10> not available
 (Font)              Font shape `TU/lmtt/b/n' tried instead on input line 35.
- [42]
+ [48]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [43]
+ [49]
 Underfull \hbox (badness 10000) in paragraph at lines 123--128
 
  []
@@ -2751,7 +2822,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 123--128
 
  []
 
-[44]
+[50]
 Underfull \hbox (badness 10000) in paragraph at lines 161--166
 
  []
@@ -2764,7 +2835,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 161--166
 
 Underfull \vbox (badness 7415) has occurred while \output is active []
 
- [45]
+ [51]
 Underfull \hbox (badness 10000) in paragraph at lines 198--205
 
  []
@@ -2779,7 +2850,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 198--205
 
  []
 
-[46]
+[52]
 Underfull \hbox (badness 10000) in paragraph at lines 240--245
 
  []
@@ -2792,7 +2863,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 240--245
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [47]
+ [53]
 Underfull \hbox (badness 10000) in paragraph at lines 297--300
 
  []
@@ -2805,7 +2876,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 301--304
 
 Underfull \vbox (badness 3240) has occurred while \output is active []
 
- [48]
+ [54]
 Underfull \hbox (badness 10000) in paragraph at lines 322--325
 
  []
@@ -2813,7 +2884,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 322--325
 
 Underfull \vbox (badness 6300) has occurred while \output is active []
 
- [49]
+ [55]
 Underfull \hbox (badness 10000) in paragraph at lines 340--345
 
  []
@@ -2826,29 +2897,29 @@ Underfull \hbox (badness 10000) in paragraph at lines 340--345
 
 Underfull \vbox (badness 2173) has occurred while \output is active []
 
- [50]
-[51]
+ [56]
+[57]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [52]
+ [58]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [53]
+ [59]
 Underfull \vbox (badness 2150) has occurred while \output is active []
 
- [54]
-[55]
+ [60]
+[61]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [56]
+ [62]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [57]
+ [63]
 Underfull \hbox (badness 10000) in paragraph at lines 720--723
 
  []
 
-[58]
+[64]
 Underfull \hbox (badness 10000) in paragraph at lines 768--773
 
  []
@@ -2858,7 +2929,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 768--773
 
  []
 
-[59]
+[65]
 Underfull \hbox (badness 10000) in paragraph at lines 775--778
 
  []
@@ -2871,27 +2942,27 @@ Underfull \hbox (badness 10000) in paragraph at lines 807--810
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [60]
+ [66]
 Underfull \vbox (badness 5288) has occurred while \output is active []
 
- [61]
-[62]
+ [67]
+[68]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [63]
+ [69]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [64]
+ [70]
 Underfull \hbox (badness 10000) in paragraph at lines 1037--1040
 
  []
 
-[65]
+[71]
 Underfull \hbox (badness 10000) in paragraph at lines 1043--1046
 
  []
 
-[66]
+[72]
 Underfull \hbox (badness 10000) in paragraph at lines 1079--1084
 
  []
@@ -2906,35 +2977,56 @@ File: include/images/openfile.jpg Graphic file (type bmp)
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [67]
+ [73]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [68]
+ [74]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [69]
-[70]
+ [75]
+[76]
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <8> not available
 (Font)              Font shape `TU/lmtt/b/n' tried instead on input line 1247.
- [71] [72]) (main.aux)
+ [77]
+Underfull \hbox (badness 10000) in paragraph at lines 1304--1307
+
+ []
+
+[78]) (main.bbl
+chapter without number
+
+Underfull \hbox (badness 2088) in paragraph at lines 14--26
+[]\TU/lmr/m/n/10.95 Antonio Niño Díaz.  (2015).  \TU/lmr/m/it/10.95 The Cycle-A
+ccurate Game Boy Docs.  []$[][][][][] [][][]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 14--26
+[][][] [] [][][][][][][][][][][][][][][][][][] [] [][][][] [] [][][][] [] [][][
+] [] [][][][][][][][] [] [][][][][][] [] [][][][] [] [][][] [] [][][][][][][] [
+]
+ []
+
+) [79
+
+
+
+
+] (main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2020/03/25>
  ***********
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 47877 strings out of 409616
- 1015414 string characters out of 5773992
+ 47989 strings out of 409616
+ 1018017 string characters out of 5773992
  2690191 words of memory out of 5000000
- 69148 multiletter control sequences out of 15000+600000
- 563745 words of font info for 94 fonts, out of 8000000 for 9000
+ 69250 multiletter control sequences out of 15000+600000
+ 563761 words of font info for 96 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 113i,21n,134p,11003b,2258s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 113i,21n,134p,10982b,2258s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on main.pdf (92 pages).
+Output written on main.pdf (99 pages).
