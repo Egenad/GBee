@@ -800,6 +800,7 @@ En la configuración predeterminada (valor 0x00) el MBC1 soporta hasta 512KiB de
 \subsubsection{Memoria}
 
 \paragraph{Banco de ROM 0x00: 0x0000-0x3FFF}
+\label{par:rom0bank}
 Esta región usualmente contiene los primeros 16KiB de ROM del cartucho (suele ser fija, es decir, no cambia).
 
 \paragraph{Bancos de ROM 0x01-0x7F: 0x4000-0x7FFF}
@@ -811,5 +812,23 @@ Esta región se utiliza para leer o escribir en la RAM externa presente en algun
 Los tamaños disponibles de RAM son 8 KiB (que cubre toda la región mapeada) o 32 KiB, distribuidos en 4 bancos de 8 KiB cada uno. La segunda opción solo está disponible en cartuchos con ROM de hasta 512 KiB.
 \\\\
 La RAM externa suele estar alimentada por una batería, lo que permite el almacenamiento de datos incluso cuando la consola está apagada. Esta batería, normalmente una celda de botón soldada en la placa del cartucho, garantiza la persistencia de los datos. Además, dado que la velocidad de la RAM externa es comparable a la RAM interna de la Game Boy, algunos desarrolladores la utilizan como memoria de trabajo adicional (WRAM), aunque esto puede limitar el espacio disponible para el almacenamiento de datos.
+
+\subsubsection{Registros}
+
+Las siglas ROM hacen referencia a la Read Only Memory, es decir, memoria de solo lectura. Este tipo de memoria tiene la característica de ser no modificable durante la ejecución del programa. En el caso de la Game Boy, a pesar de que algunas regiones de la memoria ROM se comportan como registros, no se puede escribir en ellas directamente. La diferencia radica en que, aunque las instrucciones pueden apuntar a estas regiones como si se tratase de registros, los valores no se almacenan físicamente en la ROM. En su lugar, la operación tiene efecto según la región designada, sin que el valor sea guardado en esa área específica de la ROM. Este comportamiento es gestionado por el controlador, que permite la alternancia entre distintas partes de la ROM en ciertos momentos durante la ejecución del juego, sin modificar el contenido original de la memoria.
+\\\\
+Todos estos registros tienen por defecto el valor 0x00. Para el banco de ROM será tratado como 0x01.
+
+\paragraph{Habilitar RAM Externa: 0x0000-0x1FFF}
+Para poder acceder a la RAM externa, antes debe ser activada mediante este registro. La forma de hacerlo es escribir en la región cualquier valor cuyos 4 nibbles inferiores sean el valor 0xA.
+\\\\
+Se recomienda a los desarrolladores dehabilitar la RAM externa una vez se haya accedido a ella, ya que si se extrae el cartucho o se apaga la consola se pueden corromper los datos.
+
+\paragraph{Número de Banco ROM: 0x2000–0x3FFF}
+Este registro tiene en cuenta los 5 primeros bits del valor que se escriba, es decir, los valores que se tienen en cuenta están en el rango 0x01-0x1F.
+\\\\
+Si se intenta escribir el valor 0x00, la CPU lo tratará como un 0x01 ya que el \hyperref[par:rom0bank]{banco fijo de ROM} no puede estar duplicado.
+\\\\
+En el caso de que se indique un número mayor al de bancos disponibles en el cartucho, el banco seleccionado como resultado será el último. Por ejemplo, en un cartucho de 256KiB, el bit número 5 quedaría enmascarado, ya que el solamente necesita 4 bits para seleccionar uno de sus 16 posibles bancos.
 
 \cleardoublepage

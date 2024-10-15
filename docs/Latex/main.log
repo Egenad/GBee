@@ -1,9 +1,10 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex 2024.6.20)  14 OCT 2024 17:32
+This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex 2024.6.20)  15 OCT 2024 17:19
 entering extended mode
  restricted \write18 enabled.
+ file:line:error style messages enabled.
  %&-line parsing enabled.
-**./main.tex
-(main.tex
+**d:/Git/GBee/docs/Latex/main.tex
+(d:/Git/GBee/docs/Latex/main.tex
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-04>
 (include/init.tex
@@ -2359,7 +2360,10 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 ]
-[8] [9] [10
+[8]
+File: include/images/herramientas.png Graphic file (type bmp)
+<include/images/herramientas.png>
+ [9] [10
 
 
 ]) (capitulos/Design.tex
@@ -2784,19 +2788,36 @@ Underfull \hbox (badness 10000) in paragraph at lines 796--799
  []
 
 [44]
-Underfull \hbox (badness 10000) in paragraph at lines 809--814
+Underfull \hbox (badness 10000) in paragraph at lines 810--815
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 809--814
+Underfull \hbox (badness 10000) in paragraph at lines 810--815
 
  []
 
-[45] [46
+
+Underfull \hbox (badness 10000) in paragraph at lines 818--821
+
+ []
 
 
-]) (capitulos/Develop.tex
+Underfull \hbox (badness 10000) in paragraph at lines 823--826
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 828--833
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 828--833
+
+ []
+
+[45] [46]) (capitulos/Develop.tex
 chapter 7.
 
 Underfull \hbox (badness 10000) in paragraph at lines 4--7
@@ -2804,6 +2825,8 @@ Underfull \hbox (badness 10000) in paragraph at lines 4--7
  []
 
 [47
+
+
 
 
 ]
@@ -3021,12 +3044,12 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 47989 strings out of 409616
- 1018017 string characters out of 5773992
+ 48004 strings out of 409616
+ 1018442 string characters out of 5773992
  2690191 words of memory out of 5000000
- 69250 multiletter control sequences out of 15000+600000
+ 69263 multiletter control sequences out of 15000+600000
  563761 words of font info for 96 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 113i,21n,134p,10982b,2258s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 113i,21n,134p,11003b,2258s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 Output written on main.pdf (99 pages).

@@ -64,6 +64,9 @@
 \contentsline {paragraph}{\numberline {6.4.2.1.1}Banco de ROM 0x00: 0x0000-0x3FFF}{44}{paragraph.6.4.2.1.1}%
 \contentsline {paragraph}{\numberline {6.4.2.1.2}Bancos de ROM 0x01-0x7F: 0x4000-0x7FFF}{44}{paragraph.6.4.2.1.2}%
 \contentsline {paragraph}{\numberline {6.4.2.1.3}Banco de RAM 0x00-0x03: 0xA000-0xBFFF}{45}{paragraph.6.4.2.1.3}%
+\contentsline {subsubsection}{\numberline {6.4.2.2}Registros}{45}{subsubsection.6.4.2.2}%
+\contentsline {paragraph}{\numberline {6.4.2.2.1}Habilitar RAM Externa: 0x0000-0x1FFF}{45}{paragraph.6.4.2.2.1}%
+\contentsline {paragraph}{\numberline {6.4.2.2.2}Número de Banco ROM: 0x2000–0x3FFF}{45}{paragraph.6.4.2.2.2}%
 \contentsline {chapter}{\numberline {7}Desarrollo}{47}{chapter.7}%
 \contentsline {section}{\numberline {7.1}Módulos / Estructura del Proyecto}{47}{section.7.1}%
 \contentsline {section}{\numberline {7.2}CPU}{48}{section.7.2}%
@@ -83,5 +86,5 @@
 \contentsline {section}{\numberline {7.4}ROM}{71}{section.7.4}%
 \contentsline {subsection}{\numberline {7.4.1}Lectura de ROM}{72}{subsection.7.4.1}%
 \contentsline {subsection}{\numberline {7.4.2}Lectura/Escritura en ROM}{78}{subsection.7.4.2}%
-\contentsline {chapter}{\nonumberline Bibliografía}{79}{chapter*.35}%
+\contentsline {chapter}{\nonumberline Bibliografía}{79}{chapter*.36}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
