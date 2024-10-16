@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex 2024.6.20)  15 OCT 2024 17:19
+This is XeTeX, Version 3.141592653-2.6-0.999995 (MiKTeX 24.1) (preloaded format=xelatex 2024.6.20)  16 OCT 2024 14:03
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -2783,48 +2783,72 @@ File: include/images/cart.jpg Graphic file (type bmp)
 Underfull \vbox (badness 2662) has occurred while \output is active []
 
  [43]
-Underfull \hbox (badness 10000) in paragraph at lines 796--799
+File: include/images/nombc.jpg Graphic file (type bmp)
+<include/images/nombc.jpg>
+
+Underfull \hbox (badness 10000) in paragraph at lines 803--806
 
  []
 
 [44]
-Underfull \hbox (badness 10000) in paragraph at lines 810--815
+File: include/images/mbc1.jpg Graphic file (type bmp)
+<include/images/mbc1.jpg>
+
+Underfull \hbox (badness 10000) in paragraph at lines 824--829
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 810--815
+Underfull \hbox (badness 10000) in paragraph at lines 824--829
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 818--821
+Underfull \hbox (badness 10000) in paragraph at lines 832--835
+
+ []
+
+[45]
+Underfull \hbox (badness 10000) in paragraph at lines 837--840
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 823--826
+Underfull \hbox (badness 10000) in paragraph at lines 841--850
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 828--833
+Underfull \hbox (badness 10000) in paragraph at lines 841--850
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 828--833
+Underfull \hbox (badness 10000) in paragraph at lines 841--850
 
  []
 
-[45] [46]) (capitulos/Develop.tex
+
+Underfull \hbox (badness 10000) in paragraph at lines 841--850
+
+ []
+
+[46]
+LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <8> not available
+(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 853.
+
+Underfull \hbox (badness 10000) in paragraph at lines 871--874
+
+ []
+
+[47] [48]) (capitulos/Develop.tex
 chapter 7.
 
 Underfull \hbox (badness 10000) in paragraph at lines 4--7
 
  []
 
-[47
+[49
 
 
 
@@ -2832,10 +2856,10 @@ Underfull \hbox (badness 10000) in paragraph at lines 4--7
 ]
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10> not available
 (Font)              Font shape `TU/lmtt/b/n' tried instead on input line 35.
- [48]
+ [50]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [49]
+ [51]
 Underfull \hbox (badness 10000) in paragraph at lines 123--128
 
  []
@@ -2845,7 +2869,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 123--128
 
  []
 
-[50]
+[52]
 Underfull \hbox (badness 10000) in paragraph at lines 161--166
 
  []
@@ -2858,7 +2882,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 161--166
 
 Underfull \vbox (badness 7415) has occurred while \output is active []
 
- [51]
+ [53]
 Underfull \hbox (badness 10000) in paragraph at lines 198--205
 
  []
@@ -2873,7 +2897,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 198--205
 
  []
 
-[52]
+[54]
 Underfull \hbox (badness 10000) in paragraph at lines 240--245
 
  []
@@ -2886,7 +2910,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 240--245
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [53]
+ [55]
 Underfull \hbox (badness 10000) in paragraph at lines 297--300
 
  []
@@ -2899,7 +2923,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 301--304
 
 Underfull \vbox (badness 3240) has occurred while \output is active []
 
- [54]
+ [56]
 Underfull \hbox (badness 10000) in paragraph at lines 322--325
 
  []
@@ -2907,7 +2931,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 322--325
 
 Underfull \vbox (badness 6300) has occurred while \output is active []
 
- [55]
+ [57]
 Underfull \hbox (badness 10000) in paragraph at lines 340--345
 
  []
@@ -2920,29 +2944,29 @@ Underfull \hbox (badness 10000) in paragraph at lines 340--345
 
 Underfull \vbox (badness 2173) has occurred while \output is active []
 
- [56]
-[57]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
  [58]
+[59]
 Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [59]
-Underfull \vbox (badness 2150) has occurred while \output is active []
 
  [60]
-[61]
 Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [61]
+Underfull \vbox (badness 2150) has occurred while \output is active []
 
  [62]
+[63]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [63]
+ [64]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [65]
 Underfull \hbox (badness 10000) in paragraph at lines 720--723
 
  []
 
-[64]
+[66]
 Underfull \hbox (badness 10000) in paragraph at lines 768--773
 
  []
@@ -2952,7 +2976,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 768--773
 
  []
 
-[65]
+[67]
 Underfull \hbox (badness 10000) in paragraph at lines 775--778
 
  []
@@ -2965,27 +2989,27 @@ Underfull \hbox (badness 10000) in paragraph at lines 807--810
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [66]
+ [68]
 Underfull \vbox (badness 5288) has occurred while \output is active []
 
- [67]
-[68]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
  [69]
+[70]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [70]
+ [71]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [72]
 Underfull \hbox (badness 10000) in paragraph at lines 1037--1040
 
  []
 
-[71]
+[73]
 Underfull \hbox (badness 10000) in paragraph at lines 1043--1046
 
  []
 
-[72]
+[74]
 Underfull \hbox (badness 10000) in paragraph at lines 1079--1084
 
  []
@@ -3000,22 +3024,19 @@ File: include/images/openfile.jpg Graphic file (type bmp)
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [73]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [74]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
  [75]
-[76]
-LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <8> not available
-(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 1247.
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [76]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
  [77]
+[78] [79]
 Underfull \hbox (badness 10000) in paragraph at lines 1304--1307
 
  []
 
-[78]) (main.bbl
+[80]) (main.bbl
 chapter without number
 
 Underfull \hbox (badness 2088) in paragraph at lines 14--26
@@ -3030,7 +3051,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 14--26
 ]
  []
 
-) [79
+) [81
 
 
 
@@ -3044,12 +3065,12 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 48004 strings out of 409616
- 1018442 string characters out of 5773992
+ 48064 strings out of 409616
+ 1019376 string characters out of 5773992
  2690191 words of memory out of 5000000
- 69263 multiletter control sequences out of 15000+600000
+ 69321 multiletter control sequences out of 15000+600000
  563761 words of font info for 96 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  113i,21n,134p,11003b,2258s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on main.pdf (99 pages).
+Output written on main.pdf (101 pages).

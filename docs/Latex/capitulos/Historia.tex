@@ -787,15 +787,29 @@ Cada juego especifica qué tipo de controlador utiliza mediante el registro 0x01
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\textwidth]{include/images/cart.jpg}
-    \caption{Cartucho de Game Boy MBC5}
+    \caption{Diagrama - Cartucho de Game Boy MBC5}
     \label{figure:cart_gameboy}
 \end{figure}
 
 \subsection{No MBC: 0x00} Los juegos pequeños, que tienen un tamaño de ROM de hasta 32 KiB, no necesitan un utilizar bancos de memoria. En su lugar, la ROM se coloca directamente en la memoria en el rango de direcciones 0x0000-0x7FFF. Además, si se requiere RAM adicional (hasta 8 KiB), se puede conectar en el rango 0xA000-0xBFFF utilizando un circuito lógico.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{include/images/nombc.jpg}
+    \caption{PCB sin MBC}
+    \label{figure:cart_no_mbc}
+\end{figure}
+
 \subsection{MBC1: 0x01-0x03} Es el modelo de chip más antiguo. Pese a ello, trabaja de forma muy similar a los más recientes, lo que facilitó la actualización de los juegos o la posibilidad de hacerlos retro-compatibles.
 \\\\
 En la configuración predeterminada (valor 0x00) el MBC1 soporta hasta 512KiB de ROM y un total de 32KiB de RAM mediante el uso de bancos. Esta configuración puede cambiar, por ejemplo para utilizar la parte de RAM como ROM, aumentando esta última hasta 2MiBs. Es importante tener en cuenta que la memoria en el rango de direcciones 0x0000–0x7FFF se usa tanto para leer desde la ROM como para escribir en los registros de control del MBC.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{include/images/mbc1.jpg}
+    \caption{PCB MBC1}
+    \label{figure:cart_mbc1}
+\end{figure}
 
 \subsubsection{Memoria}
 
@@ -824,11 +838,47 @@ Para poder acceder a la RAM externa, antes debe ser activada mediante este regis
 \\\\
 Se recomienda a los desarrolladores dehabilitar la RAM externa una vez se haya accedido a ella, ya que si se extrae el cartucho o se apaga la consola se pueden corromper los datos.
 
-\paragraph{Número de Banco ROM: 0x2000–0x3FFF}
-Este registro tiene en cuenta los 5 primeros bits del valor que se escriba, es decir, los valores que se tienen en cuenta están en el rango 0x01-0x1F.
+\paragraph{Número de Banco ROM: 0x2000–0x3FFF} Este registro considera únicamente los primeros 5 bits del valor escrito, lo que implica que los valores efectivos estarán en el rango de 0x01 a 0x1F.
 \\\\
-Si se intenta escribir el valor 0x00, la CPU lo tratará como un 0x01 ya que el \hyperref[par:rom0bank]{banco fijo de ROM} no puede estar duplicado.
+En caso de que se intente escribir el valor 0x00, el sistema lo interpretará como 0x01, debido a que el \hyperref[par:rom0bank]{banco fijo de ROM} no puede ser duplicado en ambas regiones de memoria.
 \\\\
-En el caso de que se indique un número mayor al de bancos disponibles en el cartucho, el banco seleccionado como resultado será el último. Por ejemplo, en un cartucho de 256KiB, el bit número 5 quedaría enmascarado, ya que el solamente necesita 4 bits para seleccionar uno de sus 16 posibles bancos.
+Si se selecciona un número de banco mayor que el número de bancos disponibles en el cartucho, el valor del banco se ajustará (enmascarará) al número máximo permitido. Por ejemplo, en un cartucho de 256 KiB, que solo requiere 4 bits para direccionar uno de sus 16 bancos, el bit 5 será ignorado.
+\\\\
+En el caso de ROMs más pequeñas, que no requieren el uso completo de los 5 bits, existe una excepción que permite duplicar el banco 0 en la región 0x4000-0x7FFF. Si se escribe el valor 0x10, los primeros 4 bits indicarán la selección del banco 0, que normalmente se traduciría al banco 1. Sin embargo, dado que el bit 5 está activado, el valor completo no será interpretado como 0x00, lo que evita la traducción 00→01. Esto permite tener el banco 0 mapeado tanto en las regiones de memoria 0x0000–0x3FFF como en 0x4000–0x7FFF.
+\\\\
+En los casos en que la ROM es muy grande y utilice parte de la RAM para llegar a un máximo de 2MiB, se podrá llegar a utilizar un total de 128 bancos. Con 5 bits, no es posible representar todos ellos (el máximo es 0x1F). Para poder hacerlo, se deberán utilizar los dos bits del registro de la región 0x4000–0x5FFF de forma complementaria. El banco de ROM resultante se calcularía de la siguiente manera: $BancoSeleccionado = (RegistroSecundario << 5) + BancoROM$.
+
+Por ejemplo, si se quisiese seleccionar el banco número 101, nuestro registro secundario debería tener un valor de 0x03 y el registro de ROM un 0x05:
+
+\begin{lstlisting}[language=Consola, caption={Selección del banco de ROM en cartuchos grandes.}, label={code:bigromselectbank}]
+    00000011 << 5 = 01100000 --> el valor 0x03 (0011) pasa a valer 0x60 (96 en decimal)
+
+      0110 0000
+    + 0000 0101
+    ------------
+      0110 0101 = 101 en decimal
+\end{lstlisting}
+
+\paragraph{Número de Banco RAM / Complementario de Banco ROM: 0x4000–0x5FFF} Registro de 2 bits que se utiliza para seleccionar el número de banco de RAM (0x00-0x03) o especificar de forma complementaria el banco de ROM. Si la ROM y la RAM no son lo suficientemente grandes, este registro no tiene ningún uso.
+
+\paragraph{Modo de Banco: 0x6000–0x7FFF} Este registro de 1 bit controla el comportamiento del registro de 2 bit mencionado anteriormente. Los dos comportamientos pueden ser:
+
+\begin{itemize}
+    \item \textbf{0x00:} Modo por defecto. Los dos bits del registro 0x4000–0x5FFF se utilizan como bits superiores en la selección del banco de ROM. En este modo solamente se puede acceder al banco 0 de RAM. Este modo permite acceder a un tamaño máximo de 8KiB de RAM y 2MiB de ROM.
+    \item \textbf{0x01:} Modo avanzado en el que las regiones 0x0000-0x3FFF y 0xA000-0xBFFF no son fijas. Los dos bits del registro 0x4000–0x5FFF se utilizan para seleccionar el banco de RAM. Esto permite un máximo de 32KiB de RAM y 512KiB de ROM. Solamente se podrán acceder a los bancos del 0x00 al 0x1F de ROM.
+\end{itemize}
+
+La forma en la que estos modos funcionan es mediante unas puertas AND que el controlador tiene entre los dos registros de selección de bancos y el segundo bit más alto de la dirección de memoria. Estas puertas en el modo 1 se deshabilitan. Un ejemplo del modo 0 a continuación:
+\\\\
+Supongamos que el registro de banco ROM contiene un 5, siendo la región de memoria 0x0000-0x3FFF:
+
+\begin{lstlisting}[language=Consola, caption={Selección del banco de ROM en modo 0.}, label={code:bigromselectbankmode0}]
+        00101 -> 5 en binario
+    AND 00000 -> (segundo bit más alto de la dirección en la región 0x0000-0x3FFF)
+    ------------
+        00000 (resultado, siempre 0)
+\end{lstlisting}
+
+\textbf{Resultado:} Siempre se accede al banco 0 en esta región de memoria, sin importar el valor del registro de banco. Es por ello que esta región es "fija". Con la región de RAM 0xA000–0xBFFF pasa exactamente lo mismo, debido a que el segundo bit más alto de la dirección 0xA000 es 0.
 
 \cleardoublepage
