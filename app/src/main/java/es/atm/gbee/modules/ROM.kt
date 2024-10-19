@@ -83,7 +83,7 @@ object ROM {
     private var console: CONSOLE_TYPE   = CONSOLE_TYPE.UNKNOWN
 
     private var ramEnabled: Boolean     = false
-    private var ramBanking: Boolean     = false
+    private var bankingMode: Boolean    = false
 
     private var ramBanks                = Array(16){ByteArray(8 * 1024)} // MBC1 = 4 Banks Max. -- MBC3 / MBC5 = 16 Banks Max.
     private var currentRamBank : Int    = -1
@@ -448,7 +448,7 @@ object ROM {
         }
 
         if(address in EXTERNAL_RAM_START..< WRAM_START){
-            if (!ramEnabled || !ramBanking || currentRamBank < 0 || currentRamBank >= ramBanks.size){
+            if (!ramEnabled || !bankingMode || currentRamBank < 0 || currentRamBank >= ramBanks.size){
                 return 0xFF.toByte()
             }
 
@@ -484,22 +484,22 @@ object ROM {
         }
 
         if(address in (ROM_BANK_NUMBER_END + 1)..RAM_BANK_NUMBER_END){ // RAM BANK SELECTION
-            if(ramBanking && saveNeeded){
+            if(bankingMode && saveNeeded){
                 saveBattery()
             }
             currentRamBank = valueVar and 0b11
         }
 
-        if(address in (RAM_BANK_NUMBER_END + 1)..RAM_BANK_MODE_END){ //
-            ramBanking = valueVar and 1 != 0
+        if(address in (RAM_BANK_NUMBER_END + 1)..RAM_BANK_MODE_END){ // BANKING MODE
+            bankingMode = valueVar and 1 != 0
 
-            if(ramBanking && saveNeeded){
+            if(bankingMode && saveNeeded){
                 saveBattery()
             }
         }
 
         if(address in EXTERNAL_RAM_START..< WRAM_START){
-            if(ramEnabled && ramBanking){
+            if(ramEnabled && bankingMode){
                 ramBanks[currentRamBank][address - EXTERNAL_RAM_START] = value
 
                 if(cartHasBattery()) saveNeeded = true
