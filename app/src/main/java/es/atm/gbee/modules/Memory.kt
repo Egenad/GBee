@@ -285,4 +285,8 @@ object Memory {
     fun getMemory(): ByteArray{
         return memory
     }
+
+    fun switchROMBank(){
+
+    }
 }

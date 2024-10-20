@@ -29,3 +29,13 @@ fun convertBytesToString(bytes: ByteArray): String {
     val title = bytes.takeWhile { it != 0.toByte() && it.toInt() in 32..126 } // Filter only ASCII characters
     return String(title.toByteArray(), Charsets.US_ASCII)
 }
+
+fun copyBytes(source: ByteArray, destination: ByteArray, destinationStartIndex: Int) {
+    if (destinationStartIndex + source.size > destination.size) {
+        throw IllegalArgumentException("Destination has not enough space.")
+    }
+
+    for (i in source.indices) {
+        destination[destinationStartIndex + i] = source[i]
+    }
+}

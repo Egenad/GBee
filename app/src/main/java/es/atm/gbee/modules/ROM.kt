@@ -472,52 +472,59 @@ object ROM {
 
     private fun writeMBC1(address: Int, value: Byte){
         val valueInt = value.toInt() and 0xFF
-        var valueVar = valueInt
 
-        if(address <= ENABLE_RAM_END){
-            ramEnabled = valueInt and 0xF == 0xA
-        }
-
-        if(address in (ENABLE_RAM_END + 1)..ROM_BANK_NUMBER_END){ // ROM BANK SELECTION
-            if(valueVar == 0) valueVar = 1
-            currentRomBank = valueVar and 0b11111
-        }
-
-        if(address in (ROM_BANK_NUMBER_END + 1)..RAM_BANK_NUMBER_END){ // RAM BANK SELECTION
-            if(bankingMode && saveNeeded){
-                saveBattery()
+        when {
+            address <= ENABLE_RAM_END -> {  // ENABLE RAM
+                ramEnabled = valueInt and 0xF == 0xA
             }
-            currentRamBank = valueVar and 0b11
-        }
+            address in (ENABLE_RAM_END + 1)..ROM_BANK_NUMBER_END -> {// ROM BANK SELECTION
+                currentRomBank = valueInt and 0b11111
 
-        if(address in (RAM_BANK_NUMBER_END + 1)..RAM_BANK_MODE_END){ // BANKING MODE
-            bankingMode = valueVar and 1 != 0
+                if (!bankingMode) { // MODE 0 -> Use RAM Bank 2 bit register as upper 5-6 bits of the ROM Bank
+                    currentRomBank = currentRomBank or (currentRamBank shl 5)
 
-            if(bankingMode && saveNeeded){
-                saveBattery()
+                    if (currentRomBank == 0 || currentRomBank == 0x20 || currentRomBank == 0x40 || currentRomBank == 0x60) { // In MODE 0 isn't possible to access these banks
+                        currentRomBank++
+                    }
+                }
+
+                // TODO: Switch bank in Memory module
             }
-        }
+            address in (ROM_BANK_NUMBER_END + 1)..RAM_BANK_NUMBER_END -> {  // RAM BANK SELECTION
+                if (bankingMode && saveNeeded) {
+                    saveExRAMToFile()
+                }
+                currentRamBank = valueInt and 0b11
+            }
+            address in (RAM_BANK_NUMBER_END + 1)..RAM_BANK_MODE_END -> {  // BANKING MODE
+                bankingMode = valueInt and 0b1 != 0
 
-        if(address in EXTERNAL_RAM_START..< WRAM_START){
-            if(ramEnabled && bankingMode){
-                ramBanks[currentRamBank][address - EXTERNAL_RAM_START] = value
+                if(bankingMode && saveNeeded){
+                    saveExRAMToFile()
+                }
+            }
+            address in EXTERNAL_RAM_START..< WRAM_START -> { // WRITE TO EXTERNAL RAM
+                if(ramEnabled && bankingMode){
+                    ramBanks[currentRamBank][address - EXTERNAL_RAM_START] = value
 
-                if(cartHasBattery()) saveNeeded = true
+                    if(cartHasBattery()) saveNeeded = true
+                }
             }
         }
     }
 
-    private fun saveBattery(){
-        if(currentRamBank >= 0){
-            val batteryFilename = "$cartTitle.battery"
+    private fun loadExRAMFromFile(){
 
+    }
+
+    private fun saveExRAMToFile(){
+        if(currentRamBank >= 0){
+            val batteryFilename = "$cartTitle.sav"
             try {
                 val file = File(batteryFilename)
-                val outputStream = FileOutputStream(file)
-
-                // Write RAM data to file
-                outputStream.write(ramBanks[currentRamBank], 0, 0x2000)
-                outputStream.close()
+                FileOutputStream(file).use { fos ->
+                    fos.write(ramBanks[currentRamBank])
+                }
             } catch (e: IOException) {
                 System.err.println("FAILED TO OPEN OR WRITE: $batteryFilename")
             }
