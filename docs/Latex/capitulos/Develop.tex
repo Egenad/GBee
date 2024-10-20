@@ -1301,8 +1301,70 @@ Además, se puede observar que la ROM se ha cargado correctamente en nuestra mem
 \end{lstlisting}
 
 \subsection{Lectura/Escritura en ROM}
-Para implementar las acciones de leer o escribir en ROM, hay que tener en cuenta cómo cada \hyperref[history_mbcs]{MBC} gestiona de manera particular las regiones de memoria y cuáles son sus registros.
+
+\paragraph{Implementación de las Acciones de Lectura y Escritura en ROM}
+Para implementar las operaciones, es necesario tener en cuenta cómo cada \hyperref[history_mbcs]{MBC} gestiona de manera específica las diferentes regiones de memoria y los registros asociados. Cada MBC presenta un mecanismo particular para el acceso y la selección de bancos de ROM y RAM, lo que afecta directamente la forma en que el emulador debe interactuar con ellos.
 \\\\
-Para poder conseguir un emulador completo, se deben implementar todos los tipos de controladores (es decir, desde el MBC1 hasta el MBC7 y el resto de controladores especiales). En este apartado solamente vamos a ver cómo implementar el primero, que abarca un amplio repertorio de juegos como \textit{Tetris DX} o \textit{Mario \& Yoshi}.
+Con el objetivo de lograr un emulador completo, es imprescindible implementar todos los tipos de controladores, desde el MBC1 hasta el MBC7, así como otros controladores especiales. No obstante, en este apartado se detallará exclusivamente la implementación del MBC1, que abarca una amplia gama de títulos, incluyendo juegos como \textit{Tetris DX} y \textit{Mario \& Yoshi}.
+\\\\
+Como ya se ha explicado, dependiendo de las regiones de memoria en las que se intente escribir, se deben actualizar unos registros u otros.
+
+\begin{lstlisting}[language=Kotlin, caption={Escritura en regiones ROM.}, label={code:romwritekotlin}]
+
+    private var ramEnabled: Boolean     = false
+    private var ramBanking: Boolean     = false
+
+    private var ramBanks                = Array(16){ByteArray(8 * 1024)} // MBC1 = 4 Banks Max. -- MBC3 / MBC5 = 16 Banks Max.
+    private var currentRamBank : Int    = -1
+    private var currentRomBank : Int    = -1
+
+    private var saveNeeded: Boolean     = false
+
+    [...]
+
+    private fun writeMBC1(address: Int, value: Byte){
+        val valueInt = value.toInt() and 0xFF
+        var valueVar = valueInt
+
+        if(address <= ENABLE_RAM_END){
+            ramEnabled = valueInt and 0xF == 0xA
+        }
+
+        if(address in (ENABLE_RAM_END + 1)..ROM_BANK_NUMBER_END){ // ROM BANK SELECTION
+            if(valueVar == 0) valueVar = 1
+            currentRomBank = valueVar and 0b11111
+        }
+
+        if(address in (ROM_BANK_NUMBER_END + 1)..RAM_BANK_NUMBER_END){ // RAM BANK SELECTION
+            if(ramBanking && saveNeeded){
+                saveBattery()
+            }
+            currentRamBank = valueVar and 0b11
+        }
+
+        if(address in (RAM_BANK_NUMBER_END + 1)..RAM_BANK_MODE_END){ //
+            ramBanking = valueVar and 1 != 0
+
+            if(ramBanking && saveNeeded){
+                saveBattery()
+            }
+        }
+
+        if(address in EXTERNAL_RAM_START..< WRAM_START){
+            if(ramEnabled && ramBanking){
+                ramBanks[currentRamBank][address - EXTERNAL_RAM_START] = value
+
+                if(cartHasBattery()) saveNeeded = true
+            }
+        }
+    }
+\end{lstlisting}
+
+Desglosemos el código:
+
+\begin{itemize}
+    \item Si se intenta escribir en la región 0x0000-0x1FFF y los primeros 4 bits contienen el valor 0xA, se activará la RAM.
+    \item Si se escribe en la región 0x2000-0x3FFF se seleccionará el número de banco ROM utilizando los 5 primeros bits del valor indicado. En caso de que sea 0, se convertirá a 1.
+\end{itemize}
 
 \cleardoublepage
