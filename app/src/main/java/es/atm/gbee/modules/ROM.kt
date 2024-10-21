@@ -74,22 +74,23 @@ object ROM {
 
     private var bootSection = ByteArray(0xFF)
 
-    private var cartTitle : String      = "Unknown"
-    private var licenseCode : String    = "None"
-    private var cartType : Int          = -1
-    private var romSize : Int           = -1
-    private var ramSize : Int           = -1
-    private var romVersion : Int        = -1
-    private var console: CONSOLE_TYPE   = CONSOLE_TYPE.UNKNOWN
+    private var cartTitle : String          = "Unknown"
+    private var licenseCode : String        = "None"
+    private var cartType : Int              = -1
+    private var romSize : Int               = -1
+    private var ramSize : Int               = -1
+    private var romVersion : Int            = -1
+    private var console: CONSOLE_TYPE       = CONSOLE_TYPE.UNKNOWN
 
-    private var ramEnabled: Boolean     = false
-    private var bankingMode: Boolean    = false
+    private var ramEnabled: Boolean         = false
+    private var bankingMode: BankingMode    = BankingMode.MODE_0
 
-    private var ramBanks                = Array(16){ByteArray(8 * 1024)} // MBC1 = 4 Banks Max. -- MBC3 / MBC5 = 16 Banks Max.
-    private var currentRamBank : Int    = -1
-    private var currentRomBank : Int    = -1
+    private var ramBanks                    = Array(16){ByteArray(8 * 1024)} // MBC1 = 4 Banks Max. -- MBC3 / MBC5 = 16 Banks Max.
+    private var currentRamBank : Int        = -1
+    private var currentRomBank : Int        = -1
+    private var currentRomBank0 : Int       = 0
 
-    private var saveNeeded: Boolean     = false
+    private var saveNeeded: Boolean         = false
 
     val newLicenseCodes: Map<String, String> = mapOf(
         "00" to "None",
@@ -345,6 +346,11 @@ object ROM {
         0x05 to 64
     )
 
+    enum class BankingMode(val mode: Int) {
+        MODE_0(0),
+        MODE_1(1)
+    }
+
     fun getNewLicenseNameFromIndex(code: String): String {
         return newLicenseCodes[code] ?: "Unknown"
     }
@@ -448,7 +454,7 @@ object ROM {
         }
 
         if(address in EXTERNAL_RAM_START..< WRAM_START){
-            if (!ramEnabled || !bankingMode || currentRamBank < 0 || currentRamBank >= ramBanks.size){
+            if (!ramEnabled || bankingMode == BankingMode.MODE_0 || currentRamBank < 0 || currentRamBank >= ramBanks.size){
                 return 0xFF.toByte()
             }
 
@@ -480,31 +486,38 @@ object ROM {
             address in (ENABLE_RAM_END + 1)..ROM_BANK_NUMBER_END -> {// ROM BANK SELECTION
                 currentRomBank = valueInt and 0b11111
 
-                if (!bankingMode) { // MODE 0 -> Use RAM Bank 2 bit register as upper 5-6 bits of the ROM Bank
-                    currentRomBank = currentRomBank or (currentRamBank shl 5)
+                if (bankingMode == BankingMode.MODE_0) { // MODE 0 -> Use RAM Bank 2 bit register as upper 5-6 bits of the ROM Bank
+                    currentRomBank += (currentRamBank shl 5)
 
                     if (currentRomBank == 0 || currentRomBank == 0x20 || currentRomBank == 0x40 || currentRomBank == 0x60) { // In MODE 0 isn't possible to access these banks
                         currentRomBank++
                     }
+                }else{ // MODE 1
+                    /*currentRomBank0 = when {
+                        currentRomBank in 0x21..0x3F -> 0x20
+                        currentRomBank in 0x41..0x5F -> 0x40
+                        currentRomBank in 0x61..0x7F -> 0x60
+                        else -> 0
+                    }*/
                 }
 
                 // TODO: Switch bank in Memory module
             }
             address in (ROM_BANK_NUMBER_END + 1)..RAM_BANK_NUMBER_END -> {  // RAM BANK SELECTION
-                if (bankingMode && saveNeeded) {
+                if (bankingMode == BankingMode.MODE_1 && saveNeeded) {
                     saveExRAMToFile()
                 }
                 currentRamBank = valueInt and 0b11
             }
             address in (RAM_BANK_NUMBER_END + 1)..RAM_BANK_MODE_END -> {  // BANKING MODE
-                bankingMode = valueInt and 0b1 != 0
+                bankingMode = if (valueInt and 0b1 != 0) BankingMode.MODE_1 else BankingMode.MODE_0
 
-                if(bankingMode && saveNeeded){
+                if(bankingMode == BankingMode.MODE_1 && saveNeeded){
                     saveExRAMToFile()
                 }
             }
             address in EXTERNAL_RAM_START..< WRAM_START -> { // WRITE TO EXTERNAL RAM
-                if(ramEnabled && bankingMode){
+                if(ramEnabled && bankingMode == BankingMode.MODE_1){
                     ramBanks[currentRamBank][address - EXTERNAL_RAM_START] = value
 
                     if(cartHasBattery()) saveNeeded = true
