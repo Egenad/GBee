@@ -5,9 +5,10 @@ import es.atm.gbee.etc.extractByte
 import es.atm.gbee.etc.extractByteArray
 import es.atm.gbee.etc.memcmp
 import es.atm.gbee.etc.printROM
+import es.atm.gbee.modules.mbcs.MBCInterface
+import es.atm.gbee.modules.mbcs.MBC1
+import es.atm.gbee.modules.mbcs.NoMBC
 import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 import kotlin.math.min
 
 // --- CARTRIDGE HEADER ---
@@ -78,21 +79,13 @@ object ROM {
     private var licenseCode : String        = "None"
     private var cartType : Int              = -1
     private var romSize : Int               = -1
+    private var romBanks : Int              = -1
     private var ramSize : Int               = -1
     private var romVersion : Int            = -1
     private var console: CONSOLE_TYPE       = CONSOLE_TYPE.UNKNOWN
+    private var mbcInterface: MBCInterface? = null
 
-    private var ramEnabled: Boolean         = false
-    private var bankingMode: BankingMode    = BankingMode.MODE_0
-
-    private var ramBanks                    = Array(16){ByteArray(8 * 1024)} // MBC1 = 4 Banks Max. -- MBC3 / MBC5 = 16 Banks Max.
-    private var currentRamBank : Int        = -1
-    private var currentRomBank : Int        = -1
-    private var currentRomBank0 : Int       = 0
-
-    private var saveNeeded: Boolean         = false
-
-    val newLicenseCodes: Map<String, String> = mapOf(
+    private val newLicenseCodes: Map<String, String> = mapOf(
         "00" to "None",
         "01" to "Nintendo R&D1",
         "08" to "Capcom",
@@ -156,7 +149,7 @@ object ROM {
         "A4" to "Konami (Yu-Gi-Oh!)",
     )
 
-    val oldLicenseCodes : Map<Int, String> = mapOf(
+    private val oldLicenseCodes : Map<Int, String> = mapOf(
         0x00 to "None",
         0x01 to "Nintendo",
         0x08 to "Capcom",
@@ -346,6 +339,18 @@ object ROM {
         0x05 to 64
     )
 
+    val romBanksMap : Map<Int, Int> = mapOf(
+        0x00 to 2,
+        0x01 to 4,
+        0x02 to 8,
+        0x03 to 16,
+        0x04 to 32,
+        0x05 to 64,
+        0x06 to 128,
+        0x07 to 256,
+        0x08 to 512
+    )
+
     enum class BankingMode(val mode: Int) {
         MODE_0(0),
         MODE_1(1)
@@ -363,8 +368,16 @@ object ROM {
        return cartTypes[index] ?: "Unknown"
     }
 
-    fun cartTypeIsMBC(): Boolean{
+    private fun cartTypeIsMBC(): Boolean{
         return getRomTypeFromIndex(cartType).contains("MBC")
+    }
+
+    fun cartHasRam(): Boolean{
+        return getRomTypeFromIndex(cartType).contains("RAM")
+    }
+
+    fun cartHasBattery() : Boolean{
+        return getRomTypeFromIndex(cartType).contains("BATTERY")
     }
 
     fun getCartTypeIndex(): Int{
@@ -427,7 +440,11 @@ object ROM {
         }
 
         cartType    = extractByte(romBytes, CART_TYPE).toInt() and 0xFF
-        romSize     = 32 * (1 shl extractByte(romBytes, ROM_SIZE).toInt() and 0xFF) // Value in KiB
+        initMBC()
+
+        val romVal  = extractByte(romBytes, ROM_SIZE).toInt() and 0xFF
+        romSize     = 32 * (1 shl romVal) // Value in KiB
+        romBanks    = romBanksMap[romVal] ?: 0
         ramSize     = extractByte(romBytes, RAM_SIZE).toInt() and 0xFF
         romVersion  = extractByte(romBytes, ROM_V_NUM).toInt() and 0xFF
         console     = CONSOLE_TYPE.fromValue(extractByte(romBytes, TITLE_END).toInt() and 0xFF)
@@ -440,6 +457,14 @@ object ROM {
         return true
     }
 
+    fun initMBC(){
+        mbcInterface = when(getCartTypeIndex()){
+            0 -> NoMBC()
+            1 -> MBC1()
+            else -> null
+        }
+    }
+
     fun reloadBootPortion(){
         for (address in 0x00..0xFF){
             Memory.write(address, bootSection[address])
@@ -447,105 +472,11 @@ object ROM {
     }
 
     fun readFromROM(address: Int): Byte{
-
-        // Check if fixed ROM
-        if(!cartTypeIsMBC() || address < ROM_SW_START){
-            return Memory.read(address)
-        }
-
-        if(address in EXTERNAL_RAM_START..< WRAM_START){
-            if (!ramEnabled || bankingMode == BankingMode.MODE_0 || currentRamBank < 0 || currentRamBank >= ramBanks.size){
-                return 0xFF.toByte()
-            }
-
-            return ramBanks[currentRamBank][address - EXTERNAL_RAM_START]
-        }
-
-        return Memory.read(address)
+        return mbcInterface?.read(address) ?: Memory.read(address)
     }
 
     fun writeToROM(address: Int, value: Byte){
-
-        if(!cartTypeIsMBC()){
-            return
-        }
-
-        when(getCartTypeIndex()){
-            1 -> writeMBC1(address, value)
-        }
-
-    }
-
-    private fun writeMBC1(address: Int, value: Byte){
-        val valueInt = value.toInt() and 0xFF
-
-        when {
-            address <= ENABLE_RAM_END -> {  // ENABLE RAM
-                ramEnabled = valueInt and 0xF == 0xA
-            }
-            address in (ENABLE_RAM_END + 1)..ROM_BANK_NUMBER_END -> {// ROM BANK SELECTION
-                currentRomBank = valueInt and 0b11111
-
-                if (bankingMode == BankingMode.MODE_0) { // MODE 0 -> Use RAM Bank 2 bit register as upper 5-6 bits of the ROM Bank
-                    currentRomBank += (currentRamBank shl 5)
-
-                    if (currentRomBank == 0 || currentRomBank == 0x20 || currentRomBank == 0x40 || currentRomBank == 0x60) { // In MODE 0 isn't possible to access these banks
-                        currentRomBank++
-                    }
-                }else{ // MODE 1
-                    /*currentRomBank0 = when {
-                        currentRomBank in 0x21..0x3F -> 0x20
-                        currentRomBank in 0x41..0x5F -> 0x40
-                        currentRomBank in 0x61..0x7F -> 0x60
-                        else -> 0
-                    }*/
-                }
-
-                // TODO: Switch bank in Memory module
-            }
-            address in (ROM_BANK_NUMBER_END + 1)..RAM_BANK_NUMBER_END -> {  // RAM BANK SELECTION
-                if (bankingMode == BankingMode.MODE_1 && saveNeeded) {
-                    saveExRAMToFile()
-                }
-                currentRamBank = valueInt and 0b11
-            }
-            address in (RAM_BANK_NUMBER_END + 1)..RAM_BANK_MODE_END -> {  // BANKING MODE
-                bankingMode = if (valueInt and 0b1 != 0) BankingMode.MODE_1 else BankingMode.MODE_0
-
-                if(bankingMode == BankingMode.MODE_1 && saveNeeded){
-                    saveExRAMToFile()
-                }
-            }
-            address in EXTERNAL_RAM_START..< WRAM_START -> { // WRITE TO EXTERNAL RAM
-                if(ramEnabled && bankingMode == BankingMode.MODE_1){
-                    ramBanks[currentRamBank][address - EXTERNAL_RAM_START] = value
-
-                    if(cartHasBattery()) saveNeeded = true
-                }
-            }
-        }
-    }
-
-    private fun loadExRAMFromFile(){
-
-    }
-
-    private fun saveExRAMToFile(){
-        if(currentRamBank >= 0){
-            val batteryFilename = "$cartTitle.sav"
-            try {
-                val file = File(batteryFilename)
-                FileOutputStream(file).use { fos ->
-                    fos.write(ramBanks[currentRamBank])
-                }
-            } catch (e: IOException) {
-                System.err.println("FAILED TO OPEN OR WRITE: $batteryFilename")
-            }
-        }
-    }
-
-    private fun cartHasBattery() : Boolean{
-        return getRomTypeFromIndex(cartType).contains("BATTERY")
+        mbcInterface?.write(address, value)
     }
 
     fun getCartTitle() : String{
@@ -562,6 +493,10 @@ object ROM {
 
     fun getRomSize(): Int{
         return romSize
+    }
+
+    fun getRomTotalBanks(): Int{
+        return romBanks
     }
 
     fun getRamSize(): Int{

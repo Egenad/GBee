@@ -401,7 +401,6 @@ object PPU {
             startTimer = now
             frameCount = 0
 
-            println("PPU - FPS: $fps")
         }
 
         frameCount++

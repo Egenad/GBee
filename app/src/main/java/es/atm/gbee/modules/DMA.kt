@@ -11,7 +11,6 @@ object DMA {
     private var startDelay : Byte = 0
 
     fun start(value: Byte){                             // Value: Indicates range (0xXX00 - 0xXX9F)
-        println("DMA - Started")
         active = true
         offset = 0
         startDelay = 2

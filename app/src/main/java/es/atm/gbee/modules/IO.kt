@@ -49,7 +49,7 @@ object IO {
             return Memory.read(address)
         }
 
-        println("IO - Unsupported read on address: $address")
+        //println("IO - Unsupported read on address: $address")
         return 0
     }
 
@@ -95,7 +95,7 @@ object IO {
             return
         }
 
-        println("IO - Unkown write on address: $address")
+        //println("IO - Unkown write on address: $address")
     }
 
     fun readJoyPad(): Byte{

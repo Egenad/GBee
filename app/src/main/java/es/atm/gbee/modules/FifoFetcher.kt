@@ -104,7 +104,6 @@ class FifoFetcher {
                 tile = ((tile.toInt() and 0xFF) + 128).toByte() // Signed Region [-128, 128] --> Transform to [0, 255]
             }
             tileData[0] = tile
-            println("PPU - Fetched Tile: $tile, Map X = $mapX, Map Y = $mapY")
         }
 
         state = FetcherState.LOW_DATA_TILE
