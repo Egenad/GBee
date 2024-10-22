@@ -9,9 +9,12 @@ import java.io.IOException
 abstract class MBC : MBCInterface {
 
     abstract var ramBanks : Array<ByteArray>?
+    abstract var romBanks : Array<ByteArray>?
 
     var currentRamBank : Int = 0
     var currentRomBank : Int = 1
+
+    var romBankMask : Int    = 0b11111
 
     var bankingMode: BankingMode = BankingMode.MODE_0
 

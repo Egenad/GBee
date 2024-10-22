@@ -78,9 +78,8 @@ object ROM {
     private var cartTitle : String          = "Unknown"
     private var licenseCode : String        = "None"
     private var cartType : Int              = -1
-    private var romSize : Int               = -1
     private var romBanks : Int              = -1
-    private var ramSize : Int               = -1
+    private var ramBanks : Int              = -1
     private var romVersion : Int            = -1
     private var console: CONSOLE_TYPE       = CONSOLE_TYPE.UNKNOWN
     private var mbcInterface: MBCInterface? = null
@@ -330,13 +329,13 @@ object ROM {
         0xFF to "HuC1+RAM+BATTERY"
     )
 
-    val ramSizes : Map<Int, Int> = mapOf(
-        0x00 to 0, // KiB
-        0x01 to 2,
-        0x02 to 8,
-        0x03 to 32,
-        0x04 to 128,
-        0x05 to 64
+    val ramBanksMap : Map<Int, Int> = mapOf(
+        0x00 to 0,
+        0x01 to 1,
+        0x02 to 1,
+        0x03 to 4,
+        0x04 to 16,
+        0x05 to 8
     )
 
     val romBanksMap : Map<Int, Int> = mapOf(
@@ -351,9 +350,9 @@ object ROM {
         0x08 to 512
     )
 
-    enum class BankingMode(val mode: Int) {
-        MODE_0(0),
-        MODE_1(1)
+    enum class BankingMode() {
+        MODE_0,
+        MODE_1
     }
 
     fun getNewLicenseNameFromIndex(code: String): String {
@@ -384,10 +383,6 @@ object ROM {
         val regex = """\d+""".toRegex()
         val matchResult = regex.find(getRomTypeFromIndex(cartType))
         return matchResult?.value?.toInt() ?: 0
-    }
-
-    fun getRamSizeFromIndex(index: Int): Int {
-        return ramSizes[index] ?: 0
     }
 
     fun load_rom_from_path(path: String){
@@ -442,10 +437,8 @@ object ROM {
         cartType    = extractByte(romBytes, CART_TYPE).toInt() and 0xFF
         initMBC()
 
-        val romVal  = extractByte(romBytes, ROM_SIZE).toInt() and 0xFF
-        romSize     = 32 * (1 shl romVal) // Value in KiB
-        romBanks    = romBanksMap[romVal] ?: 0
-        ramSize     = extractByte(romBytes, RAM_SIZE).toInt() and 0xFF
+        romBanks    = romBanksMap[extractByte(romBytes, ROM_SIZE).toInt() and 0xFF] ?: 0
+        ramBanks    = ramBanksMap[extractByte(romBytes, RAM_SIZE).toInt() and 0xFF] ?: 0
         romVersion  = extractByte(romBytes, ROM_V_NUM).toInt() and 0xFF
         console     = CONSOLE_TYPE.fromValue(extractByte(romBytes, TITLE_END).toInt() and 0xFF)
 
@@ -491,16 +484,12 @@ object ROM {
         return cartType
     }
 
-    fun getRomSize(): Int{
-        return romSize
-    }
-
     fun getRomTotalBanks(): Int{
         return romBanks
     }
 
-    fun getRamSize(): Int{
-        return ramSize
+    fun getRamTotalBanks(): Int{
+        return ramBanks
     }
 
     fun getRomVersion(): Int{
