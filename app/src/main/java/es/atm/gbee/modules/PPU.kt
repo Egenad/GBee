@@ -114,7 +114,7 @@ object PPU {
     private var vRam : ByteArray            = ByteArray((VRAM_END - VRAM_START) + 1)
 
     private var ppuEnabled : Boolean        = true          // Bit 7
-    private var lcdEnabled : Boolean        = true
+    private var lcdEnabled : Boolean        = false
     private var winTilemapAddr : Int        = TM_1_START    // Bit 6
     private var enabledWindow : Boolean     = false         // Bit 5
     private var addrModeAddr : Int          = VRAM_START    // Bit 4 - Where the tiles are stored - 0 = 8800–97FF; 1 = 8000–8FFF
@@ -207,7 +207,7 @@ object PPU {
         }
     }
 
-    fun oamMode(stat: Byte){
+    private fun oamMode(stat: Byte){
         if(lineTicks >= OAM_CYCLES){ // ENTER DRAWING PIXELS MODE
             Memory.write(LCD_STAT, StatObj.PPU_MODE.set(stat, PPUMode.DRAW_LCD.number))
 
@@ -216,7 +216,7 @@ object PPU {
         }
     }
 
-    fun drawLCDMode(stat: Byte){
+    private fun drawLCDMode(stat: Byte){
 
         fifoFetcher.process()
 
@@ -231,7 +231,7 @@ object PPU {
         }
     }
 
-    fun hBlankMode(stat: Byte){
+    private fun hBlankMode(stat: Byte){
         if(lineTicks >= LINE_TOTAL_TICKS){
             increment_LY()
 
@@ -260,7 +260,7 @@ object PPU {
         }
     }
 
-    fun vBlankMode(stat: Byte){
+    private fun vBlankMode(stat: Byte){
         if(lineTicks >= LINE_TOTAL_TICKS){
             increment_LY()
 

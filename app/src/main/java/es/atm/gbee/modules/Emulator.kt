@@ -1,6 +1,8 @@
 package es.atm.gbee.modules
 
+import es.atm.gbee.etc.printVRAM
 import es.atm.gbee.modules.Memory.insertBootstrapToMemory
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -13,6 +15,7 @@ class Emulator {
 
     private val audioSys: Audio = Audio()
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun run(bytes : ByteArray?){
 
         if(bytes == null || bytes.isEmpty()){
@@ -25,12 +28,12 @@ class Emulator {
         }
     }
 
-    suspend fun runCpu(bytes: ByteArray){
+    private suspend fun runCpu(bytes: ByteArray){
 
         PPU.init()
 
         // LOAD GAME ROM
-        if(!ROM.load_rom(bytes)){
+        if(!ROM.loadRom(bytes)){
             System.err.println("Failed to load ROM. Program must exit.")
             return
         }
@@ -50,8 +53,7 @@ class Emulator {
         println("ROM - Reload Boot Portion")
         ROM.reloadBootPortion()
 
-        //Memory.dumpMemory(0xC000, 0xDFFF)
-
+        running = false
         while(running){
             if(paused){
                 delay(10)

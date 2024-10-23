@@ -270,23 +270,14 @@ object Memory {
     }
 
     fun read(address: Int): Byte{
-        return memory[address]
+        return if(address in 0..< MEMORY_SIZE) memory[address] else 0xFF.toByte()
     }
 
     fun write(address: Int, value: Byte){
-        memory[address] = value
+        if(address in 0..< MEMORY_SIZE) memory[address] = value
     }
 
     fun getNintendoLogo() : ByteArray{
         return nintendoLogo
-    }
-
-    // TESTING PURPOSES !!
-    fun getMemory(): ByteArray{
-        return memory
-    }
-
-    fun switchROMBank(){
-
     }
 }

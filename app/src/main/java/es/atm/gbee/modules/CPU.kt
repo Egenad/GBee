@@ -86,8 +86,6 @@ object CPU {
 
         // Halt or DMA transferring
         if(cpu_halted || DMA.transferring()){
-            //if(cpu_halted) println("CPU - Halted")
-            //if(DMA.transferring()) println("CPU - DMA is active")
             cycles += CYCLES_4
             return true
         }
@@ -95,12 +93,6 @@ object CPU {
         // Opcode execution
         val opcode = fetch()
 
-        /*
-        val hlAddr = get_16bit_address(H, L)
-        val deAddr = get_16bit_address(D, E)
-        val bcAddr = get_16bit_address(B, C)
-        println("CPU - Executing Instruction: " + opcode.toHexString(HexFormat.Default) + " - PC Address: " + (PC - 1).toHexString(HexFormat.Default) + " - SP Address: " + SP.toHexString(HexFormat.Default) + " - HL Address: " + hlAddr.toHexString(HexFormat.Default) + " - DE Address: " + deAddr.toHexString(HexFormat.Default) + " - BC Address: " + bcAddr.toHexString(HexFormat.Default) + " - A: " + A.toHexString(HexFormat.Default))
-        */
         try {
             cycles += execute(opcode)
         }catch (ex: IllegalArgumentException){
@@ -110,15 +102,15 @@ object CPU {
         return true
     }
 
-    fun setFlag(flag: Int) {
+    private fun setFlag(flag: Int) {
         F = (F.toInt() or flag).toByte()
     }
 
-    fun clearFlag(flag: Int) {
+    private fun clearFlag(flag: Int) {
         F = (F.toInt() and flag.inv()).toByte()
     }
 
-    fun updateFlag(flag: Int, condition: Boolean) {
+    private fun updateFlag(flag: Int, condition: Boolean) {
         if (condition) {
             setFlag(flag)
         } else {
@@ -1290,7 +1282,7 @@ object CPU {
         return CYCLES_8
     }
 
-    fun ld_h_a(): Int{
+    fun ld_h_a(): Int{ // TODO: Start debug boot here
         H = A
         return CYCLES_4
     }

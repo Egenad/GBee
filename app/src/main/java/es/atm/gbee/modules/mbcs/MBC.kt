@@ -9,7 +9,8 @@ import java.io.IOException
 abstract class MBC : MBCInterface {
 
     abstract var ramBanks : Array<ByteArray>?
-    abstract var romBanks : Array<ByteArray>?
+
+    abstract var romData : ByteArray?
 
     var currentRamBank : Int = 0
     var currentRomBank : Int = 1

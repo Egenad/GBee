@@ -69,12 +69,15 @@ class GameSurfaceView @JvmOverloads constructor(
     }
 
     fun render(canvas: Canvas) {
-        canvas.drawColor(Color.WHITE) // Background
-
-        if(debugMode){
-            renderTileMemory(canvas)
+        if(PPU.lcdIsEnabled()) {
+            canvas.drawColor(Color.WHITE) // Background
+            if (debugMode) {
+                renderTileMemory(canvas)
+            } else {
+                renderVRam(canvas)
+            }
         }else{
-            renderVRam(canvas)
+            canvas.drawColor(Color.BLACK) // Background
         }
     }
 

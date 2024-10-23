@@ -75,14 +75,14 @@ object ROM {
 
     private var bootSection = ByteArray(0xFF)
 
-    private var cartTitle : String          = "Unknown"
-    private var licenseCode : String        = "None"
-    private var cartType : Int              = -1
-    private var romBanks : Int              = -1
-    private var ramBanks : Int              = -1
-    private var romVersion : Int            = -1
-    private var console: CONSOLE_TYPE       = CONSOLE_TYPE.UNKNOWN
-    private var mbcInterface: MBCInterface? = null
+    private var cartTitle : String              = "Unknown"
+    private var licenseCode : String            = "None"
+    private var cartType : Int                  = -1
+    private var romBanks : Int                  = -1
+    private var ramBanks : Int                  = -1
+    private var romVersion : Int                = -1
+    private var console: CONSOLE_TYPE           = CONSOLE_TYPE.UNKNOWN
+    private var mbcInterface: MBCInterface?     = null
 
     private val newLicenseCodes: Map<String, String> = mapOf(
         "00" to "None",
@@ -389,13 +389,13 @@ object ROM {
         try {
             val file = File(path)
             val bytes = file.readBytes()
-            load_rom(bytes)
+            loadRom(bytes)
         }catch (ex: Exception){
             println("Error loading ROM: $ex")
         }
     }
 
-    fun load_rom(romBytes: ByteArray): Boolean{
+    fun loadRom(romBytes: ByteArray): Boolean{
 
         try {
             if(romBytes.isNotEmpty()){
@@ -405,7 +405,7 @@ object ROM {
                     Memory.write(ROM_START + i, romBytes[i])
                 }
 
-                return rom_init(romBytes)
+                return romInit(romBytes)
             }
         }catch (ex: Exception){
             println("Error loading ROM: $ex")
@@ -414,7 +414,7 @@ object ROM {
         return false
     }
 
-    fun rom_init(romBytes: ByteArray): Boolean{
+    private fun romInit(romBytes: ByteArray): Boolean{
 
         // Compare Cartridge Header with the Boot fixed one
 
@@ -435,12 +435,12 @@ object ROM {
         }
 
         cartType    = extractByte(romBytes, CART_TYPE).toInt() and 0xFF
-        initMBC()
-
         romBanks    = romBanksMap[extractByte(romBytes, ROM_SIZE).toInt() and 0xFF] ?: 0
         ramBanks    = ramBanksMap[extractByte(romBytes, RAM_SIZE).toInt() and 0xFF] ?: 0
         romVersion  = extractByte(romBytes, ROM_V_NUM).toInt() and 0xFF
         console     = CONSOLE_TYPE.fromValue(extractByte(romBytes, TITLE_END).toInt() and 0xFF)
+
+        initMBC(romBytes)
 
         println("ROM Loaded Successfully!")
         printROM()
@@ -450,10 +450,10 @@ object ROM {
         return true
     }
 
-    fun initMBC(){
+    private fun initMBC(romBytes: ByteArray){
         mbcInterface = when(getCartTypeIndex()){
-            0 -> NoMBC()
-            1 -> MBC1()
+            0 -> NoMBC(romBytes)
+            1 -> MBC1(romBytes)
             else -> null
         }
     }

@@ -15,52 +15,45 @@ import es.atm.gbee.modules.ROM_START
 import es.atm.gbee.modules.ROM_SW_START
 import es.atm.gbee.modules.WRAM_START
 
-class MBC1 : MBC(){
+const val MBC1_RAM_BANK_SIZE : Int = 8 * 1024   // 4 RAM Banks Max, 8 KiB each
+const val MBC1_ROM_BANK_SIZE : Int = 16 * 1024  // 16 KiB each ROM bank
+
+class MBC1(romBytes: ByteArray) : MBC() {
 
     private var saveNeeded = false
-    override var ramBanks: Array<ByteArray>? = Array(4){ByteArray(8 * 1024)} // MBC1 = 4 RAM Banks Max, 8 KiB each
-    override var romBanks: Array<ByteArray>?
+    override var ramBanks: Array<ByteArray>? = Array(4){ByteArray(MBC1_RAM_BANK_SIZE)}
+    override var romData: ByteArray?
 
     init {
        val romTotalBanks = ROM.getRomTotalBanks()
 
         when(romTotalBanks){
-            2 -> romBankMask = 0b1
-            4 -> romBankMask = 0xb11
-            8 -> romBankMask = 0xb111
-            16 -> romBankMask = 0xb1111
+            2 -> romBankMask    = 0b1
+            4 -> romBankMask    = 0xb11
+            8 -> romBankMask    = 0xb111
+            16 -> romBankMask   = 0xb1111
         }
 
-        romBanks = Array(romTotalBanks){ ByteArray(16 * 1024) } // 16KiB each bank
+        romData = romBytes
     }
 
     override fun read(address: Int): Byte {
         when (address) {
-            in ROM_START..< ROM_SW_START -> {                                              // READ FROM ROM FIXED BANK
-                when(bankingMode){
-                    BankingMode.MODE_0 -> return Memory.read(address)
-                    BankingMode.MODE_1 -> {
-                        val totalRomBanks = ROM.getRomTotalBanks()
-                        var bank = currentRomBank
-
-                        when (totalRomBanks) {
-                            in 33..64 -> { // 2 bit register used as complementary
-                                bank = ((currentRamBank and 0b1) shl 5) + currentRomBank
-                            }
-                            in 65 .. 128 -> {
-                                bank = (currentRamBank shl 5) + currentRomBank
-                            }
-                        }
-                        return romBanks!![bank][address]
-                    }
+            in ROM_START..< ROM_SW_START -> { // READ FROM ROM FIXED BANK
+                return when(bankingMode){
+                    BankingMode.MODE_0 -> Memory.read(address)
+                    BankingMode.MODE_1 -> romData?.get(getROM0BankAddr(address)) ?: 0xFF.toByte()
                 }
             }
-            in ROM_SW_START..ROM_END -> {                                              // READ FROM ROM BANK SELECTION
-
+            in ROM_SW_START..ROM_END -> return romData?.get(getROMSwBankAddr(address)) ?: 0xFF.toByte() // READ FROM SWITCHABLE ROM BANK
+            in EXTERNAL_RAM_START..< WRAM_START -> { // READ FROM EXTERNAL RAM
+                return if(ramEnabled) {
+                    ramBanks!![currentRamBank][address - EXTERNAL_RAM_START]
+                } else 0xFF.toByte()
             }
         }
 
-        return Memory.read(address)
+        return 0xFF.toByte()
     }
 
     override fun write(address: Int, value: Byte) {
@@ -73,7 +66,7 @@ class MBC1 : MBC(){
             }
             address in (ENABLE_RAM_END + 1)..ROM_BANK_NUMBER_END -> {                           // ROM BANK SELECTION
                 var currentRomBank = valueInt and romBankMask
-                if (currentRomBank == 0) currentRomBank++
+                if (currentRomBank == 0) currentRomBank += 1
             }
             address in (ROM_BANK_NUMBER_END + 1)..RAM_BANK_NUMBER_END -> {                      // RAM BANK SELECTION
                 if (bankingMode == BankingMode.MODE_1 && saveNeeded) {
@@ -96,5 +89,37 @@ class MBC1 : MBC(){
                 }
             }
         }
+    }
+
+    private fun getROM0BankAddr(address: Int): Int {
+        val totalRomBanks = ROM.getRomTotalBanks()
+        var addressToReturn = address
+
+        when (totalRomBanks) {
+            in 33..64 -> { // 2 bit register used as complementary
+                addressToReturn = ((currentRamBank and 0b1) shl 5) * address
+            }
+            in 65 .. 128 -> {
+                addressToReturn = (currentRamBank shl 5) * address
+            }
+        }
+
+        return addressToReturn
+    }
+
+    private fun getROMSwBankAddr(address: Int): Int{
+        val totalRomBanks = ROM.getRomTotalBanks()
+        var addressToReturn = (currentRomBank * MBC1_ROM_BANK_SIZE) + (address - ROM_SW_START)
+
+        when (totalRomBanks) {
+            in 33..64 -> { // 2 bit register used as complementary
+                addressToReturn = ((((currentRamBank and 0b1) shl 5) + currentRomBank) * MBC1_ROM_BANK_SIZE) + (address - ROM_SW_START)
+            }
+            in 65 .. 128 -> {
+                addressToReturn = (((currentRamBank shl 5) + currentRomBank) * MBC1_ROM_BANK_SIZE) * (address - ROM_SW_START)
+            }
+        }
+
+        return addressToReturn
     }
 }
