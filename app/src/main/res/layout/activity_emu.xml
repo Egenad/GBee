@@ -33,4 +33,158 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/frameLayout" />
+
+    <!-- D-Pad -->
+
+    <LinearLayout
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/selectstart"
+        android:gravity="center"
+        android:layout_margin="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <GridLayout
+            android:id="@+id/dpad_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:rowCount="3"
+            android:columnCount="3">
+
+            <!-- Espacio vacío arriba a la izquierda -->
+            <View
+                android:layout_width="50dp"
+                android:layout_height="50dp"/>
+
+            <!-- Botón UP -->
+            <Button
+                android:id="@+id/dpad_up"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:text="^"
+                android:textSize="40sp"
+                android:padding="0dp"
+                android:layout_row="0"
+                android:layout_column="1"/>
+
+            <!-- Espacio vacío arriba a la derecha -->
+            <View
+                android:layout_width="50dp"
+                android:layout_height="50dp"/>
+
+            <!-- Botón LEFT -->
+            <Button
+                android:id="@+id/dpad_left"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:text="<"
+                android:textSize="30sp"
+                android:padding="0dp"
+                android:layout_row="1"
+                android:layout_column="0"/>
+
+            <!-- Botón CENTRAL (View o botón según prefieras) -->
+            <View
+                android:id="@+id/dpad_center"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="@android:color/darker_gray"
+                android:layout_row="1"
+                android:layout_column="1"/>
+
+            <!-- Botón RIGHT -->
+            <Button
+                android:id="@+id/dpad_right"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:text=">"
+                android:textSize="30sp"
+                android:padding="0dp"
+                android:layout_row="1"
+                android:layout_column="2"/>
+
+            <!-- Espacio vacío abajo a la izquierda -->
+            <View
+                android:layout_width="50dp"
+                android:layout_height="50dp"/>
+
+            <!-- Botón DOWN -->
+            <Button
+                android:id="@+id/dpad_down"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:text="v"
+                android:textSize="30sp"
+                android:padding="0dp"
+                android:layout_row="2"
+                android:layout_column="1"/>
+
+            <!-- Espacio vacío abajo a la derecha -->
+            <View
+                android:layout_width="50dp"
+                android:layout_height="50dp"/>
+
+        </GridLayout>
+
+        <!-- Botones A y B -->
+
+        <LinearLayout
+            android:id="@+id/ab"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginLeft="50dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <Button
+                android:id="@+id/button_b"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:textSize="20sp"
+                android:padding="0dp"
+                android:text="B"
+                android:layout_margin="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/dpad_center"/>
+
+            <Button
+                android:id="@+id/button_a"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:textSize="20sp"
+                android:text="A"
+                android:layout_marginBottom="20dp"
+                app:layout_constraintStart_toStartOf="@+id/button_b"
+                app:layout_constraintEnd_toStartOf="@+id/button_a"
+                app:layout_constraintTop_toTopOf="@+id/button_a"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Botones Select y Start -->
+
+    <LinearLayout
+        android:id="@+id/selectstart"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:gravity="center"
+        android:layout_margin="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <Button
+            android:id="@+id/button_select"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_margin="10dp"
+            android:text="Select"/>
+
+        <Button
+            android:id="@+id/button_start"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_margin="10dp"
+            android:text="Start"/>
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
