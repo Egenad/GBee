@@ -53,7 +53,7 @@ class Emulator {
         println("ROM - Reload Boot Portion")
         ROM.reloadBootPortion()
 
-        running = false
+        //running = false
         while(running){
             if(paused){
                 delay(10)
