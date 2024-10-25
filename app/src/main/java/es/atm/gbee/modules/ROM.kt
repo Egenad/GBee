@@ -298,7 +298,7 @@ object ROM {
 
     // MBC = Memory Bank Controller
 
-    val cartTypes : Map<Int, String> = mapOf(
+    private val cartTypes : Map<Int, String> = mapOf(
         0x00 to "ROM ONLY",
         0x01 to "MBC1",
         0x02 to "MBC1+RAM",
@@ -329,7 +329,7 @@ object ROM {
         0xFF to "HuC1+RAM+BATTERY"
     )
 
-    val ramBanksMap : Map<Int, Int> = mapOf(
+    private val ramBanksMap : Map<Int, Int> = mapOf(
         0x00 to 0,
         0x01 to 1,
         0x02 to 1,
@@ -338,7 +338,7 @@ object ROM {
         0x05 to 8
     )
 
-    val romBanksMap : Map<Int, Int> = mapOf(
+    private val romBanksMap : Map<Int, Int> = mapOf(
         0x00 to 2,
         0x01 to 4,
         0x02 to 8,
@@ -355,11 +355,11 @@ object ROM {
         MODE_1
     }
 
-    fun getNewLicenseNameFromIndex(code: String): String {
+    private fun getNewLicenseNameFromIndex(code: String): String {
         return newLicenseCodes[code] ?: "Unknown"
     }
 
-    fun getOldLicenseNameFromIndex(code: Int): String {
+    private fun getOldLicenseNameFromIndex(code: Int): String {
         return oldLicenseCodes[code] ?: "Unknown"
     }
 
@@ -440,6 +440,8 @@ object ROM {
         romVersion  = extractByte(romBytes, ROM_V_NUM).toInt() and 0xFF
         console     = CONSOLE_TYPE.fromValue(extractByte(romBytes, TITLE_END).toInt() and 0xFF)
 
+        println(checkSum(romBytes))
+
         initMBC(romBytes)
 
         println("ROM Loaded Successfully!")
@@ -447,6 +449,17 @@ object ROM {
 
         bootSection = extractByteArray(romBytes, 0x00, 0xFF, true) // Save portion of code where the boot is going to load
 
+        return true
+    }
+
+    private fun checkSum(romBytes: ByteArray): Boolean{
+        // Checksum. Has to match with 0x14D value
+        var checksum: Byte = 0
+        for (address in 0x0134..0x014C){
+            val byte = Memory.getByteOnAddress(address)
+            checksum = ((checksum - byte - 0x1) and 0xFF).toByte()
+        }
+        if(extractByte(romBytes, HEADER_CHECKSUM) != checksum) return false
         return true
     }
 

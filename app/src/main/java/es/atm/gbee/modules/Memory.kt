@@ -166,7 +166,7 @@ object Memory {
         0x86.toByte(),                                  // ADD A, [HL]
         0x23.toByte(),                                  // INC HL
         0x05.toByte(),                                  // DEC B
-        0x20.toByte(), 0xFB.toByte(),                   // JR NZ, PC + 0xFB
+        0x20.toByte(), 0xFB.toByte(),                   // JR NZ, PC + 0xFB             ----- If bad checksum, lock up here -----
         0x86.toByte(),                                  // ADD A, [HL]
         0x20.toByte(), 0xFE.toByte(),                   // JR NZ, 0xFE
         0x3E.toByte(), 0x01.toByte(),                   // LD A, 0x01

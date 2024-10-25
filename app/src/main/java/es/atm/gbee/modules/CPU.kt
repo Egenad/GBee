@@ -67,6 +67,8 @@ object CPU {
 
     private var pendingBootROM  = true
 
+    private var lastOpcode      = 0xFF.toByte()
+
     init {
         SP = 0xFFFE
         PC = 0 // Jumps to 0x100 after boot
@@ -93,11 +95,18 @@ object CPU {
         // Opcode execution
         val opcode = fetch()
 
+        if(opcode == 0x20.toByte() && pendingBootROM && lastOpcode == opcode){
+            println("Boot checksum failed")
+            return false
+        }
+
         try {
             cycles += execute(opcode)
         }catch (ex: IllegalArgumentException){
             return false
         }
+
+        lastOpcode = opcode
 
         return true
     }
@@ -444,14 +453,14 @@ object CPU {
     }
 
     fun updateAddOperationFlags(val1: Int, val2: Int, result: Int){
-        updateFlag(FLAG_Z, result == 0)                               // Activated (1) if the result of the operation is 0.
+        updateFlag(FLAG_Z, result.toByte() == 0.toByte())                               // Activated (1) if the result of the operation is 0.
         clearFlag(FLAG_N)                                             // Set to 0
         updateFlag(FLAG_H, (val1 and 0xF) + (val2 and 0xF) > 0xF)     // Set (1) if there was a carry from the low nibble (the first 4 bits) during the operation.
         updateFlag(FLAG_C, result > 0xFF)                             // Set (1) if there was a carry during the addition (greater than 0xFF)
     }
 
     fun updateSubOperationFlags(val1: Int, val2: Int, result: Int){
-        updateFlag(FLAG_Z, result == 0)                               // Activated (1) if the result of the operation is 0.
+        updateFlag(FLAG_Z, result.toByte() == 0.toByte())                               // Activated (1) if the result of the operation is 0.
         updateFlag(FLAG_N, true)                                      // Activated (1) because a subtraction was performed.
         updateFlag(FLAG_H, (val1 and 0xF) < (val2 and 0xF))           // Set (1) if there was a carry from the low nibble (the first 4 bits) during the subtraction.
         updateFlag(FLAG_C, (val1 and 0xFF) < (val2 and 0xFF))         // Set (1) if there was a carry during the subtraction from the most significant bit (bit 7).

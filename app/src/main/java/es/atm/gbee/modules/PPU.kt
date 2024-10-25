@@ -29,6 +29,8 @@ const val C_BGP_OCPS : Int  = 0xFF68 // Not Used - Reserved
 const val C_BGP_OBPI : Int  = 0xFF68 // Not Used - Reserved
 
 const val OAM_CYCLES            = 80
+const val MAX_OBJ_PER_SCANLINE  = 10
+const val OAM_OBJ_NUMBER        = 40
 const val PIXEL_TRANSFER_CYCLES = 172 // TODO: Penalties Algorithm
 const val HBLANK_CYCLES         = 204
 const val LINE_TOTAL_TICKS      = 456
@@ -96,8 +98,8 @@ enum class PPUMode(val number: Int){
 *    Bits 2, 1, 0 - CGB palette [CGB Mode Only]: Which of OBP0–7 to use
 */
 data class OAMObj(
-    val x: Byte,
     val y: Byte,
+    val x: Byte,
     val tile: Byte,
     val flags: Byte
 )
@@ -110,7 +112,7 @@ object PPU {
     private var prevFrameTime : Long        = 0
     private var startTimer : Long           = 0
 
-    private var oamRam: ByteArray           = ByteArray(40 * 4) { 0 } // Max number: 40 OAM Objs * 4 Bytes each
+    private var oamRam: ByteArray           = ByteArray(OAM_OBJ_NUMBER * 4) { 0 } // Max number: 40 OAM Objs * 4 Bytes each
     private var vRam : ByteArray            = ByteArray((VRAM_END - VRAM_START) + 1)
 
     private var ppuEnabled : Boolean        = true          // Bit 7
@@ -122,6 +124,9 @@ object PPU {
     private var objSize : Int               = 8             // Bit 2
     private var objEnabled : Boolean        = false         // Bit 1
     private var bgWinEnabled : Boolean      = true          // Bit 0
+
+    private var lineSpriteCount: Int = 0
+    private var objsFetched : Array<OAMObj> = Array(MAX_OBJ_PER_SCANLINE) { OAMObj(0, 0, 0, 0) }
 
     private val fifoFetcher : FifoFetcher = FifoFetcher()
 
@@ -210,9 +215,10 @@ object PPU {
     private fun oamMode(stat: Byte){
         if(lineTicks >= OAM_CYCLES){ // ENTER DRAWING PIXELS MODE
             Memory.write(LCD_STAT, StatObj.PPU_MODE.set(stat, PPUMode.DRAW_LCD.number))
-
-            // Reset FIFO Fetcher
-            fifoFetcher.resetParams()
+            fifoFetcher.resetParams() // Reset FIFO Fetcher
+        }else if(lineTicks == 1){ // Scanning -> Read OAM on the first tick
+            lineSpriteCount = 0
+            loadLineSprites()
         }
     }
 
@@ -340,32 +346,52 @@ object PPU {
     }
 
     private fun handleLCDC(value: Byte){
-
         // Bit 7
         ppuEnabled = LCDCObj.LCDC_ENABLE.get(value) != 0
         lcdEnabled = ppuEnabled
-
         // Bit 6
         winTilemapAddr = if(LCDCObj.WIN_TILEMAP.get(value) == 0) TM_1_START else TM_2_START
-
         // Bit 5
         enabledWindow = LCDCObj.WINDOW_ENABLE.get(value) != 0
-
         // Bit 4
         addrModeAddr = if(LCDCObj.ADDRESS_MODE.get(value) == 0) SIGNED_TILE_REGION else VRAM_START
-
         // Bit 3
         bgTilemapAddr = if(LCDCObj.BG_TILEMAP.get(value) == 0) TM_1_START else TM_2_START
-
         // Bit 2
         objSize = if(LCDCObj.OBJ_SIZE.get(value) == 0) 8 else 16
-
         // Bit 1
         objEnabled = LCDCObj.OBJ_ENABLE.get(value) != 0
-
         // Bit 0
         bgWinEnabled = LCDCObj.MASTER_ENABLE.get(value) != 0
+    }
 
+    private fun loadLineSprites(){
+        val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
+        val lcdc = Memory.getByteOnAddress(LCDC_ADDR)
+        val objSize = LCDCObj.OBJ_SIZE.get(lcdc)
+        val spriteHeight = if(objSize == 0) 8 else 16
+
+        for(i in oamRam.indices step 4){
+
+            if(lineSpriteCount >= MAX_OBJ_PER_SCANLINE){
+                break
+            }
+
+            val y = oamRam[i].toInt() and 0xFF
+            val x = oamRam[i + 1].toInt() and 0xFF
+            val tile = oamRam[i + 2].toInt() and 0xFF
+            val flags = oamRam[i + 3].toInt() and 0xFF
+
+            if(x == 0){ // Sprite not visible
+                continue
+            }
+
+            if(y <= ly + 16 && (y + spriteHeight) > ly + 16){ // Sprite on current line
+                val fetched = OAMObj(y.toByte(), x.toByte(), tile.toByte(), flags.toByte())
+                objsFetched[lineSpriteCount] = fetched
+                lineSpriteCount++
+            }
+        }
     }
 
     fun readFromVRAM(address: Int) : Byte{

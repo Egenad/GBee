@@ -67,9 +67,11 @@ class FifoFetcher {
     private var mapX: Int = 0               // Global X position of the map
     private var tileY: Int = 0              // Line of the tile to be fetched
 
-    private val videoBuffer: IntArray      = IntArray(GB_Y_RESOLUTION * GB_X_RESOLUTION) { 0 }
-    private var tileData: ByteArray         = ByteArray(3) { 0 } // Fetched Tile Data
-    private var objData: ByteArray          = ByteArray(6) { 0 } // Fetched OBJ / Sprite Data
+    private val videoBuffer: IntArray = IntArray(GB_Y_RESOLUTION * GB_X_RESOLUTION) { 0 }
+    private var tileData: ByteArray   = ByteArray(3) { 0 } // Fetched Tile Data
+
+    // OBJs Data
+    private var objData: ByteArray   = ByteArray(6) { 0 } // Fetched OBJ / Sprite Data
 
     fun process(){
         val scx = Memory.getByteOnAddress(SCX)
