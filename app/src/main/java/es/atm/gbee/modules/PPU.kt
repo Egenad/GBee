@@ -415,22 +415,23 @@ object PPU {
     }
 
     private fun calculateFPS(){
-        val now = SystemClock.currentThreadTimeMillis()
+        val now = SystemClock.elapsedRealtime()
         val frameTime = now - prevFrameTime
 
         if(frameTime < GB_FPS){
             Thread.sleep(GB_FPS - frameTime)
         }
 
+        frameCount++
+
         if(now - startTimer >= 1000){
             val fps = frameCount
+            println("FPS: $fps")
             startTimer = now
             frameCount = 0
-
         }
 
-        frameCount++
-        prevFrameTime = SystemClock.currentThreadTimeMillis()
+        prevFrameTime = SystemClock.elapsedRealtime()
     }
 
     private fun moduleIsActive(): Boolean{

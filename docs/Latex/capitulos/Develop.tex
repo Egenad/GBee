@@ -1307,64 +1307,136 @@ Para implementar las operaciones, es necesario tener en cuenta cómo cada \hyper
 \\\\
 Con el objetivo de lograr un emulador completo, es imprescindible implementar todos los tipos de controladores, desde el MBC1 hasta el MBC7, así como otros controladores especiales. No obstante, en este apartado se detallará exclusivamente la implementación del MBC1, que abarca una amplia gama de títulos, incluyendo juegos como \textit{Tetris DX} y \textit{Mario \& Yoshi}.
 \\\\
-Como ya se ha explicado, dependiendo de las regiones de memoria en las que se intente escribir, se deben actualizar unos registros u otros.
+La estructura propuesta, de forma que se faciliten la integración de los distintos tipos de MBC, es la siguiente:
+\begin{itemize}
+    \item Se generará una interfaz llamada MBCInterface, el cual tendrá dos funciones a implementar de lectura y escritura.
+    \item Una clase abstracta MBC la cual implementa la interfaz y que contendrá datos como el modo de banca, el banco actual de ROM o los bancos de RAM.
+    \item El módulo de ROM contendrá una variable de clase de tipo MBCInterface que por defecto será nulo y que obtendrá valor en la lectura inicial de ROM.
+    \item El tipo NoMBC implementará directamente el MBCInterface, mientras que MBC1 heredará de la clase abstracta MBC.
+    \item A la hora de escribir o leer en ROM, simplemente se trasladará la responsabilidad de la tarea a la variable guardada.
+\end{itemize}
 
-\begin{lstlisting}[language=Kotlin, caption={Escritura en regiones ROM.}, label={code:romwritekotlin}]
-
-    private var ramEnabled: Boolean     = false
-    private var ramBanking: Boolean     = false
-
-    private var ramBanks                = Array(16){ByteArray(8 * 1024)} // MBC1 = 4 Banks Max. -- MBC3 / MBC5 = 16 Banks Max.
-    private var currentRamBank : Int    = -1
-    private var currentRomBank : Int    = -1
-
-    private var saveNeeded: Boolean     = false
-
+\begin{lstlisting}[language=Kotlin, caption={Inicialización del MBC.}, label={code:initmbc}]
+    private var mbcInterface: MBCInterface?     = null
     [...]
-
-    private fun writeMBC1(address: Int, value: Byte){
-        val valueInt = value.toInt() and 0xFF
-        var valueVar = valueInt
-
-        if(address <= ENABLE_RAM_END){
-            ramEnabled = valueInt and 0xF == 0xA
+    private fun initMBC(romBytes: ByteArray){
+        mbcInterface = when(getCartTypeIndex()){
+            0 -> NoMBC(romBytes)
+            1 -> MBC1(romBytes)
+            [...] // Resto de controladores
+            else -> null
         }
+    }   
+\end{lstlisting}
 
-        if(address in (ENABLE_RAM_END + 1)..ROM_BANK_NUMBER_END){ // ROM BANK SELECTION
-            if(valueVar == 0) valueVar = 1
-            currentRomBank = valueVar and 0b11111
-        }
+Como ya ha sido explicado, dependiendo de las regiones de memoria en las que se intente escribir, se deben actualizar unos registros específicos.
 
-        if(address in (ROM_BANK_NUMBER_END + 1)..RAM_BANK_NUMBER_END){ // RAM BANK SELECTION
-            if(ramBanking && saveNeeded){
-                saveBattery()
+\begin{lstlisting}[language=Kotlin, caption={Lectura en regiones ROM.}, label={code:romreadkotlin}]
+    override fun read(address: Int): Byte {
+        when (address) {
+            in ROM_START..< ROM_SW_START -> { // READ FROM ROM FIXED BANK
+                return when(bankingMode){
+                    BankingMode.MODE_0 -> Memory.read(address)
+                    BankingMode.MODE_1 -> romData?.get(getROM0BankAddr(address)) ?: 0xFF.toByte()
+                }
             }
-            currentRamBank = valueVar and 0b11
-        }
-
-        if(address in (RAM_BANK_NUMBER_END + 1)..RAM_BANK_MODE_END){ //
-            ramBanking = valueVar and 1 != 0
-
-            if(ramBanking && saveNeeded){
-                saveBattery()
-            }
-        }
-
-        if(address in EXTERNAL_RAM_START..< WRAM_START){
-            if(ramEnabled && ramBanking){
-                ramBanks[currentRamBank][address - EXTERNAL_RAM_START] = value
-
-                if(cartHasBattery()) saveNeeded = true
+            in ROM_SW_START..ROM_END -> return romData?.get(getROMSwBankAddr(address)) ?: 0xFF.toByte() // READ FROM SWITCHABLE ROM BANK
+            in EXTERNAL_RAM_START..< WRAM_START -> { // READ FROM EXTERNAL RAM
+                return if(ramEnabled) {
+                    ramBanks!![currentRamBank][address - EXTERNAL_RAM_START]
+                } else 0xFF.toByte()
             }
         }
+
+        return 0xFF.toByte()
     }
 \end{lstlisting}
 
 Desglosemos el código:
 
 \begin{itemize}
-    \item Si se intenta escribir en la región 0x0000-0x1FFF y los primeros 4 bits contienen el valor 0xA, se activará la RAM.
-    \item Si se escribe en la región 0x2000-0x3FFF se seleccionará el número de banco ROM utilizando los 5 primeros bits del valor indicado. En caso de que sea 0, se convertirá a 1.
+    \item Si la dirección de memoria a leer se encuentra en el rango \texttt{0x0000-0x3FFF} (ROM fija o estática), primero se comprobará el modo de banco. En el caso del modo básico, la lectura se redirigirá al módulo de memoria. Para el modo avanzado, la lectura se realizará directamente sobre los bytes cargados del fichero \texttt{.gb/.gbc}. La función \texttt{getROM0BankAddr(address: Int)} verifica la cantidad de bancos ROM que contiene el cartucho, aplicando, si es necesario, una máscara y utilizando el registro de dos bits de la región \texttt{0x4000-0x5FFF} de manera complementaria.
+
+    \item Si la dirección se encuentra en la región de ROM dinámica, \texttt{0x4000-0x7FFF}, los datos se obtendrán directamente del fichero \texttt{.gb/.gbc}. La función \texttt{getROMSwBankAddr(address: Int)} implementará una lógica similar a la de \texttt{getROM0BankAddr}, con la diferencia de que, en este caso, se sumará el resultado de la multiplicación entre el número de banco ROM actual y el tamaño de un banco (16 KiB) a la dirección indicada.
+
+    \item Si la dirección se encuentra dentro del rango de la RAM externa, se comprobará primero que esta esté activada, para proceder a leer los valores correspondientes de la variable de clase.
 \end{itemize}
+
+Veamos ahora la escritura:
+
+\begin{lstlisting}[language=Kotlin, caption={Escritura en regiones ROM.}, label={code:romwritekotlin}]
+    override fun write(address: Int, value: Byte) {
+        val valueInt = value.toInt() and 0xFF
+
+        when {
+            address <= ENABLE_RAM_END -> {  // ENABLE RAM
+                if(cartHasRam())
+                    ramEnabled = valueInt and 0xF == 0xA
+            }
+            address in (ENABLE_RAM_END + 1)..ROM_BANK_NUMBER_END -> {                           // ROM BANK SELECTION
+                var currentRomBank = valueInt and romBankMask
+                if (currentRomBank == 0) currentRomBank += 1
+            }
+            address in (ROM_BANK_NUMBER_END + 1)..RAM_BANK_NUMBER_END -> {                      // RAM BANK SELECTION
+                if (bankingMode == BankingMode.MODE_1 && saveNeeded) {
+                    saveExRAMToFile()
+                }
+                currentRamBank = valueInt and 0b11
+            }
+            address in (RAM_BANK_NUMBER_END + 1)..RAM_BANK_MODE_END -> {                        // BANKING MODE
+                bankingMode = if (valueInt and 0b1 != 0) BankingMode.MODE_1 else BankingMode.MODE_0
+
+                if(bankingMode == BankingMode.MODE_1 && saveNeeded){
+                    saveExRAMToFile()
+                }
+            }
+            address in EXTERNAL_RAM_START..< WRAM_START -> {                                       // WRITE TO EXTERNAL RAM
+                if(ramEnabled){
+                    ramBanks!![currentRamBank][address - EXTERNAL_RAM_START] = value
+
+                    if(cartHasBattery()) saveNeeded = true
+                }
+            }
+        }
+    }
+\end{lstlisting}
+
+Desglosemos nuevamente el código:
+
+\begin{itemize}
+    \item Si la dirección de memoria se encuentra en el rango \texttt{0x0000} hasta \texttt{0x1FFF}, se realiza la habilitación de RAM externa. 
+    \begin{itemize}
+        \item Si el cartucho incluye RAM, se habilita la RAM cuando los 4 bits inferiores del valor escrito (\texttt{value}) son iguales a \texttt{0xA}.
+    \end{itemize}
+    
+    \item Si la dirección está en el rango desde \texttt{0x2000} hasta \texttt{0x3FFF}, se selecciona el banco de ROM.
+    \begin{itemize}
+        \item Se determina el banco de ROM actual utilizando una máscara \texttt{romBankMask} y aplicándola a \texttt{value}. 
+        \item Si el banco resultante es el banco 0 (que está reservado), se ajusta el valor a 1 para evitar acceder a la ROM reservada.
+    \end{itemize}
+    
+    \item Si la dirección está en el rango desde \texttt{0x4000} hasta \texttt{0x5FFF}, se selecciona el banco de RAM.
+    \begin{itemize}
+        \item Si el modo de banca está en básico y es necesario guardar el estado, se llama a la función \texttt{saveExRAMToFile()} para almacenar los datos en el archivo de RAM externa.
+    \end{itemize}
+    
+    \item Si la dirección está en el rango desde \texttt{0x6000} hasta \texttt{0x7FFF}, se define el modo de banca.
+    \begin{itemize}
+        \item Se selecciona el modo 1 si el bit menos significativo es 1, y modo 0 en caso contrario.
+        \item Si el modo seleccionado es el básico y se requiere guardar, se realiza nuevamente el guardado con \texttt{saveExRAMToFile()}.
+    \end{itemize}
+    
+    \item Si la dirección cae en el rango de RAM externa, \texttt{0xA000} hasta \texttt{0xBFFF}, se realiza una escritura en la RAM externa.
+    \begin{itemize}
+        \item Si la RAM está habilitada, el valor se escribe en el banco de RAM actual, ajustando la dirección para obtener la posición correcta.
+        \item Si el cartucho tiene batería, se establece un flag para indicar que se requiere guardar.
+    \end{itemize}
+\end{itemize}
+
+Con esto ya tendríamos lo básico para que nuestro controlador funcione. Partiendo de este ejemplo, se deben implementar el resto de los tipos existentes para asegurar que cualquier juego funcione.
+
+\section{Interrupciones}
+
+
 
 \cleardoublepage

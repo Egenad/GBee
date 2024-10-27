@@ -881,4 +881,23 @@ Supongamos que el registro de banco ROM contiene un 5, siendo la región de memo
 
 \textbf{Resultado:} Siempre se accede al banco 0 en esta región de memoria, sin importar el valor del registro de banco. Es por ello que esta región es "fija". Con la región de RAM 0xA000–0xBFFF pasa exactamente lo mismo, debido a que el segundo bit más alto de la dirección 0xA000 es 0.
 
+\subsection{MBC2: 0x05-0x06}
+\subsection{MBC3: 0x0F-0x13}
+\subsection{MBC5: 0x19-0x1E}
+\subsection{MBC6: 0x20}
+\subsection{MBC7: 0x22}
+\subsection{MMM01: 0x0B-0x0D}
+
+\section{Interrupciones}
+
+Las interrupciones son un mecanismo clave que permite la interacción y sincronización entre el hardware y el software. Se trata de eventos específicos que detienen temporalmente la ejecución del programa principal y activan una rutina especial de código para gestionar un evento particular, como el refresco de pantalla, la lectura de botones, o el temporizador. Estas interrupciones permiten que la Game Boy gestione tareas cruciales en segundo plano sin que el programa principal tenga que supervisarlas constantemente.
+\\\\
+Existen los distintos tipos:
+
+\begin{itemize}
+    \item \textbf{VBlank}: Como indica el nombre, esta interrupción se lanza cada vez que la PPU entra en el modo 1, también conocido como VBlank.
+    \item \textbf{LCD STAT}: Hay distintas maneras de que esta interrupción se active, todas ellas relacionadas con los estados del barrido de pantalla.
+    \item 
+\end{itemize}
+
 \cleardoublepage
