@@ -890,14 +890,68 @@ Supongamos que el registro de banco ROM contiene un 5, siendo la región de memo
 
 \section{Interrupciones}
 
-Las interrupciones son un mecanismo clave que permite la interacción y sincronización entre el hardware y el software. Se trata de eventos específicos que detienen temporalmente la ejecución del programa principal y activan una rutina especial de código para gestionar un evento particular, como el refresco de pantalla, la lectura de botones, o el temporizador. Estas interrupciones permiten que la Game Boy gestione tareas cruciales en segundo plano sin que el programa principal tenga que supervisarlas constantemente.
+Las interrupciones son mecanismos que permiten a la CPU pausar temporalmente la ejecución del programa principal para saltar a una posición específica de memoria, conocida como vector de interrupción. Este proceso resulta útil porque puede ocurrir en cualquier parte del código, lo que facilita la respuesta a eventos externos en tiempo real.
 \\\\
-Existen los distintos tipos:
+En la mayoría de las CPU, existe un \textit{master flag} para controlar las interrupciones, y la CPU Z80 de la Game Boy no es una excepción. Sin embargo, además de este flag, la Game Boy cuenta con registros específicos para gestionar las interrupciones. El registro maestro es el Interrupt Master Enable (IME), que se desactiva con el opcode DI, evitando que ocurra cualquier interrupción. Por el contrario, el opcode EI activa el IME, permitiendo que se procesen las interrupciones especificadas en el registro Interrupt Enable (IE, ubicado en 0xFFFF). Complementariamente, existe el registro Interrupt Flag (IF, ubicado en 0xFF0F), que marca qué interrupción en particular ha sido activada.
+\\\\
+Cuando ocurre una interrupción, se sigue el siguiente procedimiento:
 
 \begin{itemize}
-    \item \textbf{VBlank}: Como indica el nombre, esta interrupción se lanza cada vez que la PPU entra en el modo 1, también conocido como VBlank.
-    \item \textbf{LCD STAT}: Hay distintas maneras de que esta interrupción se active, todas ellas relacionadas con los estados del barrido de pantalla.
-    \item 
+    \item Al activarse una interrupción, su bit correspondiente en el registro IF se establece en 1.
+    \item Si tanto el IME como el bit correspondiente en el registro IE están activos, se realizan tres pasos adicionales.
+    \item El IME se desactiva, evitando que otra interrupción interrumpa la que ya está en proceso.
+    \item El contador de programa (Program Counter, PC) se guarda en la pila de memoria (stack).
+    \item La CPU salta al vector de la interrupción correspondiente, ejecutando el código específico para manejar ese evento.
 \end{itemize}
+    
+Este procedimiento garantiza que las interrupciones se gestionen de forma controlada, evitando conflictos y permitiendo que la CPU responda adecuadamente a eventos críticos en tiempo real.
+\\\\
+Cuando se producen varias solicitudes de interrupción de forma simultánea, se otorga prioridad a aquellas con un valor de bit menor. En este esquema de prioridades, el bit 0 (interrupción de VBlank) tiene la mayor prioridad, mientras que el bit 5 (interrupción del Joypad) posee la prioridad más baja.
+
+\subsection{Tipos}
+
+\begin{itemize}
+    \item \textbf{VBlank (0x40)}: Como indica el nombre, esta interrupción se lanza cada vez que la PPU entra en el modo 1, también conocido como VBlank.
+    \item \textbf{LCD STAT (0x48)}: Hay distintas maneras de que esta interrupción se active, todas ellas relacionadas con los estados del barrido de pantalla.
+    \item \textbf{Timer (0x50)}: Se activa a intervalos regulares según la configuración del temporizador (TIMA).
+    \item \textbf{Serial (0x58)}: Se utiliza para la comunicación serie, permitiendo que dos consolas intercambien datos a través del cable Link.
+    \item \textbf{Joypad (0x60)}: Esta interrupción se activa cuando el jugador presiona un botón. Tiene ciertos inconvenientes, ya que el hardware de la consola tiene el problema del rebote de interruptor, provocando se detecten más de una vez las transiciones de los bits al pulsar un mismo botón.
+\end{itemize}
+\label{interrupttype}
+
+\subsection{Registros}
+
+\subsubsection{IME (Interrupt Master Enable)}
+Se trata de un flag interno de solo escritura (no está enlazado a ninguna dirección de memoria). Controla que cualquier tipo de interrupción se pueda lanzar. Al inicio de ejecución de cualquier juego, está deshabilitada. Se maneja a través de las operaciones:
+\begin{itemize}
+    \item \textbf{EI}: Habilita las interrupciones (IME = 1). No toma efecto hasta la ejecución de la siguiente instrucción.
+    \item \textbf{DI}: Deshabilita las interrupciones (IME = 0).
+    \item \textbf{RETI}: Habilita las interrupciones y ejecuta un RET.
+    \item \textbf{Cuando una interrupción está siendo procesada}: En estos momentos, para que no se solapen varias interrupciones de manera simultánea, se deshabilita (IME = 0).
+\end{itemize}
+
+\subsubsection{IE (Interrupt Enable - 0xFFFF)}
+Registro de 5 bits que controla qué interrupciones \textbf{pueden} ser lanzadas:
+\begin{itemize}
+    \item \textbf{Bit 0}: VBlank.
+    \item \textbf{Bit 1}: LCD STAT.
+    \item \textbf{Bit 2}: Timer.
+    \item \textbf{Bit 3}: Serial.
+    \item \textbf{Bit 4}: Joypad.
+\end{itemize}
+
+\subsubsection{IF (Interrupt Flag - 0xFF0F)}
+Registro de 5 bits que indica qué interrupciones \textbf{deben} ser lanzadas. Los bits se corresponden con los del IE.
+Una vez la CPU maneja la interrupción, el valor del bit vuelve de manera automática a 0.
+
+\section{Temporizadores / Timers}
+
+Los temporizadores son mecanismos esenciales para la sincronización y el control de eventos en el sistema. Ayudan a la CPU a gestionar y coordinar actividades en el juego, como controlar la velocidad de animaciones, gestionar el conteo de frames y mantener la precisión en la ejecución de instrucciones de tiempo crítico.
+
+\subsection{DIV (Divisor de reloj - 0xFF04)}
+Contador general que incrementa a una frecuencia fija de 16384Hz (incrementa cada 256 ciclos de la CPU) y aproximadamente 16779Hz en SGB. Al intentar escribir cualquier valor en el registro, se restablece a 0x00. En caso de que se ejecute una instrucción STOP, dejará de actualizarse hasta que se reinicie la ejecución.
+
+\subsection{Temporizador de contador (TIMA - 0xFF05)}
+Temporizador principal que permite ejecutar acciones basadas en su cuenta. Esto es útil para activar eventos en el juego, como cambios de pantalla o actualizaciones de elementos en pantalla. Se incrementa en base a la frecuencia definida por el registro TAC (0xFF07). Cuando su valor supera 0xFF, se restrablece al valor especificado en el registro TMA (0xFF06) y se genera \hyperref[interrupttype]{su interrupción}.
 
 \cleardoublepage
