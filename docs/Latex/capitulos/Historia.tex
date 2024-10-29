@@ -949,9 +949,77 @@ Una vez la CPU maneja la interrupción, el valor del bit vuelve de manera autom�
 Los temporizadores son mecanismos esenciales para la sincronización y el control de eventos en el sistema. Ayudan a la CPU a gestionar y coordinar actividades en el juego, como controlar la velocidad de animaciones, gestionar el conteo de frames y mantener la precisión en la ejecución de instrucciones de tiempo crítico.
 
 \subsection{DIV (Divisor de reloj - 0xFF04)}
-Contador general que incrementa a una frecuencia fija de 16384Hz (incrementa cada 256 ciclos de la CPU) y aproximadamente 16779Hz en SGB. Al intentar escribir cualquier valor en el registro, se restablece a 0x00. En caso de que se ejecute una instrucción STOP, dejará de actualizarse hasta que se reinicie la ejecución.
+Contador general de 16 bits que incrementa a una frecuencia fija de 16384Hz (incrementa cada 256 ciclos de la CPU) y aproximadamente 16779Hz en SGB. Al intentar escribir cualquier valor en el registro, se restablece a 0x00. En caso de que se ejecute una instrucción STOP, dejará de actualizarse hasta que se reinicie la ejecución. Solamente los 8 primeros bits (0-7) son visibles para el desarrollador.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+    \hline
+    \textbf{Bit} & \textbf{Incremento por ciclos de máquina} & \textbf{Incremento por ciclos de reloj} \\ \hline
+    0  & 1 & 4 \\ \hline
+    1  & 2 & 8 \\ \hline
+    2  & 4 & 16 \\ \hline
+    3  & 8  & 32 \\ \hline
+    4  & 16 & 64 \\ \hline
+    5  & 32 & 128 \\ \hline
+    6  & 64 & 256 \\ \hline
+    7  & 128 & 512 \\ \hline
+    8  & 256 & 1024 \\ \hline
+    9  & 512 & 2048 \\ \hline
+    10 & 1024 & 4096 \\ \hline
+    11 & 2048 & 8192 \\ \hline
+    12 & 4096 & 16384 \\ \hline
+    13 & 8192 & 32768 \\ \hline
+    14 & 16384 & 65536 \\ \hline
+    15 & 32768 & 131072 \\ \hline
+    \end{tabular}
+    \caption{Incrementos del registro DIV según ciclos de máquina y de reloj}
+\end{table}
 
 \subsection{Temporizador de contador (TIMA - 0xFF05)}
 Temporizador principal que permite ejecutar acciones basadas en su cuenta. Esto es útil para activar eventos en el juego, como cambios de pantalla o actualizaciones de elementos en pantalla. Se incrementa en base a la frecuencia definida por el registro TAC (0xFF07). Cuando su valor supera 0xFF, se restrablece al valor especificado en el registro TMA (0xFF06) y se genera \hyperref[interrupttype]{su interrupción}.
+
+\subsection{Temporizador de módulo (TMA - 0xFF06)}
+Este registro almacena el valor al cual se restablece el temporizador TIMA cuando se produce un desbordamiento. Cuando TIMA llega a 0xFF y genera una interrupción, este toma el valor de TMA para continuar con el conteo.
+
+\subsection{Controlador de temporizador (TAC - 0xFF07)}
+Su bit 2 controla que el contador TIMA pueda ser incrementado (0 = Pausado, 1 = Habilitado). Los bits del 3 al 7 no tienen utilidad. Por último, con los bits 0 y 1 se puede controlar la frecuencia a la que el contador avanza:
+
+\begin{table}[h!]
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    \textbf{Selección de Reloj} & \textbf{Incremento} & \textbf{DMG, SGB2, CGB (velocidad simple)} & \textbf{SGB1} & \textbf{CGB (velocidad doble)} \\ \hline
+    00 & 256 M-cycles & 4096Hz & $\sim$4194Hz & 8192Hz \\ \hline
+    01 & 4 M-cycles & 262144Hz & $\sim$268400Hz & 524288Hz \\ \hline
+    10 & 16 M-cycles & 65536Hz & $\sim$67110Hz & 131072Hz \\ \hline
+    11 & 64 M-cycles & 16384Hz & $\sim$16780Hz & 32768Hz \\ \hline
+    \end{tabular}%
+    }
+    \caption{Selección de modos de reloj y sus frecuencias.}
+\end{table}
+
+\subsection{Funcionamiento del Temporizador}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{include/images/tmatactima.jpg}
+    \caption{Diagrama - Interacción entre TMA y TIMA}
+    \label{figure:tmatima}
+\end{figure}
+
+A continuación se explica el comportamiento del diagrama:
+
+\begin{enumerate} 
+    \item El temporizador TIMA se incrementa a la frecuencia especificada por el registro TAC. Cuando TIMA supera el valor 0xFF, se produce un desbordamiento, que es detectado por el sistema. 
+    \item Al ocurrir un desbordamiento, se activa la interrupción correspondiente en el registro IF, y el valor de TIMA se restablece al valor presente en el registro TMA durante la señal de carga. 
+    \item Si se escribe un valor en TIMA, este nuevo valor sobrescribe el actual y, además, impide que se produzca un desbordamiento en el mismo ciclo, como lo indica la operación NOT en la puerta AND. 
+    \item Si se escribe un valor en TMA, TIMA tomará ese valor en el momento de un desbordamiento. 
+    \item Entre TMA y TIMA se encuentra un multiplexor que controla qué valor se carga en el registro TIMA. Este multiplexor se activa al realizar una escritura en TIMA, y su funcionamiento es el siguiente: 
+    \begin{itemize} 
+        \item \textbf{0:} Carga el contenido de TMA en TIMA en caso de que se produzca un desbordamiento. 
+        \item \textbf{1:} Permite escribir un valor directamente en TIMA desde el bus de datos de la CPU. 
+    \end{itemize} 
+\end{enumerate}
 
 \cleardoublepage

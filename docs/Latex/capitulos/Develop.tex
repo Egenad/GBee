@@ -1437,6 +1437,70 @@ Con esto ya tendríamos lo básico para que nuestro controlador funcione. Partie
 
 \section{Interrupciones}
 
+Las interrupciones deben ser procesadas en todos los ciclos de CPU, justo antes de ejecutar la siguiente instrucción de ROM. En la siguiente implementación, se puede ver el inicio del método \texttt{tick()}:
 
+\begin{lstlisting}[language=Kotlin, caption={Interrupciones en el método principal de la CPU.}, label={code:cpuhandleinterrupt}]
+    fun tick(): Boolean{
+
+        // Interrupciones
+        if(!pendingEI){
+            handleInterrupts()
+        }else{
+            pendingEI = false
+            Interrupt.enableInterrupts(true)
+        }
+
+        [...]
+\end{lstlisting}
+
+El flag \textit{pendingEI} es una variable que se activa en el momento que un opcode EI es ejecutado. Como se explicó previamente, esta instrucción no habilita las interrupciones de forma inmediata, si no que toma efecto en el siguiente ciclo de ejecución.
+\\\\
+En el método \texttt{handleInterrupts()}, se va a comprobar que las interrupciones estén habilitadas y que se deba procesar al menos una. En caso de que ambas condiciones se cumplan, se delegará el trabajo al módulo específico de las interrupciones.
+\\\\
+La lógica principal del módulo es la siguiente:
+
+\begin{lstlisting}[language=Kotlin, caption={Lógica principal del módulo Interrupt.}, label={code:interruptlogic}]
+    fun flush(){
+        val activeInterrupts = getPendingInterrupts()
+
+        if ((activeInterrupts and InterruptType.VBLANK.getInterruptMask()) != 0)        return handleInterrupt(VBLANK_PTR, InterruptType.VBLANK)
+        else if ((activeInterrupts and InterruptType.LCD_STAT.getInterruptMask()) != 0) return handleInterrupt(LCD_STAT_PTR, InterruptType.LCD_STAT)
+        else if ((activeInterrupts and InterruptType.TIMER.getInterruptMask()) != 0)    return handleInterrupt(TIMER_PTR, InterruptType.TIMER)
+        else if ((activeInterrupts and InterruptType.SERIAL.getInterruptMask()) != 0)   return handleInterrupt(SERIAL_PTR, InterruptType.SERIAL)
+        else if ((activeInterrupts and InterruptType.JOYPAD.getInterruptMask()) != 0)   return handleInterrupt(JOYPAD_PTR, InterruptType.JOYPAD)
+    }
+
+    private fun handleInterrupt(address: Int, type: InterruptType){
+        enableInterrupts(false)       // IME se deshabilita para prevenir que otras interrupciones se ejecuten
+
+        // Desactivar interrupciones
+        val bit = (type.getInterruptMask()).inv()
+        val ifValue = (Memory.getByteOnAddress(IF).toInt() and 0xFF)
+        set_IF(ifValue and bit)
+
+        CPU.executeInterrupt(address)
+    }
+\end{lstlisting}
+
+Primero se ejecuta la función \texttt{flush()}, la cual se encarga de verificar las interrupciones pendientes y, si se detecta alguna, manejarla de manera adecuada:
+
+\begin{enumerate}
+    \item Se obtienen las interrupciones activas mediante la función getPendingInterrupts(), que retorna una máscara de bits representando las interrupciones pendientes.
+    \item Se evalúa si cada tipo de interrupción está activa utilizando operaciones AND en combinación con las máscaras de interrupción.
+    \item Si se detecta una interrupción activa para el tipo VBLANK, se llama a la función \texttt{handleInterrupt()} con la dirección de interrupción (0x0040) y el tipo correspondiente, finalizando así la ejecución de flush. Para el resto de tipos se hace lo mismo, siguiente la prioridad de bit.
+\end{enumerate}
+
+Por otro lado, la función \texttt{handleInterrupt(address: Int, type: InterruptType)} gestiona el proceso de atender una interrupción específica, asegurándose de que no se produzcan interrupciones adicionales durante su ejecución.
+
+\begin{enumerate}
+    \item Se deshabilitan las interrupciones globalmente llamando a enableInterrupts(false). Esto evita que otras interrupciones se ejecuten mientras se atiende la actual.
+    \item Se lee el valor actual del registro IF, se realiza una operación bit a bit and con la máscara invertida para desactivar el bit correspondiente a la interrupción actual, y se actualiza en memoria.
+    \item Finalmente, se ejecuta la rutina de servicio de interrupción llamando al método \\
+    \texttt{executeInterrupt(address)}. En este se desactiva el HALT de la CPU (en caso de que lo estuviese), se pushea PC al stack pointer, y se sobreescribe PC con la dirección obtenida por parámetro. 
+\end{enumerate}
+
+Lo que ocurra a continuación depende de la decisión que haya tomado el desarrollador del juego que se ejecute.
+
+\section{Temporizadores / Timers}
 
 \cleardoublepage
