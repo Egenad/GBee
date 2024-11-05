@@ -1,7 +1,6 @@
 package es.atm.gbee.modules
 
 import android.os.SystemClock
-import kotlin.io.encoding.Base64
 
 const val SIGNED_TILE_REGION : Int = 0x8800
 
@@ -36,6 +35,8 @@ const val HBLANK_CYCLES         = 204
 const val LINE_TOTAL_TICKS      = 456
 
 const val TOTAL_LINES           = 154
+const val OAM_Y_OFFSET          = 16
+const val OAM_X_OFFSET          = 8
 
 const val GB_X_RESOLUTION       = 160
 const val GB_Y_RESOLUTION       = 144
@@ -104,6 +105,19 @@ data class OAMObj(
     val flags: Byte
 )
 
+enum class ObjFlags(private val shift: Int, private val mask: Int) {
+    PALETTE(0, 0b111),
+    BANK(3, 0b1),
+    DMG_PALETTE(4, 0b1),
+    X_FLIP(5, 0b1),
+    Y_FLIP(6, 0b1),
+    PRIORITY(7, 0b1);
+
+    fun get(value: Byte): Int {
+        return (value.toInt() shr shift) and mask
+    }
+}
+
 object PPU {
 
     private var currentFrame : Int          = 0
@@ -126,7 +140,7 @@ object PPU {
     private var bgWinEnabled : Boolean      = true          // Bit 0
 
     private var lineSpriteCount: Int = 0
-    private var objsFetched : Array<OAMObj> = Array(MAX_OBJ_PER_SCANLINE) { OAMObj(0, 0, 0, 0) }
+    private var objsFetched : Array<OAMObj?> = Array(MAX_OBJ_PER_SCANLINE) { null }
 
     private val fifoFetcher : FifoFetcher = FifoFetcher()
 
@@ -339,7 +353,7 @@ object PPU {
             in OBP0 .. OBP1 -> {
                 Memory.write(address, ((value.toInt() and 0xFF) and 0b11111100).toByte())
             }
-            else -> {
+            BGP -> {
                 Memory.write(address, value)
             }
         }
@@ -366,10 +380,13 @@ object PPU {
     }
 
     private fun loadLineSprites(){
-        val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
+        val currentY = (Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF) + OAM_Y_OFFSET
         val lcdc = Memory.getByteOnAddress(LCDC_ADDR)
         val objSize = LCDCObj.OBJ_SIZE.get(lcdc)
         val spriteHeight = if(objSize == 0) 8 else 16
+
+        objsFetched.fill(null)
+        lineSpriteCount = 0
 
         for(i in oamRam.indices step 4){
 
@@ -382,14 +399,13 @@ object PPU {
             val tile = oamRam[i + 2].toInt() and 0xFF
             val flags = oamRam[i + 3].toInt() and 0xFF
 
-            if(x == 0){ // Sprite not visible
+            if(x == 0 || x >= (GB_X_RESOLUTION + 8)){ // Sprite not visible
                 continue
             }
 
-            if(y <= ly + 16 && (y + spriteHeight) > ly + 16){ // Sprite on current line
-                val fetched = OAMObj(y.toByte(), x.toByte(), tile.toByte(), flags.toByte())
-                objsFetched[lineSpriteCount] = fetched
-                lineSpriteCount++
+            if(y <= currentY && (y + spriteHeight) > currentY){ // Sprite pixels on current line
+                objsFetched[lineSpriteCount++] = OAMObj(y.toByte(), x.toByte(), tile.toByte(), flags.toByte())
+                objsFetched.sortBy { it?.x ?: Byte.MAX_VALUE} // Sort by X position
             }
         }
     }
@@ -438,6 +454,14 @@ object PPU {
         return ppuEnabled
     }
 
+    fun bgWinIsEnabled(): Boolean{
+        return bgWinEnabled
+    }
+
+    fun objsAreEnabled(): Boolean{
+        return objEnabled
+    }
+
     fun lcdIsEnabled(): Boolean{
         return lcdEnabled
     }
@@ -469,5 +493,9 @@ object PPU {
 
     fun getBufferPixelFromIndex(index: Int): Int{
         return fifoFetcher.getValueFromVideoBuffer(index)
+    }
+
+    fun getFetchedSpriteEntries() : Array<OAMObj?>{
+        return objsFetched
     }
 }

@@ -144,7 +144,14 @@ class FifoFetcher {
             val bit = 7 - i
             val low = (((tileData[1].toInt() and 0xFF) shr bit) and 1)
             val high = ((((tileData[2].toInt() and 0xFF) shr bit) and 1) shl 1)
-            val color = PPU.getColorIndex(high or low) // Pixel Color
+            var color = PPU.getColorIndex(high or low) // Pixel Color
+
+            if(PPU.bgWinIsEnabled()){
+                color = PPU.getColorIndex(0)
+            }
+            if(PPU.objsAreEnabled()){
+                color = fetchSpritePixel(high or low)
+            }
 
             if(x >= 0){
                 fifo.push(color)
@@ -153,6 +160,34 @@ class FifoFetcher {
         }
 
         return true
+    }
+
+    private fun fetchSpritePixel(bgColor: Int): Int{
+
+        val fetchedObjs = PPU.getFetchedSpriteEntries().filterNotNull()
+        val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
+
+        for(i in 0 until fetchedObjs.size){
+            val spr_x = ((fetchedObjs[i].x.toInt() and 0xFF) - OAM_X_OFFSET) + (scx % 8)
+
+            if(spr_x + 8 < fifoPixels){ // Pixel past the current fifo line pixel count
+                continue
+            }
+
+            val offset = fifoPixels - spr_x
+
+            if(offset < 0 || offset > 7){ // Out of bounds
+                continue
+            }
+
+            val bit = 7 - offset
+
+            if(ObjFlags.X_FLIP.get(fetchedObjs[i].flags) == 1){
+
+            }
+        }
+
+        return 0
     }
 
     private fun pushPixeltoBuffer(){
