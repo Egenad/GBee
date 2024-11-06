@@ -149,8 +149,8 @@ class FifoFetcher {
             if(PPU.bgWinIsEnabled()){
                 color = PPU.getColorIndex(0)
             }
-            if(PPU.objsAreEnabled()){
-                color = fetchSpritePixel(high or low)
+            if(PPU.objsAreEnabled() || ROM.isCGB()){
+                color = fetchSpritePixel(color, high or low)
             }
 
             if(x >= 0){
@@ -162,7 +162,9 @@ class FifoFetcher {
         return true
     }
 
-    private fun fetchSpritePixel(bgColor: Int): Int{
+    private fun fetchSpritePixel(color: Int, bgColor: Int): Int{
+
+        var colorToReturn = color
 
         val fetchedObjs = PPU.getFetchedSpriteEntries().filterNotNull()
         val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
@@ -180,14 +182,41 @@ class FifoFetcher {
                 continue
             }
 
-            val bit = 7 - offset
+            var bit = 7 - offset
 
             if(ObjFlags.X_FLIP.get(fetchedObjs[i].flags) == 1){
-
+                bit = offset
             }
+
+            val low = (((tileData[1].toInt() and 0xFF) shr bit) and 1)
+            val high = ((((tileData[2].toInt() and 0xFF) shr bit) and 1) shl 1)
+
+            /**
+             * u8 hi = !!(ppu_get_context()->pfc.fetch_entry_data[i * 2] & (1 << bit));
+             *         u8 lo = !!(ppu_get_context()->pfc.fetch_entry_data[(i * 2) + 1] & (1 << bit)) << 1;
+             *
+             *         bool bg_priority = ppu_get_context()->fetched_entries[i].f_bgp;
+             *
+             *         if (!(hi|lo)) {
+             *             //transparent
+             *             continue;
+             *         }
+             *
+             *         if (!bg_priority || bg_color == 0) {
+             *             color = (ppu_get_context()->fetched_entries[i].f_pn) ?
+             *                 lcd_get_context()->sp2_colors[hi|lo] : lcd_get_context()->sp1_colors[hi|lo];
+             *
+             *             if (hi|lo) {
+             *                 break;
+             *             }
+             *         }
+             *     }
+             *
+             *     return color;
+             */
         }
 
-        return 0
+        return colorToReturn
     }
 
     private fun pushPixeltoBuffer(){
