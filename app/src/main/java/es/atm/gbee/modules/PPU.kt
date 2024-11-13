@@ -379,6 +379,11 @@ object PPU {
         bgWinEnabled = LCDCObj.MASTER_ENABLE.get(value) != 0
     }
 
+    /**
+     * Grabs the sprites for the current line.
+     * Saves all data on objsFetched array. Because of hardware limitations,
+     * GB can only render 10 sprites per line.
+     */
     private fun loadLineSprites(){
         val currentY = (Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF) + OAM_Y_OFFSET
         val lcdc = Memory.getByteOnAddress(LCDC_ADDR)

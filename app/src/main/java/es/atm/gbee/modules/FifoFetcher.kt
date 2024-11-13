@@ -114,11 +114,17 @@ class FifoFetcher {
 
     private fun fetchLowData(){
         tileData[1] = Memory.getByteOnAddress(PPU.getAddrModeAddr() + ((tileData[0].toInt() and 0xFF) * 16) + tileY)
+
+        loadSpriteData(0)
+
         state = FetcherState.HIGH_DATA_TILE
     }
 
     private fun fetchHighData(){
         tileData[2] = Memory.getByteOnAddress(PPU.getAddrModeAddr() + ((tileData[0].toInt() and 0xFF) * 16) + (tileY + 1))
+
+        loadSpriteData(1)
+
         state = FetcherState.SLEEP
     }
 
@@ -149,7 +155,7 @@ class FifoFetcher {
             if(PPU.bgWinIsEnabled()){
                 color = PPU.getColorIndex(0)
             }
-            if(PPU.objsAreEnabled() || ROM.isCGB()){
+            if(PPU.objsAreEnabled() || ROM.isCGB()){ // CGB ignores this condition
                 color = fetchSpritePixel(color, high or low)
             }
 
@@ -162,6 +168,10 @@ class FifoFetcher {
         return true
     }
 
+    private fun loadSpriteData(index: Int){
+        //TODO
+    }
+
     private fun fetchSpritePixel(color: Int, bgColor: Int): Int{
 
         var colorToReturn = color
@@ -169,14 +179,14 @@ class FifoFetcher {
         val fetchedObjs = PPU.getFetchedSpriteEntries().filterNotNull()
         val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
 
-        for(i in 0 until fetchedObjs.size){
-            val spr_x = ((fetchedObjs[i].x.toInt() and 0xFF) - OAM_X_OFFSET) + (scx % 8)
+        for(i in fetchedObjs.indices){
+            val sprX = ((fetchedObjs[i].x.toInt() and 0xFF) - OAM_X_OFFSET) + (scx % 8)
 
-            if(spr_x + 8 < fifoPixels){ // Pixel past the current fifo line pixel count
+            if(sprX + 8 < fifoPixels){ // Pixel past the current fifo line pixel count
                 continue
             }
 
-            val offset = fifoPixels - spr_x
+            val offset = fifoPixels - sprX
 
             if(offset < 0 || offset > 7){ // Out of bounds
                 continue
@@ -188,8 +198,8 @@ class FifoFetcher {
                 bit = offset
             }
 
-            val low = (((tileData[1].toInt() and 0xFF) shr bit) and 1)
-            val high = ((((tileData[2].toInt() and 0xFF) shr bit) and 1) shl 1)
+            val low = (((tileData[i * 2].toInt() and 0xFF) shr bit) and 1)
+            val high = ((((tileData[(i * 2) + 1].toInt() and 0xFF) shr bit) and 1) shl 1)
 
             /**
              * u8 hi = !!(ppu_get_context()->pfc.fetch_entry_data[i * 2] & (1 << bit));
