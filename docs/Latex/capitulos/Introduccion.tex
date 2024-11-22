@@ -83,73 +83,7 @@ A lo largo del documento se van a utilizar varias nomenclaturas para hacer la le
     \item \textbf{FIFO:} First In, First Out. Estructura de datos que organiza elementos de manera que el primero en entrar es el primero en salir, garantizando un orden de procesamiento basado en la secuencia de llegada.
     \item \textbf{URI:} Uniform Resource Identifier. Es una cadena de carácteres que identifican un recurso online o local.
     \item \textbf{Intent:} objeto en Android que se utiliza para comunicar componentes.
+    \item \textbf{SPI:} Serial Peripheral Interface. Protocolo de comunicación serial sincrónico que permite el intercambio de datos entre un dispositivo maestro y uno o más esclavos.
 \end{itemize}
 
-\cleardoublepage
-
-\chapter{Metodología y Planificación}
-\label{planificacion}
-\section{Metodología Aplicada}
-La metodología adoptada para la planificación del proyecto es ágil, un enfoque que, si bien es comúnmente utilizado en proyectos colaborativos, resulta igualmente eficaz en proyectos individuales. La clave de esta metodología radica en la gestión eficiente del tiempo, permitiendo que cada tarea sea ejecutada dentro de un plazo bien definido, con el objetivo de maximizar los resultados y cumplir con los plazos establecidos.
-\section{Etapas del Proyecto}
-El proyecto está dividido en distintas etapas o iteraciones, cada una de las cuales ofrece la oportunidad de aprender y aplicar nuevos conocimientos relacionados con la emulación y el desarrollo. Al final de cada iteración, se lleva a cabo una revisión exhaustiva del progreso, lo que permite identificar áreas de mejora o posibles errores, minimizando así el tiempo perdido en futuras fases del desarrollo.
-\\\\
-Durante el proceso de desarrollo, las tareas y objetivos están en constante evolución, dado que se parte de una base de conocimientos limitada que se incrementa a medida que avanza el proyecto. Este enfoque implica que, en muchas ocasiones, lo que en un inicio parecía correctamente implementado debe ser revisado o incluso reestructurado, conforme se adquiere una comprensión más profunda de los desafíos técnicos involucrados.
-\\\\
-En la siguiente tabla se puede ver la planificación estimada con la que se pretende presentar y defender el proyecto a inicios de Junio de 2024 (C3). No se tienen en cuenta posibles retrasos por enfermedades, viajes u otros
-
-\begin{table}[H]
-    \centering
-    \begin{tabular}{|l|l|l|}
-    \hline
-    \textbf{Apartado} & \textbf{Tiempo estimado} & \textbf{Fecha límite} \\ \hline
-    Agradecimientos, Objetivos y Justificación & 1 semana & 25 Agosto \\ \hline
-    Planificación y Metodología & 2 semanas & 8 Septiembre \\ \hline
-    Diseño & 4 semanas & 6 Octubre \\ \hline
-    Aprendizaje & 1 semana & 13 Octubre \\ \hline
-    Marco teórico & 3 semanas & 3 Noviembre \\ \hline
-    Desarrollo & 5 semanas & 8 Diciembre \\ \hline
-    Pruebas y validación & 2 semanas & 22 Diciembre \\ \hline
-    Resultados & 1 semana & 29 Diciembre \\ \hline
-    Conclusiones y trabajo futuro & 1 semana & 5 Enero \\ \hline
-    Bibliografía y Referencias & 1 semana & 12 Enero \\ \hline
-    \end{tabular}
-    \caption{Planificación de contenidos y fechas límite}
-\end{table}
-
-Entrando en detalle en algunas etapas del proeycto:
-
-\begin{itemize}
-	\item \textbf{Diseño:} Antes de iniciar el desarrollo del emulador, es fundamental tener claridad sobre los objetivos y el alcance del proyecto. Se realizará un análisis preliminar de diversos emuladores existentes, lo cual permitirá obtener una visión más sólida y concreta de las funcionalidades y desafíos que se enfrentarán durante la implementación.
-
-	\item \textbf{Aprendizaje:} En esta fase inicial, el enfoque será comprender en profundidad las especificaciones técnicas de la consola Game Boy, desde su CPU y PPU hasta la gestión de ciclos y sus interacciones con los componentes de hardware. Se realizarán pruebas exploratorias, cuyo propósito será construir una base sólida para el desarrollo posterior del emulador.
-	
-	\item \textbf{Desarrollo:} Esta es la etapa central y más intensiva del proyecto. Durante el desarrollo del emulador, se implementarán las funcionalidades principales como la emulación de la CPU, la gestión de gráficos, la sincronización de ciclos, y la integración con las interfaces gráficas en Android. Al mismo tiempo, se generará la documentación técnica detallada para acompañar el progreso y justificar las decisiones tomadas durante la implementación.
-	
-	\item \textbf{Revisión y Maquetación:} La fase final se centrará en la revisión exhaustiva tanto del emulador como de la documentación. Se corregirán posibles errores detectados, se optimizará el rendimiento del emulador, y se pulirá la maquetación de la memoria, asegurando que todo el trabajo cumpla con los estándares de calidad requeridos.
-	
-\end{itemize}
-	
-\section{Mínimo Producto Viable}
-
-Lo normal en todo proyecto es que ocurran imprevistos que hagan al programador perder más tiempo en una tarea o incluso paralizar por completo el proyecto. Además, esto se junta con el hecho de que aquí no hay nadie que pueda ocupar nuestro puesto mientras ese problema se soluciona. Por esta razón, es importante tener en mente un \textbf{producto mínimo viable}, con el cual obtener un producto usable de en el tiempo disponible.
-
-\section{Herramientas utilizadas}
-
-El desarrollo de la aplicación se apoyará del uso de las siguientes tecnologías:
-
-\begin{itemize}
-    \item \textbf{Android Studio:} Se utilizará como editor de código principal, permitiendo la creación, prueba y depuración de la aplicación mediante emuladores de dispositivos Android.
-    \item \textbf{Visual Studio Code:} Herramienta clave para la redacción y visualización de documentos en LaTeX, además de proporcionar un entorno gráfico para gestionar el control de versiones mediante Git.
-    \item \textbf{Photoshop:} Herramienta principal de diseño utilizada para la creación de la interfaz gráfica de la aplicación.
-    \item \textbf{Procreate:} Aplicación de diseño gráfico que se empleará para la creación de ilustraciones y recursos visuales específicos de la interfaz, complementando a Photoshop en tareas artísticas y detalladas.
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{include/images/herramientas.png}
-    \caption{Herramientas utilizadas en el proyecto}
-    \label{figure:tools}
-\end{figure}
-	
 \cleardoublepage

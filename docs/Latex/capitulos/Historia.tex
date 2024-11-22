@@ -945,11 +945,11 @@ Registro de 5 bits que indica qué interrupciones \textbf{deben} ser lanzadas. L
 Una vez la CPU maneja la interrupción, el valor del bit vuelve de manera automática a 0.
 
 \section{Temporizadores / Timers}
-
+\label{history_timer}
 Los temporizadores son mecanismos esenciales para la sincronización y el control de eventos en el sistema. Ayudan a la CPU a gestionar y coordinar actividades en el juego, como controlar la velocidad de animaciones, gestionar el conteo de frames y mantener la precisión en la ejecución de instrucciones de tiempo crítico.
 
 \subsection{DIV (Divisor de reloj - 0xFF04)}
-Contador general de 16 bits que incrementa a una frecuencia fija de 16384Hz (incrementa cada 256 ciclos de la CPU) y aproximadamente 16779Hz en SGB. Al intentar escribir cualquier valor en el registro, se restablece a 0x00. En caso de que se ejecute una instrucción STOP, dejará de actualizarse hasta que se reinicie la ejecución. Solamente los 8 primeros bits (0-7) son visibles para el desarrollador.
+Contador general de 16 bits que incrementa a una frecuencia fija de 16384Hz (incrementa cada 256 ciclos de la CPU) y aproximadamente 16779Hz en SGB. Al intentar escribir cualquier valor en el registro, se restablecen los 8 primeros bits a 0x00. En caso de que se ejecute una instrucción STOP, dejará de actualizarse hasta que se reinicie la ejecución. Solamente los 8 bits más altos (8-15) son visibles para el desarrollador, los cuales son únicamente de lectura.
 \begin{table}[H]
     \centering
     \begin{tabular}{|c|c|c|}
@@ -1021,5 +1021,65 @@ A continuación se explica el comportamiento del diagrama:
         \item \textbf{1:} Permite escribir un valor directamente en TIMA desde el bus de datos de la CPU. 
     \end{itemize} 
 \end{enumerate}
+
+\section{I/O - Entrada / Salida}
+Los registros pertenecientes al rango de I/O (0xFF00-0xFF70) son los siguientes:
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|p{5cm}|}
+    \hline
+    \textbf{Inicio} & \textbf{Final}   & \textbf{Primera aparición} & \textbf{Propósito} \\ \hline
+    0xFF00         &                & DMG                     & Joypad \\ \hline
+    0xFF01         & 0xFF02         & DMG                     & Transferencia serie \\ \hline
+    0xFF04         & 0xFF07         & DMG                     & Temporizador y divisor \\ \hline
+    0xFF0F         &                & DMG                     & Interrupciones \\ \hline
+    0xFF10         & 0xFF26         & DMG                     & Audio \\ \hline
+    0xFF30         & 0xFF3F         & DMG                     & Patrón de onda \\ \hline
+    0xFF40         & 0xFF4B         & DMG                     & Control LCD, estado, posición, desplazamiento y paletas \\ \hline
+    0xFF4F         &                & CGB                     & Selección de banco de VRAM \\ \hline
+    0xFF50         &                & DMG                     & Activar/Desactivar el boot de ROM \\ \hline
+    0xFF51         & 0xFF55         & CGB                     & VRAM DMA \\ \hline
+    0xFF68         & 0xFF6B         & CGB                     & Paletas de BG / OBJ \\ \hline
+    0xFF70         &                & CGB                     & Selección de banco de WRAM \\ \hline
+    \end{tabular}
+    \caption{Registros de I/O mapeados en memoria de la Game Boy.}
+    \label{tab:memory_io_registers}
+\end{table}
+
+\subsection{Joypad: 0xFF00}
+
+Para el control de los botones en la Game Boy, se utiliza un único registro mapeado en memoria en la dirección 0xFF00, también conocido como el registro P1. Este registro encapsula el estado de los 8 botones (A, B, Start, Select, Arriba, Abajo, Izquierda, Derecha) en un único byte, estructurado como una matriz. Cada bit representa un botón o conjunto de botones, permitiendo identificar cuál ha sido presionado.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{include/images/joypad.png}
+    \caption{Distribución del Joypad}
+    \label{figure:joypad}
+\end{figure}
+
+La notación P1N en las especificaciones se refiere a “Player 1” seguido del número del bit correspondiente. Por ejemplo, si se desea consultar el estado de los botones A, B, Start o Select, es necesario configurar el bit 5 en 1 y el bit 4 en 0. Esto selecciona la línea correspondiente a estos botones en la matriz virtual que el registro simula.
+\\\\
+Es importante destacar que el registro opera con lógica inversa: un botón presionado se representa con un valor 0, mientras que un botón sin presionar es un 1. Para trabajar de manera más intuitiva con estos valores, se puede realizar una operación complementaria, invirtiendo los bits, lo que facilita el manejo de la información en la lógica habitual (donde 1 indica botón presionado y 0 lo contrario).
+
+\subsection{Transferencia Serie: 0xFF01-0xFF02}
+
+Estos registros tienen relación directa con la comunicación entre dos consolas, la cual se realiza mediante un Cable Link, byte a byte. Se utiliza el protocolo SPI, en la que una de las consolas actua como "maestro" y genera una señal de reloj interna, que controla el momento exacto en que ocurre el intercambio con el resto de consolas.
+\\\\
+Si la consola esclava no ha cargado el siguiente byte de datos cuando comienza la transferencia, el último byte enviado será retransmitido. Por el contrario, si la consola esclava está lista para enviar un nuevo byte pero la transferencia anterior aún no ha concluido, no podrá transmitir hasta que el proceso en curso haya finalizado.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{include/images/link_cable.png}
+    \caption{Cable Link}
+    \label{figure:linkCable}
+\end{figure}
+
+\subsubsection{SB (0xFF01): Transferencia de datos en serie}
+
+Antes de que de comienzo la transferencia de datos, contiene el byte que va a ser enviado.
+\\\\
+Durante la transferencia, el registro se modifica en cada ciclo de ejecución. El bit más significativo (bit 7) es enviado, mientras que los bits restantes se desplazan a la izquierda, con el bit 6 convirtiéndose en el nuevo bit 7, siguiendo un proceso similar a un \textit{shift left}. Simultáneamente, el bit menos significativo (bit 0) se reemplaza por el bit 7 del byte que la otra consola está transfiriendo. Este procedimiento se repite durante 8 ciclos hasta completar el intercambio del byte.
+
+\subsubsection{SB (0xFF02): }
 
 \cleardoublepage

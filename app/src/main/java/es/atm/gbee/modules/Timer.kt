@@ -1,6 +1,6 @@
 package es.atm.gbee.modules
 
-const val DIV   = 0xFF04 // Divider Register (16 bit Register, but only the first 8 bit (0-7) are public to the developer)
+const val DIV   = 0xFF04 // Divider Register (16 bit Register, but only the upper 8 bit (0-7) are public to the developer)
 const val TIMA  = 0xFF05 // Timer Counter
 const val TMA   = 0xFF06 // Timer Module
 const val TAC   = 0xFF07 // Timer Control
@@ -61,12 +61,11 @@ object Timer {
                 Interrupt.requestInterrupt(Interrupt.InterruptType.TIMER.getByteMask())
             }
         }
-
     }
 
     fun readFromTimer(address: Int): Byte{
         when(address){
-            DIV -> return (div16 shr 8).toByte()
+            DIV -> return ((div16 shr 8) and 0xFF).toByte()
             TIMA -> return Memory.read(TIMA)
             TMA -> return Memory.read(TMA)
             TAC -> return Memory.read(TAC)
@@ -78,8 +77,7 @@ object Timer {
     fun writeToTimer(address: Int, value: Byte){
         when(address){
             DIV -> {
-                div16 = 0
-                Memory.write(DIV, 0x00)
+                div16 = (div16 and 0xFF00)
             }
             TIMA -> Memory.write(TIMA, value)
             TMA -> Memory.write(TMA, value)

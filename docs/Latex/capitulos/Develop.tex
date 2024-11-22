@@ -1503,4 +1503,107 @@ Lo que ocurra a continuación depende de la decisión que haya tomado el desarro
 
 \section{Temporizadores / Timers}
 
+La implementación debe simular el comportamiento de los \hyperref[history_timer]{temporizadores} en el hardware original. Para ello se comenzará declarando unas constantes que representen las direcciones de memoria reales y se generarán las funciones de lectura y escritura:
+
+\begin{lstlisting}[language=Kotlin, caption={Lectura y escritura en registros de Timers.}, label={code:timerwriteread}]
+    const val DIV   = 0xFF04 // Divider Register (16 bit Register, but only the upper 8 bit (0-7) are public to the developer)
+    const val TIMA  = 0xFF05 // Timer Counter
+    const val TMA   = 0xFF06 // Timer Module
+    const val TAC   = 0xFF07 // Timer Control
+
+    [...]
+
+    fun readFromTimer(address: Int): Byte{
+        when(address){
+            DIV -> return ((div16 shr 8) and 0xFF).toByte()
+            TIMA -> return Memory.read(TIMA)
+            TMA -> return Memory.read(TMA)
+            TAC -> return Memory.read(TAC)
+        }
+
+        return 0
+    }
+
+    fun writeToTimer(address: Int, value: Byte){
+        when(address){
+            DIV -> {
+                div16 = (div16 and 0xFF00)
+            }
+            TIMA -> Memory.write(TIMA, value)
+            TMA -> Memory.write(TMA, value)
+            TAC -> Memory.write(TAC, value)
+        }
+    }
+\end{lstlisting}
+
+A la hora de interactuar con el registro DIV, es importante considerar que internamente consta de 16 bits, aunque externamente solo se exponen los 8 bits más altos. Para manejarlo, se utiliza una variable de clase llamada \textit{div16}, que se inicializa siempre en 0x0000.
+\\\\
+Cuando se realiza una operación de escritura en este registro, únicamente se reinician a 0 los 8 bits menos significativos, preservando el estado de los 8 bits más altos. Por otro lado, al leer el registro, solo se devuelven los 8 bits más altos del valor contenido.
+\\\\
+Por último, se debe implementar la función que actualice en cada ciclo de ejecución el temporizador. Los pasos que debe seguir son:
+
+\begin{itemize}
+    \item Comparar el valor actual de DIV y verificar si ha llegado el momento de incrementar el contador TIMA basado en el valor de TAC (registro de control del temporizador).
+    \item Usar el valor de TAC para determinar la frecuencia de incremento de DIV. Dependiendo de los dos primeros bits de TAC, el temporizador se incrementará a una velocidad diferente (256, 4, 16 o 64 ciclos de máquina).
+    \item Si TIMA llega a 0xFF, se recarga con el valor de TMA y se genera una interrupción de temporizador.
+\end{itemize}
+
+\begin{lstlisting}[language=Kotlin, caption={Lectura y escritura en registros de Timers.}, label={code:timertick}]
+    fun tick(){
+        val prevDIV = div16
+        div16 += 1
+
+        var timerUpdate = false
+        val tacValue = Memory.read(TAC).toInt() and 0xFF
+
+        when(tacValue and 0b11){
+            0b00 -> timerUpdate = (prevDIV and (1 shl 9) != 0) && (div16 and (1 shl 9) == 0)
+            0b01 -> timerUpdate = (prevDIV and (1 shl 3) != 0) && (div16 and (1 shl 3) == 0)
+            0b10 -> timerUpdate = (prevDIV and (1 shl 5) != 0) && (div16 and (1 shl 5) == 0)
+            0b11 -> timerUpdate = (prevDIV and (1 shl 7) != 0) && (div16 and (1 shl 7) == 0)
+        }
+
+        if(timerUpdate && (tacValue and (1 shl 2) != 0)){
+            var timaValue = Memory.read(TIMA).toInt() and 0xFF
+            timaValue++
+            Memory.write(TIMA, timaValue.toByte())
+
+            if(timaValue == 0xFF){
+                Memory.write(TIMA, Memory.read(TMA))
+                Interrupt.requestInterrupt(Interrupt.InterruptType.TIMER.getByteMask())
+            }
+        }
+    }
+\end{lstlisting}
+
+\section{RAM}
+
+En la Game Boy, el término RAM puede hacer referencia a distintas áreas de memoria: WRAM (Working RAM), HRAM (High RAM), VRAM (Video RAM) o la RAM externa presente en algunos cartuchos. Este módulo se centrará en la implementación de WRAM y HRAM, ya que la VRAM está estrechamente vinculada al funcionamiento del módulo PPU (Processing Pixel Unit), mientras que la RAM externa está gestionada por los controladores de memoria de los cartuchos \hyperref[history_mbcs]{(MBC, Memory Bank Controllers)}.
+\\\\
+La implementación de la \textbf{HRAM}, siendo esta un espacio fijo de memoria, se delegará directamente al módulo Memory, que ya se encarga de manejar lecturas y escrituras en memoria. Debido a la simplicidad de su gestión y a que no requiere lógica específica adicional, no se desarrollará un apartado independiente para explicar su implementación en esta documentación.
+
+\subsection{WRAM}
+La WRAM en modo DMG es fija y se maneja directamente, mientras que en modo CGB incluye un banco fijo y hasta siete bancos conmutables adicionales, permitiendo que la memoria sea más dinámica. Estos bancos se almacenan en un array (\textit{wramBanks}) y el banco activo se controla mediante la variable \textit{wramBank}. Las lecturas y escrituras en la WRAM consideran si se está accediendo a un banco conmutable o al espacio fijo, ajustando automáticamente la dirección de memoria según sea necesario.
+
+\begin{lstlisting}[language=Kotlin, caption={Lectura y escritura en Work RAM.}, label={code:wramreadwrite}]
+    private var wramBanks: Array<ByteArray> = Array(CGB_SW_BANKS) { ByteArray(ECHO_RAM_START - SWITCHABLE_WRAM_START) } // Not used if not in CGB mode
+    private var wramBank = 0
+
+    fun readFromWRAM(address: Int) : Byte{
+        return if(!ROM.isCGB() || address < SWITCHABLE_WRAM_START){
+            Memory.read(address)
+        }else{
+            wramBanks[wramBank][address - SWITCHABLE_WRAM_START]
+        }
+    }
+
+    fun writeToWRAM(address: Int, value: Byte){
+        if(!ROM.isCGB() || address < SWITCHABLE_WRAM_START){
+            Memory.write(address, value)
+        }else{
+            wramBanks[wramBank][address - SWITCHABLE_WRAM_START] = value
+        }
+    }
+\end{lstlisting}
+
 \cleardoublepage

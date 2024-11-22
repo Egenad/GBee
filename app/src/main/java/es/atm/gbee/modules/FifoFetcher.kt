@@ -91,15 +91,19 @@ class FifoFetcher {
 
     private fun fetch(){
         when(state){
-            FetcherState.OBTAIN_TILE -> fetchTile()         // Fetch the current tile identification in the BG Tilemap
-            FetcherState.LOW_DATA_TILE -> fetchLowData()    // Fetch the low byte of the tile
-            FetcherState.HIGH_DATA_TILE -> fetchHighData()  // Fetch the high byte of the tile
+            FetcherState.OBTAIN_TILE -> getTile()               // Fetch the current tile identification in the BG Tilemap
+            FetcherState.LOW_DATA_TILE -> getTileLowData()      // Fetch the low byte of the tile
+            FetcherState.HIGH_DATA_TILE -> getTileHighData()    // Fetch the high byte of the tile
             FetcherState.SLEEP -> sleepState()
             FetcherState.PUSH -> pushState()
         }
     }
 
-    private fun fetchTile(){
+    /**
+     * Determines which background/window tile to fetch pixels from.
+     * By default the tilemap used is the one at 0x9800.
+     */
+    private fun getTile(){
         if(PPU.lcdIsEnabled()){
             var tile = Memory.getByteOnAddress(PPU.getBGTilemapAddr() + (mapX / 8) + ((mapY / 8) * 32)) // 1 Tile == 8 Pixels
             if(PPU.getAddrModeAddr() == SIGNED_TILE_REGION){
@@ -112,7 +116,7 @@ class FifoFetcher {
         fetchX += 8
     }
 
-    private fun fetchLowData(){
+    private fun getTileLowData(){
         tileData[1] = Memory.getByteOnAddress(PPU.getAddrModeAddr() + ((tileData[0].toInt() and 0xFF) * 16) + tileY)
 
         loadSpriteData(0)
@@ -120,7 +124,7 @@ class FifoFetcher {
         state = FetcherState.HIGH_DATA_TILE
     }
 
-    private fun fetchHighData(){
+    private fun getTileHighData(){
         tileData[2] = Memory.getByteOnAddress(PPU.getAddrModeAddr() + ((tileData[0].toInt() and 0xFF) * 16) + (tileY + 1))
 
         loadSpriteData(1)

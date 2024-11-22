@@ -5,6 +5,7 @@ const val SB            = 0xFF01 // Serial Transfer Data
 const val SC            = 0xFF02 // Serial Transfer Control
 
 const val DISABLE_ROM   = 0xFF50
+const val CGB_WRAM_BANK = 0xFF70
 
 const val START_BUTTON  = "START_BUTTON"
 const val SELECT_BUTTON = "SELECT_BUTTON"
