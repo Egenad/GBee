@@ -1,8 +1,8 @@
 package es.atm.gbee.activities
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
@@ -22,8 +22,10 @@ import es.atm.gbee.modules.SELECT_BUTTON
 import es.atm.gbee.modules.START_BUTTON
 import es.atm.gbee.modules.UP_DPAD
 import es.atm.gbee.views.GameSurfaceView
+import java.io.File
+import java.io.FileInputStream
 
-const val ROM_URI_EXTRA = "ROM_URI"
+const val ROM_PATH_EXTRA = "ROM_PATH"
 
 class EmuActivity : AppCompatActivity() {
 
@@ -34,8 +36,6 @@ class EmuActivity : AppCompatActivity() {
 
     private val debugMode = true
     private var tilemap = true
-
-    private val emulator = Emulator()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +54,11 @@ class EmuActivity : AppCompatActivity() {
             insets
         }
 
-        obtainRom()
+        if(Emulator.isRunning()){
+            Emulator.resume()
+        }else {
+            obtainRom()
+        }
     }
 
 
@@ -99,14 +103,49 @@ class EmuActivity : AppCompatActivity() {
     }
 
     private fun obtainRom(){
-        val romUri: Uri? = intent.getStringExtra(ROM_URI_EXTRA)?.let { Uri.parse(it) }
 
-        romUri?.let {
-            val inputStream = contentResolver.openInputStream(it)
-            val romBytes = inputStream?.readBytes()
-            inputStream?.close()
+        val romPath = intent.getStringExtra(ROM_PATH_EXTRA)
 
-            emulator.run(romBytes)
+        if (!romPath.isNullOrEmpty()) {
+            val romFile = File(romPath)
+
+            if (romFile.exists()) {
+                try {
+                    FileInputStream(romFile).use { stream ->
+                        val romBytes = stream.readBytes()
+                        Emulator.run(romBytes)
+                    }
+                } catch (e: Exception) {
+                    Log.e("ROMManagement", "Error al procesar el archivo: $romPath", e)
+                }
+            } else {
+                Log.e("ROMManagement", "El archivo no existe: $romPath")
+            }
+        } else {
+            Log.e("ROMManagement", "El path de la ROM es nulo o vacío.")
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        gameSurfaceView.resume()
+        Emulator.resume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        gameSurfaceView.pause()
+        Emulator.pause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        if (isChangingConfigurations) {
+            Emulator.pause()
+        } else {
+            gameSurfaceView.release()
+            Emulator.stop()
         }
     }
 }

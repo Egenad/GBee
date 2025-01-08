@@ -2,91 +2,121 @@
 \contentsline {chapter}{\numberline {1}Resumen}{1}{chapter.1}%
 \contentsline {chapter}{\numberline {2}Objetivos}{3}{chapter.2}%
 \contentsline {chapter}{\numberline {3}Terminología}{5}{chapter.3}%
-\contentsline {chapter}{\numberline {4}Metodología y Planificación}{7}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Metodología Aplicada}{7}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Etapas del Proyecto}{7}{section.4.2}%
-\contentsline {section}{\numberline {4.3}Mínimo Producto Viable}{8}{section.4.3}%
-\contentsline {section}{\numberline {4.4}Herramientas utilizadas}{9}{section.4.4}%
-\contentsline {chapter}{\numberline {5}Diseño}{11}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Referencias}{11}{section.5.1}%
-\contentsline {subsubsection}{\numberline {5.1.0.1}My OldBoy!}{11}{subsubsection.5.1.0.1}%
-\contentsline {subsubsection}{\numberline {5.1.0.2}GBCC}{14}{subsubsection.5.1.0.2}%
-\contentsline {subsubsection}{\numberline {5.1.0.3}iGBA}{16}{subsubsection.5.1.0.3}%
-\contentsline {section}{\numberline {5.2}Mockup}{18}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Diagrama de casos de uso}{20}{section.5.3}%
-\contentsline {chapter}{\numberline {6}Marco Teórico}{21}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Game Boy}{21}{section.6.1}%
-\contentsline {subsection}{\numberline {6.1.1}Especificaciones Técnicas}{22}{subsection.6.1.1}%
-\contentsline {subsection}{\numberline {6.1.2}Mapa de Memoria}{23}{subsection.6.1.2}%
-\contentsline {subsubsection}{\numberline {6.1.2.1}ROM: [0x0000 - 0x7FFF]}{23}{subsubsection.6.1.2.1}%
-\contentsline {subsubsection}{\numberline {6.1.2.2}VRAM: [0x8000 - 0x9FFF]}{24}{subsubsection.6.1.2.2}%
-\contentsline {subsubsection}{\numberline {6.1.2.3}RAM Externa: [0xA000 - 0xBFFF]}{24}{subsubsection.6.1.2.3}%
-\contentsline {subsubsection}{\numberline {6.1.2.4}Work RAM: [0xC000 - 0xDFFF]}{24}{subsubsection.6.1.2.4}%
-\contentsline {subsubsection}{\numberline {6.1.2.5}Echo RAM: [0xE000 - 0xFDFF]}{24}{subsubsection.6.1.2.5}%
-\contentsline {subsubsection}{\numberline {6.1.2.6}OAM: [0xFE00 - 0xFE9F]}{24}{subsubsection.6.1.2.6}%
-\contentsline {subsubsection}{\numberline {6.1.2.7}No utilizable: [0xFEA0 - 0xFEFF]}{24}{subsubsection.6.1.2.7}%
-\contentsline {subsubsection}{\numberline {6.1.2.8}I/O: [0xFEA0 - 0xFEFF]}{25}{subsubsection.6.1.2.8}%
-\contentsline {subsubsection}{\numberline {6.1.2.9}HRAM: [0xFF80 - 0xFFFE]}{25}{subsubsection.6.1.2.9}%
-\contentsline {subsubsection}{\numberline {6.1.2.10}IE: 0xFFFF}{25}{subsubsection.6.1.2.10}%
-\contentsline {section}{\numberline {6.2}CPU}{25}{section.6.2}%
-\contentsline {subsection}{\numberline {6.2.1}Diferencias}{25}{subsection.6.2.1}%
-\contentsline {subsection}{\numberline {6.2.2}Registros}{26}{subsection.6.2.2}%
-\contentsline {subsection}{\numberline {6.2.3}Opcodes}{28}{subsection.6.2.3}%
-\contentsline {subsubsection}{\numberline {6.2.3.1}Categorías}{28}{subsubsection.6.2.3.1}%
-\contentsline {subsubsection}{\numberline {6.2.3.2}Listado}{30}{subsubsection.6.2.3.2}%
-\contentsline {subsection}{\numberline {6.2.4}Ciclos}{31}{subsection.6.2.4}%
-\contentsline {subsubsection}{\numberline {6.2.4.1}Ciclos de Máquina}{31}{subsubsection.6.2.4.1}%
-\contentsline {subsubsection}{\numberline {6.2.4.2}Ciclos de Reloj}{31}{subsubsection.6.2.4.2}%
-\contentsline {section}{\numberline {6.3}ROM}{31}{section.6.3}%
-\contentsline {subsection}{\numberline {6.3.1}Secuencia de Arranque}{31}{subsection.6.3.1}%
-\contentsline {subsubsection}{\numberline {6.3.1.1}DMG / MGB}{32}{subsubsection.6.3.1.1}%
-\contentsline {subsubsection}{\numberline {6.3.1.2}CGB / AGB}{32}{subsubsection.6.3.1.2}%
-\contentsline {subsection}{\numberline {6.3.2}Cabecera del Cartucho}{33}{subsection.6.3.2}%
-\contentsline {subsubsection}{\numberline {6.3.2.1}0x0100 - 0x0103: Punto de entrada}{33}{subsubsection.6.3.2.1}%
-\contentsline {subsubsection}{\numberline {6.3.2.2}0x0104 - 0x0133: Nintendo logo}{33}{subsubsection.6.3.2.2}%
-\contentsline {subsubsection}{\numberline {6.3.2.3}0x0134 - 0x0143: Título}{34}{subsubsection.6.3.2.3}%
-\contentsline {subsubsection}{\numberline {6.3.2.4}0x013F - 0x0142: Código de fabricante}{34}{subsubsection.6.3.2.4}%
-\contentsline {subsubsection}{\numberline {6.3.2.5}0x0143: CGB Flag}{35}{subsubsection.6.3.2.5}%
-\contentsline {subsubsection}{\numberline {6.3.2.6}0x0144 – 0x0145: Nuevo código de licencia}{35}{subsubsection.6.3.2.6}%
-\contentsline {subsubsection}{\numberline {6.3.2.7}0x0146: SGB Flag}{37}{subsubsection.6.3.2.7}%
-\contentsline {subsubsection}{\numberline {6.3.2.8}0x0147: Tipo de cartucho}{37}{subsubsection.6.3.2.8}%
-\contentsline {subsubsection}{\numberline {6.3.2.9}0x0148: Tamaño de ROM}{38}{subsubsection.6.3.2.9}%
-\contentsline {subsubsection}{\numberline {6.3.2.10}0x0149: Tamaño de RAM}{38}{subsubsection.6.3.2.10}%
-\contentsline {subsubsection}{\numberline {6.3.2.11}0x014A: Destino}{39}{subsubsection.6.3.2.11}%
-\contentsline {subsubsection}{\numberline {6.3.2.12}0x014B: Antiguo código de licencia}{39}{subsubsection.6.3.2.12}%
-\contentsline {subsubsection}{\numberline {6.3.2.13}0x014C: Número de versión de ROM}{43}{subsubsection.6.3.2.13}%
-\contentsline {subsubsection}{\numberline {6.3.2.14}0x014D: Checksum}{43}{subsubsection.6.3.2.14}%
-\contentsline {subsubsection}{\numberline {6.3.2.15}0x014E - 0x014F: Checksum global}{43}{subsubsection.6.3.2.15}%
-\contentsline {section}{\numberline {6.4}MBCs}{43}{section.6.4}%
-\contentsline {subsection}{\numberline {6.4.1}No MBC: 0x00}{44}{subsection.6.4.1}%
-\contentsline {subsection}{\numberline {6.4.2}MBC1: 0x01-0x03}{44}{subsection.6.4.2}%
-\contentsline {subsubsection}{\numberline {6.4.2.1}Memoria}{45}{subsubsection.6.4.2.1}%
-\contentsline {paragraph}{\numberline {6.4.2.1.1}Banco de ROM 0x00: 0x0000-0x3FFF}{45}{paragraph.6.4.2.1.1}%
-\contentsline {paragraph}{\numberline {6.4.2.1.2}Bancos de ROM 0x01-0x7F: 0x4000-0x7FFF}{45}{paragraph.6.4.2.1.2}%
-\contentsline {paragraph}{\numberline {6.4.2.1.3}Banco de RAM 0x00-0x03: 0xA000-0xBFFF}{45}{paragraph.6.4.2.1.3}%
-\contentsline {subsubsection}{\numberline {6.4.2.2}Registros}{46}{subsubsection.6.4.2.2}%
-\contentsline {paragraph}{\numberline {6.4.2.2.1}Habilitar RAM Externa: 0x0000-0x1FFF}{46}{paragraph.6.4.2.2.1}%
-\contentsline {paragraph}{\numberline {6.4.2.2.2}Número de Banco ROM: 0x2000–0x3FFF}{46}{paragraph.6.4.2.2.2}%
-\contentsline {paragraph}{\numberline {6.4.2.2.3}Número de Banco RAM / Complementario de Banco ROM: 0x4000–0x5FFF}{47}{paragraph.6.4.2.2.3}%
-\contentsline {paragraph}{\numberline {6.4.2.2.4}Modo de Banco: 0x6000–0x7FFF}{47}{paragraph.6.4.2.2.4}%
-\contentsline {chapter}{\numberline {7}Desarrollo}{49}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Módulos / Estructura del Proyecto}{49}{section.7.1}%
-\contentsline {section}{\numberline {7.2}CPU}{50}{section.7.2}%
-\contentsline {subsection}{\numberline {7.2.1}Registros}{50}{subsection.7.2.1}%
-\contentsline {subsection}{\numberline {7.2.2}Opcodes}{52}{subsection.7.2.2}%
-\contentsline {paragraph}{\numberline {7.2.2.0.1}Funciones comunes:}{53}{paragraph.7.2.2.0.1}%
-\contentsline {paragraph}{\numberline {7.2.2.0.2}Carga - LD:}{54}{paragraph.7.2.2.0.2}%
-\contentsline {paragraph}{\numberline {7.2.2.0.3}Aritméticas y Lógicas:}{54}{paragraph.7.2.2.0.3}%
-\contentsline {paragraph}{\numberline {7.2.2.0.4}Control de flujo:}{57}{paragraph.7.2.2.0.4}%
-\contentsline {paragraph}{\numberline {7.2.2.0.5}Rotación y desplazamiento:}{61}{paragraph.7.2.2.0.5}%
-\contentsline {paragraph}{\numberline {7.2.2.0.6}Manipulación de bits:}{63}{paragraph.7.2.2.0.6}%
-\contentsline {paragraph}{\numberline {7.2.2.0.7}Especiales de sistema:}{66}{paragraph.7.2.2.0.7}%
-\contentsline {paragraph}{\numberline {7.2.2.0.8}Con pila:}{66}{paragraph.7.2.2.0.8}%
-\contentsline {section}{\numberline {7.3}Memory}{68}{section.7.3}%
-\contentsline {subsection}{\numberline {7.3.1}Lectura / Escritura}{69}{subsection.7.3.1}%
-\contentsline {subsection}{\numberline {7.3.2}Secuencia de Arranque}{70}{subsection.7.3.2}%
-\contentsline {section}{\numberline {7.4}ROM}{73}{section.7.4}%
-\contentsline {subsection}{\numberline {7.4.1}Lectura de ROM}{74}{subsection.7.4.1}%
-\contentsline {subsection}{\numberline {7.4.2}Lectura/Escritura en ROM}{80}{subsection.7.4.2}%
-\contentsline {chapter}{\nonumberline Bibliografía}{81}{chapter*.38}%
+\contentsline {chapter}{\numberline {4}Marco Teórico}{7}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Game Boy}{7}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Especificaciones Técnicas}{8}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Mapa de Memoria}{9}{subsection.4.1.2}%
+\contentsline {subsubsection}{\numberline {4.1.2.1}ROM: [0x0000 - 0x7FFF]}{9}{subsubsection.4.1.2.1}%
+\contentsline {subsubsection}{\numberline {4.1.2.2}VRAM: [0x8000 - 0x9FFF]}{10}{subsubsection.4.1.2.2}%
+\contentsline {subsubsection}{\numberline {4.1.2.3}RAM Externa: [0xA000 - 0xBFFF]}{10}{subsubsection.4.1.2.3}%
+\contentsline {subsubsection}{\numberline {4.1.2.4}Work RAM: [0xC000 - 0xDFFF]}{10}{subsubsection.4.1.2.4}%
+\contentsline {subsubsection}{\numberline {4.1.2.5}Echo RAM: [0xE000 - 0xFDFF]}{10}{subsubsection.4.1.2.5}%
+\contentsline {subsubsection}{\numberline {4.1.2.6}OAM: [0xFE00 - 0xFE9F]}{10}{subsubsection.4.1.2.6}%
+\contentsline {subsubsection}{\numberline {4.1.2.7}No utilizable: [0xFEA0 - 0xFEFF]}{10}{subsubsection.4.1.2.7}%
+\contentsline {subsubsection}{\numberline {4.1.2.8}I/O: [0xFEA0 - 0xFEFF]}{11}{subsubsection.4.1.2.8}%
+\contentsline {subsubsection}{\numberline {4.1.2.9}HRAM: [0xFF80 - 0xFFFE]}{11}{subsubsection.4.1.2.9}%
+\contentsline {subsubsection}{\numberline {4.1.2.10}IE: 0xFFFF}{11}{subsubsection.4.1.2.10}%
+\contentsline {section}{\numberline {4.2}CPU}{11}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Diferencias}{11}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Registros}{12}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.3}Opcodes}{14}{subsection.4.2.3}%
+\contentsline {subsubsection}{\numberline {4.2.3.1}Categorías}{14}{subsubsection.4.2.3.1}%
+\contentsline {subsubsection}{\numberline {4.2.3.2}Listado}{16}{subsubsection.4.2.3.2}%
+\contentsline {subsection}{\numberline {4.2.4}Ciclos}{17}{subsection.4.2.4}%
+\contentsline {subsubsection}{\numberline {4.2.4.1}Ciclos de Máquina}{17}{subsubsection.4.2.4.1}%
+\contentsline {subsubsection}{\numberline {4.2.4.2}Ciclos de Reloj}{17}{subsubsection.4.2.4.2}%
+\contentsline {section}{\numberline {4.3}ROM}{17}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Secuencia de Arranque}{17}{subsection.4.3.1}%
+\contentsline {subsubsection}{\numberline {4.3.1.1}DMG / MGB}{18}{subsubsection.4.3.1.1}%
+\contentsline {subsubsection}{\numberline {4.3.1.2}CGB / AGB}{18}{subsubsection.4.3.1.2}%
+\contentsline {subsection}{\numberline {4.3.2}Cabecera del Cartucho}{19}{subsection.4.3.2}%
+\contentsline {subsubsection}{\numberline {4.3.2.1}0x0100 - 0x0103: Punto de entrada}{19}{subsubsection.4.3.2.1}%
+\contentsline {subsubsection}{\numberline {4.3.2.2}0x0104 - 0x0133: Nintendo logo}{19}{subsubsection.4.3.2.2}%
+\contentsline {subsubsection}{\numberline {4.3.2.3}0x0134 - 0x0143: Título}{20}{subsubsection.4.3.2.3}%
+\contentsline {subsubsection}{\numberline {4.3.2.4}0x013F - 0x0142: Código de fabricante}{20}{subsubsection.4.3.2.4}%
+\contentsline {subsubsection}{\numberline {4.3.2.5}0x0143: CGB Flag}{21}{subsubsection.4.3.2.5}%
+\contentsline {subsubsection}{\numberline {4.3.2.6}0x0144 – 0x0145: Nuevo código de licencia}{21}{subsubsection.4.3.2.6}%
+\contentsline {subsubsection}{\numberline {4.3.2.7}0x0146: SGB Flag}{23}{subsubsection.4.3.2.7}%
+\contentsline {subsubsection}{\numberline {4.3.2.8}0x0147: Tipo de cartucho}{23}{subsubsection.4.3.2.8}%
+\contentsline {subsubsection}{\numberline {4.3.2.9}0x0148: Tamaño de ROM}{24}{subsubsection.4.3.2.9}%
+\contentsline {subsubsection}{\numberline {4.3.2.10}0x0149: Tamaño de RAM}{24}{subsubsection.4.3.2.10}%
+\contentsline {subsubsection}{\numberline {4.3.2.11}0x014A: Destino}{25}{subsubsection.4.3.2.11}%
+\contentsline {subsubsection}{\numberline {4.3.2.12}0x014B: Antiguo código de licencia}{25}{subsubsection.4.3.2.12}%
+\contentsline {subsubsection}{\numberline {4.3.2.13}0x014C: Número de versión de ROM}{29}{subsubsection.4.3.2.13}%
+\contentsline {subsubsection}{\numberline {4.3.2.14}0x014D: Checksum}{29}{subsubsection.4.3.2.14}%
+\contentsline {subsubsection}{\numberline {4.3.2.15}0x014E - 0x014F: Checksum global}{29}{subsubsection.4.3.2.15}%
+\contentsline {section}{\numberline {4.4}MBCs}{29}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}No MBC: 0x00}{30}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}MBC1: 0x01-0x03}{30}{subsection.4.4.2}%
+\contentsline {subsubsection}{\numberline {4.4.2.1}Memoria}{31}{subsubsection.4.4.2.1}%
+\contentsline {paragraph}{\numberline {4.4.2.1.1}Banco de ROM 0x00: 0x0000-0x3FFF}{31}{paragraph.4.4.2.1.1}%
+\contentsline {paragraph}{\numberline {4.4.2.1.2}Bancos de ROM 0x01-0x7F: 0x4000-0x7FFF}{31}{paragraph.4.4.2.1.2}%
+\contentsline {paragraph}{\numberline {4.4.2.1.3}Banco de RAM 0x00-0x03: 0xA000-0xBFFF}{31}{paragraph.4.4.2.1.3}%
+\contentsline {subsubsection}{\numberline {4.4.2.2}Registros}{32}{subsubsection.4.4.2.2}%
+\contentsline {paragraph}{\numberline {4.4.2.2.1}Habilitar RAM Externa: 0x0000-0x1FFF}{32}{paragraph.4.4.2.2.1}%
+\contentsline {paragraph}{\numberline {4.4.2.2.2}Número de Banco ROM: 0x2000–0x3FFF}{32}{paragraph.4.4.2.2.2}%
+\contentsline {paragraph}{\numberline {4.4.2.2.3}Número de Banco RAM / Complementario de Banco ROM: 0x4000–0x5FFF}{33}{paragraph.4.4.2.2.3}%
+\contentsline {paragraph}{\numberline {4.4.2.2.4}Modo de Banco: 0x6000–0x7FFF}{33}{paragraph.4.4.2.2.4}%
+\contentsline {subsection}{\numberline {4.4.3}MBC2: 0x05-0x06}{34}{subsection.4.4.3}%
+\contentsline {subsection}{\numberline {4.4.4}MBC3: 0x0F-0x13}{34}{subsection.4.4.4}%
+\contentsline {subsection}{\numberline {4.4.5}MBC5: 0x19-0x1E}{34}{subsection.4.4.5}%
+\contentsline {subsection}{\numberline {4.4.6}MBC6: 0x20}{34}{subsection.4.4.6}%
+\contentsline {subsection}{\numberline {4.4.7}MBC7: 0x22}{34}{subsection.4.4.7}%
+\contentsline {subsection}{\numberline {4.4.8}MMM01: 0x0B-0x0D}{34}{subsection.4.4.8}%
+\contentsline {section}{\numberline {4.5}Interrupciones}{34}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}Tipos}{35}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}Registros}{35}{subsection.4.5.2}%
+\contentsline {subsubsection}{\numberline {4.5.2.1}IME (Interrupt Master Enable)}{35}{subsubsection.4.5.2.1}%
+\contentsline {subsubsection}{\numberline {4.5.2.2}IE (Interrupt Enable - 0xFFFF)}{36}{subsubsection.4.5.2.2}%
+\contentsline {subsubsection}{\numberline {4.5.2.3}IF (Interrupt Flag - 0xFF0F)}{36}{subsubsection.4.5.2.3}%
+\contentsline {section}{\numberline {4.6}Temporizadores / Timers}{36}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}DIV (Divisor de reloj - 0xFF04)}{36}{subsection.4.6.1}%
+\contentsline {subsection}{\numberline {4.6.2}Temporizador de contador (TIMA - 0xFF05)}{37}{subsection.4.6.2}%
+\contentsline {subsection}{\numberline {4.6.3}Temporizador de módulo (TMA - 0xFF06)}{37}{subsection.4.6.3}%
+\contentsline {subsection}{\numberline {4.6.4}Controlador de temporizador (TAC - 0xFF07)}{37}{subsection.4.6.4}%
+\contentsline {subsection}{\numberline {4.6.5}Funcionamiento del Temporizador}{38}{subsection.4.6.5}%
+\contentsline {section}{\numberline {4.7}I/O - Entrada / Salida}{39}{section.4.7}%
+\contentsline {subsection}{\numberline {4.7.1}Joypad: 0xFF00}{39}{subsection.4.7.1}%
+\contentsline {subsection}{\numberline {4.7.2}Transferencia Serie: 0xFF01-0xFF02}{40}{subsection.4.7.2}%
+\contentsline {subsubsection}{\numberline {4.7.2.1}SB (0xFF01): Transferencia de datos en serie}{41}{subsubsection.4.7.2.1}%
+\contentsline {chapter}{\numberline {5}Metodología y Planificación}{43}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Metodología Aplicada}{43}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Requerimientos}{43}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Requerimientos Funcionales}{43}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Requerimientos No Funcionales}{43}{subsection.5.2.2}%
+\contentsline {section}{\numberline {5.3}Etapas del Proyecto}{44}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Mínimo Producto Viable}{45}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Casos de Uso}{45}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Herramientas utilizadas}{46}{section.5.6}%
+\contentsline {chapter}{\numberline {6}Diseño}{49}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Referencias}{49}{section.6.1}%
+\contentsline {subsubsection}{\numberline {6.1.0.1}My OldBoy!}{49}{subsubsection.6.1.0.1}%
+\contentsline {subsubsection}{\numberline {6.1.0.2}GBCC}{52}{subsubsection.6.1.0.2}%
+\contentsline {subsubsection}{\numberline {6.1.0.3}iGBA}{54}{subsubsection.6.1.0.3}%
+\contentsline {section}{\numberline {6.2}Mockup}{56}{section.6.2}%
+\contentsline {chapter}{\numberline {7}Desarrollo}{59}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Módulos / Estructura del Proyecto}{59}{section.7.1}%
+\contentsline {section}{\numberline {7.2}CPU}{60}{section.7.2}%
+\contentsline {subsection}{\numberline {7.2.1}Registros}{60}{subsection.7.2.1}%
+\contentsline {subsection}{\numberline {7.2.2}Opcodes}{62}{subsection.7.2.2}%
+\contentsline {paragraph}{\numberline {7.2.2.0.1}Funciones comunes:}{63}{paragraph.7.2.2.0.1}%
+\contentsline {paragraph}{\numberline {7.2.2.0.2}Carga - LD:}{64}{paragraph.7.2.2.0.2}%
+\contentsline {paragraph}{\numberline {7.2.2.0.3}Aritméticas y Lógicas:}{64}{paragraph.7.2.2.0.3}%
+\contentsline {paragraph}{\numberline {7.2.2.0.4}Control de flujo:}{67}{paragraph.7.2.2.0.4}%
+\contentsline {paragraph}{\numberline {7.2.2.0.5}Rotación y desplazamiento:}{71}{paragraph.7.2.2.0.5}%
+\contentsline {paragraph}{\numberline {7.2.2.0.6}Manipulación de bits:}{73}{paragraph.7.2.2.0.6}%
+\contentsline {paragraph}{\numberline {7.2.2.0.7}Especiales de sistema:}{76}{paragraph.7.2.2.0.7}%
+\contentsline {paragraph}{\numberline {7.2.2.0.8}Con pila:}{76}{paragraph.7.2.2.0.8}%
+\contentsline {section}{\numberline {7.3}Memory}{78}{section.7.3}%
+\contentsline {subsection}{\numberline {7.3.1}Lectura / Escritura}{79}{subsection.7.3.1}%
+\contentsline {subsection}{\numberline {7.3.2}Secuencia de Arranque}{80}{subsection.7.3.2}%
+\contentsline {section}{\numberline {7.4}ROM}{83}{section.7.4}%
+\contentsline {subsection}{\numberline {7.4.1}Lectura de ROM}{84}{subsection.7.4.1}%
+\contentsline {subsection}{\numberline {7.4.2}Lectura/Escritura en ROM}{90}{subsection.7.4.2}%
+\contentsline {paragraph}{\numberline {7.4.2.0.1}Implementación de las Acciones de Lectura y Escritura en ROM}{90}{paragraph.7.4.2.0.1}%
+\contentsline {section}{\numberline {7.5}Interrupciones}{93}{section.7.5}%
+\contentsline {section}{\numberline {7.6}Temporizadores / Timers}{95}{section.7.6}%
+\contentsline {section}{\numberline {7.7}RAM}{97}{section.7.7}%
+\contentsline {subsection}{\numberline {7.7.1}WRAM}{97}{subsection.7.7.1}%
+\contentsline {chapter}{\nonumberline Bibliografía}{99}{chapter*.45}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

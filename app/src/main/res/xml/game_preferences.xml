@@ -1,0 +1,21 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        android:key="video_settings"
+        android:title="Video"
+        android:summary="Adjust video settings"
+        android:fragment="es.atm.gbee.core.fragments.VideoSettingsFragment" />
+
+    <Preference
+        android:key="misc_settings"
+        android:title="Misc"
+        android:summary="Additional settings"
+        android:fragment="es.atm.gbee.core.fragments.MiscGameSettingsFragment"/>
+
+    <Preference
+        android:key="advanced_settings"
+        android:title="Advanced"
+        android:summary="Debug and advanced options"
+        android:fragment="es.atm.gbee.core.fragments.AdvancedSettingsFragment" />
+
+</PreferenceScreen>

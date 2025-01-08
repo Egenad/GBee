@@ -1,54 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
-        android:id="@+id/frameLayout"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_width="match_parent"
-        android:layout_centerInParent="true"
-        android:padding="16dp"
-        android:layout_height="wrap_content" >
-
-        <es.atm.gbee.views.GameSurfaceView
-            android:id="@+id/gameSurface"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            />
-    </FrameLayout>
-    <Button
-        android:id="@+id/switch_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/gbee"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frameLayout" />
-
-    <!-- D-Pad -->
-
     <LinearLayout
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/selectstart"
-        app:layout_constraintTop_toBottomOf="@+id/switch_button"
-        android:gravity="center"
-        android:layout_margin="20dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
-            android:padding="10dp"
-            android:layout_height="match_parent">
+            android:layout_weight="0.5"
+            android:layout_height="match_parent"
+            android:padding="10dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/dpad_container"
@@ -92,6 +59,7 @@
                     android:id="@+id/dpad_center"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:background="@android:color/darker_gray"
                     app:layout_constraintStart_toStartOf="@id/dpad_left"
                     app:layout_constraintEnd_toEndOf="@id/dpad_right"
                     app:layout_constraintTop_toBottomOf="@id/dpad_up"
@@ -126,83 +94,87 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintDimensionRatio="1:1" />
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <!-- Botones A y B -->
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:padding="20dp"
+            android:layout_height="wrap_content" >
+
+            <FrameLayout
+                android:id="@+id/frameLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_columnWeight="1"
+                android:padding="10dp"
+                app:layout_constraintDimensionRatio="4:3"
+                app:layout_gravity="center">
+
+                <es.atm.gbee.views.GameSurfaceView
+                    android:id="@+id/gameSurface"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </FrameLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:padding="15dp"
             android:layout_height="match_parent">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/buttAB_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+            <Button
+                android:id="@+id/button_a"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintHorizontal_bias="1"
+                app:layout_constraintVertical_bias="0.35"
+                android:text="A"
+                android:backgroundTint="@android:color/holo_blue_light" />
+
+            <Button
+                android:id="@+id/button_b"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent">
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintVertical_bias="0.65"
+                android:text="B"
+                android:backgroundTint="@android:color/holo_red_light" />
 
-                <Button
-                    android:id="@+id/button_a"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layout_constraintStart_toEndOf="@id/button_b"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/button_b"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintHorizontal_bias="1"
-                    app:layout_constraintVertical_bias="0.35"
-                    android:text="A"
-                    android:textSize="30sp"
-                    android:padding="0dp"
-                    app:layout_constraintDimensionRatio="1:1"
-                    android:backgroundTint="@android:color/holo_blue_light" />
-
-                <Button
-                    android:id="@+id/button_b"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/button_a"
-                    app:layout_constraintTop_toBottomOf="@id/button_a"
-                    app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintVertical_bias="0.65"
-                    android:text="B"
-                    android:textSize="30sp"
-                    android:padding="0dp"
-                    app:layout_constraintDimensionRatio="1:1"
-                    android:backgroundTint="@android:color/holo_red_light" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
-
-    <!-- Botones Select y Start -->
 
     <LinearLayout
         android:id="@+id/selectstart"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:gravity="center"
-        android:layout_margin="30dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_weight="0"
+        android:gravity="center">
+
         <Button
             android:id="@+id/button_select"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:layout_margin="10dp"
-            android:text="Select"/>
+            android:layout_marginEnd="10dp"
+            android:text="Select" />
 
         <Button
             android:id="@+id/button_start"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:layout_margin="10dp"
-            android:text="Start"/>
-
+            android:layout_marginStart="10dp"
+            android:text="Start" />
     </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

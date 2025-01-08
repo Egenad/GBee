@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.PixelFormat
 import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -32,12 +33,15 @@ class GameSurfaceView @JvmOverloads constructor(
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
-        gameThread?.running = true
-        gameThread?.start()
+        if (gameThread?.isAlive != true) {
+            gameThread?.running = true
+            gameThread?.start()
+        }
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
-
+        pause()
+        holder.removeCallback(this)
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
@@ -139,6 +143,31 @@ class GameSurfaceView @JvmOverloads constructor(
             }
         }
     }
+
+    fun pause() {
+        gameThread?.let {
+            it.running = false
+            try {
+                it.join()
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun release() {
+        pause()
+    }
+
+    fun resume(){
+        holder.addCallback(this)
+        gameThread?.let {
+            if(it.isAlive) {
+                it.running = true
+                it.start()
+            }
+        }
+    }
 }
 
 class GameThread(private val surfaceHolder: SurfaceHolder, private val gameSurfaceView: GameSurfaceView) : Thread() {
@@ -150,10 +179,14 @@ class GameThread(private val surfaceHolder: SurfaceHolder, private val gameSurfa
             var canvas: Canvas? = null
             try {
                 canvas = surfaceHolder.lockCanvas()
-                synchronized(surfaceHolder) {
-                    gameSurfaceView.update()
-                    gameSurfaceView.render(canvas)
+                if (canvas != null) {
+                    synchronized(surfaceHolder) {
+                        gameSurfaceView.update()
+                        gameSurfaceView.render(canvas)
+                    }
                 }
+            }catch (ex: Exception){
+                ex.printStackTrace()
             } finally {
                 if (canvas != null) {
                     surfaceHolder.unlockCanvasAndPost(canvas)

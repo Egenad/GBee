@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreferenceCompat
+        android:key="enable_audio"
+        android:title="Enable Audio"
+        android:summary="Toggle sound effects and music" />
+</PreferenceScreen>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreferenceCompat
+        android:key="enable_vsync"
+        android:title="Enable VSync"
+        android:summary="Synchronize rendering with monitor refresh rate" />
+</PreferenceScreen>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:color/transparent"
+    android:padding="4dp">
+
+    <!-- Imagen del juego -->
+    <ImageView
+        android:id="@+id/rom_image"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scaleType="fitCenter"
+        android:src="@drawable/rom_icon"
+        android:contentDescription="@drawable/rom_icon" />
+
+    <!-- Título del juego -->
+    <TextView
+        android:id="@+id/rom_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:singleLine="true"
+        android:text="Title"
+        android:textStyle="bold"
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
+</LinearLayout>

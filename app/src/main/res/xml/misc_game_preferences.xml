@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:key="game_title"
+        android:title="@string/game_title"
+        android:defaultValue=""
+        android:inputType="text"
+        android:lines="1"
+        android:maxLength="100"
+        android:singleLine="true"/>
+
+    <Preference
+        android:key="cover_image"
+        android:title="@string/game_cover"
+        android:summary="@string/game_cover_summary"
+        android:defaultValue=""
+        android:clickable="true"
+        android:icon="@android:drawable/ic_menu_gallery" />
+
+</androidx.preference.PreferenceScreen>

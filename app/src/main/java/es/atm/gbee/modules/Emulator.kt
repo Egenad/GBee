@@ -8,8 +8,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
-class Emulator {
-    private var running : Boolean = true
+object Emulator {
+
+    private var running : Boolean = false
     private var paused : Boolean = false
     private var lastCpuCycles : Int = 0
 
@@ -29,6 +30,8 @@ class Emulator {
     }
 
     private suspend fun runCpu(bytes: ByteArray){
+
+        running = true
 
         PPU.init()
 
@@ -55,7 +58,6 @@ class Emulator {
         println("ROM - Reload Boot Portion")
         ROM.reloadBootPortion()
 
-        //running = false
         while(running){
             if(paused){
                 delay(10)
@@ -82,5 +84,25 @@ class Emulator {
             }
             DMA.tick()
         }
+    }
+
+    fun pause(){
+        paused = true
+    }
+
+    fun resume(){
+        paused = false
+    }
+
+    fun stop(){
+        running = false
+    }
+
+    fun isRunning(): Boolean{
+        return running
+    }
+
+    fun isPaused(): Boolean{
+        return paused
     }
 }

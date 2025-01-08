@@ -2,30 +2,34 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Herramientas utilizadas en el proyecto}}{9}{figure.caption.10}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Game Boy}}{7}{figure.caption.9}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Versiones DMG, MGB, GBL y CGB de Game Boy}}{8}{figure.caption.10}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Set de Instrucciones}}{16}{figure.caption.14}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Set de Instrucciones Extendidas}}{16}{figure.caption.15}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Decodificación del logo de Nintendo}}{20}{figure.caption.17}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Diagrama - Cartucho de Game Boy MBC5}}{30}{figure.caption.20}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces PCB sin MBC}}{30}{figure.caption.21}%
+\contentsline {figure}{\numberline {4.8}{\ignorespaces PCB MBC1}}{31}{figure.caption.22}%
+\contentsline {figure}{\numberline {4.9}{\ignorespaces Diagrama - Interacción entre TMA y TIMA}}{38}{figure.caption.25}%
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Distribución del Joypad}}{40}{figure.caption.27}%
+\contentsline {figure}{\numberline {4.11}{\ignorespaces Cable Link}}{41}{figure.caption.28}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {5.1}{\ignorespaces My OldBoy! - Logotipo.}}{11}{figure.caption.11}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces My OldBoy! - Menú de inicio y pantalla de ajustes.}}{12}{figure.caption.12}%
-\contentsline {figure}{\numberline {5.3}{\ignorespaces My OldBoy! - Pantalla y opciones de juego.}}{13}{figure.caption.13}%
-\contentsline {figure}{\numberline {5.4}{\ignorespaces My OldBoy! - Pantalla de juego en orientación horizontal.}}{13}{figure.caption.14}%
-\contentsline {figure}{\numberline {5.5}{\ignorespaces GBCC - Logotipo.}}{14}{figure.caption.15}%
-\contentsline {figure}{\numberline {5.6}{\ignorespaces GBCC - Pantalla de juego.}}{15}{figure.caption.16}%
-\contentsline {figure}{\numberline {5.7}{\ignorespaces GBCC - Pantalla de juego en orientación horizontal.}}{15}{figure.caption.17}%
-\contentsline {figure}{\numberline {5.8}{\ignorespaces iGBA - Logotipo.}}{16}{figure.caption.18}%
-\contentsline {figure}{\numberline {5.9}{\ignorespaces iGBA - Ajustes de juego.}}{17}{figure.caption.19}%
-\contentsline {figure}{\numberline {5.10}{\ignorespaces iGBA - Pantalla de juego.}}{17}{figure.caption.20}%
-\contentsline {figure}{\numberline {5.11}{\ignorespaces Menú de inicio.}}{18}{figure.caption.21}%
-\contentsline {figure}{\numberline {5.12}{\ignorespaces Pantalla de juego.}}{19}{figure.caption.22}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Diagrama de Casos de Uso}}{46}{figure.caption.30}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Herramientas utilizadas en el proyecto}}{47}{figure.caption.31}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {6.1}{\ignorespaces Game Boy}}{21}{figure.caption.23}%
-\contentsline {figure}{\numberline {6.2}{\ignorespaces Versiones DMG, MGB, GBL y CGB de Game Boy}}{22}{figure.caption.24}%
-\contentsline {figure}{\numberline {6.3}{\ignorespaces Set de Instrucciones}}{30}{figure.caption.28}%
-\contentsline {figure}{\numberline {6.4}{\ignorespaces Set de Instrucciones Extendidas}}{30}{figure.caption.29}%
-\contentsline {figure}{\numberline {6.5}{\ignorespaces Decodificación del logo de Nintendo}}{34}{figure.caption.31}%
-\contentsline {figure}{\numberline {6.6}{\ignorespaces Diagrama - Cartucho de Game Boy MBC5}}{44}{figure.caption.34}%
-\contentsline {figure}{\numberline {6.7}{\ignorespaces PCB sin MBC}}{44}{figure.caption.35}%
-\contentsline {figure}{\numberline {6.8}{\ignorespaces PCB MBC1}}{45}{figure.caption.36}%
+\contentsline {figure}{\numberline {6.1}{\ignorespaces My OldBoy! - Logotipo.}}{49}{figure.caption.32}%
+\contentsline {figure}{\numberline {6.2}{\ignorespaces My OldBoy! - Menú de inicio y pantalla de ajustes.}}{50}{figure.caption.33}%
+\contentsline {figure}{\numberline {6.3}{\ignorespaces My OldBoy! - Pantalla y opciones de juego.}}{51}{figure.caption.34}%
+\contentsline {figure}{\numberline {6.4}{\ignorespaces My OldBoy! - Pantalla de juego en orientación horizontal.}}{51}{figure.caption.35}%
+\contentsline {figure}{\numberline {6.5}{\ignorespaces GBCC - Logotipo.}}{52}{figure.caption.36}%
+\contentsline {figure}{\numberline {6.6}{\ignorespaces GBCC - Pantalla de juego.}}{53}{figure.caption.37}%
+\contentsline {figure}{\numberline {6.7}{\ignorespaces GBCC - Pantalla de juego en orientación horizontal.}}{53}{figure.caption.38}%
+\contentsline {figure}{\numberline {6.8}{\ignorespaces iGBA - Logotipo.}}{54}{figure.caption.39}%
+\contentsline {figure}{\numberline {6.9}{\ignorespaces iGBA - Ajustes de juego.}}{55}{figure.caption.40}%
+\contentsline {figure}{\numberline {6.10}{\ignorespaces iGBA - Pantalla de juego.}}{55}{figure.caption.41}%
+\contentsline {figure}{\numberline {6.11}{\ignorespaces Menú de inicio.}}{56}{figure.caption.42}%
+\contentsline {figure}{\numberline {6.12}{\ignorespaces Pantalla de juego.}}{57}{figure.caption.43}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {7.1}{\ignorespaces Selección de archivo desde la memoria SD del dispositivo.}}{75}{figure.caption.37}%
+\contentsline {figure}{\numberline {7.1}{\ignorespaces Selección de archivo desde la memoria SD del dispositivo.}}{85}{figure.caption.44}%
 \addvspace {10\p@ }
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
