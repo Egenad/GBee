@@ -1,12 +1,13 @@
 package es.atm.gbee.core.fragments
 
-import android.content.Context
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -14,6 +15,8 @@ import es.atm.gbee.R
 import es.atm.gbee.activities.GAME_ID
 import es.atm.gbee.core.ROMDataSource
 import es.atm.gbee.core.sql.SQLManager
+import es.atm.gbee.core.utils.FileManager
+import java.io.File
 
 const val TITLE_KEY = "game_title"
 const val COVER_KEY = "cover_image"
@@ -32,16 +35,31 @@ class MiscGameSettingsFragment : PreferenceFragmentCompat() {
 
         getImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
-                val dao = SQLManager.getDatabase(requireContext()).romDAO()
-                dao.updateCoverImage(gameId, it.toString())
 
-                val coverImagePreference: Preference? = findPreference(COVER_KEY)
-                coverImagePreference?.summary = it.toString()
-                val preferences = requireContext().getSharedPreferences(gameId.toString(), Context.MODE_PRIVATE)
-                preferences.edit().putString(COVER_KEY, it.toString()).apply()
+                val filePath = FileManager.copyFileFromUriToPrivateStorage(requireContext(), uri, gameId)
 
-                ROMDataSource.getROMById(gameId, requireContext()).imageRes = it.toString()
+                if(filePath != null) {
+                    val coverImagePreference: Preference? = findPreference(COVER_KEY)
+                    coverImagePreference?.summary = filePath
+                    setImageToCoverPreference(coverImagePreference, filePath)
+
+                    val dao = SQLManager.getDatabase(requireContext()).romDAO()
+                    val rom = dao.getROMById(gameId)
+
+                    // Delete last imageRes if needed
+                    if(rom?.imageRes != null)
+                        FileManager.deleteFileFromPrivateStorage(rom.imageRes)
+
+                    dao.updateCoverImage(gameId, filePath)
+
+                    ROMDataSource.getROMById(gameId, requireContext()).imageRes = filePath
+                }
             }
+        }
+
+        val titlePreference: EditTextPreference? = findPreference(TITLE_KEY)
+        titlePreference?.setOnBindEditTextListener { editText ->
+            editText.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
         }
 
         configureLayout()
@@ -56,27 +74,35 @@ class MiscGameSettingsFragment : PreferenceFragmentCompat() {
 
         if(gameId != -1) {
 
-            val preferences = requireContext().getSharedPreferences(gameId.toString(), Context.MODE_PRIVATE)
             val dao = SQLManager.getDatabase(requireContext()).romDAO()
             val rom = dao.getROMById(gameId)
 
             if(rom != null) {
                 // Title
-                val gameTitle = preferences.getString(TITLE_KEY, rom.title)
-
                 val titlePreference: EditTextPreference? = findPreference(TITLE_KEY)
-                titlePreference?.summary = gameTitle
+                titlePreference?.summary = rom.title
+                titlePreference?.text = rom.title
 
                 titlePreference?.setOnPreferenceChangeListener { preference, newValue ->
-                    preference.summary = newValue.toString()
-                    preferences.edit().putString(TITLE_KEY, newValue.toString()).apply()
-                    dao.updateTitle(gameId, newValue.toString())
-                    ROMDataSource.getROMById(gameId, requireContext()).title = newValue.toString()
-                    true
+                    if(FileManager.isTitleValid(newValue.toString())) {
+                        preference.summary = newValue.toString()
+                        dao.updateTitle(gameId, newValue.toString())
+                        ROMDataSource.getROMById(gameId, requireContext()).title =
+                            newValue.toString()
+                        true
+                    }else{
+                        Toast.makeText(context, R.string.invalid_name, Toast.LENGTH_SHORT).show()
+                        false
+                    }
                 }
 
                 // Cover
                 val coverImagePreference: Preference? = findPreference(COVER_KEY)
+
+                if(rom.imageRes != null){
+                    coverImagePreference?.summary = rom.imageRes
+                    setImageToCoverPreference(coverImagePreference, rom.imageRes)
+                }
 
                 coverImagePreference?.setOnPreferenceClickListener {
                     getImageLauncher.launch("image/*")
@@ -84,7 +110,17 @@ class MiscGameSettingsFragment : PreferenceFragmentCompat() {
                 }
             }
         }else{
-            Toast.makeText(context, "An error has occurred", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.error, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun setImageToCoverPreference(preference: Preference?, filePath: String){
+        val file = File(filePath)
+        if (file.exists()) {
+            val drawable = Drawable.createFromPath(file.absolutePath)
+            if (drawable != null) {
+                preference?.icon = drawable
+            }
         }
     }
 }

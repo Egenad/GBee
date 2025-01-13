@@ -1,61 +1,28 @@
 package es.atm.gbee.activities
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.ContextThemeWrapper
+import android.view.View
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
+import es.atm.gbee.R
 import es.atm.gbee.activities.adapter.ROMAdapter
 import es.atm.gbee.core.ROMDataSource
 import es.atm.gbee.core.RomManagement
 import es.atm.gbee.core.sql.SQLManager
 import es.atm.gbee.databinding.ActivityMainBinding
 
-const val ROM_UPDATED = "rom_updated"
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var romAdapter: ROMAdapter
-
-    // Single File
-    private val openFileLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        uri?.let {
-            if(!RomManagement.fileAlreadyExists(this, uri)) {
-                val file = RomManagement.saveFileToPrivateStorage(this, uri)
-
-                if (file != null && file.exists()) {
-                    val romTitle = file.name
-                    val romFilePath = file.absolutePath
-
-                    RomManagement.addROM(this, romFilePath, romTitle)
-
-                    romAdapter.notifyItemInserted(ROMDataSource.roms.size - 1)
-                }
-            }else{
-                Toast.makeText(this, "La ROM seleccionada ya existe.", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    // Folder selected
-    private val openFolderLauncher = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
-        uri?.let {
-            val files = RomManagement.getGBFilesFromFolder(this, it)
-
-            files.forEach { file ->
-                val romTitle = file.name
-                val romFilePath = file.absolutePath
-
-                RomManagement.addROM(this, romFilePath, romTitle)
-            }
-
-            romAdapter.notifyItemInserted(ROMDataSource.roms.size - 1)
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,14 +35,9 @@ class MainActivity : AppCompatActivity() {
         createRecyclerView()
     }
 
-    private fun openFilePicker() {
-        openFileLauncher.launch(arrayOf("application/octet-stream"))
-    }
-
     private fun configureLayout(){
-
         binding.addRomButton.setOnClickListener {
-            openFilePicker()
+            openFileLauncher.launch(arrayOf("application/octet-stream"))
         }
 
         binding.settingsButton.setOnClickListener {
@@ -115,11 +77,115 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        romAdapter.setOnLongItemClickListener { romPosition, v ->
+            showPopupMenu(v, romPosition)
+            true
+        }
+
         binding.romGrid.adapter = romAdapter
     }
 
-    override fun onResume() {
-        super.onResume()
-        romAdapter.notifyDataSetChanged()
+    private fun updateModifiedRom(romId: Int) {
+        val position = ROMDataSource.getPositionById(romId)
+        if (position != null && position >= 0) {
+            romAdapter.notifyItemChanged(position)
+        }
+    }
+
+    private fun showPopupMenu(v: View, position: Int) {
+        val popupMenu = PopupMenu(ContextThemeWrapper(this, R.style.PopupMenuStyle), v)
+        val inflater = popupMenu.menuInflater
+        inflater.inflate(R.menu.menu_options, popupMenu.menu)
+
+        popupMenu.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.menu_settings -> {
+                    handleSettings(position)
+                    true
+                }
+                R.id.menu_delete -> {
+                    handleDelete(position)
+                    true
+                }
+                else -> false
+            }
+        }
+
+        popupMenu.show()
+    }
+
+    private fun handleSettings(position: Int) {
+        val rom = SQLManager.getDatabase(this).romDAO().getROMById(romAdapter.romList[position].id)
+
+        val intent = Intent(this, SettingsActivity::class.java)
+        intent.putExtra(GAME_ID, rom?.id ?: -1)
+        settingsLauncher.launch(intent)
+    }
+
+    private fun handleDelete(position: Int) {
+        val alertDialog = AlertDialog.Builder(this)
+            .setTitle(R.string.confirm_delete)
+            .setMessage(R.string.check_sure)
+            .setPositiveButton(R.string.delete) { _, _ ->
+                if(RomManagement.deleteRom(this, romAdapter.romList[position], position))
+                    romAdapter.notifyItemRemoved(position)
+            }
+            .setNegativeButton(R.string.cancel) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+
+        alertDialog.show()
+    }
+
+    /****
+     *
+     *  LAUNCHERS
+     *
+     ****/
+
+    private val settingsLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val modifiedRomId = result.data?.getIntExtra(GAME_ID, -1) ?: -1
+            if (modifiedRomId != -1) {
+                updateModifiedRom(modifiedRomId)
+            }
+        }
+    }
+
+    // Single File
+    private val openFileLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let {
+            if(!RomManagement.fileAlreadyExists(this, uri)) {
+                val file = RomManagement.saveFileToPrivateStorage(this, uri)
+
+                if (file != null && file.exists()) {
+                    val romTitle = file.name
+                    val romFilePath = file.absolutePath
+
+                    RomManagement.addROM(this, romFilePath, romTitle)
+
+                    romAdapter.notifyItemInserted(ROMDataSource.roms.size - 1)
+                }
+            }else{
+                Toast.makeText(this, "La ROM seleccionada ya existe.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    // Folder selected
+    private val openFolderLauncher = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+        uri?.let {
+            val files = RomManagement.getGBFilesFromFolder(this, it)
+
+            files.forEach { file ->
+                val romTitle = file.name
+                val romFilePath = file.absolutePath
+
+                RomManagement.addROM(this, romFilePath, romTitle)
+            }
+
+            romAdapter.notifyItemInserted(ROMDataSource.roms.size - 1)
+        }
     }
 }

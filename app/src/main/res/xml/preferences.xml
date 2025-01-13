@@ -1,44 +1,45 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <Preference
         android:key="video_settings"
         android:title="Video"
+        android:icon="@drawable/video_settings_vector"
         android:summary="Adjust video settings"
         android:fragment="es.atm.gbee.core.fragments.VideoSettingsFragment" />
 
     <Preference
         android:key="audio_settings"
         android:title="Audio"
+        android:icon="@drawable/music_note_vector"
         android:summary="Adjust audio settings"
         android:fragment="es.atm.gbee.core.fragments.AudioSettingsFragment" />
 
     <Preference
-        android:key="input_settings"
-        android:title="Input"
-        android:summary="Configure input mappings"
-        android:fragment="es.atm.gbee.core.fragments.InputSettingsFragment" />
-
-    <Preference
         android:key="layout_settings"
         android:title="Layout"
+        android:icon="@drawable/gamepad_vector"
         android:summary="Choose different layouts"
         android:fragment="es.atm.gbee.core.fragments.LayoutSettingsFragment" />
 
     <Preference
         android:key="misc_settings"
         android:title="Misc"
+        android:icon="@drawable/filter_vector"
         android:summary="Additional settings"
         android:fragment="es.atm.gbee.core.fragments.MiscSettingsFragment" />
 
     <Preference
         android:key="advanced_settings"
         android:title="Advanced"
+        android:icon="@drawable/settings_vector"
         android:summary="Debug and advanced options"
         android:fragment="es.atm.gbee.core.fragments.AdvancedSettingsFragment" />
 
     <Preference
         android:key="about_settings"
         android:title="About"
+        android:icon="@drawable/help_vector"
         android:summary="Version and license information"
         android:fragment="es.atm.gbee.core.fragments.AboutFragment" />
 

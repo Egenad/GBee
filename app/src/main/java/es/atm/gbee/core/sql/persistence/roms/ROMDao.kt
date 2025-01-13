@@ -1,4 +1,4 @@
-package es.atm.gbee.core.sql.persistence
+package es.atm.gbee.core.sql.persistence.roms
 
 import androidx.room.*
 

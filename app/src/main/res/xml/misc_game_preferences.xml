@@ -7,7 +7,8 @@
         android:defaultValue=""
         android:inputType="text"
         android:lines="1"
-        android:maxLength="100"
+        android:maxLength="50"
+        android:icon="@drawable/title_vector"
         android:singleLine="true"/>
 
     <Preference

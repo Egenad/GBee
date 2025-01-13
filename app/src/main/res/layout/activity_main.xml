@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:theme="@style/Base.Theme.GBee"
     tools:context=".activities.MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -26,31 +27,29 @@
 
             <ImageButton
                 android:id="@+id/settings_button"
-                android:layout_width="48dp"
-                android:layout_height="wrap_content"
+                android:layout_width="60dp"
+                android:layout_height="match_parent"
                 android:layout_marginEnd="15dp"
                 android:layout_marginTop="15dp"
                 android:layout_marginBottom="15dp"
                 android:layout_gravity="end"
-                android:scaleType="centerInside"
-                android:src="@drawable/config_bttn"
+                android:scaleType="fitCenter"
+                android:src="@drawable/settings_vector"
                 android:contentDescription="@string/settings"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                app:tint="#C89C5C" />
+                android:background="?attr/selectableItemBackgroundBorderless"/>
 
             <ImageButton
                 android:id="@+id/add_rom_button"
-                android:layout_width="30dp"
-                android:layout_height="wrap_content"
+                android:layout_width="60dp"
+                android:layout_height="match_parent"
                 android:layout_marginTop="15dp"
                 android:layout_marginBottom="15dp"
-                android:layout_marginEnd="15dp"
+                android:layout_marginEnd="0dp"
                 android:layout_gravity="end"
-                android:scaleType="centerInside"
-                android:src="@drawable/add_bttn"
+                android:scaleType="fitCenter"
+                android:src="@drawable/library_add_vector"
                 android:contentDescription="@string/add_rom"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                app:tint="#C89C5C" />
+                android:background="?attr/selectableItemBackgroundBorderless"/>
 
         </androidx.appcompat.widget.Toolbar>
 

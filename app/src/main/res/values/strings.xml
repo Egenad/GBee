@@ -18,4 +18,48 @@
     <string name="game_title">Game Title</string>
     <string name="game_cover">Game Cover</string>
     <string name="game_cover_summary">Select an image for the game cover</string>
+    <string name="error">An error has occurred</string>
+    <string name="invalid_name">Name contains invalid characters</string>
+
+    <string-array name="dmg_palette_names">
+        <item>Classic</item>
+        <item>Green</item>
+    </string-array>
+
+    <string-array name="dmg_palette_values">
+        <item>classic</item>
+        <item>green</item>
+    </string-array>
+
+    <string-array name="gbc_palette_names">
+        <item>Default</item>
+        <item>Red</item>
+        <item>Brown</item>
+        <item>Blue</item>
+        <item>Gray</item>
+        <item>Pink</item>
+        <item>Orange</item>
+        <item>Yellow</item>
+        <item>Teal</item>
+        <item>Red and Green</item>
+        <item>Blue and Red</item>
+        <item>Monochrome Gray</item>
+        <item>Monochrome Yellow</item>
+    </string-array>
+
+    <string-array name="gbc_palette_values">
+        <item>default</item>
+        <item>red</item>
+        <item>brown</item>
+        <item>blue</item>
+        <item>gray</item>
+        <item>pink</item>
+        <item>orange</item>
+        <item>yellow</item>
+        <item>teal</item>
+        <item>redgreen</item>
+        <item>bluered</item>
+        <item>monochrgray</item>
+        <item>monochryellow</item>
+    </string-array>
 </resources>

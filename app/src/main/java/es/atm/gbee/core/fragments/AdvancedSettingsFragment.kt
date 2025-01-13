@@ -5,12 +5,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
 import es.atm.gbee.R
 
-class SettingsFragment : PreferenceFragmentCompat() {
+class AdvancedSettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.preferences, rootKey)
+        setPreferencesFromResource(R.xml.advanced_preferences, rootKey)
     }
     override fun onResume() {
         super.onResume()
-        (activity as? AppCompatActivity)?.supportActionBar?.title = "Settings"
+        (activity as? AppCompatActivity)?.supportActionBar?.title = "Advanced"
     }
 }

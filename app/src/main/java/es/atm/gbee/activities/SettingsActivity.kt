@@ -1,5 +1,7 @@
 package es.atm.gbee.activities
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +19,7 @@ const val GAME_ID = "GAME_ID"
 class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
     private lateinit var binding: ActivitySettingsBinding
+    private var gameId = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +32,7 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
             setDisplayHomeAsUpEnabled(true)
         }
 
-        val gameId = intent.getIntExtra(GAME_ID, -1)
+        gameId = intent.getIntExtra(GAME_ID, -1)
 
         if (gameId != -1) {
             supportFragmentManager
@@ -73,6 +76,9 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
     }
 
     override fun onSupportNavigateUp(): Boolean {
+        val resultIntent = Intent()
+        resultIntent.putExtra(GAME_ID, gameId)
+        setResult(Activity.RESULT_OK, resultIntent)
         onBackPressedDispatcher.onBackPressed()
         return true
     }

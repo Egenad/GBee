@@ -3,11 +3,13 @@ package es.atm.gbee.core
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
 import es.atm.gbee.core.fragments.COVER_KEY
 import es.atm.gbee.core.fragments.TITLE_KEY
 import es.atm.gbee.core.sql.SQLManager
-import es.atm.gbee.core.sql.persistence.ROMEntity
+import es.atm.gbee.core.sql.persistence.roms.ROMEntity
+import es.atm.gbee.core.utils.FileManager
 import java.io.File
 import java.io.FileOutputStream
 
@@ -96,12 +98,38 @@ object RomManagement {
         return file
     }
 
-    fun deleteROM(context: Context, rom: ROMEntity?) : Boolean {
+    fun deleteRom(context: Context, rom: ROM, position: Int): Boolean{
+        val dao = SQLManager.getDatabase(context).romDAO()
+        val romEntity = dao.getROMByTitle(rom.title ?: "")
+        if(romEntity != null) {
+            // Delete private file and database entry
+            if(deleteROMFile(context, romEntity)) {
+
+                // Delete from Shared Preferences
+                val preferences = context.getSharedPreferences(romEntity.id.toString(), Context.MODE_PRIVATE)
+                val editor = preferences.edit()
+                editor.clear()
+                editor.apply()
+
+                // Delete from Data Source
+                ROMDataSource.roms.removeAt(position)
+
+                Toast.makeText(context, "${rom.title} has been deleted", Toast.LENGTH_SHORT).show()
+                return true
+            }
+        }
+        Toast.makeText(context, "An error has occurred", Toast.LENGTH_SHORT).show()
+        return false
+    }
+
+
+     private fun deleteROMFile(context: Context, rom: ROMEntity?) : Boolean {
         val romDao = SQLManager.getDatabase(context).romDAO()
 
         // Delete file from private storage
         if(rom != null) {
             val filepath = rom.filePath
+            val imagePath = rom.imageRes
 
             if (filepath.isNotEmpty()) {
                 val file = File(filepath)
@@ -111,6 +139,11 @@ object RomManagement {
             }
             // Delete from DB
             romDao.deleteROM(rom)
+
+            // Delete game cover if needed
+            if(imagePath != null)
+                FileManager.deleteFileFromPrivateStorage(imagePath)
+
             return true
         }
 

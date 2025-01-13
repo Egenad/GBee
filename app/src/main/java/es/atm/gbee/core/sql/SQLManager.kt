@@ -4,15 +4,18 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room.databaseBuilder
 import androidx.room.RoomDatabase
-import es.atm.gbee.core.sql.persistence.ROMDao
-import es.atm.gbee.core.sql.persistence.ROMEntity
+import es.atm.gbee.core.sql.persistence.roms.ROMDao
+import es.atm.gbee.core.sql.persistence.roms.ROMEntity
+import es.atm.gbee.core.sql.persistence.themes.ThemeDao
+import es.atm.gbee.core.sql.persistence.themes.ThemeEntity
 
 const val ROOM_DB_NAME = "gbee_sqlite"
 
-@Database(entities = [ROMEntity::class], version = 1, exportSchema = false)
+@Database(entities = [ROMEntity::class, ThemeEntity::class], version = 1, exportSchema = false)
 abstract class SQLManager : RoomDatabase(){
 
     abstract fun romDAO(): ROMDao
+    abstract fun themeDAO(): ThemeDao
 
     companion object {
 
