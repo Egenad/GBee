@@ -40,7 +40,6 @@
         android:key="about_settings"
         android:title="About"
         android:icon="@drawable/help_vector"
-        android:summary="Version and license information"
-        android:fragment="es.atm.gbee.core.fragments.AboutFragment" />
+        android:summary="Version and license information" />
 
 </PreferenceScreen>

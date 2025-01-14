@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <SwitchPreferenceCompat
+        android:key="animate_buttons"
+        android:title="Animate button presses" />
+
+    <SwitchPreferenceCompat
+        android:key="use_skins"
+        android:title="Use device skins"
+        android:summary="Either use default layout or custom skins" />
+
+    <Preference
+        android:key="dmg_skin"
+        android:title="DMG Skin"
+        android:summary="Select a custom skin for GB files"/>
+
+    <Preference
+        android:key="gbc_skin"
+        android:title="GBC Skin"
+        android:summary="Select a custom skin for GBC files"/>
+
 </androidx.preference.PreferenceScreen>

@@ -10,7 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import es.atm.gbee.R
-import es.atm.gbee.core.ROM
+import es.atm.gbee.core.data.rom.ROM
 import java.io.File
 
 class ROMAdapter(val romList: MutableList<ROM>, private val spanCount: Int, private val context: Context)  :

@@ -1,4 +1,4 @@
-package es.atm.gbee.core
+package es.atm.gbee.core.data.rom
 
 import android.content.Context
 import es.atm.gbee.R

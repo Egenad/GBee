@@ -5,6 +5,8 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import android.widget.Toast
 import androidx.documentfile.provider.DocumentFile
+import es.atm.gbee.core.data.rom.ROM
+import es.atm.gbee.core.data.rom.ROMDataSource
 import es.atm.gbee.core.fragments.COVER_KEY
 import es.atm.gbee.core.fragments.TITLE_KEY
 import es.atm.gbee.core.sql.SQLManager

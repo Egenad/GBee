@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <SwitchPreferenceCompat
         android:key="enable_audio"
         android:title="Enable Audio"
+        android:icon="@drawable/volume_mute"
         android:summary="Toggle sound effects and music" />
+    <SeekBarPreference
+        android:key="audio_volume"
+        android:title="Volume"
+        android:icon="@drawable/volume_up"
+        android:max="100"
+        app:min="0" />
 </PreferenceScreen>

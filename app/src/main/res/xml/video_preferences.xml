@@ -4,11 +4,13 @@
     <SwitchPreferenceCompat
         android:key="vsync_preference"
         android:title="Enable VSync"
+        android:icon="@drawable/picture_center_vector"
         android:summary="Synchronize rendering with monitor refresh rate" />
 
     <SwitchPreferenceCompat
         android:key="fps_preference"
         android:title="Show FPS Counter"
+        android:icon="@drawable/fps_vector"
         android:summary="Synchronize rendering with monitor refresh rate" />
 
     <ListPreference
@@ -16,6 +18,7 @@
         android:title="DMG Palette"
         android:entries="@array/dmg_palette_names"
         android:entryValues="@array/dmg_palette_values"
+        android:icon="@drawable/palette_vector"
         android:defaultValue="classic" />
 
     <ListPreference
@@ -23,6 +26,7 @@
         android:title="GBC Palette"
         android:entries="@array/gbc_palette_names"
         android:entryValues="@array/gbc_palette_values"
+        android:icon="@drawable/palette_vector"
         android:defaultValue="default" />
 
 

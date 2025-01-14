@@ -13,7 +13,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import es.atm.gbee.R
 import es.atm.gbee.activities.GAME_ID
-import es.atm.gbee.core.ROMDataSource
+import es.atm.gbee.core.data.rom.ROMDataSource
 import es.atm.gbee.core.sql.SQLManager
 import es.atm.gbee.core.utils.FileManager
 import java.io.File

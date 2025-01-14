@@ -13,9 +13,16 @@
         android:theme="@style/Theme.GBee"
         tools:targetApi="31">
         <activity
-            android:name=".activities.SettingsActivity"
-            android:theme="@style/SettingsStyle"
+            android:name=".activities.AboutActivity"
             android:exported="false" />
+        <activity
+            android:name=".activities.CustomSkinsActivity"
+            android:exported="false"
+            android:theme="@style/SettingsStyle" />
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:exported="false"
+            android:theme="@style/SettingsStyle" />
         <activity
             android:name=".activities.EmuActivity"
             android:exported="false" />

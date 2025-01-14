@@ -20,6 +20,11 @@
     <string name="game_cover_summary">Select an image for the game cover</string>
     <string name="error">An error has occurred</string>
     <string name="invalid_name">Name contains invalid characters</string>
+    <string name="add_skin">Add New Skin</string>
+    <string name="default_skin">Default Skin</string>
+    <string name="developed_by">Ángel Jesús Terol Martínez</string>
+    <string name="to_webpage">Webpage</string>
+    <string name="webPage">egenad.github.io</string>
 
     <string-array name="dmg_palette_names">
         <item>Classic</item>

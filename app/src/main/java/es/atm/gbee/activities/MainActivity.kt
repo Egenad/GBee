@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import es.atm.gbee.R
 import es.atm.gbee.activities.adapter.ROMAdapter
-import es.atm.gbee.core.ROMDataSource
+import es.atm.gbee.core.data.rom.ROMDataSource
 import es.atm.gbee.core.RomManagement
 import es.atm.gbee.core.sql.SQLManager
 import es.atm.gbee.databinding.ActivityMainBinding

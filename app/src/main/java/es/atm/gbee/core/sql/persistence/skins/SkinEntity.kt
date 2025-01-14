@@ -1,12 +1,13 @@
-package es.atm.gbee.core.sql.persistence.themes
+package es.atm.gbee.core.sql.persistence.skins
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "themes")
-data class ThemeEntity (
+@Entity(tableName = "skins")
+data class SkinEntity (
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val background: String,
+    val landscapeBackground: String,
     val ssbuttons: String,
     val aButton: String,
     val bButton: String?,

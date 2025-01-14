@@ -41,5 +41,11 @@ class VideoSettingsFragment : PreferenceFragmentCompat() {
             titleTextView?.setTextColor(Color.BLACK)
         }
 
+        val gbcPalPreference: ListPreference? = findPreference(CGB_PALETTE_PREFERENCE)
+        gbcPalPreference?.let { preference ->
+            val titleTextView = preference.title as? TextView
+            titleTextView?.setTextColor(Color.BLACK)
+        }
+
     }
 }

@@ -1,4 +1,4 @@
-package es.atm.gbee.core
+package es.atm.gbee.core.data.rom
 
 data class ROM(
     var id: Int = -1,
