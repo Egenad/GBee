@@ -302,6 +302,8 @@
             android:layout_marginEnd="10dp"
             android:layout_weight="0.2"
             android:scaleType="fitCenter"
+            app:tint="#E2B74F"
+            android:tintMode="multiply"
             android:src="@drawable/default_speakers" />
 
     </LinearLayout>
