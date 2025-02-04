@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
-    android:background="#ECB532"
+    android:background="#E2B74F"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -12,25 +12,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/home_panel"
-        android:layout_centerInParent="true"
-        android:padding="16dp"
-        android:layout_width="match_parent"
-        android:layout_height="0dp" >
+        app:layout_constraintDimensionRatio="10:9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="0dp">
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/default_screen"
-            android:scaleType="fitCenter" />
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/default_screen" />
 
-        <es.atm.gbee.views.GameSurfaceView
+         <es.atm.gbee.views.GameSurfaceView
             android:id="@+id/gameSurface"
-            android:layout_margin="42dp"
+            android:layout_margin="40dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             />
 
         <ImageView
@@ -39,7 +41,7 @@
             android:layout_height="match_parent"
             android:visibility="invisible"
             android:src="@drawable/default_screen_off"
-            android:scaleType="fitCenter" />
+            android:scaleType="fitXY"/>
 
     </FrameLayout>
 
@@ -56,6 +58,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.2"
+            android:scaleX="0.7"
+            android:scaleY="0.7"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:scaleType="fitCenter"
@@ -66,6 +70,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.2"
+            android:padding="5dp"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:scaleType="fitCenter"
@@ -253,7 +258,6 @@
         android:gravity="center"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        margin
         android:layout_width="match_parent"
         android:layout_height="40dp" >
 
@@ -270,6 +274,7 @@
         <ImageButton
             android:id="@+id/button_select"
             android:layout_width="0dp"
+            android:padding="5dp"
             android:layout_weight="0.2"
             android:layout_height="match_parent"
             android:layout_marginStart="10dp"
@@ -282,6 +287,7 @@
             android:id="@+id/button_start"
             android:layout_weight="0.2"
             android:layout_width="0dp"
+            android:padding="5dp"
             android:layout_height="match_parent"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
