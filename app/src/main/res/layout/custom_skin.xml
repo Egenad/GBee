@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:background="#ECB532"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/home_panel"
+        android:layout_centerInParent="true"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp" >
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/default_screen"
+            android:scaleType="fitCenter" />
+
+        <es.atm.gbee.views.GameSurfaceView
+            android:id="@+id/gameSurface"
+            android:layout_margin="42dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+
+        <ImageView
+            android:id="@+id/screen_of"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible"
+            android:src="@drawable/default_screen_off"
+            android:scaleType="fitCenter" />
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/home_panel"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/frameLayout"
+        app:layout_constraintBottom_toTopOf="@+id/control_panel">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.2"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/default_logo" />
+
+        <ImageButton
+            android:id="@+id/switch_button"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.2"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:scaleType="fitCenter"
+            android:background="@null"
+            android:src="@drawable/default_home" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.2"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:scaleType="fitCenter"
+            android:visibility="invisible"
+            android:src="@drawable/default_logo" />
+
+    </LinearLayout>
+
+    <!-- D-Pad -->
+
+    <LinearLayout
+        android:id="@+id/control_panel"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/selectstart"
+        app:layout_constraintTop_toBottomOf="@+id/home_panel"
+        android:gravity="center"
+        android:layout_margin="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:padding="10dp"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/dpad_image"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="0.2"
+                android:scaleType="fitCenter"
+                android:visibility="visible"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:src="@drawable/default_dpad" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/dpad_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <!-- Botón de arriba -->
+                <Button
+                    android:id="@+id/dpad_up"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:padding="0dp"
+                    android:visibility="invisible"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/dpad_center"
+                    app:layout_constraintDimensionRatio="1:1" />
+
+                <!-- Botón de la izquierda -->
+                <Button
+                    android:id="@+id/dpad_left"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="invisible"
+                    android:padding="0dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/dpad_center"
+                    app:layout_constraintTop_toTopOf="@+id/dpad_center"
+                    app:layout_constraintBottom_toBottomOf="@+id/dpad_center"
+                    app:layout_constraintDimensionRatio="1:1" />
+
+                <!-- Botón del centro -->
+                <View
+                    android:id="@+id/dpad_center"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:layout_constraintStart_toStartOf="@id/dpad_left"
+                    app:layout_constraintEnd_toEndOf="@id/dpad_right"
+                    app:layout_constraintTop_toBottomOf="@id/dpad_up"
+                    app:layout_constraintBottom_toTopOf="@id/dpad_down"
+                    app:layout_constraintDimensionRatio="1:1" />
+
+                <!-- Botón de la derecha -->
+                <Button
+                    android:id="@+id/dpad_right"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="invisible"
+                    android:padding="0dp"
+                    app:layout_constraintStart_toEndOf="@+id/dpad_center"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/dpad_center"
+                    app:layout_constraintBottom_toBottomOf="@+id/dpad_center"
+                    app:layout_constraintDimensionRatio="1:1" />
+
+                <!-- Botón de abajo -->
+                <Button
+                    android:id="@+id/dpad_down"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="invisible"
+                    android:padding="0dp"
+                    app:layout_constraintStart_toEndOf="@id/dpad_left"
+                    app:layout_constraintEnd_toStartOf="@id/dpad_right"
+                    app:layout_constraintTop_toBottomOf="@+id/dpad_center"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="1:1" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Botones A y B -->
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:padding="20dp"
+            android:layout_height="match_parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/buttAB_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <ImageButton
+                    android:id="@+id/button_a"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:layout_constraintStart_toEndOf="@id/button_b"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/button_b"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHorizontal_bias="1"
+                    app:layout_constraintVertical_bias="0.35"
+                    android:src="@drawable/default_a"
+                    android:scaleType="fitCenter"
+                    android:background="@null"
+                    android:padding="0dp"
+                    app:layout_constraintDimensionRatio="1:1"
+                    android:backgroundTint="@android:color/holo_blue_light" />
+
+                <ImageButton
+                    android:id="@+id/button_b"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/button_a"
+                    app:layout_constraintTop_toBottomOf="@id/button_a"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintVertical_bias="0.65"
+                    android:src="@drawable/default_b"
+                    android:scaleType="fitCenter"
+                    android:background="@null"
+                    android:padding="0dp"
+                    app:layout_constraintDimensionRatio="1:1"
+                    android:backgroundTint="@android:color/holo_red_light" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+    <!-- Botones Select y Start -->
+
+    <LinearLayout
+        android:id="@+id/selectstart"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/control_panel"
+        android:gravity="center"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        margin
+        android:layout_width="match_parent"
+        android:layout_height="40dp" >
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.2"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:visibility="invisible"
+            android:scaleType="fitCenter"
+            android:src="@drawable/default_logo" />
+
+        <ImageButton
+            android:id="@+id/button_select"
+            android:layout_width="0dp"
+            android:layout_weight="0.2"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:src="@drawable/default_start_select"/>
+
+        <ImageButton
+            android:id="@+id/button_start"
+            android:layout_weight="0.2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:src="@drawable/default_start_select"/>
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="0.2"
+            android:scaleType="fitCenter"
+            android:src="@drawable/default_speakers" />
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
