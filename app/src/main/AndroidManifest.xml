@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name=".core.GBee"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -20,12 +21,10 @@
             android:exported="false" />
         <activity
             android:name=".activities.CustomSkinsActivity"
-            android:exported="false"
-            android:theme="@style/SettingsStyle" />
+            android:exported="false"/>
         <activity
             android:name=".activities.SettingsActivity"
-            android:exported="false"
-            android:theme="@style/SettingsStyle" />
+            android:exported="false" />
         <activity
             android:name=".activities.EmuActivity"
             android:exported="false" />

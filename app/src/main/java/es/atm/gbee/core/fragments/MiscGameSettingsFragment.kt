@@ -57,11 +57,6 @@ class MiscGameSettingsFragment : PreferenceFragmentCompat() {
             }
         }
 
-        val titlePreference: EditTextPreference? = findPreference(TITLE_KEY)
-        titlePreference?.setOnBindEditTextListener { editText ->
-            editText.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-        }
-
         configureLayout()
     }
 

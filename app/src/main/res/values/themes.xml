@@ -4,23 +4,7 @@
     <style name="Base.Theme.GBee" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-        <item name="android:statusBarColor">@color/black</item>
-        <item name="alertDialogTheme">@style/DialogStyle</item>
-
     </style>
 
     <style name="Theme.GBee" parent="Base.Theme.GBee" />
-
-    <style name="PopupMenuStyle" parent="Widget.MaterialComponents.PopupMenu">
-        <item name="android:textColor">@color/black</item>
-    </style>
-
-    <style name="SettingsStyle" parent="Theme.GBee">
-        <item name="android:textColorPrimary">@color/white</item>
-        <item name="android:textColorSecondary">#ADADAD</item>
-    </style>
-
-    <style name="DialogStyle" parent="@style/ThemeOverlay.AppCompat.Dialog.Alert">
-        <item name="android:textColorPrimary">@color/black</item>
-    </style>
 </resources>

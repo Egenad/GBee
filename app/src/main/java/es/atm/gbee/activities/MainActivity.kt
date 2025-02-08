@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleDelete(position: Int) {
-        val alertDialog = AlertDialog.Builder(this)
+        val alertDialog = AlertDialog.Builder(this, R.style.DialogStyle)
             .setTitle(R.string.confirm_delete)
             .setMessage(R.string.check_sure)
             .setPositiveButton(R.string.delete) { _, _ ->

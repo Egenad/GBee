@@ -42,8 +42,6 @@ class CustomSkinsActivity : AppCompatActivity() {
             insets
         }
 
-        //window.statusBarColor = ContextCompat.getColor(this, R.color.black)
-
         createRecyclerView()
     }
 
