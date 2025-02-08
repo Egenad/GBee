@@ -25,6 +25,7 @@
     <string name="developed_by">Ángel Jesús Terol Martínez</string>
     <string name="to_webpage">Webpage</string>
     <string name="webPage">egenad.github.io</string>
+    <string name="nullValue">null</string>
 
     <string-array name="dmg_palette_names">
         <item>Classic</item>

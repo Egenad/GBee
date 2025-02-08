@@ -7,14 +7,6 @@ object ROMDataSource {
 
     val roms: MutableList<ROM> = mutableListOf()
 
-    fun getSelectedROMsCount(): Int {
-        return roms.count { it.selected }
-    }
-
-    fun deleteSelectedROMs() {
-        roms.removeAll { it.selected }
-    }
-
     fun getROMById(id: Int, context: Context): ROM {
         return roms.find { it.id == id } ?: getDefaultROM(context)
     }

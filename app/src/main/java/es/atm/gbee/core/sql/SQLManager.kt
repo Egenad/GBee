@@ -15,7 +15,7 @@ const val ROOM_DB_NAME = "gbee_sqlite"
 abstract class SQLManager : RoomDatabase(){
 
     abstract fun romDAO(): ROMDao
-    abstract fun themeDAO(): SkinDao
+    abstract fun skinDAO(): SkinDao
 
     companion object {
 

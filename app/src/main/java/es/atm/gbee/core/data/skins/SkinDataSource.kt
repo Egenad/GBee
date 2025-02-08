@@ -1,45 +1,74 @@
 package es.atm.gbee.core.data.skins
 
-import android.content.Context
-
 object SkinDataSource {
 
-    val roms: MutableList<Skin> = mutableListOf()
+    val skins: MutableList<Skin> = mutableListOf()
 
-    fun getSelectedSkinsCount(): Int {
-        return roms.count { it.selected }
+    init {
+        skins.add(getDefaultSkin())
     }
 
-    fun deleteSelectedSkins() {
-        roms.removeAll { it.selected }
-    }
-
-    fun getSkinById(id: Int, context: Context): Skin {
-        return roms.find { it.id == id } ?: getDefaultSkin(context)
+    fun getSkinById(id: Int): Skin {
+        return skins.find { it.id == id } ?: getDefaultSkin()
     }
 
     fun getPositionById(romId: Int): Int? {
-        return roms.indexOfFirst { it.id == romId }.takeIf { it != -1 }
+        return skins.indexOfFirst { it.id == romId }.takeIf { it != -1 }
     }
 
-    fun getSkinByTitle(title: String, context: Context): Skin {
-        return roms.find { it.title == title } ?: getDefaultSkin(context)
+    fun getSkinByTitle(title: String): Skin {
+        return skins.find { it.title == title } ?: getDefaultSkin()
     }
 
-    private fun getDefaultSkin(context: Context): Skin {
-        val resources = context.resources
-
-        return Skin(background = "default_background",
-            landscapeBackground = "default_landscape_background",
-            ssbuttons = "default_ssbuttons",
-            aButton = "default_a_button",
-            abSameButton = true,
-            screenBorder = null,
-            selected = false)
-
+    private fun getDefaultSkin(): Skin {
+        return Skin(
+            title = "Default Skin",
+            backgroundColor = "#E2B74F",
+            startSelectButtons = "default_start_select",
+            aButton = "default_a",
+            bButton = "default_b",
+            abSameButton = false,
+            screenBorder = "default_screen",
+            screenOff = "default_screen_off",
+            leftHomeImage = "default_logo",
+            leftLandscapeImage = "default_logo",
+            rightBottomImage = "default_speakers",
+            rightLandscapeImage = "default_speakers",
+            homeButton = "default_home"
+        )
     }
 
-    fun addROM(rom: Skin) {
-        roms.add(rom)
+    fun addSkin(rom: Skin) {
+        skins.add(rom)
+    }
+
+    fun selectAllSkins(selection : Boolean){
+        for (skin in skins){
+            skin.selected = selection
+        }
+    }
+
+    fun getSelectedSkinsCount() : Int {
+
+        var count = 0
+
+        for (skin in skins){
+            if(skin.selected)
+                count++
+        }
+
+        return count
+    }
+
+    fun deleteSelectedSkins(){
+
+        val newSkinList: MutableList<Skin> = mutableListOf()
+
+        for (skin in skins){
+            if(skin.selected)
+                newSkinList.add(skin)
+        }
+
+        skins.removeAll(newSkinList)
     }
 }

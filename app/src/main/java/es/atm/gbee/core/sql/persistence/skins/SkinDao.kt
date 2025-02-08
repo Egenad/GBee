@@ -6,19 +6,22 @@ import androidx.room.*
 interface SkinDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTheme(theme: SkinEntity): Long
+    fun insertSkin(theme: SkinEntity): Long
 
     @Update
-    fun updateTheme(theme: SkinEntity): Int
+    fun updateSkin(theme: SkinEntity): Int
 
     @Delete
-    fun deleteTheme(theme: SkinEntity): Int
+    fun deleteSkin(theme: SkinEntity): Int
 
     @Query("SELECT * FROM skins")
-    fun getAllThemes(): List<SkinEntity>
+    fun getAllSkins(): List<SkinEntity>
 
     @Query("SELECT * FROM skins WHERE id = :id")
-    fun getThemeById(id: Int): SkinEntity?
+    fun getSkinById(id: Int): SkinEntity?
+
+    @Query("SELECT * FROM skins WHERE title = :title")
+    fun getSkinByTitle(title: String): SkinEntity?
 
     @Query("DELETE FROM skins")
     fun clearTable()

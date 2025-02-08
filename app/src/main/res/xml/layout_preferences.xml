@@ -7,17 +7,13 @@
 
     <SwitchPreferenceCompat
         android:key="use_skins"
+        android:defaultValue="true"
         android:title="Use device skins"
         android:summary="Either use default layout or custom skins" />
 
     <Preference
-        android:key="dmg_skin"
-        android:title="DMG Skin"
+        android:key="custom_skin"
+        android:title="Custom Skin"
         android:summary="Select a custom skin for GB files"/>
-
-    <Preference
-        android:key="gbc_skin"
-        android:title="GBC Skin"
-        android:summary="Select a custom skin for GBC files"/>
 
 </androidx.preference.PreferenceScreen>

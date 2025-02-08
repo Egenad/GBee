@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
+import android.view.View
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +12,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import es.atm.gbee.R
 import es.atm.gbee.databinding.ActivityEmuBinding
+import es.atm.gbee.databinding.CustomSkinBinding
 import es.atm.gbee.modules.A_BUTTON
 import es.atm.gbee.modules.B_BUTTON
 import es.atm.gbee.modules.DOWN_DPAD
@@ -30,21 +32,30 @@ const val ROM_PATH_EXTRA = "ROM_PATH"
 class EmuActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityEmuBinding
+    private lateinit var bindingCS : CustomSkinBinding
     private lateinit var gameSurfaceView: GameSurfaceView
 
-    private lateinit var dbgButton: Button
+    private lateinit var dbgButton: View
 
     private val debugMode = true
     private var tilemap = true
+    private var customSkin = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        binding = ActivityEmuBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        if(customSkin) {
+            bindingCS = CustomSkinBinding.inflate(layoutInflater)
+            setContentView(bindingCS.root)
 
-        gameSurfaceView = binding.gameSurface
+            gameSurfaceView = bindingCS.gameSurface
+        }else{
+            binding = ActivityEmuBinding.inflate(layoutInflater)
+            setContentView(binding.root)
+
+            gameSurfaceView = binding.gameSurface
+        }
 
         configureButtons()
 
@@ -63,16 +74,27 @@ class EmuActivity : AppCompatActivity() {
 
 
     private fun configureButtons(){
-        setButton(binding.dpadUp, UP_DPAD)
-        setButton(binding.dpadDown, DOWN_DPAD)
-        setButton(binding.dpadLeft, LEFT_DPAD)
-        setButton(binding.dpadRight, RIGHT_DPAD)
-        setButton(binding.buttonA, A_BUTTON)
-        setButton(binding.buttonB, B_BUTTON)
-        setButton(binding.buttonSelect, SELECT_BUTTON)
-        setButton(binding.buttonStart, START_BUTTON)
-
-        dbgButton = binding.switchButton
+        if(customSkin){
+            setButton(bindingCS.dpadUp, UP_DPAD)
+            setButton(bindingCS.dpadDown, DOWN_DPAD)
+            setButton(bindingCS.dpadLeft, LEFT_DPAD)
+            setButton(bindingCS.dpadRight, RIGHT_DPAD)
+            setButton(bindingCS.buttonA, A_BUTTON)
+            setButton(bindingCS.buttonB, B_BUTTON)
+            setButton(bindingCS.buttonSelect, SELECT_BUTTON)
+            setButton(bindingCS.buttonStart, START_BUTTON)
+            dbgButton = bindingCS.switchButton
+        }else{
+            setButton(binding.dpadUp, UP_DPAD)
+            setButton(binding.dpadDown, DOWN_DPAD)
+            setButton(binding.dpadLeft, LEFT_DPAD)
+            setButton(binding.dpadRight, RIGHT_DPAD)
+            setButton(binding.buttonA, A_BUTTON)
+            setButton(binding.buttonB, B_BUTTON)
+            setButton(binding.buttonSelect, SELECT_BUTTON)
+            setButton(binding.buttonStart, START_BUTTON)
+            dbgButton = binding.switchButton
+        }
 
         if(debugMode){
             dbgButton.setOnClickListener {
@@ -83,7 +105,7 @@ class EmuActivity : AppCompatActivity() {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun setButton(button: Button, name: String){
+    private fun setButton(button: View, name: String){
         button.setOnTouchListener { v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {

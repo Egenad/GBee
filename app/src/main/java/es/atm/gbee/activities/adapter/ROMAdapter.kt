@@ -65,11 +65,6 @@ class ROMAdapter(val romList: MutableList<ROM>, private val spanCount: Int, priv
                 if (file.exists())
                     icon.setImageURI(Uri.fromFile(file))
             }
-
-            if(it.selected)
-                view.setBackgroundColor(Color.GRAY)
-            else
-                view.setBackgroundColor(Color.WHITE)
         }
 
         init {
