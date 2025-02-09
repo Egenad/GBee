@@ -48,3 +48,9 @@ render.experimental.xml
 google-services.json
 
 *.hprof
+
+docs/Latex/*.aux
+docs/Latex/*.log
+docs/Latex/*.out
+docs/Latex/*.lof
+docs/Latex/*.toc
