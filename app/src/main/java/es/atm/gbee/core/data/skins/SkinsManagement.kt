@@ -43,9 +43,18 @@ object SkinsManagement {
 
     fun loadSkinsFromDBIfNeeded(context: Context){
         val skinDao = SQLManager.getDatabase(context).skinDAO()
+
+        val defaultSkin = SkinDataSource.getDefaultSkin()
+        val defaultSkinDB = skinDao.getSkinByTitle(defaultSkin.title!!)
+
+        if(defaultSkinDB == null)
+            skinDao.insertSkin(convertDataToEntity(defaultSkin))
+
         val allSkins = skinDao.getAllSkins()
+
         if(SkinDataSource.skins.size != allSkins.size){
             SkinDataSource.skins.clear()
+
             allSkins.forEach {
                 SkinDataSource.addSkin(Skin(
                     id = it.id,
@@ -66,5 +75,25 @@ object SkinsManagement {
                     leftLandscapeImage = it.leftLandscapeImage))
             }
         }
+    }
+
+    private fun convertDataToEntity(skin: Skin): SkinEntity{
+        return SkinEntity(
+            title = skin.title,
+            backgroundColor = skin.backgroundColor,
+            startSelectButtons = skin.startSelectButtons,
+            aButton = skin.aButton,
+            bButton = skin.bButton,
+            abSameButton = skin.abSameButton,
+            screenBorder = skin.screenBorder,
+            screenOff = skin.screenOff,
+            homeButton = skin.homeButton,
+            leftHomeImage = skin.leftHomeImage,
+            rightHomeImage = skin.rightHomeImage,
+            leftBottomImage = skin.leftBottomImage,
+            rightBottomImage = skin.rightBottomImage,
+            rightLandscapeImage = skin.rightLandscapeImage,
+            leftLandscapeImage = skin.leftLandscapeImage
+        )
     }
 }

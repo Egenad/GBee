@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         binding.romGrid.layoutManager = GridLayoutManager(this, spanCount)
         binding.romGrid.itemAnimator = DefaultItemAnimator()
 
-        romAdapter = ROMAdapter(ROMDataSource.roms, spanCount, this)
+        romAdapter = ROMAdapter(ROMDataSource.roms, spanCount)
 
         // Click Listener
         romAdapter.setOnItemClickListener { romPosition ->

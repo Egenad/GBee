@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
 import java.io.File
+import java.util.UUID
 
 object FileManager {
 
@@ -15,11 +16,17 @@ object FileManager {
             val contentResolver = context.contentResolver
             val inputStream = contentResolver.openInputStream(uri) ?: return null
 
+            var defaultName = UUID.randomUUID().toString().take(8)
+
+            if(gameId != -1){
+                defaultName = "cover_image_$gameId"
+            }
+
             val fileName = contentResolver.query(uri, null, null, null, null)?.use { cursor ->
                 val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                 cursor.moveToFirst()
                 cursor.getString(nameIndex)
-            } ?: "cover_image_$gameId.jpg"
+            } ?: "$defaultName.jpg"
 
             val file = File(context.filesDir, fileName)
 

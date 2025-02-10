@@ -11,6 +11,7 @@ import es.atm.gbee.R
 import es.atm.gbee.activities.CustomSkinsActivity
 
 const val CUSTOM_SKIN_PREFERENCE = "custom_skin"
+const val USE_SKIN_PREFERENCE = "use_skins"
 
 class LayoutSettingsFragment : PreferenceFragmentCompat() {
 
@@ -24,8 +25,8 @@ class LayoutSettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.layout_preferences, rootKey)
 
-        val dmgSkinPreference: Preference? = findPreference(CUSTOM_SKIN_PREFERENCE)
-        dmgSkinPreference?.setOnPreferenceClickListener {
+        val skinPreference: Preference? = findPreference(CUSTOM_SKIN_PREFERENCE)
+        skinPreference?.setOnPreferenceClickListener {
             val intent = Intent(requireContext(), CustomSkinsActivity::class.java)
             activityCustomSkinLauncher.launch(intent)
             true

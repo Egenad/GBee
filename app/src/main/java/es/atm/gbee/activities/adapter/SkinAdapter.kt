@@ -1,16 +1,19 @@
 package es.atm.gbee.activities.adapter
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import es.atm.gbee.R
-import es.atm.gbee.core.data.rom.ROM
+import es.atm.gbee.activities.CreateCustomSkinActivity
+import es.atm.gbee.activities.SKIN_ID_EXTRA
 import es.atm.gbee.core.data.skins.Skin
 import java.io.File
 
@@ -41,19 +44,43 @@ class SkinAdapter(val skinList: MutableList<Skin>, private val context: Context)
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = skinList[position]
-        holder.bind(item)
+        holder.bind(item, context)
     }
 
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         private var name: TextView
+        private var image: ImageView
+        private var editButton: ImageButton
         private val view = v
 
-        fun bind(it: Skin) {
+        fun bind(it: Skin, context: Context) {
             name.text = it.title
+
+            image.setImageResource(R.drawable.rom_icon)
+
+            if(it.previewRes != null) {
+                val file = File(it.previewRes!!)
+                if (file.exists())
+                    image.setImageURI(Uri.fromFile(file))
+            }
+
+            view.setBackgroundColor(
+                if (it.selected) Color.parseColor("#2D2D2D") else Color.BLACK
+            )
+
+            editButton.visibility = if (it.editable) View.VISIBLE else View.INVISIBLE
+
+            editButton.setOnClickListener {
+                val intent = Intent(context, CreateCustomSkinActivity::class.java)
+                intent.putExtra(SKIN_ID_EXTRA, it.id)
+                context.startActivity(intent)
+            }
         }
 
         init {
             name = view.findViewById(R.id.itemName)
+            image = view.findViewById(R.id.itemImage)
+            editButton = view.findViewById(R.id.editButton)
         }
     }
 

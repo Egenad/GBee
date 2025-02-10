@@ -18,5 +18,7 @@ data class Skin(
     var rightLandscapeImage: String? = null,
     var leftLandscapeImage: String? = null,
     var selected: Boolean = false,
-    var deletable: Boolean = false
+    var deletable: Boolean = true,
+    var editable: Boolean = true,
+    var previewRes: String? = null
 )

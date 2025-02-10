@@ -5,12 +5,13 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.preference.PreferenceManager
 import es.atm.gbee.R
+import es.atm.gbee.core.fragments.USE_SKIN_PREFERENCE
 import es.atm.gbee.databinding.ActivityEmuBinding
 import es.atm.gbee.databinding.CustomSkinBinding
 import es.atm.gbee.modules.A_BUTTON
@@ -44,6 +45,9 @@ class EmuActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
+        customSkin = preferences.getBoolean(USE_SKIN_PREFERENCE, false)
 
         if(customSkin) {
             bindingCS = CustomSkinBinding.inflate(layoutInflater)

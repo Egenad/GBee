@@ -20,7 +20,7 @@ object SkinDataSource {
         return skins.find { it.title == title } ?: getDefaultSkin()
     }
 
-    private fun getDefaultSkin(): Skin {
+    fun getDefaultSkin(): Skin {
         return Skin(
             title = "Default Skin",
             backgroundColor = "#E2B74F",
@@ -34,12 +34,14 @@ object SkinDataSource {
             leftLandscapeImage = "default_logo",
             rightBottomImage = "default_speakers",
             rightLandscapeImage = "default_speakers",
-            homeButton = "default_home"
+            homeButton = "default_home",
+            editable = false,
+            deletable = false
         )
     }
 
-    fun addSkin(rom: Skin) {
-        skins.add(rom)
+    fun addSkin(skin: Skin) {
+        skins.add(skin)
     }
 
     fun selectAllSkins(selection : Boolean){

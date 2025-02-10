@@ -1,5 +1,6 @@
 package es.atm.gbee.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
@@ -12,6 +13,7 @@ import es.atm.gbee.R
 import es.atm.gbee.activities.adapter.SkinAdapter
 import es.atm.gbee.core.data.skins.SkinDataSource
 import es.atm.gbee.core.data.skins.SkinsManagement
+import es.atm.gbee.core.sql.SQLManager
 import es.atm.gbee.databinding.ActivityCustomSkinsBinding
 
 class CustomSkinsActivity : AppCompatActivity() {
@@ -36,6 +38,7 @@ class CustomSkinsActivity : AppCompatActivity() {
         }
 
         createRecyclerView()
+        configureLayout()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -68,8 +71,20 @@ class CustomSkinsActivity : AppCompatActivity() {
         val recyclerAdapter = recycledList.adapter as SkinAdapter
 
         recyclerAdapter.setOnItemClickListener {
-                filmPosition ->
+                skinPosition ->
             run {
+
+                /*val selectedSkinTitle = skinAdapter.skinList[skinPosition].title
+
+                if (selectedSkinTitle != null) {
+                    val skinEntity = SQLManager.getDatabase(this).skinDAO().getSkinByTitle(selectedSkinTitle)
+
+                    if (skinEntity != null)
+                        startActivity(
+                            Intent(this, CreateCustomSkinActivity::class.java)
+                                .putExtra(SKIN_ID_EXTRA, skinEntity.id)
+                        )
+                }*/
 
             }
         }
@@ -83,5 +98,12 @@ class CustomSkinsActivity : AppCompatActivity() {
                 true
             }
         }*/
+    }
+
+    private fun configureLayout(){
+        binding.addSkinButton.setOnClickListener {
+            val intent = Intent(this, CreateCustomSkinActivity::class.java)
+            this.startActivity(intent)
+        }
     }
 }

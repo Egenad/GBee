@@ -1,7 +1,5 @@
 package es.atm.gbee.activities.adapter
 
-import android.content.Context
-import android.graphics.Color
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +11,7 @@ import es.atm.gbee.R
 import es.atm.gbee.core.data.rom.ROM
 import java.io.File
 
-class ROMAdapter(val romList: MutableList<ROM>, private val spanCount: Int, private val context: Context)  :
+class ROMAdapter(val romList: MutableList<ROM>, private val spanCount: Int)  :
     RecyclerView.Adapter<ROMAdapter.ViewHolder?>() {
 
     private var listener: (romPosition: Int) -> Unit = {}
