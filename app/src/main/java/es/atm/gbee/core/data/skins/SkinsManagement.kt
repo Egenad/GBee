@@ -14,6 +14,10 @@ object SkinsManagement {
         saveSkinToDatabaseAndDataSource(skin, context)
     }
 
+    fun updateSkin(context: Context, skin: Skin){
+
+    }
+
     private fun saveSkinToDatabaseAndDataSource(skin: Skin, context: Context) {
         val db = SQLManager.getDatabase(context)
 
@@ -23,16 +27,14 @@ object SkinsManagement {
             startSelectButtons = skin.startSelectButtons,
             aButton = skin.aButton,
             bButton = skin.bButton,
-            abSameButton = skin.abSameButton,
-            screenBorder = skin.screenBorder,
+            screenOn = skin.screenOn,
             screenOff = skin.screenOff,
+            dpad = skin.dpad,
             homeButton = skin.homeButton,
             leftHomeImage = skin.leftHomeImage,
             rightHomeImage = skin.rightHomeImage,
             leftBottomImage = skin.leftBottomImage,
-            rightBottomImage = skin.rightBottomImage,
-            rightLandscapeImage = skin.rightLandscapeImage,
-            leftLandscapeImage = skin.leftLandscapeImage
+            rightBottomImage = skin.rightBottomImage
         )
 
         val id = db.skinDAO().insertSkin(skinEntity)
@@ -63,37 +65,33 @@ object SkinsManagement {
                     startSelectButtons = it.startSelectButtons,
                     aButton = it.aButton,
                     bButton = it.bButton,
-                    abSameButton = it.abSameButton,
-                    screenBorder = it.screenBorder,
+                    screenOn = it.screenOn,
                     screenOff = it.screenOff,
+                    dpad = it.dpad,
                     homeButton = it.homeButton,
                     leftHomeImage = it.leftHomeImage,
                     rightHomeImage = it.rightHomeImage,
                     leftBottomImage = it.leftBottomImage,
-                    rightBottomImage = it.rightBottomImage,
-                    rightLandscapeImage = it.rightLandscapeImage,
-                    leftLandscapeImage = it.leftLandscapeImage))
+                    rightBottomImage = it.rightBottomImage))
             }
         }
     }
 
-    private fun convertDataToEntity(skin: Skin): SkinEntity{
+     private fun convertDataToEntity(skin: Skin): SkinEntity{
         return SkinEntity(
             title = skin.title,
             backgroundColor = skin.backgroundColor,
             startSelectButtons = skin.startSelectButtons,
             aButton = skin.aButton,
             bButton = skin.bButton,
-            abSameButton = skin.abSameButton,
-            screenBorder = skin.screenBorder,
+            screenOn = skin.screenOn,
             screenOff = skin.screenOff,
+            dpad = skin.dpad,
             homeButton = skin.homeButton,
             leftHomeImage = skin.leftHomeImage,
             rightHomeImage = skin.rightHomeImage,
             leftBottomImage = skin.leftBottomImage,
-            rightBottomImage = skin.rightBottomImage,
-            rightLandscapeImage = skin.rightLandscapeImage,
-            leftLandscapeImage = skin.leftLandscapeImage
+            rightBottomImage = skin.rightBottomImage
         )
     }
 }

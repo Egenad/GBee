@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
 import java.io.File
+import java.io.FileNotFoundException
 import java.util.UUID
 
 object FileManager {
@@ -17,10 +18,8 @@ object FileManager {
             val inputStream = contentResolver.openInputStream(uri) ?: return null
 
             var defaultName = UUID.randomUUID().toString().take(8)
-
-            if(gameId != -1){
+            if(gameId != -1)
                 defaultName = "cover_image_$gameId"
-            }
 
             val fileName = contentResolver.query(uri, null, null, null, null)?.use { cursor ->
                 val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
@@ -61,5 +60,21 @@ object FileManager {
     fun isTitleValid(title: String): Boolean {
         val regex = "^[a-zA-Z0-9_ -]+$"
         return title.matches(regex.toRegex())
+    }
+
+    fun getDrawableAsByteArray(context: Context, resId: Int): ByteArray {
+        if (resId == 0) throw FileNotFoundException("Drawable not found")
+
+        val inputStream = context.resources.openRawResource(resId)
+        return inputStream.readBytes()
+    }
+
+    fun uriToByteArray(context: Context, uri: Uri): ByteArray? {
+        return try {
+            context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
     }
 }

@@ -1,10 +1,16 @@
 package es.atm.gbee.core.data.skins
 
+import android.content.Context
+import es.atm.gbee.R
+import es.atm.gbee.core.utils.FileManager
+
 object SkinDataSource {
 
+    private lateinit var appContext: Context
     val skins: MutableList<Skin> = mutableListOf()
 
-    init {
+    fun init(context: Context) {
+        appContext = context.applicationContext
         skins.add(getDefaultSkin())
     }
 
@@ -24,17 +30,15 @@ object SkinDataSource {
         return Skin(
             title = "Default Skin",
             backgroundColor = "#E2B74F",
-            startSelectButtons = "default_start_select",
-            aButton = "default_a",
-            bButton = "default_b",
-            abSameButton = false,
-            screenBorder = "default_screen",
-            screenOff = "default_screen_off",
-            leftHomeImage = "default_logo",
-            leftLandscapeImage = "default_logo",
-            rightBottomImage = "default_speakers",
-            rightLandscapeImage = "default_speakers",
-            homeButton = "default_home",
+            startSelectButtons = FileManager.getDrawableAsByteArray(appContext, R.drawable.default_start_select),
+            aButton = FileManager.getDrawableAsByteArray(appContext, R.drawable.default_a),
+            bButton = FileManager.getDrawableAsByteArray(appContext, R.drawable.default_b),
+            screenOn = FileManager.getDrawableAsByteArray(appContext, R.drawable.default_screen),
+            screenOff = FileManager.getDrawableAsByteArray(appContext, R.drawable.default_screen_off),
+            dpad = FileManager.getDrawableAsByteArray(appContext, R.drawable.default_dpad),
+            leftHomeImage = FileManager.getDrawableAsByteArray(appContext, R.drawable.default_logo),
+            rightBottomImage = FileManager.getDrawableAsByteArray(appContext, R.drawable.default_speakers),
+            homeButton = FileManager.getDrawableAsByteArray(appContext, R.drawable.default_home),
             editable = false,
             deletable = false
         )

@@ -16,7 +16,9 @@ import es.atm.gbee.R
 import es.atm.gbee.activities.adapter.ROMAdapter
 import es.atm.gbee.core.data.rom.ROMDataSource
 import es.atm.gbee.core.data.rom.RomManagement
+import es.atm.gbee.core.data.skins.SkinsManagement
 import es.atm.gbee.core.sql.SQLManager
+import es.atm.gbee.core.utils.UIManager
 import es.atm.gbee.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -123,19 +125,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleDelete(position: Int) {
-        val alertDialog = AlertDialog.Builder(this, R.style.DialogStyle)
-            .setTitle(R.string.confirm_delete)
-            .setMessage(R.string.check_sure)
-            .setPositiveButton(R.string.delete) { _, _ ->
-                if(RomManagement.deleteRom(this, romAdapter.romList[position], position))
-                    romAdapter.notifyItemRemoved(position)
-            }
-            .setNegativeButton(R.string.cancel) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
 
-        alertDialog.show()
+        UIManager.showCustomAlertDialog(
+            this,
+            R.string.confirm_delete,
+            R.string.check_sure,
+            null,
+            R.string.delete,
+            R.string.cancel,
+        ) { _ ->
+            if(RomManagement.deleteRom(this, romAdapter.romList[position], position))
+                romAdapter.notifyItemRemoved(position)
+        }
     }
 
     /****

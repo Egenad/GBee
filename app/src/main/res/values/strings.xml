@@ -21,6 +21,8 @@
     <string name="pick_color">Pick Color</string>
     <string name="color_hint">#DADADA</string>
     <string name="title_not_blank">The title can not be empty</string>
+    <string name="title_exists">A skin with this title already exists</string>
+    <string name="skin_saved_correctly">The changes were saved successfully</string>
     <string name="color_not_blank">The color value can not be empty</string>
     <string name="color_not_valid">The color value is not valid</string>
     <string name="check_sure">Are you sure you want to delete this ROM?</string>
