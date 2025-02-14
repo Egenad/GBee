@@ -1,20 +1,25 @@
 package es.atm.gbee.activities
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import es.atm.gbee.R
 import es.atm.gbee.activities.adapter.SkinAdapter
 import es.atm.gbee.core.data.skins.SkinDataSource
 import es.atm.gbee.core.data.skins.SkinsManagement
-import es.atm.gbee.core.sql.SQLManager
 import es.atm.gbee.databinding.ActivityCustomSkinsBinding
+
+const val SELECTED_SKIN = "selected_skin"
 
 class CustomSkinsActivity : AppCompatActivity() {
 
@@ -58,52 +63,64 @@ class CustomSkinsActivity : AppCompatActivity() {
         binding.skinList.layoutManager = LinearLayoutManager(this)
         binding.skinList.itemAnimator = DefaultItemAnimator()
 
-        skinAdapter = SkinAdapter(SkinDataSource.skins, this)
-
-        binding.skinList.adapter = skinAdapter
-
-        createRecycledViewListeners()
-    }
-
-    private fun createRecycledViewListeners(){
-
-        val recycledList = binding.skinList
-        val recyclerAdapter = recycledList.adapter as SkinAdapter
-
-        recyclerAdapter.setOnItemClickListener {
-                skinPosition ->
-            run {
-
-                /*val selectedSkinTitle = skinAdapter.skinList[skinPosition].title
-
-                if (selectedSkinTitle != null) {
-                    val skinEntity = SQLManager.getDatabase(this).skinDAO().getSkinByTitle(selectedSkinTitle)
-
-                    if (skinEntity != null)
-                        startActivity(
-                            Intent(this, CreateCustomSkinActivity::class.java)
-                                .putExtra(SKIN_ID_EXTRA, skinEntity.id)
-                        )
-                }*/
-
-            }
+        skinAdapter = SkinAdapter(SkinDataSource.skins) {skinId ->
+            val intent = Intent(this, CreateCustomSkinActivity::class.java)
+            intent.putExtra(SKIN_ID_EXTRA, skinId)
+            launcher.launch(intent)
         }
 
-        /*recyclerAdapter.setOnLongItemClickListener {
-            if (customCallback.actionMode != null) {
-                false
-            } else {
-                customCallback.startSupportActionMode((activity as AppCompatActivity?)!!, recyclerAdapter)
-                customCallback.actionItemClicked(it)
-                true
-            }
-        }*/
+        binding.skinList.adapter = skinAdapter
     }
 
     private fun configureLayout(){
         binding.addSkinButton.setOnClickListener {
             val intent = Intent(this, CreateCustomSkinActivity::class.java)
-            this.startActivity(intent)
+            launcher.launch(intent)
+        }
+
+        skinAdapter.setOnItemClickListener { skinPosition ->
+
+            // Deselect last skin and notify if needed
+            val position = SkinDataSource.deselectLastSkin()
+            var toSelect = -1
+
+            if(position != -1) {
+                skinAdapter.notifyItemChanged(position)
+                SkinsManagement.updateSkin(this, SkinDataSource.skins[position])
+            }
+
+            if(position != skinPosition) {
+                // Select skin in DataSource and notify
+                SkinDataSource.selectSkinByPosition(skinPosition)
+                skinAdapter.notifyItemChanged(skinPosition)
+
+                // Save to shared preferences
+                val selectedSkin = SkinDataSource.skins[skinPosition]
+                toSelect = selectedSkin.id
+                Toast.makeText(this, "Skin ${selectedSkin.title} selected", Toast.LENGTH_SHORT).show()
+
+                // Save to DB
+                SkinsManagement.updateSkin(this, SkinDataSource.skins[skinPosition])
+            }
+
+            val preferences = PreferenceManager.getDefaultSharedPreferences(this)
+            preferences.edit().putInt(SELECTED_SKIN, toSelect).apply()
+        }
+    }
+
+    private val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val changesMade = result.data?.getBooleanExtra(CHANGES_MADE, false) ?: false
+            if (changesMade) {
+                val skinUpdated = result.data?.getIntExtra(SKIN_ID_EXTRA, -1) ?: -1
+                if(skinUpdated != -1){
+                    val skinPosition = SkinDataSource.getPositionById(skinUpdated) ?: -1
+                    if(skinPosition != -1)
+                        skinAdapter.notifyItemChanged(skinPosition)
+                }else{
+                    skinAdapter.notifyDataSetChanged()
+                }
+            }
         }
     }
 }

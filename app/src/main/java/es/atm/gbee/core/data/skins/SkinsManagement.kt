@@ -1,10 +1,20 @@
 package es.atm.gbee.core.data.skins
 
 import android.content.Context
-import es.atm.gbee.core.data.rom.ROM
-import es.atm.gbee.core.data.rom.ROMDataSource
-import es.atm.gbee.core.fragments.COVER_KEY
-import es.atm.gbee.core.fragments.TITLE_KEY
+import android.util.Log
+import es.atm.gbee.R
+import es.atm.gbee.activities.BUTTON_A
+import es.atm.gbee.activities.BUTTON_B
+import es.atm.gbee.activities.BUTTON_DPAD
+import es.atm.gbee.activities.BUTTON_HOME
+import es.atm.gbee.activities.BUTTON_SELECT
+import es.atm.gbee.activities.BUTTON_START
+import es.atm.gbee.activities.LEFT_BOTTOM
+import es.atm.gbee.activities.LEFT_HOME
+import es.atm.gbee.activities.RIGHT_BOTTOM
+import es.atm.gbee.activities.RIGHT_HOME
+import es.atm.gbee.activities.SCREEN_OFF
+import es.atm.gbee.activities.SCREEN_ON
 import es.atm.gbee.core.sql.SQLManager
 import es.atm.gbee.core.sql.persistence.skins.SkinEntity
 
@@ -14,33 +24,24 @@ object SkinsManagement {
         saveSkinToDatabaseAndDataSource(skin, context)
     }
 
-    fun updateSkin(context: Context, skin: Skin){
-
+    fun updateSkin(context: Context, skinData: Skin){
+        val skinDao = SQLManager.getDatabase(context).skinDAO()
+        skinDao.updateSkin(convertDataToEntity(skinData))
     }
 
     private fun saveSkinToDatabaseAndDataSource(skin: Skin, context: Context) {
-        val db = SQLManager.getDatabase(context)
+        try {
+            val db = SQLManager.getDatabase(context)
 
-        val skinEntity = SkinEntity(
-            title = skin.title,
-            backgroundColor = skin.backgroundColor,
-            startSelectButtons = skin.startSelectButtons,
-            aButton = skin.aButton,
-            bButton = skin.bButton,
-            screenOn = skin.screenOn,
-            screenOff = skin.screenOff,
-            dpad = skin.dpad,
-            homeButton = skin.homeButton,
-            leftHomeImage = skin.leftHomeImage,
-            rightHomeImage = skin.rightHomeImage,
-            leftBottomImage = skin.leftBottomImage,
-            rightBottomImage = skin.rightBottomImage
-        )
+            val skinEntity = convertDataToEntity(skin)
 
-        val id = db.skinDAO().insertSkin(skinEntity)
-        skin.id = id.toInt()
+            val id = db.skinDAO().insertSkin(skinEntity)
+            skin.id = id.toInt()
 
-        SkinDataSource.addSkin(skin)
+            SkinDataSource.addSkin(skin)
+        } catch (e: Exception) {
+            Log.e("DatabaseError", "Error inserting skin: ${e.message}", e)
+        }
     }
 
     fun loadSkinsFromDBIfNeeded(context: Context){
@@ -58,27 +59,15 @@ object SkinsManagement {
             SkinDataSource.skins.clear()
 
             allSkins.forEach {
-                SkinDataSource.addSkin(Skin(
-                    id = it.id,
-                    title = it.title,
-                    backgroundColor = it.backgroundColor,
-                    startSelectButtons = it.startSelectButtons,
-                    aButton = it.aButton,
-                    bButton = it.bButton,
-                    screenOn = it.screenOn,
-                    screenOff = it.screenOff,
-                    dpad = it.dpad,
-                    homeButton = it.homeButton,
-                    leftHomeImage = it.leftHomeImage,
-                    rightHomeImage = it.rightHomeImage,
-                    leftBottomImage = it.leftBottomImage,
-                    rightBottomImage = it.rightBottomImage))
+                SkinDataSource.addSkin(convertEntityToData(it))
             }
         }
     }
 
-     private fun convertDataToEntity(skin: Skin): SkinEntity{
+
+    fun convertDataToEntity(skin: Skin): SkinEntity{
         return SkinEntity(
+            id = if (skin.id != -1) skin.id else 0,
             title = skin.title,
             backgroundColor = skin.backgroundColor,
             startSelectButtons = skin.startSelectButtons,
@@ -91,7 +80,47 @@ object SkinsManagement {
             leftHomeImage = skin.leftHomeImage,
             rightHomeImage = skin.rightHomeImage,
             leftBottomImage = skin.leftBottomImage,
-            rightBottomImage = skin.rightBottomImage
+            rightBottomImage = skin.rightBottomImage,
+            editable = skin.editable,
+            deletable = skin.deletable,
+            selected = skin.selected
         )
+    }
+
+    fun convertEntityToData(entity: SkinEntity): Skin{
+        return Skin(
+            id = entity.id,
+            title = entity.title,
+            backgroundColor = entity.backgroundColor,
+            startSelectButtons = entity.startSelectButtons,
+            aButton = entity.aButton,
+            bButton = entity.bButton,
+            screenOn = entity.screenOn,
+            screenOff = entity.screenOff,
+            dpad = entity.dpad,
+            homeButton = entity.homeButton,
+            leftHomeImage = entity.leftHomeImage,
+            rightHomeImage = entity.rightHomeImage,
+            leftBottomImage = entity.leftBottomImage,
+            rightBottomImage = entity.rightBottomImage,
+            selected = entity.selected,
+            deletable = entity.deletable,
+            editable = entity.editable
+        )
+    }
+
+    fun getDefaultDrawable(button: String): Int {
+        return when (button) {
+            BUTTON_A -> R.drawable.default_a
+            BUTTON_B -> R.drawable.default_b
+            BUTTON_START, BUTTON_SELECT -> R.drawable.default_start_select
+            BUTTON_HOME -> R.drawable.default_home
+            LEFT_BOTTOM, RIGHT_BOTTOM -> R.drawable.default_speakers
+            LEFT_HOME, RIGHT_HOME -> R.drawable.default_logo
+            BUTTON_DPAD -> R.drawable.default_dpad
+            SCREEN_ON -> R.drawable.default_screen
+            SCREEN_OFF -> R.drawable.default_screen_off
+            else -> R.drawable.image_vector
+        }
     }
 }

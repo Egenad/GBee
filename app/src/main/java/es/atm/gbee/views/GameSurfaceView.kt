@@ -157,6 +157,7 @@ class GameSurfaceView @JvmOverloads constructor(
 
     fun release() {
         pause()
+        holder.removeCallback(this)
     }
 
     fun resume(){

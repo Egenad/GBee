@@ -1,17 +1,23 @@
 package es.atm.gbee.activities
 
 import android.annotation.SuppressLint
+import android.content.res.ColorStateList
+import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.widget.ImageViewCompat
 import androidx.preference.PreferenceManager
 import es.atm.gbee.R
 import es.atm.gbee.core.fragments.USE_SKIN_PREFERENCE
+import es.atm.gbee.core.sql.SQLManager
 import es.atm.gbee.databinding.ActivityEmuBinding
 import es.atm.gbee.databinding.CustomSkinBinding
 import es.atm.gbee.modules.A_BUTTON
@@ -54,6 +60,10 @@ class EmuActivity : AppCompatActivity() {
             setContentView(bindingCS.root)
 
             gameSurfaceView = bindingCS.gameSurface
+
+            val selectedSkin = preferences.getInt(SELECTED_SKIN, -1)
+            if(selectedSkin != -1)
+                loadCustomSkin(selectedSkin)
         }else{
             binding = ActivityEmuBinding.inflate(layoutInflater)
             setContentView(binding.root)
@@ -172,6 +182,52 @@ class EmuActivity : AppCompatActivity() {
         } else {
             gameSurfaceView.release()
             Emulator.stop()
+        }
+    }
+
+    private fun loadCustomSkin(skinId: Int){
+
+        val skinDao = SQLManager.getDatabase(this).skinDAO()
+        val skinEntity = skinDao.getSkinById(skinId)
+
+        if(skinEntity != null){
+
+            val color = Color.parseColor(skinEntity.backgroundColor)
+            bindingCS.main.setBackgroundColor(color)
+
+            val colorState = ColorStateList.valueOf(color)
+
+            // Change tint color for images
+            if(bindingCS.leftHome != null)
+                ImageViewCompat.setImageTintList(bindingCS.leftHome!!, colorState)
+
+            if(bindingCS.rightHome != null)
+                ImageViewCompat.setImageTintList(bindingCS.rightHome!!, colorState)
+
+            ImageViewCompat.setImageTintList(bindingCS.rightBottom!!, colorState)
+            ImageViewCompat.setImageTintList(bindingCS.leftBottom!!, colorState)
+
+            val buttonData: Map<ImageView?, ByteArray?> = mapOf(
+                bindingCS.buttonA to skinEntity.aButton,
+                bindingCS.buttonB to skinEntity.bButton,
+                bindingCS.buttonStart to skinEntity.startSelectButtons,
+                bindingCS.buttonSelect to skinEntity.startSelectButtons,
+                bindingCS.switchButton to skinEntity.homeButton,
+                bindingCS.dpadImage to skinEntity.dpad,
+                bindingCS.screenOffImage to skinEntity.screenOff,
+                bindingCS.screenOnImage to skinEntity.screenOn,
+                bindingCS.leftHome to skinEntity.leftHomeImage,
+                bindingCS.rightHome to skinEntity.rightHomeImage,
+                bindingCS.rightBottom to skinEntity.rightBottomImage,
+                bindingCS.leftBottom to skinEntity.leftBottomImage
+            )
+
+            buttonData.forEach { (button, imageData) ->
+                imageData?.let { byteArray ->
+                    val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+                    button?.setImageBitmap(bitmap)
+                }
+            }
         }
     }
 }

@@ -48,33 +48,18 @@ object SkinDataSource {
         skins.add(skin)
     }
 
-    fun selectAllSkins(selection : Boolean){
-        for (skin in skins){
-            skin.selected = selection
-        }
+    fun selectSkinByPosition(position : Int){
+        skins[position].selected = true
     }
 
-    fun getSelectedSkinsCount() : Int {
-
-        var count = 0
-
-        for (skin in skins){
-            if(skin.selected)
-                count++
+    fun deselectLastSkin(): Int{
+        var result = -1
+        for ((position, skin) in skins.withIndex()){
+            if(skin.selected) {
+                skin.selected = false
+                result = position
+            }
         }
-
-        return count
-    }
-
-    fun deleteSelectedSkins(){
-
-        val newSkinList: MutableList<Skin> = mutableListOf()
-
-        for (skin in skins){
-            if(skin.selected)
-                newSkinList.add(skin)
-        }
-
-        skins.removeAll(newSkinList)
+        return result
     }
 }

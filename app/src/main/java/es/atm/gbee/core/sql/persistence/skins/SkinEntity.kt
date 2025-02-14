@@ -18,5 +18,8 @@ data class SkinEntity (
     var leftHomeImage: ByteArray?,
     var rightHomeImage: ByteArray?,
     var leftBottomImage: ByteArray?,
-    var rightBottomImage: ByteArray?
+    var rightBottomImage: ByteArray?,
+    var editable: Boolean,
+    var deletable: Boolean,
+    var selected: Boolean
 )

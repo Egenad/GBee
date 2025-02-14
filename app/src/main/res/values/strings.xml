@@ -10,7 +10,9 @@
     <string name="down_button">v</string>
     <string name="settings">Settings</string>
     <string name="save">Save</string>
+    <string name="reset">Reset</string>
     <string name="exit">Exit</string>
+    <string name="tint_mode">Tint Mode</string>
     <string name="add_rom">Add ROM</string>
     <string name="unknown">Unknown</string>
     <string name="delete">Delete</string>

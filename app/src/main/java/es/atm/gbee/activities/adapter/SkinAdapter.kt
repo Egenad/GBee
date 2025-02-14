@@ -1,5 +1,6 @@
 package es.atm.gbee.activities.adapter
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -10,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.RecyclerView
 import es.atm.gbee.R
 import es.atm.gbee.activities.CreateCustomSkinActivity
@@ -17,7 +19,10 @@ import es.atm.gbee.activities.SKIN_ID_EXTRA
 import es.atm.gbee.core.data.skins.Skin
 import java.io.File
 
-class SkinAdapter(val skinList: MutableList<Skin>, private val context: Context)  :
+class SkinAdapter(
+    private val skinList: MutableList<Skin>,
+    private val onEditClicked: (Int) -> Unit
+)  :
     RecyclerView.Adapter<SkinAdapter.ViewHolder?>() {
 
     private var listener: (skinPosition: Int) -> Unit = {}
@@ -26,7 +31,7 @@ class SkinAdapter(val skinList: MutableList<Skin>, private val context: Context)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v: View = LayoutInflater.from(parent.context).inflate(R.layout.skin_item, parent, false)
 
-        val holder = ViewHolder(v)
+        val holder = ViewHolder(v, onEditClicked)
 
         v.setOnClickListener {
             listener(holder.adapterPosition)
@@ -44,17 +49,19 @@ class SkinAdapter(val skinList: MutableList<Skin>, private val context: Context)
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = skinList[position]
-        holder.bind(item, context)
+        holder.bind(item)
     }
 
-    class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+    class ViewHolder(v: View, private val onEditClicked: (Int) -> Unit) : RecyclerView.ViewHolder(v) {
         private var name: TextView
+        private var id: Int
         private var image: ImageView
         private var editButton: ImageButton
         private val view = v
 
-        fun bind(it: Skin, context: Context) {
+        fun bind(it: Skin) {
             name.text = it.title
+            id = it.id
 
             image.setImageResource(R.drawable.rom_icon)
 
@@ -71,9 +78,7 @@ class SkinAdapter(val skinList: MutableList<Skin>, private val context: Context)
             editButton.visibility = if (it.editable) View.VISIBLE else View.INVISIBLE
 
             editButton.setOnClickListener {
-                val intent = Intent(context, CreateCustomSkinActivity::class.java)
-                intent.putExtra(SKIN_ID_EXTRA, it.id)
-                context.startActivity(intent)
+                onEditClicked(id)
             }
         }
 
@@ -81,6 +86,7 @@ class SkinAdapter(val skinList: MutableList<Skin>, private val context: Context)
             name = view.findViewById(R.id.itemName)
             image = view.findViewById(R.id.itemImage)
             editButton = view.findViewById(R.id.editButton)
+            id = -1
         }
     }
 
@@ -91,5 +97,7 @@ class SkinAdapter(val skinList: MutableList<Skin>, private val context: Context)
     fun setOnLongItemClickListener(listener: (skinPosition: Int, v: View) -> Boolean) {
         this.listenerLong = listener
     }
+
+
 
 }

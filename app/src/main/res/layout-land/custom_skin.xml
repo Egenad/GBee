@@ -117,6 +117,7 @@
             android:layout_margin="0dp">
 
             <ImageView
+                android:id="@+id/screen_on_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:adjustViewBounds="true"
@@ -135,7 +136,7 @@
                 />
 
             <ImageView
-                android:id="@+id/screen_of"
+                android:id="@+id/screen_off_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="invisible"
@@ -202,6 +203,7 @@
         android:paddingTop="5dp">
 
         <ImageView
+            android:id="@+id/left_bottom"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.3"
@@ -209,6 +211,7 @@
             android:layout_marginEnd="10dp"
             android:visibility="visible"
             android:scaleType="fitCenter"
+            android:tintMode="multiply"
             android:src="@drawable/default_logo" />
 
         <ImageButton
@@ -245,6 +248,7 @@
             android:src="@drawable/default_start_select"/>
 
         <ImageView
+            android:id="@id/right_bottom"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.3"

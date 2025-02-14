@@ -122,8 +122,7 @@ object RomManagement {
         return false
     }
 
-
-     private fun deleteROMFile(context: Context, rom: ROMEntity?) : Boolean {
+    private fun deleteROMFile(context: Context, rom: ROMEntity?) : Boolean {
         val romDao = SQLManager.getDatabase(context).romDAO()
 
         // Delete file from private storage

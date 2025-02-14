@@ -1,12 +1,13 @@
 package es.atm.gbee.activities
 
+import android.app.Activity
+import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.TextUtils
 import android.view.View
 import android.widget.EditText
@@ -43,6 +44,8 @@ const val SCREEN_OFF        = "screen_off"
 const val RIGHT_BOTTOM      = "rightBottom"
 const val LEFT_BOTTOM       = "leftBottom"
 
+const val CHANGES_MADE      = "changed_made"
+
 class CreateCustomSkinActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCreateCustomSkinBinding
@@ -51,10 +54,12 @@ class CreateCustomSkinActivity : AppCompatActivity() {
 
     private val buttonUris = mutableMapOf<String, Uri?>()
     private var currentButtonName: String? = null
-    private var editMode = false
     private var screenOn = true
     private var skinId = -1
     private var pickedColor = "#DADADA"
+
+    private var changesMade = false
+    private var savedChanges = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +73,8 @@ class CreateCustomSkinActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        binding.gameSurface.release()
 
         configureEditor()
     }
@@ -103,7 +110,7 @@ class CreateCustomSkinActivity : AppCompatActivity() {
             uri?.let {
                 currentButtonName?.let { buttonName ->
                     buttonUris[buttonName] = uri
-
+                    changesMade = true
                     val buttonView = buttonMap.entries.find { it.value == buttonName }?.key
                     if (buttonView is ImageView) {
                         buttonView.setImageURI(uri)
@@ -121,25 +128,27 @@ class CreateCustomSkinActivity : AppCompatActivity() {
         UIManager.showPopupMenu(this, binding.optionsButton, R.menu.skin_menu_options) { itemId ->
             when (itemId) {
                 R.id.menu_save -> {
-                    if (!editMode)
+                    if (skinId == -1)
                         saveNewSkin()
                     else
                         updateSkin()
                     true
                 }
                 R.id.menu_exit -> {
-                    UIManager.showCustomAlertDialog(
-                        this,
-                        R.string.check_sure_exit,
-                        null,
-                        null,
-                        R.string.accept,
-                        R.string.cancel
-                    ) { dialog ->
-                        dialog.dismiss()
-                        /*Handler(Looper.getMainLooper()).postDelayed({
-                            finish()
-                        }, 100)*/
+                    if(changesMade && !savedChanges) {
+                        UIManager.showCustomAlertDialog(
+                            this,
+                            R.string.check_sure_exit,
+                            null,
+                            null,
+                            R.string.accept,
+                            R.string.cancel
+                        ) { dialog ->
+                            dialog.dismiss()
+                            finishActivity()
+                        }
+                    }else{
+                        finishActivity()
                     }
 
                     true
@@ -151,8 +160,35 @@ class CreateCustomSkinActivity : AppCompatActivity() {
 
     private fun loadEditorImages(skinId: Int){
 
-        editMode = true
+        val skinDao = SQLManager.getDatabase(this).skinDAO()
+        val skin = skinDao.getSkinById(skinId)
 
+        if(skin != null) {
+
+            changePickedColor(skin.backgroundColor)
+
+            val buttonData: Map<ImageView?, ByteArray?> = mapOf(
+                binding.buttonA to skin.aButton,
+                binding.buttonB to skin.bButton,
+                binding.buttonStart to skin.startSelectButtons,
+                binding.buttonSelect to skin.startSelectButtons,
+                binding.switchButton to skin.homeButton,
+                binding.dpadImage to skin.dpad,
+                binding.screenOffImage to skin.screenOff,
+                binding.screenOnImage to skin.screenOn,
+                binding.leftHome to skin.leftHomeImage,
+                binding.rightHome to skin.rightHomeImage,
+                binding.rightBottom to skin.rightBottomImage,
+                binding.leftBottom to skin.leftBottomImage
+            )
+
+            buttonData.forEach { (button, imageData) ->
+                imageData?.let { byteArray ->
+                    val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+                    button?.setImageBitmap(bitmap)
+                }
+            }
+        }
     }
 
     private fun configureButtons(){
@@ -174,6 +210,7 @@ class CreateCustomSkinActivity : AppCompatActivity() {
                     Toast.makeText(this, R.string.color_not_blank, Toast.LENGTH_SHORT).show()
                 } else if (isValidHexColor(enteredColor)) {
                     changePickedColor(enteredColor)
+                    changesMade = true
                 } else {
                     Toast.makeText(this, R.string.color_not_valid, Toast.LENGTH_SHORT).show()
                 }
@@ -200,6 +237,33 @@ class CreateCustomSkinActivity : AppCompatActivity() {
                 currentButtonName = value
                 getImageLauncher.launch("image/*")
             }
+            button?.setOnLongClickListener {
+                UIManager.showPopupMenu(this, button, R.menu.images_menu) { itemId ->
+                    when (itemId) {
+                        R.id.menu_reset -> {
+                            buttonUris[value] = Uri.parse("android.resource://${this.packageName}/${SkinsManagement.getDefaultDrawable(value)}")
+                            when (value) {
+                                BUTTON_A -> binding.buttonA.setImageResource(R.drawable.default_a)
+                                BUTTON_B -> binding.buttonB.setImageResource(R.drawable.default_b)
+                                BUTTON_START -> binding.buttonStart.setImageResource(R.drawable.default_start_select)
+                                BUTTON_SELECT -> binding.buttonSelect.setImageResource(R.drawable.default_start_select)
+                                BUTTON_HOME -> binding.switchButton.setImageResource(R.drawable.default_home)
+                                LEFT_BOTTOM -> binding.leftBottom!!.setImageResource(R.drawable.default_speakers)
+                                RIGHT_BOTTOM -> binding.rightBottom!!.setImageResource(R.drawable.default_speakers)
+                                LEFT_HOME -> binding.leftHome?.setImageResource(R.drawable.default_logo)
+                                RIGHT_HOME -> binding.rightHome?.setImageResource(R.drawable.default_logo)
+                                BUTTON_DPAD -> binding.dpadImage.setImageResource(R.drawable.default_dpad)
+                                SCREEN_ON -> binding.screenOnImage.setImageResource(R.drawable.default_screen)
+                                SCREEN_OFF -> binding.screenOffImage.setImageResource(R.drawable.default_screen_off)
+                            }
+                            changesMade = true
+                            true
+                        }
+                        else -> false
+                    }
+                }
+                true
+            }
         }
 
     }
@@ -216,7 +280,6 @@ class CreateCustomSkinActivity : AppCompatActivity() {
         val container = UIManager.obtainEditTextContainer(this, resources.getString(R.string.enter_title), editText)
         
         // Need a valid title for the skin if its new
-
         UIManager.showCustomAlertDialog(
             this,
             R.string.set_title,
@@ -233,6 +296,7 @@ class CreateCustomSkinActivity : AppCompatActivity() {
                     // Save to DataSource and DB
                     SkinsManagement.addSkin(this, generateNewSkin(enteredTitle))
                     Toast.makeText(this, R.string.skin_saved_correctly, Toast.LENGTH_SHORT).show()
+                    savedChanges = true
                     dialog.dismiss()
                 }else{
                     Toast.makeText(this, R.string.title_exists, Toast.LENGTH_SHORT).show()
@@ -249,7 +313,13 @@ class CreateCustomSkinActivity : AppCompatActivity() {
         newSkin.editable = true
 
         newSkin.title = title
-        newSkin.backgroundColor = pickedColor
+        updateSkinValues(newSkin)
+
+        return newSkin
+    }
+
+    private fun updateSkinValues(skin: Skin){
+        skin.backgroundColor = pickedColor
 
         buttonUris.forEach { (viewName: String, uri) ->
 
@@ -258,24 +328,22 @@ class CreateCustomSkinActivity : AppCompatActivity() {
 
                 if (bytes != null) {
                     when (viewName) {
-                        BUTTON_A -> newSkin.aButton = bytes
-                        BUTTON_B -> newSkin.bButton = bytes
-                        BUTTON_START -> newSkin.startSelectButtons = bytes
-                        BUTTON_SELECT -> newSkin.startSelectButtons = bytes
-                        BUTTON_HOME -> newSkin.homeButton = bytes
-                        LEFT_BOTTOM -> newSkin.leftBottomImage = bytes
-                        RIGHT_BOTTOM -> newSkin.rightBottomImage = bytes
-                        LEFT_HOME -> newSkin.leftHomeImage = bytes
-                        RIGHT_HOME -> newSkin.rightHomeImage = bytes
-                        BUTTON_DPAD -> newSkin.dpad = bytes
-                        SCREEN_ON -> newSkin.screenOn = bytes
-                        SCREEN_OFF -> newSkin.screenOff = bytes
+                        BUTTON_A -> skin.aButton = bytes
+                        BUTTON_B -> skin.bButton = bytes
+                        BUTTON_START -> skin.startSelectButtons = bytes
+                        BUTTON_SELECT -> skin.startSelectButtons = bytes
+                        BUTTON_HOME -> skin.homeButton = bytes
+                        LEFT_BOTTOM -> skin.leftBottomImage = bytes
+                        RIGHT_BOTTOM -> skin.rightBottomImage = bytes
+                        LEFT_HOME -> skin.leftHomeImage = bytes
+                        RIGHT_HOME -> skin.rightHomeImage = bytes
+                        BUTTON_DPAD -> skin.dpad = bytes
+                        SCREEN_ON -> skin.screenOn = bytes
+                        SCREEN_OFF -> skin.screenOff = bytes
                     }
                 }
             }
         }
-
-        return newSkin
     }
 
     private fun changePickedColor(colorStr: String){
@@ -298,5 +366,24 @@ class CreateCustomSkinActivity : AppCompatActivity() {
 
     private fun updateSkin(){
 
+        val skinDao = SQLManager.getDatabase(this).skinDAO()
+        val skin = skinDao.getSkinById(skinId)
+
+        if(skin != null) {
+            val skinData = SkinsManagement.convertEntityToData(skin)
+            updateSkinValues(skinData)
+            SkinsManagement.updateSkin(this, skinData)
+            savedChanges = true
+            Toast.makeText(this, R.string.skin_saved_correctly, Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
+    private fun finishActivity(){
+        val resultIntent = Intent()
+        resultIntent.putExtra(CHANGES_MADE, savedChanges)
+        resultIntent.putExtra(SKIN_ID_EXTRA, skinId)
+        setResult(Activity.RESULT_OK, resultIntent)
+        finish()
     }
 }

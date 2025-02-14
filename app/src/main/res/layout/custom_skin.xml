@@ -19,6 +19,7 @@
         android:layout_margin="0dp">
 
         <ImageView
+            android:id="@+id/screen_on_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
@@ -37,7 +38,7 @@
             />
 
         <ImageView
-            android:id="@+id/screen_of"
+            android:id="@+id/screen_off_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="invisible"
@@ -56,6 +57,7 @@
         app:layout_constraintBottom_toTopOf="@+id/control_panel">
 
         <ImageView
+            android:id="@+id/left_home"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.2"
@@ -64,6 +66,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:scaleType="fitCenter"
+            android:tintMode="multiply"
             android:src="@drawable/default_logo" />
 
         <ImageButton
@@ -79,6 +82,7 @@
             android:src="@drawable/default_home" />
 
         <ImageView
+            android:id="@+id/right_home"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.2"
@@ -86,6 +90,7 @@
             android:layout_marginEnd="10dp"
             android:scaleType="fitCenter"
             android:visibility="invisible"
+            android:tintMode="multiply"
             android:src="@drawable/default_logo" />
 
     </LinearLayout>
@@ -263,6 +268,7 @@
         android:layout_height="40dp" >
 
         <ImageView
+            android:id="@+id/left_bottom"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.2"
@@ -282,6 +288,7 @@
             android:layout_marginEnd="10dp"
             android:background="@null"
             android:scaleType="fitCenter"
+            android:tintMode="multiply"
             android:src="@drawable/default_start_select"/>
 
         <ImageButton
@@ -297,6 +304,7 @@
             android:src="@drawable/default_start_select"/>
 
         <ImageView
+            android:id="@+id/right_bottom"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="10dp"
