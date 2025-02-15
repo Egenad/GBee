@@ -143,9 +143,8 @@ class FifoFetcher {
     }
 
     private fun pushPixelToFifo(): Boolean{
-        if(fifo.getSize() > 8){
+        if(fifo.getSize() > 8)
             return false // Fifo is full
-        }
 
         val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
         val x = fetchX - (8 - (scx % 8))
@@ -157,10 +156,10 @@ class FifoFetcher {
             var color = PPU.getColorIndex(high or low) // Pixel Color
 
             if(PPU.bgWinIsEnabled()){
-                color = PPU.getColorIndex(0)
+                //color = PPU.getColorIndex(0)
             }
             if(PPU.objsAreEnabled() || ROM.isCGB()){ // CGB ignores this condition
-                color = fetchSpritePixel(color, high or low)
+                //color = fetchSpritePixel(color, high or low)
             }
 
             if(x >= 0){
@@ -227,7 +226,7 @@ class FifoFetcher {
              *     }
              *
              *     return color;
-             */
+             *     */
         }
 
         return colorToReturn
