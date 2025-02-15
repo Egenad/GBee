@@ -16,6 +16,7 @@
     <string name="add_rom">Add ROM</string>
     <string name="unknown">Unknown</string>
     <string name="delete">Delete</string>
+    <string name="delete_cs">Delete Custom Skin</string>
     <string name="cancel">Cancel</string>
     <string name="accept">Accept</string>
     <string name="enter_title">Enter Skin Title</string>
@@ -28,6 +29,7 @@
     <string name="color_not_blank">The color value can not be empty</string>
     <string name="color_not_valid">The color value is not valid</string>
     <string name="check_sure">Are you sure you want to delete this ROM?</string>
+    <string name="check_sure_skin_del">Are you sure you want to delete this Skin?</string>
     <string name="check_sure_exit">Are you sure you exit from editor? Any unsaved changes will be lost.</string>
     <string name="confirm_delete">Confirm delete</string>
     <string name="confirm_exit">Confirm exit</string>

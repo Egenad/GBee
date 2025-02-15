@@ -125,7 +125,7 @@ class CreateCustomSkinActivity : AppCompatActivity() {
     }
 
     private fun showPopUpMenu() {
-        UIManager.showPopupMenu(this, binding.optionsButton, R.menu.skin_menu_options) { itemId ->
+        UIManager.showPopupMenu(this, binding.optionsButton, R.menu.create_skin_menu_options) { itemId ->
             when (itemId) {
                 R.id.menu_save -> {
                     if (skinId == -1)

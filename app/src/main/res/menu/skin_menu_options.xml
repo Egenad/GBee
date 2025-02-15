@@ -2,11 +2,7 @@
 <menu
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/menu_save"
-        android:title="@string/save"
-        android:icon="@android:drawable/ic_menu_preferences"/>
-    <item
-        android:id="@+id/menu_exit"
-        android:title="@string/exit"
-        android:icon="@android:drawable/ic_menu_preferences"/>
+        android:id="@+id/menu_delete"
+        android:title="@string/delete"
+        android:icon="@android:drawable/ic_menu_delete"/>
 </menu>

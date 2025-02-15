@@ -2,6 +2,7 @@ package es.atm.gbee.core.data.skins
 
 import android.content.Context
 import android.util.Log
+import androidx.room.Delete
 import es.atm.gbee.R
 import es.atm.gbee.activities.BUTTON_A
 import es.atm.gbee.activities.BUTTON_B
@@ -18,6 +19,12 @@ import es.atm.gbee.activities.SCREEN_ON
 import es.atm.gbee.core.sql.SQLManager
 import es.atm.gbee.core.sql.persistence.skins.SkinEntity
 
+enum class DeleteResult(){
+    NOT_DELETED,
+    DELETED,
+    DEFAULT_UPDATED
+}
+
 object SkinsManagement {
 
     fun addSkin(context: Context, skin: Skin) {
@@ -27,6 +34,37 @@ object SkinsManagement {
     fun updateSkin(context: Context, skinData: Skin){
         val skinDao = SQLManager.getDatabase(context).skinDAO()
         skinDao.updateSkin(convertDataToEntity(skinData))
+    }
+
+    fun deleteSkin(context: Context, skinPosition: Int): DeleteResult{
+        var defaultUpdated = false
+        try {
+            val skinDao = SQLManager.getDatabase(context).skinDAO()
+
+            if (SkinDataSource.skinIsSelected(skinPosition)) {
+                val defaultSkin = skinDao.getSkinByTitle(SkinDataSource.getDefaultSkin().title!!)
+                if(defaultSkin != null) {
+                    defaultSkin.selected = true
+                    updateSkin(context, convertEntityToData(defaultSkin))
+                    SkinDataSource.selectSkinByPosition(0)
+                    defaultUpdated = true
+                }
+            }
+
+            // Remove from DataSource DB
+            val skin = SkinDataSource.getSkinByPosition(skinPosition)
+            if (skin != null) {
+                skinDao.deleteSkin(convertDataToEntity(skin))
+                SkinDataSource.removeFromPosition(skinPosition)
+                if(defaultUpdated)
+                    return DeleteResult.DEFAULT_UPDATED
+                return DeleteResult.DELETED
+            }
+        }catch (e: Exception){
+            Log.e("DatabaseError", "Error deleting skin: ${e.message}", e)
+        }
+
+        return DeleteResult.NOT_DELETED
     }
 
     private fun saveSkinToDatabaseAndDataSource(skin: Skin, context: Context) {

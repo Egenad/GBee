@@ -15,8 +15,10 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import es.atm.gbee.R
 import es.atm.gbee.activities.adapter.SkinAdapter
+import es.atm.gbee.core.data.skins.DeleteResult
 import es.atm.gbee.core.data.skins.SkinDataSource
 import es.atm.gbee.core.data.skins.SkinsManagement
+import es.atm.gbee.core.utils.UIManager
 import es.atm.gbee.databinding.ActivityCustomSkinsBinding
 
 const val SELECTED_SKIN = "selected_skin"
@@ -105,6 +107,38 @@ class CustomSkinsActivity : AppCompatActivity() {
 
             val preferences = PreferenceManager.getDefaultSharedPreferences(this)
             preferences.edit().putInt(SELECTED_SKIN, toSelect).apply()
+        }
+
+        skinAdapter.setOnLongItemClickListener { skinPosition, v ->
+
+            UIManager.showPopupMenu(this, v, R.menu.skin_menu_options) { itemId ->
+                when(itemId){
+                    R.id.menu_delete -> {
+                        UIManager.showCustomAlertDialog(
+                            this,
+                            R.string.delete_cs,
+                            R.string.check_sure_skin_del,
+                            null,
+                            R.string.delete,
+                            R.string.cancel
+                        ) { dialog ->
+                            val result = SkinsManagement.deleteSkin(this, skinPosition)
+                            if(result != DeleteResult.NOT_DELETED){
+                                Toast.makeText(this, "Skin deleted", Toast.LENGTH_SHORT).show()
+                                skinAdapter.notifyItemRemoved(skinPosition)
+                                if(result == DeleteResult.DEFAULT_UPDATED)
+                                    skinAdapter.notifyItemChanged(0)
+                            }else{
+                                Toast.makeText(this, "Error deleting skin", Toast.LENGTH_SHORT).show()
+                            }
+
+                            dialog.dismiss()
+                        }
+                    }
+                }
+                true
+            }
+            true
         }
     }
 

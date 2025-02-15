@@ -26,6 +26,13 @@ object SkinDataSource {
         return skins.find { it.title == title } ?: getDefaultSkin()
     }
 
+    fun getSkinByPosition(position: Int): Skin? {
+        if(position > 0 && position < skins.size)
+            return skins[position]
+
+        return null
+    }
+
     fun getDefaultSkin(): Skin {
         return Skin(
             title = "Default Skin",
@@ -50,6 +57,24 @@ object SkinDataSource {
 
     fun selectSkinByPosition(position : Int){
         skins[position].selected = true
+    }
+
+    fun skinIsSelected(position: Int): Boolean{
+        if(position >= 0 && position < skins.size)
+            return skins[position].selected
+
+        return false
+    }
+
+    fun removeFromPosition(position: Int): Boolean{
+        try {
+            skins.removeAt(position)
+            return true
+        }catch (e: Exception){
+            e.printStackTrace()
+        }
+
+        return false
     }
 
     fun deselectLastSkin(): Int{
