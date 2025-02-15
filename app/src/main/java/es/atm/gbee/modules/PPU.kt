@@ -140,7 +140,8 @@ object PPU {
     private var bgWinEnabled : Boolean      = true          // Bit 0
 
     private var lineSpriteCount: Int = 0
-    private var objsFetched : Array<OAMObj?> = Array(MAX_OBJ_PER_SCANLINE) { null }
+    //private var objsFetched : Array<OAMObj?> = Array(MAX_OBJ_PER_SCANLINE) { null }
+    private var objsFetched : Array<OAMObj?> = Array(MAX_OBJ_PER_SCANLINE) { OAMObj(0, 0, 0, 0) }
 
     private val fifoFetcher : FifoFetcher = FifoFetcher()
 
@@ -353,7 +354,8 @@ object PPU {
             in OBP0 .. OBP1 -> {
                 Memory.write(address, ((value.toInt() and 0xFF) and 0b11111100).toByte())
             }
-            BGP -> {
+            //BGP -> { TODO: RESTORE THIS
+            else -> {
                 Memory.write(address, value)
             }
         }
@@ -385,13 +387,15 @@ object PPU {
      * GB can only render 10 sprites per line.
      */
     private fun loadLineSprites(){
+
+        val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF // TODO: Delete this line and use currentY
         val currentY = (Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF) + OAM_Y_OFFSET
         val lcdc = Memory.getByteOnAddress(LCDC_ADDR)
         val objSize = LCDCObj.OBJ_SIZE.get(lcdc)
         val spriteHeight = if(objSize == 0) 8 else 16
 
-        objsFetched.fill(null)
-        lineSpriteCount = 0
+        //objsFetched.fill(null)
+        //lineSpriteCount = 0
 
         for(i in oamRam.indices step 4){
 
@@ -404,13 +408,20 @@ object PPU {
             val tile = oamRam[i + 2].toInt() and 0xFF
             val flags = oamRam[i + 3].toInt() and 0xFF
 
-            if(x == 0 || x >= (GB_X_RESOLUTION + 8)){ // Sprite not visible
+            if(x == 0 /*|| x >= (GB_X_RESOLUTION + 8)*/){ // Sprite not visible
                 continue
             }
 
-            if(y <= currentY && (y + spriteHeight) > currentY){ // Sprite pixels on current line
+            /*if(y <= currentY && (y + spriteHeight) > currentY){ // Sprite pixels on current line
                 objsFetched[lineSpriteCount++] = OAMObj(y.toByte(), x.toByte(), tile.toByte(), flags.toByte())
                 objsFetched.sortBy { it?.x ?: Byte.MAX_VALUE} // Sort by X position
+            }*/
+
+            // TODO: Delete this block and replace for the commented one
+            if(y <= ly + 16 && (y + spriteHeight) > ly + 16) { // Sprite on current line
+                val fetched = OAMObj(y.toByte(), x.toByte(), tile.toByte(), flags.toByte())
+                objsFetched[lineSpriteCount] = fetched
+                lineSpriteCount++
             }
         }
     }

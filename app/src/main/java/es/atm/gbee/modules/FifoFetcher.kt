@@ -119,7 +119,7 @@ class FifoFetcher {
     private fun getTileLowData(){
         tileData[1] = Memory.getByteOnAddress(PPU.getAddrModeAddr() + ((tileData[0].toInt() and 0xFF) * 16) + tileY)
 
-        loadSpriteData(0)
+        //loadSpriteData(0)
 
         state = FetcherState.HIGH_DATA_TILE
     }
@@ -127,7 +127,7 @@ class FifoFetcher {
     private fun getTileHighData(){
         tileData[2] = Memory.getByteOnAddress(PPU.getAddrModeAddr() + ((tileData[0].toInt() and 0xFF) * 16) + (tileY + 1))
 
-        loadSpriteData(1)
+        //loadSpriteData(1)
 
         state = FetcherState.SLEEP
     }
@@ -155,12 +155,12 @@ class FifoFetcher {
             val high = ((((tileData[2].toInt() and 0xFF) shr bit) and 1) shl 1)
             var color = PPU.getColorIndex(high or low) // Pixel Color
 
-            if(PPU.bgWinIsEnabled()){
-                //color = PPU.getColorIndex(0)
+            /*if(PPU.bgWinIsEnabled()){
+                color = PPU.getColorIndex(0)
             }
             if(PPU.objsAreEnabled() || ROM.isCGB()){ // CGB ignores this condition
-                //color = fetchSpritePixel(color, high or low)
-            }
+                color = fetchSpritePixel(color, high or low)
+            }*/
 
             if(x >= 0){
                 fifo.push(color)
@@ -198,7 +198,7 @@ class FifoFetcher {
             var bit = 7 - offset
 
             if(ObjFlags.X_FLIP.get(fetchedObjs[i].flags) == 1){
-                bit = offset
+                //bit = offset TODO: Check this
             }
 
             val low = (((tileData[i * 2].toInt() and 0xFF) shr bit) and 1)
@@ -229,7 +229,8 @@ class FifoFetcher {
              *     */
         }
 
-        return colorToReturn
+        //return colorToReturn
+        return 0
     }
 
     private fun pushPixeltoBuffer(){
