@@ -56,8 +56,8 @@ class Fifo {
 class FifoFetcher {
     private var state : FetcherState = FetcherState.OBTAIN_TILE
 
-    private var lineX : Int         = 0     // X position of the line
-    private var fetchX : Int        = 0     // Tile X Coordinate to be fetched
+    private var lineX : Int         = 0     // X position of the line. Actual X scanline coordinate.
+    private var fetchX : Int        = 0     // Tile X Coordinate to be fetched. Used to calculate mapX and obtain tiles from VRAM.
     private var pushedPixels : Int  = 0     // Pixels pushed to the screen
     private var fifoPixels : Int    = 0     // Pixels in the fifo
 
@@ -105,7 +105,23 @@ class FifoFetcher {
      */
     private fun getTile(){
         if(PPU.lcdIsEnabled()){
-            var tile = Memory.getByteOnAddress(PPU.getBGTilemapAddr() + (mapX / 8) + ((mapY / 8) * 32)) // 1 Tile == 8 Pixels
+
+            val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
+            val wy = Memory.getByteOnAddress(WY).toInt() and 0xFF
+
+            // Obtain tilemap to use (BG or WIN)
+            val wx = Memory.getByteOnAddress(WX).toInt() and 0xFF
+            val windowTile = PPU.windowIsEnabled() && (lineX + WIN_X_OFFSET >= wx) && ly >= wy
+            val tilemapToUse = if(windowTile) PPU.getWinTilemapAddr() else PPU.getBGTilemapAddr()
+
+            if(windowTile){
+                println("Window Tile")
+            }
+
+            val xCoordinate = if (windowTile) (fetchX / 8) else (mapX / 8) and 0x1F
+            val yCoordinate = if (windowTile) (ly - wy) else (mapY / 8)
+
+            var tile = Memory.getByteOnAddress(tilemapToUse + xCoordinate + (yCoordinate * GB_X_TOTAL_TILES)) // 1 Tile == 8 Pixels
             if(PPU.getAddrModeAddr() == SIGNED_TILE_REGION){
                 tile = ((tile.toInt() and 0xFF) + 128).toByte() // Signed Region [-128, 128] --> Transform to [0, 255]
             }
@@ -119,7 +135,7 @@ class FifoFetcher {
     private fun getTileLowData(){
         tileData[1] = Memory.getByteOnAddress(PPU.getAddrModeAddr() + ((tileData[0].toInt() and 0xFF) * 16) + tileY)
 
-        //loadSpriteData(0)
+        loadSpriteData(0)
 
         state = FetcherState.HIGH_DATA_TILE
     }
@@ -127,7 +143,7 @@ class FifoFetcher {
     private fun getTileHighData(){
         tileData[2] = Memory.getByteOnAddress(PPU.getAddrModeAddr() + ((tileData[0].toInt() and 0xFF) * 16) + (tileY + 1))
 
-        //loadSpriteData(1)
+        loadSpriteData(1)
 
         state = FetcherState.SLEEP
     }
@@ -137,12 +153,12 @@ class FifoFetcher {
     }
 
     private fun pushState(){
-        if(pushPixelToFifo()){
+        if(pushPixelsToFifo()){
             state = FetcherState.OBTAIN_TILE
         }
     }
 
-    private fun pushPixelToFifo(): Boolean{
+    private fun pushPixelsToFifo(): Boolean{
         if(fifo.getSize() > 8)
             return false // Fifo is full
 
