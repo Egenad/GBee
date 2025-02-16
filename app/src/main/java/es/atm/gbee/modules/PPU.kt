@@ -189,7 +189,7 @@ object PPU {
         Pair(PALETTE_TYPE.C_MONOCHRMYELLOW_PL, intArrayOf(0xFF000000.toInt(), 0xFFB8B800.toInt(), 0xFFFFFF54.toInt(), 0xFFFFFFFF.toInt()))
     )
 
-    private var selectedPalette = PALETTE_TYPE.BASIC_PL
+    private var selectedPalette = PALETTE_TYPE.GREENER_PL
 
     fun init() {
         Memory.write(LCD_STAT, 0x81.toByte())
@@ -354,7 +354,9 @@ object PPU {
             in OBP0 .. OBP1 -> {
                 Memory.write(address, ((value.toInt() and 0xFF) and 0b11111100).toByte())
             }
-            //BGP -> { TODO: RESTORE THIS
+            BGP -> { // Background Palette
+                Memory.write(address, value)
+            }
             else -> {
                 Memory.write(address, value)
             }
@@ -442,7 +444,7 @@ object PPU {
         }
     }
 
-    fun getPaletteColors(palette: PALETTE_TYPE) : IntArray{
+    private fun getPaletteColors(palette: PALETTE_TYPE) : IntArray{
         return palettes[palette]!!
     }
 
@@ -458,7 +460,7 @@ object PPU {
 
         if(now - startTimer >= 1000){
             val fps = frameCount
-            println("FPS: $fps")
+            //println("FPS: $fps")
             startTimer = now
             frameCount = 0
         }
@@ -504,7 +506,10 @@ object PPU {
 
     fun getColorIndex(index: Int): Int{
         val tileColors = getPaletteColors(selectedPalette)
-        return tileColors[index]
+
+        // index == BGP index (0xFF47)
+        val bgpColorIndex = ((Memory.getByteOnAddress(BGP).toInt() and 0xFF) shr (index * 2)) and 0b11
+        return tileColors[bgpColorIndex]
     }
 
     fun getBufferPixelFromIndex(index: Int): Int{
