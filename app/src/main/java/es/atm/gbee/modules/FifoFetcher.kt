@@ -105,23 +105,20 @@ class FifoFetcher {
      */
     private fun getTile(){
         if(PPU.lcdIsEnabled()){
-
             val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
             val wy = Memory.getByteOnAddress(WY).toInt() and 0xFF
+            val wx = Memory.getByteOnAddress(WX).toInt() and 0xFF - WIN_X_OFFSET
 
             // Obtain tilemap to use (BG or WIN)
-            val wx = Memory.getByteOnAddress(WX).toInt() and 0xFF
-            val windowTile = PPU.windowIsEnabled() && (lineX + WIN_X_OFFSET >= wx) && ly >= wy
+            val windowTile = PPU.windowIsEnabled() && fetchX >= wx && ly >= wy
             val tilemapToUse = if(windowTile) PPU.getWinTilemapAddr() else PPU.getBGTilemapAddr()
 
-            if(windowTile){
-                println("Window Tile")
-            }
+            val xCoordinate = if (windowTile) ((fetchX - wx) / 8) else (mapX / 8) and 0x1F
+            val yCoordinate = if (windowTile) ((ly - wy) / 8) else (mapY / 8)
 
-            val xCoordinate = if (windowTile) (fetchX / 8) else (mapX / 8) and 0x1F
-            val yCoordinate = if (windowTile) (ly - wy) else (mapY / 8)
+            val address = tilemapToUse + xCoordinate + (yCoordinate * GB_X_TOTAL_TILES)
+            var tile = Memory.getByteOnAddress(address) // 1 Tile == 8 Pixels
 
-            var tile = Memory.getByteOnAddress(tilemapToUse + xCoordinate + (yCoordinate * GB_X_TOTAL_TILES)) // 1 Tile == 8 Pixels
             if(PPU.getAddrModeAddr() == SIGNED_TILE_REGION){
                 tile = ((tile.toInt() and 0xFF) + 128).toByte() // Signed Region [-128, 128] --> Transform to [0, 255]
             }
