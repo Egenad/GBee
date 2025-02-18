@@ -130,7 +130,10 @@ class FifoFetcher {
     }
 
     private fun getTileLowData(){
-        tileData[1] = Memory.getByteOnAddress(PPU.getAddrModeAddr() + ((tileData[0].toInt() and 0xFF) * 16) + tileY)
+
+        val offset = calculeTileDataOffset()
+
+        tileData[1] = Memory.getByteOnAddress(PPU.getAddrModeAddr() + ((tileData[0].toInt() and 0xFF) * 16) + offset)
 
         loadSpriteData(0)
 
@@ -138,7 +141,10 @@ class FifoFetcher {
     }
 
     private fun getTileHighData(){
-        tileData[2] = Memory.getByteOnAddress(PPU.getAddrModeAddr() + ((tileData[0].toInt() and 0xFF) * 16) + (tileY + 1))
+
+        val offset = calculeTileDataOffset()
+
+        tileData[2] = Memory.getByteOnAddress(PPU.getAddrModeAddr() + ((tileData[0].toInt() and 0xFF) * 16) + (offset + 1))
 
         loadSpriteData(1)
 
@@ -286,5 +292,18 @@ class FifoFetcher {
 
     fun getValueFromVideoBuffer(address: Int): Int{
         return videoBuffer[address]
+    }
+
+    private fun isWindowTile(_fetchX: Int, _wx: Int, _wy: Int, _ly: Int): Boolean{
+        return (PPU.windowIsEnabled() && _fetchX >= _wx && _ly >= _wy)
+    }
+
+    private fun calculeTileDataOffset(): Int{
+        val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
+        val wy = Memory.getByteOnAddress(WY).toInt() and 0xFF
+        val wx = Memory.getByteOnAddress(WX).toInt() and 0xFF - WIN_X_OFFSET
+
+        val isWindowTile = isWindowTile(fetchX, wx, wy, ly)
+        return if (isWindowTile) ((ly - wy) % 8) * 2 else tileY
     }
 }
