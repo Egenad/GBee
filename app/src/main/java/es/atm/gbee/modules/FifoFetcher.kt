@@ -61,10 +61,11 @@ class FifoFetcher {
     private var pushedPixels : Int  = 0     // Pixels pushed to the screen
     private var fifoPixels : Int    = 0     // Pixels in the fifo
 
-    private var fifo : Fifo = Fifo()
+    private var backgroundFifo : Fifo   = Fifo()
+    private var spriteFifo : Fifo       = Fifo()
 
-    private var mapY: Int = 0               // Global Y position of the map
-    private var mapX: Int = 0               // Global X position of the map
+    private var mapY: Int  = 0              // Global Y position of the map
+    private var mapX: Int  = 0              // Global X position of the map
     private var tileY: Int = 0              // Line of the tile to be fetched
 
     private val videoBuffer: IntArray = IntArray(GB_Y_RESOLUTION * GB_X_RESOLUTION) { 0 }
@@ -86,7 +87,7 @@ class FifoFetcher {
             fetch()
         }
 
-        pushPixeltoBuffer() // Push pixels to pipeline
+        pushPixelsToBuffer() // Push pixels to pipeline
     }
 
     private fun fetch(){
@@ -162,7 +163,7 @@ class FifoFetcher {
     }
 
     private fun pushPixelsToFifo(): Boolean{
-        if(fifo.getSize() > 8)
+        if(backgroundFifo.getSize() > 8)
             return false // Fifo is full
 
         val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
@@ -172,17 +173,10 @@ class FifoFetcher {
             val bit = 7 - i
             val low = (((tileData[1].toInt() and 0xFF) shr bit) and 1)
             val high = ((((tileData[2].toInt() and 0xFF) shr bit) and 1) shl 1)
-            var color = PPU.getColorIndex(high or low) // Pixel Color
-
-            /*if(PPU.bgWinIsEnabled()){
-                color = PPU.getColorIndex(0)
-            }
-            if(PPU.objsAreEnabled() || ROM.isCGB()){ // CGB ignores this condition
-                color = fetchSpritePixel(color, high or low)
-            }*/
+            val color = if(PPU.bgWinIsEnabled()) PPU.getColorIndex(high or low) else PPU.getColorIndex(0) // Pixel Color
 
             if(x >= 0){
-                fifo.push(color)
+                backgroundFifo.push(color)
                 fifoPixels++
             }
         }
@@ -249,12 +243,15 @@ class FifoFetcher {
         }
 
         //return colorToReturn
-        return 0
+        return -1
     }
 
-    private fun pushPixeltoBuffer(){
-        if(fifo.getSize() > 8){ // Process pixels if the FIFO has at least 8
-            val pixelData = fifo.pop()
+    /**
+     * Mode 3: PPU transfers pixels to the LCD
+     */
+    private fun pushPixelsToBuffer(){
+        if(backgroundFifo.getSize() > 8){ // Process pixels if the FIFO has at least 8
+            val pixelData = backgroundFifo.pop()
 
             if(lineX >= ((Memory.getByteOnAddress(SCX).toInt() and 0xFF) % 8) && pixelData != null){ // Check that Coordinate X is inside the visible region of the screen
                 val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
@@ -269,8 +266,8 @@ class FifoFetcher {
     }
 
     fun clear(){
-        while(!fifo.isEmpty()){
-            fifo.pop()
+        while(!backgroundFifo.isEmpty()){
+            backgroundFifo.pop()
         }
     }
 

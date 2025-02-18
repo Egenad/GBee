@@ -221,15 +221,15 @@ object PPU {
             val stat = Memory.getByteOnAddress(LCD_STAT)
 
             when (StatObj.PPU_MODE.get(stat)) {
-                PPUMode.HBlank.number -> hBlankMode(stat)
-                PPUMode.VBlank.number -> vBlankMode(stat)
-                PPUMode.OAM.number -> oamMode(stat)
-                PPUMode.DRAW_LCD.number -> drawLCDMode(stat)
+                PPUMode.HBlank.number -> hBlankMode(stat)       // MODE 0
+                PPUMode.VBlank.number -> vBlankMode(stat)       // MODE 1
+                PPUMode.OAM.number -> oamMode(stat)             // MODE 2
+                PPUMode.DRAW_LCD.number -> drawLCDMode(stat)    // MODE 3
             }
         }
     }
 
-    private fun oamMode(stat: Byte){
+    private fun oamMode(stat: Byte){ // MODE 2
         if(lineTicks >= OAM_CYCLES){ // ENTER DRAWING PIXELS MODE
             Memory.write(LCD_STAT, StatObj.PPU_MODE.set(stat, PPUMode.DRAW_LCD.number))
             fifoFetcher.resetParams() // Reset FIFO Fetcher
@@ -239,7 +239,7 @@ object PPU {
         }
     }
 
-    private fun drawLCDMode(stat: Byte){
+    private fun drawLCDMode(stat: Byte){ // MODE 3
 
         fifoFetcher.process()
 
@@ -392,41 +392,38 @@ object PPU {
      */
     private fun loadLineSprites(){
 
-        val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF // TODO: Delete this line and use currentY
-        val currentY = (Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF) + OAM_Y_OFFSET
-        val lcdc = Memory.getByteOnAddress(LCDC_ADDR)
-        val objSize = LCDCObj.OBJ_SIZE.get(lcdc)
-        val spriteHeight = if(objSize == 0) 8 else 16
+        if(objEnabled || ROM.isCGB()) { // CGB Ignores this condition
 
-        //objsFetched.fill(null)
-        //lineSpriteCount = 0
+            val currentY = (Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF) + OAM_Y_OFFSET
+            val lcdc = Memory.getByteOnAddress(LCDC_ADDR)
+            val objSize = LCDCObj.OBJ_SIZE.get(lcdc)
+            val spriteHeight = if (objSize == 0) 8 else 16
 
-        for(i in oamRam.indices step 4){
+            objsFetched.fill(null)
+            lineSpriteCount = 0
 
-            if(lineSpriteCount >= MAX_OBJ_PER_SCANLINE){
-                break
+            for (i in oamRam.indices step 4) {
+
+                if (lineSpriteCount >= MAX_OBJ_PER_SCANLINE) {
+                    break
+                }
+
+                val y = oamRam[i].toInt() and 0xFF
+                val x = oamRam[i + 1].toInt() and 0xFF
+                val tile = oamRam[i + 2].toInt() and 0xFF
+                val flags = oamRam[i + 3].toInt() and 0xFF
+
+                if (x == 0 || x >= (GB_X_RESOLUTION + 8)) { // Sprite not visible
+                    continue
+                }
+
+                if (y <= currentY && (y + spriteHeight) > currentY) { // Sprite on current line
+                    objsFetched[lineSpriteCount] = OAMObj(y.toByte(), x.toByte(), tile.toByte(), flags.toByte())
+                    lineSpriteCount++
+                }
             }
 
-            val y = oamRam[i].toInt() and 0xFF
-            val x = oamRam[i + 1].toInt() and 0xFF
-            val tile = oamRam[i + 2].toInt() and 0xFF
-            val flags = oamRam[i + 3].toInt() and 0xFF
-
-            if(x == 0 || x >= (GB_X_RESOLUTION + 8)){ // Sprite not visible
-                continue
-            }
-
-            /*if(y <= currentY && (y + spriteHeight) > currentY){ // Sprite pixels on current line
-                objsFetched[lineSpriteCount++] = OAMObj(y.toByte(), x.toByte(), tile.toByte(), flags.toByte())
-                objsFetched.sortBy { it?.x ?: Byte.MAX_VALUE} // Sort by X position
-            }*/
-
-            // TODO: Delete this block and replace for the commented one
-            if(y <= ly + 16 && (y + spriteHeight) > ly + 16) { // Sprite on current line
-                val fetched = OAMObj(y.toByte(), x.toByte(), tile.toByte(), flags.toByte())
-                objsFetched[lineSpriteCount] = fetched
-                lineSpriteCount++
-            }
+            objsFetched.sortBy { it?.x ?: Byte.MAX_VALUE} // Sort by X position
         }
     }
 
