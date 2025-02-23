@@ -142,7 +142,6 @@ object PPU {
     private var bgWinEnabled : Boolean      = true          // Bit 0
 
     private var lineSpriteCount: Int = 0
-    //private var objsFetched : Array<OAMObj?> = Array(MAX_OBJ_PER_SCANLINE) { null }
     private var objsFetched : Array<OAMObj?> = Array(MAX_OBJ_PER_SCANLINE) { OAMObj(0, 0, 0, 0) }
 
     private val fifoFetcher : FifoFetcher = FifoFetcher()

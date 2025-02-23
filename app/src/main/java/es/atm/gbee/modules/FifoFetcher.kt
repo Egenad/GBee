@@ -157,6 +157,7 @@ class FifoFetcher {
 
         for(i in 0..7){
             val bit = 7 - i
+
             val low = (((tileData[1].toInt() and 0xFF) shr bit) and 1)
             val high = ((((tileData[2].toInt() and 0xFF) shr bit) and 1) shl 1)
             val color = if(PPU.bgWinIsEnabled()) PPU.getColorIndex(high or low) else PPU.getColorIndex(0) // Pixel Color
@@ -172,28 +173,49 @@ class FifoFetcher {
         if(spriteFifo.getSize() > 8)
             return false
 
-        val fetchedObjs = PPU.getFetchedSpriteEntries().filterNotNull()
-        val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
+        val fetchedObjs = PPU.getFetchedSpriteEntries()
 
         for(i in fetchedObjs.indices){
-            val sprX = ((fetchedObjs[i].x.toInt() and 0xFF) - OAM_X_OFFSET) + (scx % 8)
 
-            val offset = fetchX - sprX
+            if(fetchedObjs[i] != null) {
 
-            if(offset < 0 || offset > 7){ // Out of bounds
-                continue
+                val sprX = ((fetchedObjs[i]!!.x.toInt() and 0xFF) - OAM_X_OFFSET)
+                val offset = fetchX - sprX
+
+                if (offset < 0 || offset > 7) { // Out of bounds
+                    continue
+                }
+
+                var bit = 7 - offset
+                if (ObjFlags.X_FLIP.get(fetchedObjs[i]!!.flags) == 1) {
+                    bit = offset
+                }
+
+                val spriteHeight =
+                    if (LCDCObj.OBJ_SIZE.get(Memory.getByteOnAddress(LCDC_ADDR)) == 1) 16 else 8
+                var tileIndex = fetchedObjs[i]!!.tile.toInt() and 0xFF
+                val spriteY = (fetchedObjs[i]!!.y.toInt() and 0xFF) - OAM_Y_OFFSET
+                val currentY = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
+
+                if (spriteHeight == 16) {
+                    if ((ObjFlags.Y_FLIP.get(fetchedObjs[i]!!.flags) == 0 && (currentY - spriteY) >= 8) ||
+                        (ObjFlags.Y_FLIP.get(fetchedObjs[i]!!.flags) == 1 && (currentY - spriteY) < 8)
+                    ) {
+                        tileIndex += 1
+                    }
+                }
+
+                val address =
+                    PPU.getAddrModeAddr() + ((fetchedObjs[i]!!.tile.toInt() and 0xFF) * 16) + (currentY - spriteY)
+
+                val low = (Memory.getByteOnAddress(address).toInt() shr bit) and 1
+                val high = ((Memory.getByteOnAddress(address + 1).toInt() shr bit) and 1) shl 1
+
+                val color = PPU.getColorIndex(high or low)
+                spriteFifo.push(color)
+
+                println("Sprite Pixel: $color")
             }
-
-            var bit = 7 - offset
-            if(ObjFlags.X_FLIP.get(fetchedObjs[i].flags) == 1){
-                bit = offset
-            }
-
-            val low = (((tileData[i * 2].toInt() and 0xFF) shr bit) and 1)
-            val high = ((((tileData[(i * 2) + 1].toInt() and 0xFF) shr bit) and 1) shl 1)
-
-            val color = PPU.getColorIndex(high or low)
-            spriteFifo.push(color)
         }
 
         return true

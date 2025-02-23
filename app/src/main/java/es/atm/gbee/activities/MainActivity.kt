@@ -1,6 +1,5 @@
 package es.atm.gbee.activities
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
@@ -16,7 +15,6 @@ import es.atm.gbee.R
 import es.atm.gbee.activities.adapter.ROMAdapter
 import es.atm.gbee.core.data.rom.ROMDataSource
 import es.atm.gbee.core.data.rom.RomManagement
-import es.atm.gbee.core.data.skins.SkinsManagement
 import es.atm.gbee.core.sql.SQLManager
 import es.atm.gbee.core.utils.UIManager
 import es.atm.gbee.databinding.ActivityMainBinding
