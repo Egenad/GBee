@@ -8,7 +8,8 @@ enum class FetcherState(val number: Int){
     PUSH(4)
 }
 
-class FifoEntry(val value: Int, var next: FifoEntry? = null)
+open class FifoEntry(val value: Int, var next: FifoEntry? = null)
+class FifoEntrySprite(value: Int, next: FifoEntry? = null, val priority: Int) : FifoEntry(value, next)
 
 class Fifo {
     private var head: FifoEntry? = null
@@ -17,6 +18,15 @@ class Fifo {
 
     fun push(value: Int) {
         val newEntry = FifoEntry(value)
+        makePush(newEntry)
+    }
+
+    fun push(value: Int, priority: Int) {
+        val newEntry = FifoEntrySprite(value, priority = priority)
+        makePush(newEntry)
+    }
+
+    private fun makePush(newEntry: FifoEntry?){
         if (tail == null) { // First Entry
             head = newEntry
             tail = newEntry
@@ -27,17 +37,17 @@ class Fifo {
         size++
     }
 
-    fun pop(): Int? {
-        if (head == null)
-            return null
-
-        val dequeuedValue = head?.value
+    fun pop(): FifoEntry? {
+        val dequeuedEntry = head
         head = head?.next
-        if (head == null) {
-            tail = null
-        }
-        size--
-        return dequeuedValue
+        if (head == null) tail = null
+        if (dequeuedEntry != null) size--
+        return dequeuedEntry
+    }
+
+    fun popSprite(): FifoEntrySprite? {
+        val dequeuedEntry = pop()
+        return dequeuedEntry as? FifoEntrySprite
     }
 
     fun peek(): Int? {
@@ -82,7 +92,6 @@ class FifoFetcher {
         if(PPU.getLineTicks() % 2 == 0){
             fetch()
         }
-        mixFifoPixels()
         pushPixelsToBuffer() // Push pixels to pipeline
     }
 
@@ -149,7 +158,7 @@ class FifoFetcher {
     }
 
     private fun pushBGPixelsToFifo(): Boolean{
-        if(backgroundFifo.getSize() > 8)
+        if(backgroundFifo.getSize() >= 8)
             return false // Fifo is full
 
         val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
@@ -170,74 +179,91 @@ class FifoFetcher {
 
     private fun pushSpritePixelsToFifo(): Boolean{
 
-        if(spriteFifo.getSize() > 8)
+        if(spriteFifo.getSize() >= 8)
             return false
 
         val fetchedObjs = PPU.getFetchedSpriteEntries()
 
-        for(i in fetchedObjs.indices){
+        for (obj in fetchedObjs) {
 
-            if(fetchedObjs[i] != null) {
+            if (spriteFifo.getSize() >= 8) break
 
-                val sprX = ((fetchedObjs[i]!!.x.toInt() and 0xFF) - OAM_X_OFFSET)
+            if(obj != null) {
+
+                val sprX = ((obj.x.toInt() and 0xFF) - OAM_X_OFFSET)
                 val offset = fetchX - sprX
 
-                if (offset < 0 || offset > 7) { // Out of bounds
+                if (offset < 0 || offset > 7) // Out of bounds
                     continue
-                }
 
-                var bit = 7 - offset
-                if (ObjFlags.X_FLIP.get(fetchedObjs[i]!!.flags) == 1) {
-                    bit = offset
-                }
+                val flags = obj.flags
 
-                val spriteHeight =
-                    if (LCDCObj.OBJ_SIZE.get(Memory.getByteOnAddress(LCDC_ADDR)) == 1) 16 else 8
-                var tileIndex = fetchedObjs[i]!!.tile.toInt() and 0xFF
-                val spriteY = (fetchedObjs[i]!!.y.toInt() and 0xFF) - OAM_Y_OFFSET
+                val spriteHeight = if (LCDCObj.OBJ_SIZE.get(Memory.getByteOnAddress(LCDC_ADDR)) == 1) 16 else 8
+                var tileIndex = obj.tile.toInt() and 0xFF
+                val spriteY = (obj.y.toInt() and 0xFF) - OAM_Y_OFFSET
                 val currentY = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
 
                 if (spriteHeight == 16) {
-                    if ((ObjFlags.Y_FLIP.get(fetchedObjs[i]!!.flags) == 0 && (currentY - spriteY) >= 8) ||
-                        (ObjFlags.Y_FLIP.get(fetchedObjs[i]!!.flags) == 1 && (currentY - spriteY) < 8)
-                    ) {
+                    if ((ObjFlags.Y_FLIP.get(flags) == 0 && (currentY - spriteY) >= 8) ||
+                        (ObjFlags.Y_FLIP.get(flags) == 1 && (currentY - spriteY) < 8)) {
                         tileIndex += 1
                     }
                 }
 
-                val address =
-                    PPU.getAddrModeAddr() + ((fetchedObjs[i]!!.tile.toInt() and 0xFF) * 16) + (currentY - spriteY)
+                val baseAddress = VRAM_START + (tileIndex * 16)
+                val tileLine = (currentY - spriteY) % 8
+                val address = baseAddress + (tileLine * 2)
 
-                val low = (Memory.getByteOnAddress(address).toInt() shr bit) and 1
-                val high = ((Memory.getByteOnAddress(address + 1).toInt() shr bit) and 1) shl 1
+                val lowByte = Memory.getByteOnAddress(address).toInt()
+                val highByte = Memory.getByteOnAddress(address + 1).toInt()
 
-                val color = PPU.getColorIndex(high or low)
-                spriteFifo.push(color)
+                for (i in 0 until 8) {
+                    if (spriteFifo.getSize() >= 8) break
 
-                println("Sprite Pixel: $color")
+                    var bit = 7 - i
+                    if (ObjFlags.X_FLIP.get(flags) == 1) {
+                        bit = i
+                    }
+
+                    val low = (lowByte shr bit) and 1
+                    val high = ((highByte shr bit) and 1) shl 1
+                    val color = PPU.getColorIndex(high or low)
+
+                    spriteFifo.push(color, ObjFlags.PRIORITY.get(flags))
+
+                    println("Sprite Pixel: $color")
+                }
             }
         }
 
         return true
     }
 
-    private fun mixFifoPixels(){
-        // Mix Background and Sprite Fifos. Result will be saved in background fifo
+    private fun mixPixels(backgroundPixel: Int, spritePixel: FifoEntrySprite?): Int{
+        if (spritePixel == null || spritePixel.value == PPU.getColorIndex(0))
+            return backgroundPixel
 
+        if(backgroundPixel != PPU.getColorIndex(0) && spritePixel.priority == 1)
+            return backgroundPixel
+
+        return spritePixel.value
     }
 
     /**
      * Mode 3: PPU transfers pixels to the LCD
      */
     private fun pushPixelsToBuffer(){
-        if(backgroundFifo.getSize() > 8){ // Process pixels if the FIFO has at least 8
-            val pixelData = backgroundFifo.pop()
+        if(backgroundFifo.getSize() >= 8){ // Process pixels if the FIFO has at least 8
+            val pixelData = backgroundFifo.pop()?.value
+            val spritePixel = if (spriteFifo.getSize() > 0) spriteFifo.popSprite() else null
 
             if(lineX >= ((Memory.getByteOnAddress(SCX).toInt() and 0xFF) % 8) && pixelData != null){ // Check that Coordinate X is inside the visible region of the screen
                 val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
                 val address = pushedPixels + (ly * GB_X_RESOLUTION)                                  // Address = Pixels already pushed + (Actual Line * X Resolution)
 
-                putValueToVideoBuffer(address, pixelData)
+                val mixedPixel = mixPixels(pixelData, spritePixel)
+
+                putValueToVideoBuffer(address, mixedPixel)
                 pushedPixels++
             }
 
