@@ -410,15 +410,15 @@ object PPU {
 
                 val y = oamRam[i].toInt() and 0xFF
                 val x = oamRam[i + 1].toInt() and 0xFF
-                val tile = oamRam[i + 2].toInt() and 0xFF
-                val flags = oamRam[i + 3].toInt() and 0xFF
+                val tile = oamRam[i + 2]
+                val flags = oamRam[i + 3]
 
                 if (x == 0 || x >= (GB_X_RESOLUTION + OAM_X_OFFSET)) { // Sprite not visible
                     continue
                 }
 
                 if (y <= currentY && (y + spriteHeight) > currentY) { // Sprite on current line
-                    objsFetched[lineSpriteCount] = OAMObj(y.toByte(), x.toByte(), tile.toByte(), flags.toByte())
+                    objsFetched[lineSpriteCount] = OAMObj(y.toByte(), x.toByte(), tile, flags)
                     lineSpriteCount++
                 }
             }

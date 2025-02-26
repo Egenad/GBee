@@ -86,12 +86,12 @@ class FifoFetcher {
     private var fetchedSprites: Int = 0
 
     fun process(){
-        val scx = Memory.getByteOnAddress(SCX)
-        val scy = Memory.getByteOnAddress(SCY)
-        val ly  = Memory.getByteOnAddress(LY_ADDR)
+        val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
+        val scy = Memory.getByteOnAddress(SCY).toInt() and 0xFF
+        val ly  = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
 
-        mapY = ((scy.toInt() and 0xFF) + (ly.toInt() and 0xFF))
-        mapX = ((scx.toInt() and 0xFF) + fetchX)
+        mapY = scy + ly
+        mapX = scx+ fetchX
         tileY = (mapY % 8) * 2
 
         if(PPU.getLineTicks() % 2 == 0){
@@ -133,7 +133,7 @@ class FifoFetcher {
         val wx = Memory.getByteOnAddress(WX).toInt() and 0xFF - WIN_X_OFFSET
 
         // Obtain tilemap to use (BG or WIN)
-        val windowTile = PPU.windowIsEnabled() && fetchX >= wx && ly >= wy
+        val windowTile = isWindowTile()
         val tilemapToUse = if(windowTile) PPU.getWinTilemapAddr() else PPU.getBGTilemapAddr()
 
         val xCoordinate = if (windowTile) ((fetchX - wx) / 8) else (mapX / 8) and 0x1F
@@ -155,13 +155,12 @@ class FifoFetcher {
         for (obj in fetchedObjs) {
             if(obj != null) {
                 val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
-                val sprX = (obj.x - OAM_X_OFFSET) + (scx % PIXELS_PER_TILE)
+                val sprX = ((obj.x.toInt() and 0xFF) - OAM_X_OFFSET) + (scx % PIXELS_PER_TILE)
 
                 if ((sprX >= fetchX && sprX < fetchX + OAM_X_OFFSET) ||
                 ((sprX + OAM_X_OFFSET) >= fetchX && (sprX + OAM_X_OFFSET) < fetchX + OAM_X_OFFSET)) {
                     objTileData[fetchedSprites] = obj
                     fetchedSprites++
-                    println()
                 }
 
                 if (fetchedSprites >= 3) break
@@ -206,12 +205,11 @@ class FifoFetcher {
                 val spriteY = (objTileData[i]!!.y.toInt() and 0xFF) - OAM_Y_OFFSET
                 var tileIndex = objTileData[i]!!.tile.toInt() and 0xFF
 
-                if (spriteHeight == 16) {
+                if (spriteHeight == 16)
                     if ((ObjFlags.Y_FLIP.get(flags) == 0 && (ly - spriteY) >= 8) ||
                         (ObjFlags.Y_FLIP.get(flags) == 1 && (ly - spriteY) < 8)) {
                         tileIndex += 1
                     }
-                }
 
                 val baseAddress = VRAM_START + (tileIndex * 16)
                 val tileLine = (ly - spriteY) % 8
@@ -237,7 +235,7 @@ class FifoFetcher {
             var color = if(PPU.bgWinIsEnabled()) PPU.getColorIndex(high or low) else PPU.getColorIndex(0) // Pixel Color
 
             if(PPU.objsAreEnabled())
-                color = obtainSpriteColor(bit, color)
+                color = obtainSpriteColor(color)
 
             if(x >= 0){
                 backgroundFifo.push(color)
@@ -248,7 +246,7 @@ class FifoFetcher {
         return true
     }
 
-    private fun obtainSpriteColor(bit: Int, color: Int): Int{
+    private fun obtainSpriteColor(color: Int): Int{
 
         for (i in 0 until fetchedSprites) {
 
@@ -348,8 +346,13 @@ class FifoFetcher {
         return videoBuffer[address]
     }
 
-    private fun isWindowTile(_fetchX: Int, _wx: Int, _wy: Int, _ly: Int): Boolean{
-        return (PPU.windowIsEnabled() && _fetchX >= _wx && _ly >= _wy)
+    private fun isWindowTile(): Boolean{
+
+        val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
+        val wy = Memory.getByteOnAddress(WY).toInt() and 0xFF
+        val wx = Memory.getByteOnAddress(WX).toInt() and 0xFF - WIN_X_OFFSET
+
+        return (PPU.windowIsEnabled() && fetchX >= wx && ly >= wy)
     }
 
     private fun calculeTileDataOffset(): Int{
@@ -357,7 +360,7 @@ class FifoFetcher {
         val wy = Memory.getByteOnAddress(WY).toInt() and 0xFF
         val wx = Memory.getByteOnAddress(WX).toInt() and 0xFF - WIN_X_OFFSET
 
-        val isWindowTile = isWindowTile(fetchX, wx, wy, ly)
+        val isWindowTile = isWindowTile()
         return if (isWindowTile) ((ly - wy) % 8) * 2 else tileY
     }
 }
