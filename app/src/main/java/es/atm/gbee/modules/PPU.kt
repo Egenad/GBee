@@ -38,6 +38,7 @@ const val TOTAL_LINES           = 154
 const val OAM_Y_OFFSET          = 16
 const val OAM_X_OFFSET          = 8
 const val WIN_X_OFFSET          = 7
+const val PIXELS_PER_TILE       = 8
 
 const val GB_X_RESOLUTION       = 160
 const val GB_Y_RESOLUTION       = 144
@@ -412,7 +413,7 @@ object PPU {
                 val tile = oamRam[i + 2].toInt() and 0xFF
                 val flags = oamRam[i + 3].toInt() and 0xFF
 
-                if (x == 0 || x >= (GB_X_RESOLUTION + 8)) { // Sprite not visible
+                if (x == 0 || x >= (GB_X_RESOLUTION + OAM_X_OFFSET)) { // Sprite not visible
                     continue
                 }
 
