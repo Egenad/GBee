@@ -91,7 +91,7 @@ class FifoFetcher {
         val ly  = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
 
         mapY = scy + ly
-        mapX = scx+ fetchX
+        mapX = scx + fetchX
         tileY = (mapY % 8) * 2
 
         if(PPU.getLineTicks() % 2 == 0){
@@ -130,6 +130,7 @@ class FifoFetcher {
     private fun getBGTile(){
         val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
         val wy = Memory.getByteOnAddress(WY).toInt() and 0xFF
+        val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
         val wx = Memory.getByteOnAddress(WX).toInt() and 0xFF - WIN_X_OFFSET
 
         // Obtain tilemap to use (BG or WIN)
@@ -139,7 +140,7 @@ class FifoFetcher {
         val xCoordinate = if (windowTile) ((fetchX - wx) / 8) else (mapX / 8) and 0x1F
         val yCoordinate = if (windowTile) ((ly - wy) / 8) else (mapY / 8)
 
-        val address = tilemapToUse + xCoordinate + (yCoordinate * GB_X_TOTAL_TILES)
+        val address = tilemapToUse + ((xCoordinate + (yCoordinate * GB_X_TOTAL_TILES)) and 0x3ff)
         var tile = Memory.getByteOnAddress(address) // 1 Tile == 8 Pixels
 
         if(PPU.getAddrModeAddr() == SIGNED_TILE_REGION){
@@ -358,7 +359,6 @@ class FifoFetcher {
     private fun calculeTileDataOffset(): Int{
         val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
         val wy = Memory.getByteOnAddress(WY).toInt() and 0xFF
-        val wx = Memory.getByteOnAddress(WX).toInt() and 0xFF - WIN_X_OFFSET
 
         val isWindowTile = isWindowTile()
         return if (isWindowTile) ((ly - wy) % 8) * 2 else tileY
