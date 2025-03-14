@@ -1,4 +1,5 @@
-\selectlanguage *[]{spanish}
+\xpginauxfiletrue 
+\selectlanguage *{spanish}
 \contentsline {chapter}{\numberline {1}Resumen}{1}{chapter.1}%
 \contentsline {chapter}{\numberline {2}Objetivos}{3}{chapter.2}%
 \contentsline {chapter}{\numberline {3}Terminología}{5}{chapter.3}%
@@ -79,44 +80,56 @@
 \contentsline {subsection}{\numberline {4.7.1}Joypad: 0xFF00}{39}{subsection.4.7.1}%
 \contentsline {subsection}{\numberline {4.7.2}Transferencia Serie: 0xFF01-0xFF02}{40}{subsection.4.7.2}%
 \contentsline {subsubsection}{\numberline {4.7.2.1}SB (0xFF01): Transferencia de datos en serie}{41}{subsubsection.4.7.2.1}%
-\contentsline {chapter}{\numberline {5}Metodología y Planificación}{43}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Metodología Aplicada}{43}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Requerimientos}{43}{section.5.2}%
-\contentsline {subsection}{\numberline {5.2.1}Requerimientos Funcionales}{43}{subsection.5.2.1}%
-\contentsline {subsection}{\numberline {5.2.2}Requerimientos No Funcionales}{43}{subsection.5.2.2}%
-\contentsline {section}{\numberline {5.3}Etapas del Proyecto}{44}{section.5.3}%
-\contentsline {section}{\numberline {5.4}Mínimo Producto Viable}{45}{section.5.4}%
-\contentsline {section}{\numberline {5.5}Casos de Uso}{45}{section.5.5}%
-\contentsline {section}{\numberline {5.6}Herramientas utilizadas}{46}{section.5.6}%
-\contentsline {chapter}{\numberline {6}Diseño}{49}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Referencias}{49}{section.6.1}%
-\contentsline {subsubsection}{\numberline {6.1.0.1}My OldBoy!}{49}{subsubsection.6.1.0.1}%
-\contentsline {subsubsection}{\numberline {6.1.0.2}GBCC}{52}{subsubsection.6.1.0.2}%
-\contentsline {subsubsection}{\numberline {6.1.0.3}iGBA}{54}{subsubsection.6.1.0.3}%
-\contentsline {section}{\numberline {6.2}Mockup}{56}{section.6.2}%
-\contentsline {chapter}{\numberline {7}Desarrollo}{59}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Módulos / Estructura del Proyecto}{59}{section.7.1}%
-\contentsline {section}{\numberline {7.2}CPU}{60}{section.7.2}%
-\contentsline {subsection}{\numberline {7.2.1}Registros}{60}{subsection.7.2.1}%
-\contentsline {subsection}{\numberline {7.2.2}Opcodes}{62}{subsection.7.2.2}%
-\contentsline {paragraph}{\numberline {7.2.2.0.1}Funciones comunes:}{63}{paragraph.7.2.2.0.1}%
-\contentsline {paragraph}{\numberline {7.2.2.0.2}Carga - LD:}{64}{paragraph.7.2.2.0.2}%
-\contentsline {paragraph}{\numberline {7.2.2.0.3}Aritméticas y Lógicas:}{64}{paragraph.7.2.2.0.3}%
-\contentsline {paragraph}{\numberline {7.2.2.0.4}Control de flujo:}{67}{paragraph.7.2.2.0.4}%
-\contentsline {paragraph}{\numberline {7.2.2.0.5}Rotación y desplazamiento:}{71}{paragraph.7.2.2.0.5}%
-\contentsline {paragraph}{\numberline {7.2.2.0.6}Manipulación de bits:}{73}{paragraph.7.2.2.0.6}%
-\contentsline {paragraph}{\numberline {7.2.2.0.7}Especiales de sistema:}{76}{paragraph.7.2.2.0.7}%
-\contentsline {paragraph}{\numberline {7.2.2.0.8}Con pila:}{76}{paragraph.7.2.2.0.8}%
-\contentsline {section}{\numberline {7.3}Memory}{78}{section.7.3}%
-\contentsline {subsection}{\numberline {7.3.1}Lectura / Escritura}{79}{subsection.7.3.1}%
-\contentsline {subsection}{\numberline {7.3.2}Secuencia de Arranque}{80}{subsection.7.3.2}%
-\contentsline {section}{\numberline {7.4}ROM}{83}{section.7.4}%
-\contentsline {subsection}{\numberline {7.4.1}Lectura de ROM}{84}{subsection.7.4.1}%
-\contentsline {subsection}{\numberline {7.4.2}Lectura/Escritura en ROM}{90}{subsection.7.4.2}%
-\contentsline {paragraph}{\numberline {7.4.2.0.1}Implementación de las Acciones de Lectura y Escritura en ROM}{90}{paragraph.7.4.2.0.1}%
-\contentsline {section}{\numberline {7.5}Interrupciones}{93}{section.7.5}%
-\contentsline {section}{\numberline {7.6}Temporizadores / Timers}{95}{section.7.6}%
-\contentsline {section}{\numberline {7.7}RAM}{97}{section.7.7}%
-\contentsline {subsection}{\numberline {7.7.1}WRAM}{97}{subsection.7.7.1}%
-\contentsline {chapter}{\nonumberline Bibliografía}{99}{chapter*.45}%
+\contentsline {subsubsection}{\numberline {4.7.2.2}SC (0xFF02): Control de transmisión de datos}{41}{subsubsection.4.7.2.2}%
+\contentsline {paragraph}{\numberline {4.7.2.2.1}Reloj Interno}{42}{paragraph.4.7.2.2.1}%
+\contentsline {paragraph}{\numberline {4.7.2.2.2}Reloj Externo}{42}{paragraph.4.7.2.2.2}%
+\contentsline {section}{\numberline {4.8}PPU}{42}{section.4.8}%
+\contentsline {subsection}{\numberline {4.8.1}Tiles}{43}{subsection.4.8.1}%
+\contentsline {subsection}{\numberline {4.8.2}Capas}{43}{subsection.4.8.2}%
+\contentsline {subsubsection}{\numberline {4.8.2.1}Background}{44}{subsubsection.4.8.2.1}%
+\contentsline {paragraph}{\numberline {4.8.2.1.1}0xFF42 - 0xFF43: SCY, SCX}{45}{paragraph.4.8.2.1.1}%
+\contentsline {subsubsection}{\numberline {4.8.2.2}Window}{45}{subsubsection.4.8.2.2}%
+\contentsline {paragraph}{\numberline {4.8.2.2.1}0xFF4A - 0xFF4B: WY, WX}{46}{paragraph.4.8.2.2.1}%
+\contentsline {subsubsection}{\numberline {4.8.2.3}Sprites}{47}{subsubsection.4.8.2.3}%
+\contentsline {chapter}{\numberline {5}Metodología y Planificación}{49}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Metodología Aplicada}{49}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Requerimientos}{49}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Requerimientos Funcionales}{49}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Requerimientos No Funcionales}{49}{subsection.5.2.2}%
+\contentsline {section}{\numberline {5.3}Etapas del Proyecto}{50}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Mínimo Producto Viable}{51}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Casos de Uso}{51}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Herramientas utilizadas}{52}{section.5.6}%
+\contentsline {chapter}{\numberline {6}Diseño}{55}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Referencias}{55}{section.6.1}%
+\contentsline {subsubsection}{\numberline {6.1.0.1}My OldBoy!}{55}{subsubsection.6.1.0.1}%
+\contentsline {subsubsection}{\numberline {6.1.0.2}GBCC}{58}{subsubsection.6.1.0.2}%
+\contentsline {subsubsection}{\numberline {6.1.0.3}iGBA}{60}{subsubsection.6.1.0.3}%
+\contentsline {section}{\numberline {6.2}Mockup}{62}{section.6.2}%
+\contentsline {chapter}{\numberline {7}Desarrollo}{65}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Módulos / Estructura del Proyecto}{65}{section.7.1}%
+\contentsline {section}{\numberline {7.2}CPU}{66}{section.7.2}%
+\contentsline {subsection}{\numberline {7.2.1}Registros}{66}{subsection.7.2.1}%
+\contentsline {subsection}{\numberline {7.2.2}Opcodes}{68}{subsection.7.2.2}%
+\contentsline {paragraph}{\numberline {7.2.2.0.1}Funciones comunes:}{69}{paragraph.7.2.2.0.1}%
+\contentsline {paragraph}{\numberline {7.2.2.0.2}Carga - LD:}{70}{paragraph.7.2.2.0.2}%
+\contentsline {paragraph}{\numberline {7.2.2.0.3}Aritméticas y Lógicas:}{70}{paragraph.7.2.2.0.3}%
+\contentsline {paragraph}{\numberline {7.2.2.0.4}Control de flujo:}{73}{paragraph.7.2.2.0.4}%
+\contentsline {paragraph}{\numberline {7.2.2.0.5}Rotación y desplazamiento:}{77}{paragraph.7.2.2.0.5}%
+\contentsline {paragraph}{\numberline {7.2.2.0.6}Manipulación de bits:}{79}{paragraph.7.2.2.0.6}%
+\contentsline {paragraph}{\numberline {7.2.2.0.7}Especiales de sistema:}{82}{paragraph.7.2.2.0.7}%
+\contentsline {paragraph}{\numberline {7.2.2.0.8}Con pila:}{82}{paragraph.7.2.2.0.8}%
+\contentsline {section}{\numberline {7.3}Memory}{84}{section.7.3}%
+\contentsline {subsection}{\numberline {7.3.1}Lectura / Escritura}{85}{subsection.7.3.1}%
+\contentsline {subsection}{\numberline {7.3.2}Secuencia de Arranque}{86}{subsection.7.3.2}%
+\contentsline {section}{\numberline {7.4}ROM}{89}{section.7.4}%
+\contentsline {subsection}{\numberline {7.4.1}Lectura de ROM}{90}{subsection.7.4.1}%
+\contentsline {subsection}{\numberline {7.4.2}Lectura/Escritura en ROM}{96}{subsection.7.4.2}%
+\contentsline {paragraph}{\numberline {7.4.2.0.1}Implementación de las Acciones de Lectura y Escritura en ROM}{96}{paragraph.7.4.2.0.1}%
+\contentsline {section}{\numberline {7.5}Interrupciones}{99}{section.7.5}%
+\contentsline {section}{\numberline {7.6}Temporizadores / Timers}{101}{section.7.6}%
+\contentsline {section}{\numberline {7.7}RAM}{103}{section.7.7}%
+\contentsline {subsection}{\numberline {7.7.1}WRAM}{103}{subsection.7.7.1}%
+\contentsline {chapter}{\nonumberline Bibliografía}{105}{chapter*.54}%
+\xpginauxfilefalse 
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

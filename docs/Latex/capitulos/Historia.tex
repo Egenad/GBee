@@ -105,7 +105,7 @@ FFFF & FFFF & Registro de habilitación de interrupciones (IE) \\ \hline
 \subsubsection{ROM: [0x0000 - 0x7FFF]}
 En las primeras direcciones del mapa de memoria (0x0000–0x7FFF) se encuentran los bancos de memoria ROM, que almacenan el código del juego cargado desde el cartucho. La sección entre 0x0000 y 0x3FFF es el banco fijo de 16 KiB que se carga automáticamente al encender la consola. Por último, la sección entre 0x4000 y 0x7FFF corresponde a bancos de ROM adicionales que pueden ser intercambiados (si el tipo de cartucho lo permite) para ofrecer acceso a más de 32 KiB de memoria.
 
-\subsubsection{VRAM: [0x8000 - 0x9FFF]}
+\subsubsection{VRAM: [0x8000 - 0x9FFF]}\label{mem:vram}
 La VRAM es una memoria de 8 KiB que se utiliza para almacenar datos gráficos, como los sprites y tiles que se dibujan en pantalla. En los modelos CGB, esta sección de la memoria tiene dos bancos, con la posibilidad de intercambiarlos entre ellos y almacenar gráficos adicionales.
 
 \subsubsection{RAM Externa: [0xA000 - 0xBFFF]}
@@ -117,7 +117,7 @@ La WRAM es un área de memoria utilizada por el sistema para almacenar variables
 \subsubsection{Echo RAM: [0xE000 - 0xFDFF]}
 Esta es una copia exacta de la WRAM en las direcciones 0xC000–0xDDFF. Aunque se puede acceder a ella de la misma forma que la RAM original, Nintendo prohíbe su uso, ya que podría causar errores de sincronización o conflictos de acceso.
 
-\subsubsection{OAM: [0xFE00 - 0xFE9F]}
+\subsubsection{OAM: [0xFE00 - 0xFE9F]}\label{mem:oam}
 La OAM es un pequeño bloque de memoria dedicado a almacenar información sobre los sprites que aparecen en pantalla, como su posición, prioridad y patrones de color. Puede contener hasta un total de 40 sprites, cada uno de 8x8 u 8x16 píxeles. Sin embargo, por limitaciones de hardware, solamente se pueden mostrar 10 sprites por scanline.
 
 \subsubsection{No utilizable: [0xFEA0 - 0xFEFF]}
@@ -1080,6 +1080,144 @@ Antes de que de comienzo la transferencia de datos, contiene el byte que va a se
 \\\\
 Durante la transferencia, el registro se modifica en cada ciclo de ejecución. El bit más significativo (bit 7) es enviado, mientras que los bits restantes se desplazan a la izquierda, con el bit 6 convirtiéndose en el nuevo bit 7, siguiendo un proceso similar a un \textit{shift left}. Simultáneamente, el bit menos significativo (bit 0) se reemplaza por el bit 7 del byte que la otra consola está transfiriendo. Este procedimiento se repite durante 8 ciclos hasta completar el intercambio del byte.
 
-\subsubsection{SB (0xFF02): }
+\subsubsection{SC (0xFF02): Control de transmisión de datos}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|p{10cm}|}
+        \hline
+        \textbf{Bit} & \textbf{Descripción} \\ \hline
+        7 & Indica si la transferencia de datos está en progreso o no. (0 = transferencia completa, 1 = transferencia en progreso) \\ \hline
+        6 - 2 & Sin uso. \\ \hline
+        1 & Solo funciona en CGB. Habilita una velocidad serial mayor (+-256kHz) \\ \hline
+        0 & Selección de reloj. 0 = Reloj externo, 1 = Reloj interno de la consola maestro. \\ \hline
+    \end{tabular}
+    \caption{Bits del registro SC (Serial Control) de la Game Boy}
+\end{table}
+    
+
+Se activa al configurar la transmisión de datos. La consola que funciona como maestro cargará un byte en el registro SB para posteriormente establecer este registro en 0x81 (0b10000001) el cual indica que se ha iniciado una transferencia y se utilizará el reloj interno de la consola maestro.
+\\\\
+La otra consola deberá establecer el registro en 0x80 para habilitar el puerto. Al producirse la interrupción del serial cuando la transmisión de datos finalice, establecerá el bit 7 a 0.
+
+\paragraph{Reloj Interno}
+
+Las velocidad del reloj interno para DMG es de 8192Hz. Esto nos da una tasa de transferencia de 1KByte por segundo. En el modo CGB, disponemos de cuatro tasas de velocidad, dependiendo del bit 1 en el registro SC, y dependiendo de si se utiliza el modo \textit{Double Speed}.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        \textbf{Frecuencia} & \textbf{Velocidad} & \textbf{Condiciones} \\ \hline
+        8192Hz & 1 KB/s & Bit 1 = 0, Velocidad normal. \\ \hline
+        16384Hz & 2 KB/s & Bit 1 = 0, Velocidad doble. \\ \hline
+        262144Hz & 32KB/s & Bit 1 = 1, Velocidad normal \\ \hline
+        524288Hz & 64KB/s & Bit 1 = 1, Velocidad doble \\ \hline
+    \end{tabular}
+    \caption{Frecuencias del Reloj Interno.}
+\end{table}
+
+\paragraph{Reloj Externo}
+
+El reloj externo de forma general lo aporta la otra consola, pero si se conectara la consola a un ordenador, la frecuencia podría ser cualquiera. Hay indicios de que el modelo DMG llega a reconocer frecuencias de 500 kHz. Los pulsos de reloj no necesitan ser regulares por ambos lados, ya que la consola va a esperar pacientemente hasta recibir el siguiente bit de información.
+
+\section{PPU}
+
+La GPU o comunmente conocida como PPU en la Game Boy es el componente encargado de gestionar la información que se muestra por pantalla. Maneja la representación de tiles para sprites y fondos, utilizando para ello una paleta de 4 colores. La resolución de la pantalla es de 160x144 píxeles, con una tasa de refresco de 59.7Hz. Para gestionar el dibujo de cada pixel, la PPU opera en diferentes modos, conocidos como \textit{H-Blank} (Modo 0), \textit{V-Blank} (Modo 1), \textit{OAM Scan} (Modo 2) y \textit{Drawing Pixels} (Modo 3, también conocido como \textit{H-Draw}).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{include/images/ppu_modes.png}
+    \caption{Modos internos de la PPU}
+    \label{figure:ppu_modes}
+\end{figure}
+
+\subsection{Tiles}
+
+Los tiles son la base de la representación gráfica en la Game Boy. Cada tile tiene un tamaño de 8x8 píxeles (16 bytes en total, 2 bytes por línea) y puede ser representado por un máximo de 4 colores. De esta forma, se evita procesar los pixeles de forma individual, lo que reduce la carga de trabajo de la CPU y permite una representación más eficiente de los gráficos.
+\\\\
+El color de cada pixel se obtiene de un índice de 2 bits. Este índice se utiliza para acceder a la paleta de colores, que contiene un total de 4 colores. A este formato se le denomina comunmente \textbf{2BPP}, el cual hace referencia a "2 bits por pixel". La paleta de colores es compartida por todos los tiles, lo que permite una mayor eficiencia en el uso de la memoria.
+\\\\ 
+Para obtener el índice correcto para cada pixel, se deben leer de forma simultánea 2 líneas distintas de la memoria de tiles. La primera línea contiene los bits menos significativos, mientras que la segunda línea contiene los bits más significativos.
+\\\\
+Tomando como ejemplo el siguiente tile: \textit{\$3C \$7E \$42 \$42 \$42 \$42 \$42 \$42 \$7E \$5E \$7E \$0A \$7C \$56 \$38 \$7C}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{include/images/colores_bits_tile.png}
+    \caption{Obtención de colores para un tile}
+    \label{figure:tile_colors}
+\end{figure}
+
+\subsection{Capas}
+
+La PPU de la Game Boy tiene \textbf{tres capas} diferentes: el \textbf{\textit{Background}} o Fondo principal, el \textbf{\textit{Window}} o HUD, y los \textbf{sprites}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{include/images/layers.png}
+    \caption{Capas de la PPU}
+    \label{figure:ppu_layers}
+\end{figure}
+
+\subsubsection{Background}
+
+La pantalla principal es la que sirve de fondo, es decir, cualquier cosa que no vaya a necesitar actualizarse de forma constante.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{include/images/grid_bg.png}
+    \caption{Capa de fondo de la PPU}
+    \label{figure:bg_layer}
+\end{figure}
+
+Está compuesto por 32x32 tiles (256x256 pixeles). De esos tiles totales, solamente una sección de 20x18 tiles (160x144 pixeles) puede ser renderizada en pantalla (\textit{LCD} en la figura previa). Esa sección se puede mover utilizando los registros SCX y SCY, las cuales establecen un offset de la posición inicial (esquina superior izquierda).
+
+\paragraph{0xFF42 - 0xFF43: SCY, SCX}
+
+Estos registros definen un desplazamiento (\textit{offset}) para la posición inicial de la pantalla. Los valores pueden superar los límites inferior y derecho, pero no el superior ni el izquierdo, ya que los valores no pueden salir del rango 0-255. Si la pantalla LCD excede estos límites, la imagen se repetirá en bucle desde la posición inicial.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{include/images/scrolling_diagram.png}
+    \caption{Diagrama de scroll del LCD}
+    \label{figure:bg_scroll}
+\end{figure}
+
+\subsubsection{Window}
+
+Inicialmente, la ventana (Window) será invisible ya que no tendrá ninguna información a mostrar. En los videojuegos, se utiliza comúnmente para mostrar el HUD (barras de estado, menús emergentes, etc.).
+\\\\
+Su posición en pantalla está determinada por los registros WX y WY, donde WX incluye un desplazamiento de 7 píxeles (equivalente a un tile). Por lo tanto, si WX = 7, WY = 0, SCX = 0 y SCY = 0, la ventana se alineará exactamente sobre el Background.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{include/images/grid_window.png}
+    \caption{Capa de HUD de la PPU}
+    \label{figure:window_layer}
+\end{figure}
+
+Si se analizan juegos como Pokémon Rojo/Azul, se puede apreciar mejor cómo se gestionan todas las ventanas de diálogos o de inventario.
+\\\\
+Por un lado, está la pantalla de Background (Screen 1), donde se carga el tilemap. Por otro lado, la ventana (Screen 2) actúa como una copia de los tiles de fondo que el scroll permite visualizar en la primera. Esto permite generar una escena completamente idéntica, de modo que, al superponer la segunda pantalla sobre la primera, no se percibe ninguna diferencia.
+\\\\
+La principal ventaja de este mecanismo es la posibilidad de mostrar ventanas emergentes sin necesidad de modificar el fondo ni añadir sprites, como se ilustra en la siguiente imagen.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{include/images/window_pokemon.png}
+    \caption{Dibujado de Ventanas en Pokémon Rojo/Azul}
+    \label{figure:window_pokemon}
+\end{figure}
+
+\paragraph{0xFF4A - 0xFF4B: WY, WX}
+
+Especifican el offset de la ventana respecto de la esquina superior izquierda. Los valores que pueden tomar están dentro de los siguientes rangos: 0-166 para WX y 0-143 para WY. Mencionado previamente, WX tiene un offset de 7 pixeles. 
+\\\\
+Hay bugs conocidos con los siguientes valores: si se establece en 0, la ventana tendrá un efecto de \textit{temblor} horizontal cuando se modifique el registro SCX. Por otro lado, si se establece en 166, la ventana se dibujará en la siguiente línea del scanline.
+
+\subsubsection{Sprites}
+
+Los sprites de manera general son 8x8 pixeles (2x2 tiles) que no están limitados y se mueven de forma independiente del Background y el Window. Se pueden definir también como 8x16 pixeles (2x4 tiles). La información de ellos, como se ha explicado previamente, se almacena en la memoria \hyperref[mem:oam]{OAM}.
 
 \cleardoublepage
