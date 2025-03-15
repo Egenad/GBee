@@ -25,6 +25,29 @@ cycleaccurate}%
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
+{Bulbapedia}%
+}{%
+{Bulbapedia}%
+}{%
+{\protect \APACyear {2024}}%
+}]{%
+linkcablewiki}
+\APACinsertmetastar {%
+linkcablewiki}%
+\begin{APACrefauthors}%
+{Bulbapedia}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2024}{}{}.
+\newblock
+\APACrefbtitle {{Game Link Cable}.} {{Game Link Cable}.}
+\newblock
+\APAChowpublished
+  {\url{https://bulbapedia.bulbagarden.net/wiki/Game_Link_Cable}}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
 {Computing History}%
 }{%
 {Computing History}%
@@ -67,6 +90,29 @@ hardwaredatabase}%
 \APACrefbtitle {{Game Boy hardware database}.} {{Game Boy hardware database}.}
 \newblock
 \APAChowpublished {\url{https://gbhwdb.gekkio.fi/}}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{Hacktix, Brian Jia}%
+}{%
+{Hacktix, Brian Jia}%
+}{%
+{\protect \APACyear {2023}}%
+}]{%
+gbedg}
+\APACinsertmetastar {%
+gbedg}%
+\begin{APACrefauthors}%
+{Hacktix, Brian Jia}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2023}{}{}.
+\newblock
+\APACrefbtitle {{GBEDG - Gamevoy Emulator Development Guide}.} {{GBEDG -
+  Gamevoy Emulator Development Guide}.}
+\newblock
+\APAChowpublished {\url{https://hacktix.github.io/GBEDG/}}.
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
@@ -152,7 +198,7 @@ newpandocs}%
 \newblock
 \APACrefYearMonthDay{2020}{}{}.
 \newblock
-\APAChowpublished {\url{https://github.com/zid/gameboy}}.
+\APAChowpublished {\url{https://gbdev.io/pandocs/Specifications.html}}.
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%
@@ -310,6 +356,53 @@ wikigbf}%
 \APACrefbtitle {{z80 Heaven}.} {{z80 Heaven}.}
 \newblock
 \APAChowpublished {\url{http://z80-heaven.wikidot.com/}}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{Wikipedia}%
+}{%
+{Wikipedia}%
+}{%
+{\protect \APACyear {2023}}%
+}]{%
+spiwiki}
+\APACinsertmetastar {%
+spiwiki}%
+\begin{APACrefauthors}%
+{Wikipedia}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2023}{}{}.
+\newblock
+\APACrefbtitle {{Serial Peripheral Interface}.} {{Serial Peripheral
+  Interface}.}
+\newblock
+\APAChowpublished
+  {\url{https://es.wikipedia.org/wiki/Serial_Peripheral_Interface}}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+{Ángel Jesús Terol Martínez}%
+}{%
+{Ángel Jesús Terol Martínez}%
+}{%
+{\protect \APACyear {2020}}%
+}]{%
+goldensacra}
+\APACinsertmetastar {%
+goldensacra}%
+\begin{APACrefauthors}%
+{Ángel Jesús Terol Martínez}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2020}{}{}.
+\newblock
+\APACrefbtitle {{Golden Sacra - Videojuego en ensamblador para Game Boy}.}
+  {{Golden Sacra - Videojuego en ensamblador para Game Boy}.}
+\newblock
+\APAChowpublished {\url{https://rua.ua.es/dspace/handle/10045/109317}}.
 \PrintBackRefs{\CurrentBib}
 
 \end{thebibliography}

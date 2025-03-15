@@ -107,6 +107,20 @@ En las primeras direcciones del mapa de memoria (0x0000–0x7FFF) se encuentran 
 
 \subsubsection{VRAM: [0x8000 - 0x9FFF]}\label{mem:vram}
 La VRAM es una memoria de 8 KiB que se utiliza para almacenar datos gráficos, como los sprites y tiles que se dibujan en pantalla. En los modelos CGB, esta sección de la memoria tiene dos bancos, con la posibilidad de intercambiarlos entre ellos y almacenar gráficos adicionales.
+\\\\
+Se divide en tres secciones:
+\begin{itemize}
+    \item \label{mem:vram_1} \textbf{0x8000 - 0x97FF}: Bloque de memoria en el que se almacena la información de los tiles. Cada tile ocupa 16 bytes, por lo que forma general accederemos a la información de cada uno multiplicando su índice por 16 (el tile 0 hará referencia a la posición 0x8000, y el tile 1 a la posición 0x8010).
+    \item \textbf{0x9800 - 0x9BFF}: Bloque de memoria de 1024 bytes en el que se almacena la información de los mapas de fondo (Background y Window). La información guardada deberán ser los índices de los tiles a dibujar.
+    \item \textbf{0x9C00 - 0x9FFF}: Espejo de la sección anterior, que se utiliza para almacenar la información de los mapas de fondo en caso de que se necesite más memoria.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{include/images/mem_vram.png}
+    \caption{Visualización de la memoria VRAM (\cite{goldensacra})}
+    \label{figure:mem_vram}
+\end{figure}
 
 \subsubsection{RAM Externa: [0xA000 - 0xBFFF]}
 Algunos cartuchos incluyen RAM adicional que se usa principalmente para guardar datos o estados del juego, como partidas guardadas. Esta RAM externa, que varía en tamaño según el cartucho, se puede acceder a través de esta región de memoria.
@@ -119,6 +133,48 @@ Esta es una copia exacta de la WRAM en las direcciones 0xC000–0xDDFF. Aunque s
 
 \subsubsection{OAM: [0xFE00 - 0xFE9F]}\label{mem:oam}
 La OAM es un pequeño bloque de memoria dedicado a almacenar información sobre los sprites que aparecen en pantalla, como su posición, prioridad y patrones de color. Puede contener hasta un total de 40 sprites, cada uno de 8x8 u 8x16 píxeles. Sin embargo, por limitaciones de hardware, solamente se pueden mostrar 10 sprites por scanline.
+\\\\
+En la siguiente figura, se muestra cómo se guardarían los tiles 4 y 6 en memoria para que en pantalla se muestren de manera continua:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{include/images/oam_tiles.png}
+    \caption{Datos de tiles en OAM (\cite{goldensacra})}
+    \label{figure:oam_tiles}
+\end{figure}
+
+A continuación se describen los datos de forma más específica:
+
+\begin{itemize}
+    \item \textbf{Byte 0 - Posición Y}, el cual tiene un offset de 16 píxeles. Y = 0 dejaría el sprite escondido, mientras que Y = 16 lo mostraría en la parte superior de pantalla.
+    
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\textwidth]{include/images/y_position.png}
+        \caption{Posiciones Y de los sprites (\cite{newpandocs})}
+        \label{figure:y_positions}
+    \end{figure}
+
+    \item \textbf{Byte 1 - Posición X}, el cual tiene un offset de 8 píxeles.
+    \item \textbf{Byte 2 - Índice de tile}. En el modo 8x8, este byte especifica un índice único de tile, dentro del rango [0x00-0xFF]. La consola selecciona internamente el tile en la VRAM, dentro de la región de memoria \hyperref[mem:vram_1]{0x8000 - 0x97FF}. En el modo 8x16, este índice corresponde al tile superior del objeto, y la consola utiliza el tile contiguo en memoria para el tile inferior, ajustando automáticamente la referencia en memoria. En modo CGB el índice se puede referir a los bancos 0 o 1 de VRAM, dependiendo del bit 3 del byte 3.
+    \item \textbf{Byte 3 - Atributos}. Aplican ciertos efectos o ajustes al sprite:
+        \begin{itemize}
+            \item \textbf{Bit 7:} Control de la prioridad del sprite. Si su valor es 1, los tiles de Background y Window cuyos índices de color vayan del 1 al 3 se renderizarán por encima del objeto.
+            \item \textbf{Bit 6:} Flip Y del sprite.
+            \item \textbf{Bit 5:} Flip X del sprite.
+            \item \textbf{Bit 4:} Selecciona la paleta de color para modo DMG. 0 = OBP0, 1 = OBP1.
+            \item \textbf{Bit 3:} Para modos CGB, selecciona el banco de VRAM a utilizar.
+            \item \textbf{Bit 2-0:} Selecciona la paleta de color para modo CGB. Va de OBP0 hasta OBP7.
+        \end{itemize}
+
+\end{itemize}
+
+\paragraph{DMA - 0xFF46:} Mecanismo que permite la transferencia eficiente de datos desde la memoria ROM o RAM hacia la memoria OAM sin la intervención directa de la CPU. En lugar de copiar los datos byte a byte mediante instrucciones de la CPU, un controlador dedicado se encarga de mover grandes bloques de datos de manera optimizada.
+\\\\
+Para iniciar una transferencia DMA, se debe escribir cualquier valor en el registro 0xFF46. El valor insertado se interpretará como la parte alta de la dirección de origen y se multiplicará por 0x100. Por ejemplo, si se escribe 0x80, la transferencia comenzará desde 0x8000, mientras que si se introduce 0xC2, se iniciará desde 0xC200.
+\\\\
+Este proceso copia un total de \textbf{160 bytes} y requiere \textbf{160 ciclos de máquina}. En el modo \textit{CGB Double Speed}, este tiempo se reduce a la mitad. Durante la transferencia, la \textbf{CPU queda inactiva y no puede ejecutar código alojado en ROM}, ya que solo mantiene acceso a la \textbf{HRAM} (0xFF80 - 0xFFFE).
+
 
 \subsubsection{No utilizable: [0xFEA0 - 0xFEFF]}
 Esta pequeña área de memoria no se utiliza y está reservada. Cualquier intento de leer o escribir en esta región puede provocar comportamientos inesperados en el sistema.
@@ -301,14 +357,14 @@ Para poder empezar a implementar todos los opcodes, debemos hacer uso de la docu
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\textwidth]{include/images/opcodes_1.jpg}
-\caption{Set de Instrucciones}
+\caption{Set de Instrucciones (\cite{opcodes})}
 \label{figure:opcodes_1}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=1\textwidth]{include/images/opcodes_2.jpg}
-\caption{Set de Instrucciones Extendidas}
+\caption{Set de Instrucciones Extendidas (\cite{opcodes})}
 \label{figure:opcodes_2}
 \end{figure}
 
@@ -782,7 +838,7 @@ Solamente se ha llegado a utilizar en Pokémon Stadium (N64) para detectar error
 
 Los MBCs se utilizan para expandir la memoria limitada de la Game Boy, tanto en términos de ROM como de RAM. Estos controladores son chips que se encuentran en el cartucho del juego, no en la consola misma. El MBC1 es el chip más antiguo, lanzado en 1989 junto a la propia consola. En contraste, el MBC7 es el más reciente, con un lanzamiento estimado en 1997 junto a la Game Boy Color.
 \\
-Cada juego especifica qué tipo de controlador utiliza mediante el registro 0x0147, como se ha visto en el apartado anterior.
+Cada juego especifica qué tipo de controlador utiliza mediante el registro 0x0147, como se ha visto en el apartado anterior. Se va a describir a continuación el funcionamiento de dos tipos de MBC, lo que para este proyecto es suficiente.
 
 \begin{figure}[H]
     \centering
@@ -796,7 +852,7 @@ Cada juego especifica qué tipo de controlador utiliza mediante el registro 0x01
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{include/images/nombc.jpg}
-    \caption{PCB sin MBC}
+    \caption{PCB sin MBC (\cite{hardwaredatabase})}
     \label{figure:cart_no_mbc}
 \end{figure}
 
@@ -807,7 +863,7 @@ En la configuración predeterminada (valor 0x00) el MBC1 soporta hasta 512KiB de
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{include/images/mbc1.jpg}
-    \caption{PCB MBC1}
+    \caption{PCB MBC1 (\cite{hardwaredatabase})}
     \label{figure:cart_mbc1}
 \end{figure}
 
@@ -880,13 +936,6 @@ Supongamos que el registro de banco ROM contiene un 5, siendo la región de memo
 \end{lstlisting}
 
 \textbf{Resultado:} Siempre se accede al banco 0 en esta región de memoria, sin importar el valor del registro de banco. Es por ello que esta región es "fija". Con la región de RAM 0xA000–0xBFFF pasa exactamente lo mismo, debido a que el segundo bit más alto de la dirección 0xA000 es 0.
-
-\subsection{MBC2: 0x05-0x06}
-\subsection{MBC3: 0x0F-0x13}
-\subsection{MBC5: 0x19-0x1E}
-\subsection{MBC6: 0x20}
-\subsection{MBC7: 0x22}
-\subsection{MMM01: 0x0B-0x0D}
 
 \section{Interrupciones}
 
@@ -1004,7 +1053,7 @@ Su bit 2 controla que el contador TIMA pueda ser incrementado (0 = Pausado, 1 = 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.7\textwidth]{include/images/tmatactima.jpg}
-    \caption{Diagrama - Interacción entre TMA y TIMA}
+    \caption{Diagrama - Interacción entre TMA y TIMA (\cite{newpandocs})}
     \label{figure:tmatima}
 \end{figure}
 
@@ -1053,7 +1102,7 @@ Para el control de los botones en la Game Boy, se utiliza un único registro map
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\textwidth]{include/images/joypad.png}
-    \caption{Distribución del Joypad}
+    \caption{Distribución del Joypad (\cite{goldensacra})}
     \label{figure:joypad}
 \end{figure}
 
@@ -1070,7 +1119,7 @@ Si la consola esclava no ha cargado el siguiente byte de datos cuando comienza l
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{include/images/link_cable.png}
-    \caption{Cable Link}
+    \caption{Cable Link (\cite{linkcablewiki})}
     \label{figure:linkCable}
 \end{figure}
 
@@ -1128,7 +1177,7 @@ La GPU o comunmente conocida como PPU en la Game Boy es el componente encargado 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.4\textwidth]{include/images/ppu_modes.png}
-    \caption{Modos internos de la PPU}
+    \caption{Modos internos de la PPU (\cite{goldensacra})}
     \label{figure:ppu_modes}
 \end{figure}
 
@@ -1145,7 +1194,7 @@ Tomando como ejemplo el siguiente tile: \textit{\$3C \$7E \$42 \$42 \$42 \$42 \$
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{include/images/colores_bits_tile.png}
-    \caption{Obtención de colores para un tile}
+    \caption{Obtención de colores para un tile (\cite{newpandocs})}
     \label{figure:tile_colors}
 \end{figure}
 
@@ -1156,7 +1205,7 @@ La PPU de la Game Boy tiene \textbf{tres capas} diferentes: el \textbf{\textit{B
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{include/images/layers.png}
-    \caption{Capas de la PPU}
+    \caption{Capas de la PPU (\cite{goldensacra})}
     \label{figure:ppu_layers}
 \end{figure}
 
@@ -1167,20 +1216,18 @@ La pantalla principal es la que sirve de fondo, es decir, cualquier cosa que no 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.4\textwidth]{include/images/grid_bg.png}
-    \caption{Capa de fondo de la PPU}
+    \caption{Capa de fondo de la PPU (\cite{gbedg})}
     \label{figure:bg_layer}
 \end{figure}
 
 Está compuesto por 32x32 tiles (256x256 pixeles). De esos tiles totales, solamente una sección de 20x18 tiles (160x144 pixeles) puede ser renderizada en pantalla (\textit{LCD} en la figura previa). Esa sección se puede mover utilizando los registros SCX y SCY, las cuales establecen un offset de la posición inicial (esquina superior izquierda).
 
-\paragraph{0xFF42 - 0xFF43: SCY, SCX}
-
-Estos registros definen un desplazamiento (\textit{offset}) para la posición inicial de la pantalla. Los valores pueden superar los límites inferior y derecho, pero no el superior ni el izquierdo, ya que los valores no pueden salir del rango 0-255. Si la pantalla LCD excede estos límites, la imagen se repetirá en bucle desde la posición inicial.
+\paragraph{SCY, SCX: 0xFF42 - 0xFF43:} Estos registros definen un desplazamiento (\textit{offset}) para la posición inicial de la pantalla. Los valores pueden superar los límites inferior y derecho, pero no el superior ni el izquierdo, ya que los valores no pueden salir del rango 0-255. Si la pantalla LCD excede estos límites, la imagen se repetirá en bucle desde la posición inicial.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{include/images/scrolling_diagram.png}
-    \caption{Diagrama de scroll del LCD}
+    \caption{Diagrama de scroll del LCD (\cite{newpandocs})}
     \label{figure:bg_scroll}
 \end{figure}
 
@@ -1193,7 +1240,7 @@ Su posición en pantalla está determinada por los registros WX y WY, donde WX i
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.4\textwidth]{include/images/grid_window.png}
-    \caption{Capa de HUD de la PPU}
+    \caption{Capa de HUD de la PPU (\cite{gbedg})}
     \label{figure:window_layer}
 \end{figure}
 
@@ -1206,18 +1253,47 @@ La principal ventaja de este mecanismo es la posibilidad de mostrar ventanas eme
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{include/images/window_pokemon.png}
-    \caption{Dibujado de Ventanas en Pokémon Rojo/Azul}
+    \caption{Dibujado de Ventanas en Pokémon Rojo/Azul (\cite{goldensacra})}
     \label{figure:window_pokemon}
 \end{figure}
 
-\paragraph{0xFF4A - 0xFF4B: WY, WX}
-
-Especifican el offset de la ventana respecto de la esquina superior izquierda. Los valores que pueden tomar están dentro de los siguientes rangos: 0-166 para WX y 0-143 para WY. Mencionado previamente, WX tiene un offset de 7 pixeles. 
+\paragraph{WY, WX: 0xFF4A - 0xFF4B}: Especifican el offset de la ventana respecto de la esquina superior izquierda. Los valores que pueden tomar están dentro de los siguientes rangos: 0-166 para WX y 0-143 para WY. Mencionado previamente, WX tiene un offset de 7 pixeles. 
 \\\\
 Hay bugs conocidos con los siguientes valores: si se establece en 0, la ventana tendrá un efecto de \textit{temblor} horizontal cuando se modifique el registro SCX. Por otro lado, si se establece en 166, la ventana se dibujará en la siguiente línea del scanline.
 
 \subsubsection{Sprites}
 
 Los sprites de manera general son 8x8 pixeles (2x2 tiles) que no están limitados y se mueven de forma independiente del Background y el Window. Se pueden definir también como 8x16 pixeles (2x4 tiles). La información de ellos, como se ha explicado previamente, se almacena en la memoria \hyperref[mem:oam]{OAM}.
+
+\subsection{Registros}
+
+A continuación se detallan los registros principales que ajustan el comportamiento y proporcionan información importante de la PPU:
+\subsubsection{Control de LCD: 0xFF40}
+
+El registro principal que controla el LCD. Permite decidir qué elementos se muestran o no por pantalla.
+
+\begin{itemize}
+    \item Bit 7: Habilita tanto la PPU como la pantalla LCD. Si se deshabilita, la pantalla se apaga y la PPU no renderiza nada. Deshabilitar la pantalla se debe hacer solamente en modo V-Blank, de otra forma puede estropear el hardware real.
+    \item Bit 6: Selecciona qué tilemap va a utilizar el Window. Si está en 0, se utiliza el tilemap 0x9800-0x9BFF. Si está en 1, se utiliza el tilemap 0x9C00-0x9FFF.
+    \item Bit 5: Habilita el Window. Si está en 0, el Window no se muestra. Si está en 1, el Window se muestra.
+    \item Bit 4: Selecciona qué tileset va a utilizar el Background y el Window. Si está en 0, se utiliza el tileset 0x8800-0x97FF. Si está en 1, se utiliza el tileset 0x8000-0x8FFF.
+    \item Bit 3: Selecciona qué tilemap va a utilizar el Background. Si está en 0, se utiliza el tilemap 0x9800-0x9BFF. Si está en 1, se utiliza el tilemap 0x9C00-0x9FFF.
+    \item Bit 2: Selecciona el tamaño de los sprites. Si está en 0, los sprites son de 8x8 pixeles. Si está en 1, los sprites son de 8x16 pixeles.
+    \item Bit 1: Habilita los sprites. Si está en 0, los sprites no se muestran. Si está en 1, los sprites se muestran.
+    \item Bit 0: Habilita el Background y el Window. Si está en 0, el Background y el Window no se muestran. Si está en 1, el Background y el Window se muestran. En modo CGB, este bit se utiliza para habilitar el modo de prioridad de sprites.
+\end{itemize}
+
+\subsection{Modos}
+
+Los modos de PPU definen cómo se dibujan los píxeles en pantalla. Cada uno de ellos se activa en un momento específico del ciclo de renderizado, permitiendo que la PPU realice las operaciones necesarias para mostrar la información en pantalla.
+
+\subsubsection{Modo 0: H-Blank}
+
+
+
+\subsubsection{Modo 1: V-Blank}
+\subsubsection{Modo 2: OAM Scan}
+\subsubsection{Modo 3: Drawing Pixels}
+
 
 \cleardoublepage
