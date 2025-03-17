@@ -169,6 +169,7 @@ A continuación se describen los datos de forma más específica:
 
 \end{itemize}
 
+\label{dma}
 \paragraph{DMA - 0xFF46:} Mecanismo que permite la transferencia eficiente de datos desde la memoria ROM o RAM hacia la memoria OAM sin la intervención directa de la CPU. En lugar de copiar los datos byte a byte mediante instrucciones de la CPU, un controlador dedicado se encarga de mover grandes bloques de datos de manera optimizada.
 \\\\
 Para iniciar una transferencia DMA, se debe escribir cualquier valor en el registro 0xFF46. El valor insertado se interpretará como la parte alta de la dirección de origen y se multiplicará por 0x100. Por ejemplo, si se escribe 0x80, la transferencia comenzará desde 0x8000, mientras que si se introduce 0xC2, se iniciará desde 0xC200.
@@ -1268,32 +1269,170 @@ Los sprites de manera general son 8x8 pixeles (2x2 tiles) que no están limitado
 \subsection{Registros}
 
 A continuación se detallan los registros principales que ajustan el comportamiento y proporcionan información importante de la PPU:
-\subsubsection{Control de LCD: 0xFF40}
+\subsubsection{Control de LCD: 0xFF40} \label{lcd_control}
 
 El registro principal que controla el LCD. Permite decidir qué elementos se muestran o no por pantalla.
 
 \begin{itemize}
-    \item Bit 7: Habilita tanto la PPU como la pantalla LCD. Si se deshabilita, la pantalla se apaga y la PPU no renderiza nada. Deshabilitar la pantalla se debe hacer solamente en modo V-Blank, de otra forma puede estropear el hardware real.
-    \item Bit 6: Selecciona qué tilemap va a utilizar el Window. Si está en 0, se utiliza el tilemap 0x9800-0x9BFF. Si está en 1, se utiliza el tilemap 0x9C00-0x9FFF.
-    \item Bit 5: Habilita el Window. Si está en 0, el Window no se muestra. Si está en 1, el Window se muestra.
-    \item Bit 4: Selecciona qué tileset va a utilizar el Background y el Window. Si está en 0, se utiliza el tileset 0x8800-0x97FF. Si está en 1, se utiliza el tileset 0x8000-0x8FFF.
-    \item Bit 3: Selecciona qué tilemap va a utilizar el Background. Si está en 0, se utiliza el tilemap 0x9800-0x9BFF. Si está en 1, se utiliza el tilemap 0x9C00-0x9FFF.
-    \item Bit 2: Selecciona el tamaño de los sprites. Si está en 0, los sprites son de 8x8 pixeles. Si está en 1, los sprites son de 8x16 pixeles.
-    \item Bit 1: Habilita los sprites. Si está en 0, los sprites no se muestran. Si está en 1, los sprites se muestran.
-    \item Bit 0: Habilita el Background y el Window. Si está en 0, el Background y el Window no se muestran. Si está en 1, el Background y el Window se muestran. En modo CGB, este bit se utiliza para habilitar el modo de prioridad de sprites.
+    \item \textbf{Bit 7}: Habilita tanto la PPU como la pantalla LCD. Si se deshabilita, la pantalla se apaga y la PPU no renderiza nada. Deshabilitar la pantalla se debe hacer solamente en modo V-Blank, de otra forma puede estropear el hardware real.
+    \item \textbf{Bit 6}: Selecciona qué tilemap va a utilizar el Window. Si está en 0, se utiliza el tilemap 0x9800-0x9BFF. Si está en 1, se utiliza el tilemap 0x9C00-0x9FFF.
+    \item \textbf{Bit 5}: Habilita el Window. Si está en 0, el Window no se muestra. Si está en 1, el Window se muestra.
+    \item \textbf{Bit 4}: Selecciona qué tileset va a utilizar el Background y el Window. Si está en 0, se utiliza el tileset 0x8800-0x97FF. Si está en 1, se utiliza el tileset 0x8000-0x8FFF.
+    \item \textbf{Bit 3}: Selecciona qué tilemap va a utilizar el Background. Si está en 0, se utiliza el tilemap 0x9800-0x9BFF. Si está en 1, se utiliza el tilemap 0x9C00-0x9FFF.
+    \item \textbf{Bit 2}: Selecciona el tamaño de los sprites. Si está en 0, los sprites son de 8x8 pixeles. Si está en 1, los sprites son de 8x16 pixeles.
+    \item \textbf{Bit 1}: Habilita los sprites. Si está en 0, los sprites no se muestran. Si está en 1, los sprites se muestran.
+    \item \textbf{Bit 0}: Habilita el Background y el Window. Si está en 0, el Background y el Window no se muestran. Si está en 1, el Background y el Window se muestran. En modo CGB, este bit se utiliza para habilitar el modo de prioridad de sprites.
+\end{itemize}
+
+\subsubsection{Coordenada Y del LCD: 0xFF44}
+Nombrado generalmente como \textit{LY}, indica la línea actual de renderizado o \textit{scanline} que va a ser renderizada. Puede contener cualquier valor en el rango [0-153], donde los valores en el rango [144-153] forman parte del período de V-Blank.
+
+\subsubsection{Comparación de LY: 0xFF45}
+Internamente la consola compara constantemente el valor de LY con el de este registro, conocido de forma general como LYC. Cuando ambos registros coinciden (y si está habilitado), la interrupción de STAT es solicitada.
+
+\subsubsection{Estado del LCD: 0xFF41}
+Habilita ciertas interrupciones y ofrece información acerca del estado actual de la pantalla.
+
+\begin{itemize}
+    \item \textbf{Bit 7}: No es utilizado.
+    \item \textbf{Bit 6}: Si se habilita, se producirá una interrupción STAT si los valores de LY y LYC son iguales.
+    \item \textbf{Bit 5}: Si se habilita, se producirá una interrupción STAT cuando el modo OAM de comienzo.
+    \item \textbf{Bit 4}: Si se habilita, se producirá una interrupción STAT cuando el modo V-Blank de comienzo.
+    \item \textbf{Bit 3}: Si se habilita, se producirá una interrupción STAT cuando el modo H-Blank de comienzo.
+    \item \textbf{Bit 2}: Su valor es 1 en caso de que el valor de LYC sea idéntico al de LY.
+    \item \textbf{Bit 1-0}: Indica el modo actual de la PPU: 00 = HBlank, 01 = V-Blank, 10 = OAM Scan, 11 = Drawing Pixels.
 \end{itemize}
 
 \subsection{Modos}
 
 Los modos de PPU definen cómo se dibujan los píxeles en pantalla. Cada uno de ellos se activa en un momento específico del ciclo de renderizado, permitiendo que la PPU realice las operaciones necesarias para mostrar la información en pantalla.
+\\\\
+Como se muestra en la figura, el renderizado completo de la pantalla tarda 70,224 ciclos de reloj, lo que equivale a 17,556 ciclos de máquina. Dado que la CPU de la Game Boy opera a 4.194304 MHz (4,194,304 ciclos de reloj por segundo), podemos calcular la tasa de fotogramas por segundo (FPS) de la siguiente manera:
+
+\[
+\text{FPS} = \frac{4,194,304 \text{ ciclos por segundo}}{70,224 \text{ ciclos por frame}} = 59.8 \approx 60
+\]
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{include/images/render_gb.png}
+    \caption{Proceso de renderizado de la PPU (\cite{newpandocs})}
+    \label{figure:gb_render}
+\end{figure}
 
 \subsubsection{Modo 0: H-Blank}
-
-
+Ocupa el tiempo restante de la línea de renderizado después de que se hayan dibujado los píxeles. En este modo, la PPU no realiza ninguna operación, permitiendo que la CPU acceda a la memoria de vídeo sin interferencias.
+\\\\
+Si el valor de LY alcanza 144 en la siguiente línea de renderizado, se generará automáticamente la interrupción de V-Blank (si está habilitada por el desarrollador).
 
 \subsubsection{Modo 1: V-Blank}
-\subsubsection{Modo 2: OAM Scan}
-\subsubsection{Modo 3: Drawing Pixels}
+Similar a H-Blank en el sentido de que la PPU no dibuja píxeles en pantalla. Sin embargo, es un período de tiempo más largo (4560 frente a un máximo de 204 ciclos de reloj).
+\\\\
+De forma similar al final de la última línea (y si está habilitado), se producirá la interrupción que indica que el proceso de OAM da comienzo.
 
+\subsubsection{Modo 2: OAM Scan}
+Se activa al inicio de cada línea de renderizado (excepto durante el modo V-Blank), justo antes de que los píxeles comiencen a dibujarse en pantalla. Durante este modo, la PPU busca sprites en la memoria OAM que deban ser renderizados en la línea actual, guardándolos posteriormente en un buffer.
+\\\\
+Para decidir qué sprites se guardan en buffer se toman en cuenta las siguientes condiciones:
+\begin{itemize}
+    \item La coordenada X del sprite debe ser mayor de 0.
+    \item \texttt{LY + 16} debe ser mayor o igual que la coordenada Y del sprite.
+    \item \texttt{LY + 16} debe ser menor o igual que la coordenada Y del sprite más su altura (8 o 16, según se haya configurado en el \hyperref[lcd_control]{bit 2 de 0xFF40}).
+    \item La cantidad de sprites almacenados en buffer no puede ser mayor de 10.
+\end{itemize}
+
+\subsubsection{Modo 3: Drawing Pixels} \label{ppu:mode3}
+Modo durante el cual la PPU transfiere los colores correspondientes de cada píxel a la pantalla LCD. La duración varía según el número de sprites en la línea de renderizado actual, si se deben renderizar tiles de Window, etc.
+
+\subsection{Pixel FIFO}
+
+La Game Boy renderiza los píxeles de forma individual y los envía uno por uno a la pantalla LCD. Para lograrlo, utiliza dos Pixel FIFOs.
+\begin{itemize}
+    \item \textbf{Background FIFO}: Almacena los píxeles del Background y del Window.
+    \item \textbf{Sprite FIFO}: Almacena los píxeles de los sprites.
+\end{itemize}
+
+Estos dos FIFOs son independientes y no comparten información entre ellos. El único momento en el que ambos se utilizan de forma simultánea es al mezclar los píxeles extraídos para ser enviados a la pantalla LCD. Cada uno puede almacenar hasta 16 píxeles, y el proceso debe garantizar que ambos contengan siempre al menos 8 píxeles en cualquier momento.
+\\\\
+La manipulación de los dos FIFOs solamente ocurre durante el \hyperref[ppu:mode3]{modo 3}.
+\\\\
+En cada FIFO, los píxeles van acompañados de una serie de atributos o propiedades:
+\begin{itemize}
+    \item \textbf{Color}: Índice de color del píxel.
+    \item \textbf{Paleta}: Paleta de colores a la que pertenece el píxel.
+    \item \textbf{Prioridad de Sprite}: Solo existe en modo CGB, indicando el índice OAM del sprite.
+    \item \textbf{Prioridad de Fondo}: Indica si el píxel es de fondo o de sprite.
+\end{itemize}
+
+\subsubsection{Pixel FIFO Fetcher}
+
+El proceso de \textit{Pixel Fetching} consta de 5 pasos:
+
+\begin{enumerate}
+    \item \textbf{Obtención de Tile}
+    \item \textbf{Obtención de datos bajos del Tile}
+    \item \textbf{Obtención de datos altos del Tile}
+    \item \textbf{Espera (Sleep) de 2 ciclos de reloj}
+    \item \textbf{Push}
+\end{enumerate}
+
+\paragraph{Obtención de Tile:} Determina qué tile de Background o Window va a ser utilizado para obtener los píxeles. Por defecto el tilemap utilizado es el 0x9800. Las siguientes condiciones se deben tener en cuenta:
+\begin{itemize}
+    \item Si el bit 3 del LCDC está habilitado y la coordenada X de la línea de renderizado actual no está dentro del Window, entonces el tilemap 0x9C00 es utilizado.
+    \item Si el bit 6 del LCDC está habilitado y la coordenada X de la línea de renderizado actual está dentro del Window, entonces el tilemap 0x9C00 es utilizado.
+\end{itemize}
+
+El fetcher hace un seguimiento constante de las coordenadas X e Y del tile sobre el que está operando:
+
+\begin{itemize}
+    \item \textbf{Coordenada X}:
+    \begin{itemize}
+        \item Si el tile actual pertenece al Window, se usa directamente su coordenada X.
+        \item En caso contrario, se utiliza la siguiente fórmula:
+        \[
+            ((SCX / 8) + \text{fetcherX}) \& 0x1F
+        \]
+    \end{itemize}
+    \item \textbf{Coordenada Y}:
+    \begin{itemize}
+        \item Si el tile actual pertenece al Window, se usa directamente su coordenada Y.
+        \item En caso contrario, se utiliza la siguiente fórmula:
+        \[
+            (LY + SCY) \& 255
+        \]
+    \end{itemize}
+\end{itemize}
+
+\paragraph{Obtención de datos bajos del Tile:} Se verifica el bit 4 del LCDC para determinar qué tilemap se debe utilizar. En modo CGB, se debe determinar también el banco correspondiente de VRAM y si el tile esta volteado verticalmente.
+\\\\
+Utilizando el numero de Tile obtenido en la operacion anterior, el fetcher obtiene el primer byte de la información en VRAM y la almacena. El offset a utilizar dependerá de si es de Background ($2*((LY + SCY) \% 8)$) o de Window ($2*((LY - WY) \% 8)$).
+
+\paragraph{Obtención de datos altos del Tile:} Este paso es el mismo que el anterior, con la diferencia de que se lee el siguiente byte de la dirección previamente recuperada.
+
+\paragraph{Sleep:} La consola espera durante dos ciclos de reloj sin realizar ninguna operación.
+
+\paragraph{Push:} Los datos de los 8 píxeles pertenecientes al tile obtenido previamente se decodifican y se cargan en el FIFO correspondiente.
+\\\\
+Si en los atributos se indica que el tile está volteado horizontalmente, los píxeles se insertarán de LSB a MSB.
+
+\subsubsection{Administrar Píxeles a la Pantalla LCD}
+
+Cada ciclo de reloj, la PPU intenta enviár un píxel al LCD. Este proceso solo se inicia si el FIFO de Background contiene píxeles. Los píxeles del FIFO de sprites sirven para ser mezclados con los demás.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{include/images/fifo_mixer.png}
+    \caption{Proceso de mezcla de los dos FIFOs (\cite{gbedg})}
+    \label{figure:fifo_mixer}
+\end{figure}
+
+Para establecer qué pixel utilizar, se ejecutan las siguientes comprobaciones:
+
+\begin{enumerate}
+    \item Si no hay pixel de sprite o el índice de color es 0 (invisible), se mantiene el pixel de fondo.
+    \item Si el índice de color del pixel de fondo no es 0, y la prioridad del pixel de sprite es 1, se mantiene el pixel de fondo.
+    \item En cualquier otro caso, se mantiene el pixel de sprite.
+\end{enumerate}
 
 \cleardoublepage

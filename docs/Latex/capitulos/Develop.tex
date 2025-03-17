@@ -1300,7 +1300,7 @@ Además, se puede observar que la ROM se ha cargado correctamente en nuestra mem
 0150: A7 FE 11 3E 00 20 01 3C E0 EF 31 FF CF F0 EF B7  | ...>. .<..1.....
 \end{lstlisting}
 
-\subsection{Lectura/Escritura en ROM}
+\subsection{Lectura/Escritura en ROM}\label{rom:read_write}
 
 \paragraph{Implementación de las Acciones de Lectura y Escritura en ROM}
 Para implementar las operaciones, es necesario tener en cuenta cómo cada \hyperref[history_mbcs]{MBC} gestiona de manera específica las diferentes regiones de memoria y los registros asociados. Cada MBC presenta un mecanismo particular para el acceso y la selección de bancos de ROM y RAM, lo que afecta directamente la forma en que el emulador debe interactuar con ellos.
@@ -1605,5 +1605,182 @@ La WRAM en modo DMG es fija y se maneja directamente, mientras que en modo CGB i
         }
     }
 \end{lstlisting}
+
+\subsection{VRAM}
+
+Al estar estrechamente vinculada al módulo de la PPU, será ahi donde declaremos la variable. Únicamente se llegará a utilizar en modo CGB, ya que de otra forma acudiremos al módulo de memoria. Su implementación no tiene mucho más misterio: debe tener las dimensiones correctas y, en caso de estar en modo CGB, obtener o escribir los valores en ella:
+
+\begin{lstlisting}[language=Kotlin, caption={Lectura y escritura en Video RAM.}, label={code:vramreadwrite}]
+    private var vRam : ByteArray = ByteArray((VRAM_END - VRAM_START) + 1)
+
+    fun readFromVRAM(address: Int) : Byte{
+        return if(!ROM.isCGB()){
+            Memory.read(address)
+        }else{
+            vRam[address - VRAM_START]
+        }
+    }
+
+    fun writeToVRAM(address: Int, value: Byte){
+        if(!ROM.isCGB()){
+            Memory.write(address, value)
+        }else{
+            vRam[address - VRAM_START] = value
+        }
+    }
+\end{lstlisting}
+
+\subsection{RAM Externa}
+
+La RAM Externa, como se ha visto, reside en los cartuchos y es gestionada por los controladores de memoria. En este caso, se ha implementado un controlador MBC1, por lo que la RAM externa se manejará a través de él. La lectura y escritura en la RAM externa se delegan al controlador MBC1, que se encarga de gestionar los bancos de RAM y de redirigir las operaciones a la RAM externa.
+\\\\
+La implementación ya se ha proporcionado en el apartado de \hyperref[rom:read_write]{lectura y escritura en ROM}.
+
+\section{DMA}
+
+Como se ha descrito en el \hyperref[dma]{apartado teórico}, definiremos una función que inicie el proceso de DMA. Por ahora no será utilizada, ya que para ello antes se debe implementar la PPU.
+\\\\
+En esta función de inicio daremos por activado el proceso, calcularemos la dirección de memoria sobre la que comenzar a iterar, y desactivaremos todas las interrupciones para que otra no pueda interrumpir la ejecución.
+
+\begin{lstlisting}[language=Kotlin, caption={Inicio del proceso DMA.}, label={code:dmainit}]
+    private var active : Boolean = false
+    private var offset : Int = 0
+    private var startAddress : Int = 0
+    private var startDelay : Byte = 0
+
+    fun start(value: Byte){ // Value: Indica el rango (0xXX00 - 0xXX9F)
+        active = true
+        offset = 0
+        startDelay = 2
+        startAddress = (value.toInt() and 0xFF) shl 8   // Si el valor es 0xC0, la dirección será 0xC000
+        Interrupt.enableInterrupts(false) // Deshabilitamos las interrupciones
+    }
+\end{lstlisting}
+
+En el método \textit{tick()} comprobaremos si hay o no un delay para comenzar la ejecución. En caso negativo obtendremos la dirección de inicio a la que le sumaremos el offset actual, y copiaremos el byte desde la RAM a la OAM. Al terminar de copiar los 160 bytes, desactivaremos el proceso y reactivaremos las interrupciones para continuar con la ejecución normal.
+
+\begin{lstlisting}[language=Kotlin, caption={Proceso DMA.}, label={code:dmaprocess}]
+    fun tick(){
+        if (active){
+            if(startDelay.toInt() == 0){
+                val address = startAddress + offset
+                PPU.writeToOAM(address, startAddress, Memory.getByteOnAddress(address))
+                offset++
+                active = (offset and 0xFF) < TOTAL_BYTES_TO_COPY
+
+                if(!active)
+                    Interrupt.enableInterrupts(true)
+            }else{
+                startDelay--
+            }
+        }
+    }
+\end{lstlisting}
+
+\section{PPU}
+
+En la PPU debemos antes de nada definir bastantes objetos con los que luego podamos trabajar de forma eficiente:
+\begin{itemize}
+    \item Enumeradores para obtener los bits individuales del LCDC, LCD Status, modo de PPU, paletas de color seleccionadas y atributos de un sprite.
+    \item Un mapa que represente las distintas paletas y sus códigos de color con los que podamos trabajar en Android.
+    \item Todas las variables de clase que necesitemos, como el contador de sprites por línea de renderizado, array de bytes para la VRam y la OAM, frame actual, paleta de color seleccionada, etc\ldots
+\end{itemize}
+
+Una vez definidos todos estos objetos, podremos pasar a inicializar la PPU:
+
+\begin{lstlisting}[language=Kotlin, caption={Inicialización de la PPU.}, label={code:ppuinit}]
+    fun init() {
+        Memory.write(LCD_STAT, 0x81.toByte())
+        Memory.write(LCDC_ADDR, 0x91.toByte())
+        Memory.write(SCY, 0)
+        Memory.write(SCX, 0)
+        Memory.write(LY_ADDR, 0)
+        Memory.write(LYC_ADDR, 0)
+        Memory.write(WY, 0)
+        Memory.write(WX, 0)
+        val consoleType = ROM.getConsole()
+
+        if(consoleType == ROM.CONSOLE_TYPE.DMG || consoleType == ROM.CONSOLE_TYPE.DMG_CGB) {
+            Memory.write(BGP, 0xFC.toByte())
+            Memory.write(OBP0, 0xFF.toByte())
+            Memory.write(OBP1, 0xFF.toByte())
+        }else{
+            //TODO - CGB
+        }
+
+        handleLCDC(0x91.toByte())
+    }
+
+    [...]
+
+    private fun handleLCDC(value: Byte){
+        // Bit 7
+        ppuEnabled = LCDCObj.LCDC_ENABLE.get(value) != 0
+        lcdEnabled = ppuEnabled
+        // Bit 6
+        winTilemapAddr = if(LCDCObj.WIN_TILEMAP.get(value) == 0) TM_1_START else TM_2_START
+        // Bit 5
+        enabledWindow = LCDCObj.WINDOW_ENABLE.get(value) != 0
+        // Bit 4
+        addrModeAddr = if(LCDCObj.ADDRESS_MODE.get(value) == 0) SIGNED_TILE_REGION else VRAM_START
+        // Bit 3
+        bgTilemapAddr = if(LCDCObj.BG_TILEMAP.get(value) == 0) TM_1_START else TM_2_START
+        // Bit 2
+        objSize = if(LCDCObj.OBJ_SIZE.get(value) == 0) 8 else 16
+        // Bit 1
+        objEnabled = LCDCObj.OBJ_ENABLE.get(value) != 0
+        // Bit 0
+        bgWinEnabled = LCDCObj.MASTER_ENABLE.get(value) != 0
+    }
+\end{lstlisting}
+
+Primero se configura la pantalla LCD:
+
+\begin{itemize}
+    \item \textbf{LCD Status (\texttt{LCD\_STAT})}: Se escribe el valor $0x81$ (\texttt{10000001} en binario). Este valor activa la interrupción cuando la línea de escaneo coincide con el valor de \texttt{LYC} y asegura que la pantalla empiece en un estado adecuado.
+    \item \textbf{LCD Control (\texttt{LCDC})}: Se escribe el valor $0x91$ (\texttt{10010001} en binario), que habilita la pantalla, permite el uso de sprites y selecciona un modo de dirección de tiles.
+\end{itemize}
+
+Ahora configuramos los registros de desplazamiento y posición:
+\begin{itemize}
+    \item \textbf{\texttt{SCY} y \texttt{SCX}}: Se establecen en $0$ para que la imagen de fondo no esté desplazada.
+    \item \textbf{\texttt{LY} y \texttt{LYC}}: Se inician en $0$ para que la pantalla empiece desde la primera línea de escaneo.
+    \item \textbf{\texttt{WY} y \texttt{WX}}: Controlan la posición de la ventana en pantalla, comenzando en $0$.
+\end{itemize}
+
+Configuramos la paleta de colores detectando el tipo de consola:
+\begin{itemize}
+    \item Si es modo DMG o en en modo compatibilidad (DMG\_CGB):
+    \begin{itemize}
+        \item \textbf{\texttt{BGP}} se establece en $0xFC$ (\texttt{11111100} en binario), configurando la paleta de colores del fondo.
+        \item \textbf{\texttt{OBP0} y \texttt{OBP1}} se establecen en $0xFF$, dejando los sprites con su configuración predeterminada.
+    \end{itemize}
+    \item Para el modo CGB, aún falta implementar la configuración específica.
+\end{itemize}
+
+Finalmente, se llama a \texttt{handleLCDC(0x91)} para aplicar la configuración del registro \texttt{LCDC}
+\\\\
+Al igual que el DMA y la CPU, la PPU también dispondrá de su propio método \texttt{tick()}. En él, comprobaremos que la PPU esté activa y ejecutaremos el código de los distintos modos según venga indicado en el \texttt{LCD Stat}.
+
+\begin{lstlisting}[language=Kotlin, caption={Lógica principal de la PPU.}, label={code:pputick}]
+    fun tick(){
+        if(moduleIsActive()) {
+            lineTicks++
+            val stat = Memory.getByteOnAddress(LCD_STAT)
+
+            when (StatObj.PPU_MODE.get(stat)) {
+                PPUMode.HBlank.number -> hBlankMode(stat)       // MODE 0
+                PPUMode.VBlank.number -> vBlankMode(stat)       // MODE 1
+                PPUMode.OAM.number -> oamMode(stat)             // MODE 2
+                PPUMode.DRAW_LCD.number -> drawLCDMode(stat)    // MODE 3
+            }
+        }
+    }
+\end{lstlisting}
+
+\subsection{Modo 0: H-Blank}
+\subsection{Modo 1: V-Blank}
+\subsection{Modo 2: OAM Scan}
+\subsection{Modo 3: Drawing Pixels}
 
 \cleardoublepage

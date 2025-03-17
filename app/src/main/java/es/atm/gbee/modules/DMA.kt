@@ -16,7 +16,6 @@ object DMA {
         startDelay = 2
         startAddress = (value.toInt() and 0xFF) shl 8   // If value is 0xC0, startAddress will be 0xC000
         Interrupt.enableInterrupts(false)               // Disable interrupts while copying
-
     }
 
     fun tick(){
