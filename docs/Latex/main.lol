@@ -59,5 +59,9 @@
 \contentsline {lstlisting}{\numberline {7.49}{\ignorespaces Proceso DMA.}}{113}{lstlisting.7.49}%
 \contentsline {lstlisting}{\numberline {7.50}{\ignorespaces Inicialización de la PPU.}}{114}{lstlisting.7.50}%
 \contentsline {lstlisting}{\numberline {7.51}{\ignorespaces Lógica principal de la PPU.}}{115}{lstlisting.7.51}%
+\contentsline {lstlisting}{\numberline {7.52}{\ignorespaces Lógica del proceso de H-Blank.}}{116}{lstlisting.7.52}%
+\contentsline {lstlisting}{\numberline {7.53}{\ignorespaces Lógica del proceso de V-Blank.}}{117}{lstlisting.7.53}%
+\contentsline {lstlisting}{\numberline {7.54}{\ignorespaces Lógica del proceso de OAM Scan.}}{118}{lstlisting.7.54}%
+\contentsline {lstlisting}{\numberline {7.55}{\ignorespaces Obtención de sprites en modo OAM Scan.}}{118}{lstlisting.7.55}%
 \addvspace {10\p@ }
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

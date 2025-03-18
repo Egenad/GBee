@@ -1779,8 +1779,131 @@ Al igual que el DMA y la CPU, la PPU también dispondrá de su propio método \t
 \end{lstlisting}
 
 \subsection{Modo 0: H-Blank}
+
+El proceso verifica si se ha alcanzado el número total de ciclos (LINE\_TOTAL\_TICKS) para la línea actual y, si es así, se actualiza el valor del registro LY. Si la línea actual ha alcanzado o superado la resolución vertical de la Game Boy (GB\_Y\_RESOLUTION), significa que la PPU ha terminado de procesar todas las líneas visibles y entra en el modo V-Blank. En este caso, el método actualiza el estado de LCD\_STAT para reflejar este cambio y solicita una interrupción de V-Blank. Además, incrementa el contador de fotogramas y llama a calculateFPS() para actualizar la métrica de rendimiento.
+\\\\
+Por otro lado, si LY no ha alcanzado este límite, significa que la PPU aún está dentro del proceso de renderizado de la pantalla y debe volver al modo OAM. En este caso, el método actualiza LCD\_STAT para reflejar este cambio y, si la interrupción de estado del LCD para OAM está habilitada, solicita la interrupción correspondiente. Finalmente, restablece lineTicks a cero para comenzar el procesamiento de la nueva línea.
+
+\begin{lstlisting}[language=Kotlin, caption={Lógica del proceso de H-Blank.}, label={code:ppuhblank}]
+    private fun hBlankMode(stat: Byte){
+        if(lineTicks >= LINE_TOTAL_TICKS){
+            increment_LY()
+
+            val ly = (Memory.getByteOnAddress(LY_ADDR).toInt()) and 0xFF
+
+            if(ly >= GB_Y_RESOLUTION){ // ENTER VBLANK MODE
+                Memory.write(LCD_STAT, StatObj.PPU_MODE.set(stat, PPUMode.VBlank.number))
+
+                Interrupt.requestInterrupt(Interrupt.InterruptType.VBLANK.getByteMask()) // ASK FOR VBLANK INTERRUPT
+
+                if(StatObj.VBLANK_INTERRUPT.get(stat) != 0)
+                    Interrupt.requestInterrupt(Interrupt.InterruptType.LCD_STAT.getByteMask()) // ASK FOR LCD STAT INTERRUPT IF LCD_STAT HAS THE VBLANK BIT ACTIVATED
+
+                currentFrame++
+
+                calculateFPS()
+
+            }else{ // RETURN TO OAM MODE
+                Memory.write(LCD_STAT, StatObj.PPU_MODE.set(stat, PPUMode.OAM.number))
+
+                if(StatObj.OAM_INTERRUPT.get(stat) != 0)
+                    Interrupt.requestInterrupt(Interrupt.InterruptType.LCD_STAT.getByteMask()) // ASK FOR LCD STAT INTERRUPT IF LCD_STAT HAS THE OAM BIT ACTIVATED
+            }
+
+            lineTicks = 0
+        }
+    }
+\end{lstlisting}
+
 \subsection{Modo 1: V-Blank}
+
+El proceso verifica si se ha alcanzado el número total de ciclos para la línea actual y, si es así, incrementa el valor del registro LY. Luego, obtiene el valor actualizado y comprueba si ha alcanzado o superado el número total de líneas. Si esto ocurre, significa que el periodo de V-Blank ha finalizado y la PPU debe volver al modo OAM para comenzar el renderizado del siguiente cuadro.
+\\\\
+En este caso, el método actualiza el estado de LCD\_STAT para reflejar el cambio al modo OAM y restablece LY\_ADDR a 0, indicando el inicio de un nuevo fotograma. Además, si la interrupción de estado del LCD para OAM está habilitada, solicita la interrupción. Al igual que en H-Blank, lineTicks se restablece a cero para comenzar el procesamiento de la nueva línea.
+
+\begin{lstlisting}[language=Kotlin, caption={Lógica del proceso de V-Blank.}, label={code:ppuvblank}]
+    private fun vBlankMode(stat: Byte){
+        if(lineTicks >= LINE_TOTAL_TICKS){
+            increment_LY()
+
+            val ly = (Memory.getByteOnAddress(LY_ADDR).toInt()) and 0xFF
+
+            if(ly >= TOTAL_LINES){ // RETURN TO OAM MODE
+                Memory.write(LCD_STAT, StatObj.PPU_MODE.set(stat, PPUMode.OAM.number))
+                Memory.write(LY_ADDR, 0)
+
+                if(StatObj.OAM_INTERRUPT.get(stat) != 0)
+                    Interrupt.requestInterrupt(Interrupt.InterruptType.LCD_STAT.getByteMask()) // ASK FOR LCD STAT INTERRUPT IF LCD_STAT HAS THE OAM BIT ACTIVATED
+            }
+
+            lineTicks = 0
+        }
+    }
+\end{lstlisting}
+
 \subsection{Modo 2: OAM Scan}
+
+Aquí gestionamos el modo OAM Scan, el cual se encarga de escanear los sprites visibles en la línea actual antes de proceder al renderizado.
+\\\\
+Si el contador lineTicks ha alcanzado el número de ciclos necesarios para el modo OAM, la PPU cambia al modo de dibujo (DRAW\_LCD), actualizando el estado de LCD\_STAT y reiniciando los parámetros del FIFO fetcher, que se encarga de obtener los píxeles a renderizar. Sin embargo, en el primer ciclo, se inicializa el conteo de sprites en la línea y se llama a loadLineSprites(), que carga los sprites visibles en la línea actual para que puedan ser procesados durante la fase de dibujo.
+
+\begin{lstlisting}[language=Kotlin, caption={Lógica del proceso de OAM Scan.}, label={code:ppuoamscan}]
+    private fun oamMode(stat: Byte){ // MODE 2
+        if(lineTicks >= OAM_CYCLES){ // ENTER DRAWING PIXELS MODE
+            Memory.write(LCD_STAT, StatObj.PPU_MODE.set(stat, PPUMode.DRAW_LCD.number))
+            fifoFetcher.resetParams() // Reset FIFO Fetcher
+        }else if(lineTicks == 1){ // Scanning -> Read OAM on the first tick
+            lineSpriteCount = 0
+            loadLineSprites()
+        }
+    }
+\end{lstlisting}
+
+El método \texttt{loadLineSprites()} se encarga de seleccionar y ordenar los sprites que deben renderizarse en la línea de escaneo actual de la pantalla. Esta función solo se ejecuta si los sprites están habilitados o si la consola es un modelo CGB, ya que en este último caso siempre se procesan los sprites.
+\\\\
+Primero, se obtiene la línea de escaneo actual, sumándole un desplazamiento para compensar la posición real de los sprites. Luego, se determina el tamaño de los sprites, que puede ser de 8 o 16 píxeles. A continuación, se inicializa el array \texttt{objsFetched} con valores nulos y se resetea el contador que indica el número de sprites obtenidos por línea. Por último, se recorre la memoria OAM en bloques de 4 bytes (siendo cada uno en orden: posición Y, posición X, índice de tile y atributos). Si se han alcanzado el número máximo de sprites por línea, el bucle se detiene.
+\\\\
+Para cada sprite, se verifican las coordenadas x e y para determinar si es visible en la línea actual. Si lo es, se almacena en el array \texttt{objsFetched}, incrementando el contador a posteriori. Finalmente, se ordena la lista de sprites por su posición x, asegurando que aquellos con menor x se rendericen primero.
+
+\begin{lstlisting}[language=Kotlin, caption={Obtención de sprites en modo OAM Scan.}, label={code:ppuoamscansprites}]
+    private fun loadLineSprites(){
+
+        if(objEnabled || ROM.isCGB()) { // CGB Ignores this condition
+
+            val currentY = (Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF) + OAM_Y_OFFSET
+            val lcdc = Memory.getByteOnAddress(LCDC_ADDR)
+            val objSize = LCDCObj.OBJ_SIZE.get(lcdc)
+            val spriteHeight = if (objSize == 0) 8 else 16
+
+            objsFetched.fill(null)
+            lineSpriteCount = 0
+
+            for (i in oamRam.indices step 4) {
+
+                if (lineSpriteCount >= MAX_OBJ_PER_SCANLINE) {
+                    break
+                }
+
+                val y = oamRam[i].toInt() and 0xFF
+                val x = oamRam[i + 1].toInt() and 0xFF
+                val tile = oamRam[i + 2]
+                val flags = oamRam[i + 3]
+
+                if (x == 0 || x >= (GB_X_RESOLUTION + OAM_X_OFFSET)) { // Sprite not visible
+                    continue
+                }
+
+                if (y <= currentY && (y + spriteHeight) > currentY) { // Sprite on current line
+                    objsFetched[lineSpriteCount] = OAMObj(y.toByte(), x.toByte(), tile, flags)
+                    lineSpriteCount++
+                }
+            }
+
+            objsFetched.sortBy { it?.x ?: Byte.MAX_VALUE} // Sort by X position
+        }
+    }
+\end{lstlisting}
+
 \subsection{Modo 3: Drawing Pixels}
 
 \cleardoublepage
