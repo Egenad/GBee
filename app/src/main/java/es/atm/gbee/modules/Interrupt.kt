@@ -76,4 +76,10 @@ object Interrupt {
         val newValue = ((value or 0xE0) and 0xFF).toByte()
         Memory.write(IF, newValue)
     }
+
+    fun reset(){
+        IME = false
+        Memory.write(IF, 0x00)
+        Memory.write(IE, 0x00)
+    }
 }

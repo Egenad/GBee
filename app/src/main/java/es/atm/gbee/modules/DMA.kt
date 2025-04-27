@@ -38,4 +38,11 @@ object DMA {
         return active
     }
 
+    fun reset(){
+        active = false
+        offset = 0
+        startAddress = 0
+        startDelay = 0
+    }
+
 }

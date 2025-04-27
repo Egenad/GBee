@@ -2,8 +2,11 @@ package es.atm.gbee.modules
 
 import es.atm.gbee.etc.printVRAM
 import es.atm.gbee.modules.Memory.insertBootstrapToMemory
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
@@ -14,17 +17,19 @@ object Emulator {
     private var paused : Boolean = false
     private var lastCpuCycles : Int = 0
 
-    private val audioSys: Audio = Audio()
+    private var cpuScope: CoroutineScope? = null
+    val audioSys: Audio = Audio()
 
-    @OptIn(DelicateCoroutinesApi::class)
     fun run(bytes : ByteArray?){
 
         if(bytes == null || bytes.isEmpty()){
+            println("Error: No bytes passed")
             System.err.println("No file was selected / passed through input")
             return
         }
 
-        GlobalScope.launch {
+        cpuScope = CoroutineScope(Dispatchers.Default)
+        cpuScope?.launch {
             runCpu(bytes)
         }
     }
@@ -34,6 +39,7 @@ object Emulator {
         running = true
 
         PPU.init()
+        CPU.init()
 
         // LOAD GAME ROM
         if(!ROM.loadRom(bytes)){
@@ -87,15 +93,20 @@ object Emulator {
     }
 
     fun pause(){
+        println("Emulator - Paused")
         paused = true
     }
 
     fun resume(){
+        println("Emulator - Resumed")
         paused = false
     }
 
     fun stop(){
+        println("Emulator - Stopped")
         running = false
+        cpuScope?.cancel()
+        resetModules()
     }
 
     fun isRunning(): Boolean{
@@ -104,5 +115,15 @@ object Emulator {
 
     fun isPaused(): Boolean{
         return paused
+    }
+
+    private fun resetModules(){
+        CPU.reset()
+        PPU.reset()
+        Memory.reset()
+        RAM.reset()
+        Timer.reset()
+        DMA.reset()
+        Interrupt.reset()
     }
 }

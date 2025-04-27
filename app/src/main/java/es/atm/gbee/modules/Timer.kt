@@ -85,4 +85,12 @@ object Timer {
         }
     }
 
+    fun reset(){
+        div16 = 0x0000
+        Memory.write(DIV, 0x00)
+        Memory.write(TIMA, 0x00)
+        Memory.write(TMA, 0x00)
+        Memory.write(TAC, 0x00)
+    }
+
 }

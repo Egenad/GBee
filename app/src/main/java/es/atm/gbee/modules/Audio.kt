@@ -26,4 +26,8 @@ const val WAVE_PATTERN_START : Int  = 0xFF30
 const val WAVE_PATTERN_END : Int    = 0xFF3F
 
 class Audio {
+
+    fun writeToAudio(address: Int, value: Byte){
+
+    }
 }

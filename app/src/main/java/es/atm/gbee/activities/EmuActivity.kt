@@ -142,6 +142,8 @@ class EmuActivity : AppCompatActivity() {
 
         val romPath = intent.getStringExtra(ROM_PATH_EXTRA)
 
+        println("Obtain Rom - $romPath")
+
         if (!romPath.isNullOrEmpty()) {
             val romFile = File(romPath)
 

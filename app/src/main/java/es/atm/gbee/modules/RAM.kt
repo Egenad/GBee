@@ -30,4 +30,11 @@ object RAM {
     fun writeToHRAM(address: Int, value: Byte){
         Memory.write(address, value)
     }
+
+    fun reset(){
+        for(i in 0 until CGB_SW_BANKS){
+            wramBanks[i] = ByteArray(ECHO_RAM_START - SWITCHABLE_WRAM_START)
+        }
+        wramBank = 0
+    }
 }

@@ -81,6 +81,7 @@ class GameSurfaceView @JvmOverloads constructor(
                 renderVRam(canvas)
             }
         }else{
+            //println("PPU - LCD is disabled")
             canvas.drawColor(Color.BLACK) // Background
         }
     }

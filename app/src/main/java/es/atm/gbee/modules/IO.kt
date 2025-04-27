@@ -122,7 +122,13 @@ object IO {
             return
         }
 
+        if(address in CHNL_1_SWEEP..WAVE_PATTERN_END){
+            Emulator.audioSys.writeToAudio(address, value)
+            return
+        }
+
         println("IO - Unkown write on address: $address")
+        Memory.write(address, value)
     }
 
     private fun readJoyPad(): Byte{

@@ -69,11 +69,28 @@ object CPU {
 
     private var lastOpcode      = 0xFF.toByte()
 
-    init {
+    fun init() {
         SP = 0xFFFE
         PC = 0 // Jumps to 0x100 after boot
         cycles = 0
         println("CPU initialized")
+    }
+
+    fun reset() {
+        init()
+        pendingBootROM = true
+        cpu_halted = false
+        cpu_halt_bug = false
+        pendingEI = false
+        lastOpcode = 0xFF.toByte()
+        A = 0
+        F = 0
+        B = 0
+        C = 0
+        D = 0
+        E = 0
+        H = 0
+        L = 0
     }
 
     fun tick(): Boolean{
@@ -94,6 +111,7 @@ object CPU {
 
         // Opcode execution
         val opcode = fetch()
+        //println(opcode)
 
         if(opcode == 0x20.toByte() && pendingBootROM && lastOpcode == opcode){
             println("Boot checksum failed")

@@ -145,7 +145,7 @@ object PPU {
     private var lineSpriteCount: Int = 0
     private var objsFetched : Array<OAMObj?> = Array(MAX_OBJ_PER_SCANLINE) { OAMObj(0, 0, 0, 0) }
 
-    private val fifoFetcher : FifoFetcher = FifoFetcher()
+    private var fifoFetcher : FifoFetcher = FifoFetcher()
 
     enum class PALETTE_TYPE(){
         BASIC_PL,
@@ -213,6 +213,11 @@ object PPU {
         }
 
         handleLCDC(0x91.toByte())
+    }
+
+    fun reset(){
+        fifoFetcher = FifoFetcher()
+        init()
     }
 
     fun tick(){
@@ -350,6 +355,7 @@ object PPU {
                 DMA.start(value)
             }
             LCDC_ADDR -> {
+                println("LCDC_ADDR: $value")
                 Memory.write(address, value)
                 handleLCDC(value)
             }

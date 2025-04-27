@@ -280,4 +280,8 @@ object Memory {
     fun getNintendoLogo() : ByteArray{
         return nintendoLogo
     }
+
+    fun reset() {
+        memory.fill(0)
+    }
 }
