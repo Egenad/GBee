@@ -47,8 +47,6 @@ object Emulator {
             return
         }
 
-        Memory.dumpMemory(0x0134, 0x014D)
-
         insertBootstrapToMemory()
         println("Memory initialized - Ready to Boot")
 

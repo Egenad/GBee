@@ -1,66 +1,49 @@
 package es.atm.gbee
 
+import es.atm.gbee.modules.CPU
+import es.atm.gbee.modules.DMA
 import es.atm.gbee.modules.Memory
+import es.atm.gbee.modules.Memory.insertBootstrapToMemory
+import es.atm.gbee.modules.PPU
 import es.atm.gbee.modules.ROM
+import es.atm.gbee.modules.Timer
+import kotlin.system.exitProcess
+
+private var lastCpuCycles : Int = 0
 
 fun main(args: Array<String>){
 
-    /*if(args.isEmpty()){
-        System.err.println("No file was selected / passed through input")
-        return
-    }*/
+    PPU.init()
+    CPU.init()
 
-    /*Memory.dumpMemory(ROM_START, ROM_END) // Print Memory
+    //ROM.load_rom_from_path("/home/angel/Documentos/Git/GBee/roms/GoldenSacra.gb")
+    ROM.load_rom_from_path("/home/angel/Documentos/Git/GBee/roms/tetris.gb")
 
-    // BOOTSTRAP
+    insertBootstrapToMemory()
+    Memory.dumpMemory(0x0000, 0x0500)
+
     while(CPU.getBootstrapPending()){
         if(!CPU.tick()){
             System.err.println("An error on the boot process has occurred. Program must exit.")
             exitProcess(0)
         }
+        //updateEmuCycles()
     }
 
-    Memory.dumpMemory(VRAM_START, VRAM_END) // Print Memory
+    println("ROM - Reload Boot Portion")
+    ROM.reloadBootPortion()
+}
 
-    exitProcess(0) // TEST
+private fun updateEmuCycles(){
+    val currentCpuCycles = CPU.getCPUCycles()
+    val cpuCycles = currentCpuCycles - lastCpuCycles
+    lastCpuCycles = currentCpuCycles
 
-    // LOAD GAME ROM
-    if(!ROM.load_rom("D:/test_rom.gb"/*args[0]*/)){
-        System.err.println("Failed to load ROM: ${args[0]} <rom>")
-        return
+    for (i in 0 until cpuCycles / 4) {
+        for (n in 0 until 4) {
+            Timer.tick()
+            PPU.tick()
+        }
+        DMA.tick()
     }
-
-    while(true){
-        if(!CPU.tick()){
-            break
-        }
-    }*/
-
-    //ROM.load_rom_from_path("D:/test_rom.gb")
-    //ROM.load_rom_from_path("D:/test_rom_2.gb")
-    //ROM.load_rom_from_path("D:/test_rom_3.gb")
-    //ROM.load_rom("D:/test_rom_4.gbc")
-    ROM.load_rom_from_path("D:/harry.gbc")
-    //ROM.load_rom("D:/test_rom_6.gb")
-    //ROM.load_rom("/Users/angelterol/Documents/Git/Android/GBee/roms/GoldenSacra.gb")
-    //ROM.load_rom("D:/Git/GBee/roms/GoldenSacra.gb")
-    //ROM.load_rom("/Users/angelterol/Documents/Git/Android/GBee/roms/mem_timing.gb")
-    //ROM.load_rom("D:/tetris.gb")
-
-    /*val emu = Emulator()
-    CPU.PC = 0x100
-    emu.run(arrayOf("/Users/angelterol/Documents/Git/Android/GBee/roms/mem_timing.gb"))
-    while(true){
-        if(!CPU.tick()){
-            System.err.println("CPU Error")
-            break
-        }
-        emu.updateEmuCycles()
-    }*/
-
-    //val emu = Emulator()
-    //emu.run("/Users/angelterol/Documents/Git/Android/GBee/roms/GoldenSacra.gb")
-
-    //ROM.load_rom_from_path("D:/Git/GBee/roms/GoldenSacra.gb")
-    Memory.dumpMemory(0x0000, 0x0500)
 }

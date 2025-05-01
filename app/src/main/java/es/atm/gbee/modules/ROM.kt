@@ -478,7 +478,8 @@ object ROM {
     }
 
     fun readFromROM(address: Int): Byte{
-        return mbcInterface?.read(address) ?: Memory.read(address)
+        return if(CPU.getBootstrapPending()) Memory.read(address)
+        else mbcInterface?.read(address) ?: Memory.read(address)
     }
 
     fun writeToROM(address: Int, value: Byte){

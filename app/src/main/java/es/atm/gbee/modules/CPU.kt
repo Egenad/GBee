@@ -93,6 +93,7 @@ object CPU {
         L = 0
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     fun tick(): Boolean{
 
         // Interrupts
@@ -111,7 +112,7 @@ object CPU {
 
         // Opcode execution
         val opcode = fetch()
-        //println(opcode)
+        val valop = opcode.toHexString(HexFormat.Default)
 
         if(opcode == 0x20.toByte() && pendingBootROM && lastOpcode == opcode){
             println("Boot checksum failed")
@@ -150,7 +151,6 @@ object CPU {
     }
 
     private fun handleInterrupts() {
-
         if(Interrupt.getInterruptEnabled() && Interrupt.getPendingInterrupts() != 0){
             // Handle the interrupt
             Interrupt.flush()
@@ -868,12 +868,12 @@ object CPU {
     }
 
     fun inc_h(): Int{
-        D = inc_8bit_register(H)
+        H = inc_8bit_register(H)
         return CYCLES_4
     }
 
     fun dec_h(): Int{
-        D = dec_8bit_register(H)
+        H = dec_8bit_register(H)
         return CYCLES_4
     }
 

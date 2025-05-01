@@ -39,7 +39,7 @@ object Timer {
 
         val prevDIV = div16
 
-        div16 += 1
+        div16 = (div16 + 1) and 0xFFFF
 
         var timerUpdate = false
         val tacValue = Memory.read(TAC).toInt() and 0xFF
