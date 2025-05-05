@@ -16,6 +16,7 @@ object Emulator {
     private var running : Boolean = false
     private var paused : Boolean = false
     private var lastCpuCycles : Int = 0
+    private var bootCompleted = false
 
     private var cpuScope: CoroutineScope? = null
     val audioSys: Audio = Audio()
@@ -50,29 +51,31 @@ object Emulator {
         insertBootstrapToMemory()
         println("Memory initialized - Ready to Boot")
 
-        // BOOTSTRAP
-        while(CPU.getBootstrapPending()){
-            if(!CPU.tick()){
-                System.err.println("An error on the boot process has occurred. Program must exit.")
-                exitProcess(0)
+        while (running) {
+            if (CPU.getBootstrapPending()) {
+                if (!CPU.tick()) {
+                    System.err.println("An error on the boot process has occurred. Program must exit.")
+                    exitProcess(0)
+                }
+            } else {
+                if (!bootCompleted) {
+                    println("ROM - Reload Boot Portion")
+                    ROM.reloadBootPortion()
+                    bootCompleted = true
+                }
+
+                if (paused) {
+                    delay(10)
+                    continue
+                }
+                if (!CPU.tick()) {
+                    System.err.println("CPU Error")
+                    break
+                }
             }
+
             updateEmuCycles()
-        }
 
-        println("ROM - Reload Boot Portion")
-        ROM.reloadBootPortion()
-
-        while(running){
-            if(paused){
-                delay(10)
-                continue
-            }
-            if(!CPU.tick()){
-                System.err.println("CPU Error")
-                break
-            }
-
-            updateEmuCycles()
         }
     }
 
@@ -103,6 +106,7 @@ object Emulator {
     fun stop(){
         println("Emulator - Stopped")
         running = false
+        bootCompleted = false
         cpuScope?.cancel()
         resetModules()
     }

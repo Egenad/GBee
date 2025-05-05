@@ -1906,4 +1906,120 @@ Para cada sprite, se verifican las coordenadas x e y para determinar si es visib
 
 \subsection{Modo 3: Drawing Pixels}
 
+El modo de dibujo es el proceso en el que la PPU renderiza los píxeles en la pantalla. En este modo, se obtienen los datos de los tiles y se procesan para generar la imagen final. La función \texttt{drawLCDMode()} gestiona este proceso:
+
+\begin{lstlisting}[language=Kotlin, caption={Dibujado de píxeles en Modo 3.}, label={code:ppuoamdrawpixels}]
+    private fun drawLCDMode(stat: Byte){
+
+        fifoFetcher.process()
+
+        if(fifoFetcher.getPushedPixels() >= GB_X_RESOLUTION){ // ENTER HBLANK MODE
+
+            fifoFetcher.clear()
+
+            Memory.write(LCD_STAT, StatObj.PPU_MODE.set(stat, PPUMode.HBlank.number))
+
+            if(StatObj.HBLANK_INTERRUPT.get(stat) != 0)
+                Interrupt.requestInterrupt(Interrupt.InterruptType.LCD_STAT.getByteMask()) // ASK FOR LCD STAT INTERRUPT IF LCD_STAT HAS THE HBLANK BIT ACTIVATED
+        }
+    }
+\end{lstlisting}
+
+El código propio del FIFO vendrá documentado más adelante, pero por ahora se debe entender que su función es transferir la información de los píxeles al búfer de la pantalla. 
+\\\\
+Después del proceso, se comprueba que el número total de píxeles (correspondientes a la línea actual) que se han añadido sea mayor o igual a la resolución horizontal de la pantalla. Si estamos en este caso, reiniciaremos el proceso volviendo al modo H-Blank, y lanzando una interrupcion del Stat si estuviese activo.
+
+\subsection{FIFO Fetcher}
+
+Como viene definido en la parte teórica, la GB disponía de dos FIFO's, los cuales trabajan de manera independiente para transferir los píxeles de Background y Window por un lado, y los Sprites por otro. El proceso original finalizaba haciendo una mezcla de la información proporcionada por ambos.
+\\\\
+En este proyecto se va a utilizar una implementación algo más sencilla, tanto de implementar como de entender, basada en la guía de programación de \cite{lld}.
+\\\\
+Como variables de clase, se necesita guardar:
+
+\begin{itemize} 
+    \item Estado del fetcher (las distintas etapas del procesado).
+    \item Coordenada X del tile en VRAM del que se está obteniendo información.
+    \item Coordenada X del scanline que se va a dibujar.
+    \item El propio FIFO, del cual se realizará una implementación propia.
+    \item El búfer de video, que será un array de enteros, con un tamaño fijo equivalente a \texttt{Resolución\_Y * Resolución\_X}.
+    \item Un array de 3 bytes donde se irá insertando información específica del tile sobre el que se trabajará.
+    \item Un array de 3 objetos OAM (definido más adelante) se guardarán los metadatos de los sprites.
+    \item Un array de 6 bytes que almacene los datos de píxeles crudos de los sprites.
+    \item La coordenada Y de la línea actual sobre la que se deben procesar los tiles.
+    \item Coordenadas globales X e Y en el mapa de tiles para determinar qué tile de VRAM debe ser obtenido y procesado.
+\end{itemize}
+
+La lógica principal de procesado se ha implementado de la siguiente manera:
+
+\begin{lstlisting}[language=Kotlin, caption={Código principal del FIFO Fetcher.}, label={code:ppufifoprocess}]
+    fun process(){
+        val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
+        val scy = Memory.getByteOnAddress(SCY).toInt() and 0xFF
+        val ly  = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
+
+        mapY = scy + ly
+        mapX = scx + fetchX
+        tileY = (mapY % 8) * 2
+
+        if(PPU.getLineTicks() % 2 == 0){
+            fetch()
+        }
+        pushPixelsToBuffer() // Push pixels to pipeline
+    }
+
+    private fun fetch(){
+        when(state){
+            FetcherState.OBTAIN_TILE -> getTile()               // Fetch the current tile identification in the BG Tilemap
+            FetcherState.LOW_DATA_TILE -> getTileLowData()      // Fetch the low byte of the tile
+            FetcherState.HIGH_DATA_TILE -> getTileHighData()    // Fetch the high byte of the tile
+            FetcherState.SLEEP -> sleepState()
+            FetcherState.PUSH -> pushState()
+        }
+    }
+\end{lstlisting}
+
+En primer lugar, \texttt{process()} accede a los registros de memoria SCX, SCY y LY. Utilizando estos registros, calcula las coordenadas absolutas (mapX, mapY) en el espacio del mapa de tiles. Por ejemplo, \texttt{mapY = SCY + LY} permite ajustar la renderización vertical según el desplazamiento del fondo, mientras que \texttt{mapX = SCX + fetchX} hace lo mismo para el eje horizontal. La variable tileY se deriva de \texttt{mapY \% 8} para identificar la línea específica dentro del tile actual, esencial para acceder a los datos de píxeles correctos en VRAM.
+\\\\
+Para evitar conflictos con el PPU, en la función se verifica el estado de los ciclos de renderizado mediante \texttt{PPU.getLineTicks() \% 2 == 0}. Esta condición asegura que \texttt{fetch()} solo se ejecute cada 2 ciclos de máquina, simulando el comportamiento del hardware real, donde el acceso a VRAM está restringido durante ciertas fases del renderizado.
+\\\\
+Finalmente, \texttt{pushPixelsToBuffer()} transfiere los píxeles desde el FIFO al búfer de video. Esta etapa es crítica para mantener un flujo constante de datos hacia la pantalla, asegurando que no haya retrasos en la visualización.
+\\\\
+La función \texttt{fetch()} implementa una máquina de estados, en el que cada estado representa una etapa específica del pipeline. Los estados son los siguientes:
+
+\begin{itemize}
+    \item \textbf{\texttt{OBTAIN\_TILE}}: donde se determina qué tile debe ser renderizado.
+    \item \textbf{\texttt{LOW\_DATA\_TILE}}: donde se obtienen los datos de píxeles bajos del tile.
+    \item \textbf{\texttt{HIGH\_DATA\_TILE}}: donde se obtienen los datos de píxeles altos del tile.
+    \item \textbf{\texttt{SLEEP}}: donde se espera a que el ciclo de renderizado esté listo para continuar.
+    \item \textbf{\texttt{PUSH}}: donde se transfieren los píxeles al búfer de video.
+\end{itemize}
+
+\subsubsection{OBTAIN\_TILE}
+El fetcher determina el tile que debe ser renderizado. Accede al mapa de tiles (ubicado en \$9800-\$9BFF o \$9C00-\$9FFF, dependiendo de los flags del registro LCDC) para leer el índice del tile correspondiente a las coordenadas mapX y mapY. Este acceso a memoria es fundamental, ya que define los datos que se procesarán en los estados siguientes.
+
+\begin{lstlisting}[language=Kotlin, caption={FIFO Fetcher - Obtención de Tile.}, label={code:ppufifogettile}]
+    private fun getTile(){
+        if(PPU.lcdIsEnabled())
+            getBGTile()
+
+        if(PPU.objsAreEnabled() && PPU.getFetchedSpriteEntries().isNotEmpty()) {
+            fetchedSprites = 0
+            getSpriteTile()
+        }
+
+        state = FetcherState.LOW_DATA_TILE
+        fetchX += 8
+    }
+\end{lstlisting}
+
+En primer lugar, la función \texttt{getBGTile()} realiza una lectura de los registros que controlan el desplazamiento y posicionamiento de los elementos gráficos. Estos incluyen el LY, las coordenadas de la ventana (WY y WX) y los valores de scroll (SCX y SCY).
+\\\\
+Posteriormente, la función realiza una evaluación de las posiciones relativas y los estados de los flags de control, para establecer si el tile que está siendo procesado pertenece al Background o al Window. Esta distinción determina qué tilemap debe ser consultado, alternando entre las zonas reservadas \texttt{0x9800} y \texttt{0x9C00} según corresponda.
+\\\\
+El proceso de cálculo de direcciones representa uno de los aspectos más elaborados de esta función. Aquí se transforman las coordenadas globales, expresadas en píxeles, en índices específicos de tiles, teniendo en cuenta que cada elemento gráfico ocupa un área de 8x8 píxeles. Este cálculo no solo considera la posición absoluta en pantalla, sino que también incorpora los efectos de desplazamiento producidos por el scroll y ajusta los valores cuando se trabaja en el modo de direccionamiento "signed" para tiles.
+\\\\
+La implementación de esta función refleja una profunda comprensión de las particularidades del hardware original, especialmente en lo que respecta a las restricciones de acceso a memoria y la sincronización temporal. Cada operación de lectura de VRAM se realiza con precisión cronométrica, emulando los ciclos de máquina del sistema real y respetando los períodos durante los cuales la memoria de video está disponible para su consulta.
+
+
 \cleardoublepage

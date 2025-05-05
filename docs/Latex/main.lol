@@ -63,5 +63,8 @@
 \contentsline {lstlisting}{\numberline {7.53}{\ignorespaces Lógica del proceso de V-Blank.}}{117}{lstlisting.7.53}%
 \contentsline {lstlisting}{\numberline {7.54}{\ignorespaces Lógica del proceso de OAM Scan.}}{118}{lstlisting.7.54}%
 \contentsline {lstlisting}{\numberline {7.55}{\ignorespaces Obtención de sprites en modo OAM Scan.}}{118}{lstlisting.7.55}%
+\contentsline {lstlisting}{\numberline {7.56}{\ignorespaces Dibujado de píxeles en Modo 3.}}{119}{lstlisting.7.56}%
+\contentsline {lstlisting}{\numberline {7.57}{\ignorespaces Código principal del FIFO Fetcher.}}{121}{lstlisting.7.57}%
+\contentsline {lstlisting}{\numberline {7.58}{\ignorespaces FIFO Fetcher - Obtención de Tile.}}{122}{lstlisting.7.58}%
 \addvspace {10\p@ }
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
