@@ -80,5 +80,12 @@
 \contentsline {lstlisting}{\numberline {7.70}{\ignorespaces Renderizado en el GameThread.}}{130}{lstlisting.7.70}%
 \contentsline {lstlisting}{\numberline {7.71}{\ignorespaces GameSurfaceView en Layout.}}{130}{lstlisting.7.71}%
 \contentsline {lstlisting}{\numberline {7.72}{\ignorespaces Estados de los Botones en el Módulo IO.}}{131}{lstlisting.7.72}%
+\contentsline {lstlisting}{\numberline {7.73}{\ignorespaces Escritura de los Estados de los Botones del Joypad}}{133}{lstlisting.7.73}%
+\contentsline {lstlisting}{\numberline {7.74}{\ignorespaces Enlace y Lógica de los Botones en la Actividad}}{134}{lstlisting.7.74}%
+\contentsline {lstlisting}{\numberline {7.75}{\ignorespaces MainActivity - Configuración del RecyclerView.}}{136}{lstlisting.7.75}%
+\contentsline {lstlisting}{\numberline {7.76}{\ignorespaces ROM Management - Añadir una ROM.}}{138}{lstlisting.7.76}%
+\contentsline {lstlisting}{\numberline {7.77}{\ignorespaces ROM Management - Eliminar una ROM.}}{139}{lstlisting.7.77}%
+\contentsline {lstlisting}{\numberline {7.78}{\ignorespaces ROM Management - Recarga de ROMs en Memoria.}}{140}{lstlisting.7.78}%
+\contentsline {lstlisting}{\numberline {7.79}{\ignorespaces ROM Adapter.}}{141}{lstlisting.7.79}%
 \addvspace {10\p@ }
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

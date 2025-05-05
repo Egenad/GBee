@@ -2389,8 +2389,366 @@ Los métodos de lectura y escritura son muy similares al resto de módulos que y
 El caso importante que se debe controlar en el propio módulo, es el del Joypad. La lógica a seguir es la siguiente:
 
 \begin{enumerate}
-    \item El \texttt{EmuActivity} nos dice que el jugador ha pulsado o dejado de pulsar un botón definido en el layout.
-    \item 
+    \item El \texttt{EmuActivity} indica que el jugador ha pulsado o dejado de pulsar un botón definido en el layout.
+    \item Se actualiza la propiedad de la variable de clase con el nuevo valor.
+    \item Se actualiza el valor en la memoria interna del emulador teniendo en cuenta el funcionamiento matricial original.
 \end{enumerate}
+
+A la hora de leer el joypad, simplemente se devuelve el valor almacenado en la memoria interna.
+\\\\
+En cuanto a la escritura, la función \texttt{updateJoyPadReadOnlyValues(value: Byte)} es el principal encargado. Empieza extrayendo los bits 4 y 5 del valor de entrada; estos bits indican qué grupo de botones se quiere consultar: los botones de dirección (arriba, abajo, izquierda, derecha) o los botones de acción (A, B, Start, Select). Esta selección se hace a través de los bits \texttt{SELECT\_DPAD} y \texttt{SELECT\_BUTTONS}.
+\\\\
+Si ambos selectores son iguales, no se selecciona ningún grupo concreto, y se ponen todos los bits de botones como "no presionados".
+\\\\
+Si solo uno de los dos selectores está activo, se determina cuál y se leen los estados de los botones direccionales del objeto \texttt{gamePadState}.
+
+\begin{lstlisting}[language=Kotlin, caption={Escritura de los Estados de los Botones del Joypad}, label={code:iojoypadwrite}]
+    private fun updateJoyPadReadOnlyValues(value: Byte): Byte{
+        var toReturn = value.toInt() and 0x30
+
+        // 0 == Button Pressed
+        // 1 == Button Released
+
+        val selectDPad      = GamePadBits.SELECT_DPAD.get(value)
+        val selectButtons   = GamePadBits.SELECT_BUTTONS.get(value)
+
+        if(selectDPad == selectButtons){ // Both selectors are either 0 or 1
+            toReturn = toReturn or 0x0F
+        }else{
+            if(selectDPad == 0){    // DPad selected
+                if(!gamePadState.up) toReturn = toReturn or (0b1 shl GamePadBits.UP_PAD.bit)
+                if(!gamePadState.down) toReturn = toReturn or (0b1 shl GamePadBits.DOWN_PAD.bit)
+                if(!gamePadState.left) toReturn = toReturn or (0b1 shl GamePadBits.LEFT_PAD.bit)
+                if(!gamePadState.right) toReturn = toReturn or (0b1 shl GamePadBits.RIGHT_PAD.bit)
+            }else{                  // Buttons selected
+                if(!gamePadState.select) toReturn = toReturn or (0b1 shl GamePadBits.SELECT_BUTTON.bit)
+                if(!gamePadState.start) toReturn = toReturn or (0b1 shl GamePadBits.START_BUTTON.bit)
+                if(!gamePadState.a) toReturn = toReturn or (0b1 shl GamePadBits.A_BUTTON.bit)
+                if(!gamePadState.b) toReturn = toReturn or (0b1 shl GamePadBits.B_BUTTON.bit)
+            }
+        }
+
+        //println(Integer.toBinaryString(toReturn))
+        return toReturn.toByte()
+    }
+\end{lstlisting}
+
+\section{Joypad}
+
+Con la implementación del módulo de entrada/salida, es posible incorporar los controles en la actividad. Lo primero es añadir los botones al layout. Además, se deben tener en cuenta los distintos tamaños de pantalla de los dispositivos, así como la orientación del mismo, ya sea en modo \textit{portrait} (vertical) o \textit{landscape} (horizontal). En otras palabras, el layout debe ser \textit{responsive}.
+\\\\
+Se trata de una tarea principalmente de diseño, que puede implicar una gran extensión a nivel de código. Por ello, en este apartado se presentará únicamente un diseño inicial, representado de forma gráfica, sobre el cual se puede seguir trabajando y refinando.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.30\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{include/images/design_1_1.png}
+        \caption{Diseño inicial en modo Portrait}
+        \label{figure:design_1_portrait}
+    \end{minipage}
+    \hspace{0.05\textwidth}
+    \begin{minipage}{0.50\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{include/images/design_1_2.png}
+        \caption{Diseño inicial en modo Landscape}
+        \label{figure:design_1_landscape}
+    \end{minipage}
+\end{figure}
+
+En la actividad se implementará una función llamada \texttt{configureButtons()}, cuya finalidad será, por un lado, enlazar cada botón del \textit{layout} con una constante que identifique qué botón representa y, por otro, delegar en la función \texttt{setButton(button: View, name: String)} la inicialización de los correspondientes \textit{listeners}.
+
+\begin{lstlisting}[language=Kotlin, caption={Enlace y Lógica de los Botones en la Actividad}, label={code:activityjoypad}]
+    private fun configureButtons(){
+        setButton(binding.dpadUp, UP_DPAD)
+        setButton(binding.dpadDown, DOWN_DPAD)
+        setButton(binding.dpadLeft, LEFT_DPAD)
+        setButton(binding.dpadRight, RIGHT_DPAD)
+        setButton(binding.buttonA, A_BUTTON)
+        setButton(binding.buttonB, B_BUTTON)
+        setButton(binding.buttonSelect, SELECT_BUTTON)
+        setButton(binding.buttonStart, START_BUTTON)
+        dbgButton = binding.switchButton
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setButton(button: View, name: String){
+        button.setOnTouchListener { v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    //println("Button pressed: $name")
+                    IO.setButtonPressed(name, true)
+                    true
+                }
+                MotionEvent.ACTION_UP -> {
+                    //println("Button released: $name")
+                    IO.setButtonPressed(name, false)
+                    v.performClick()
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+    
+\end{lstlisting}
+
+Ahora, utilizando nuevamente el juego \textit{Golden Sacra}, al pulsar el botón de Start, el emulador debe dar paso del menú principal a la pantalla de juego:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{include/images/transition_title.png}
+    \caption{Paso desde la Pantalla de Título a Juego.}\label{figure:transition_title}
+\end{figure}
+
+\section{MainActivity}
+
+A partir de este apartado se enfocará la memoria en lo que es la parte púramente de Android a nivel de aplicación. Se dará comienzo por lo primero que se ve al iniciar la aplicación: el \textit{MainActivity}.
+\\\\
+Haciendo uso del \hyperref[figure:mockupmenu]{diseño original}, se procede a generar las siguientes clases, estructuras o modificaciones:
+
+\begin{enumerate}
+    \item Añadir un Toolbar al layout que tenga dos botones, uno para añadir una ROM y otro para entrar a la configuración.
+    \item Añadir un RecyclerView al layout, el cual quedará configurado en el \texttt{onCreate()}.
+    \item Generar un Adapter para el RecyclerView, que contendrá la lógica de cómo se van a mostrar las ROMs en pantalla.
+    \item Crear un layout para cada elemento del RecyclerView, que contendrá una imágen y el nombre de la ROM.
+    \item Aádir dos \textit{listeners}, el primero (clics corto) que indicará que un usuario quiere iniciar una ROM, y otro (clics largos) que indicará que el usuario quiere hacer algo (eliminar o modificar) esa ROM.
+    \item Añadir un \textit{listener} al botón de añadir ROM, que abrirá un explorador de archivos para que el usuario seleccione la ROM que quiere añadir.
+    \item Copiar y guardar las ROMs añadidas por el usuario en la memoria interna de la aplicación, para que se mantengan entre sesiones, independientemente de si el usuario la ha borrado de la carpeta original a posteriori.
+    \item Generar un modelo de SQLite para guardar la información de las ROMs en la base de datos. De esta forma el usuario podrá modificar el título y la imagen utilizada como carátula. 
+    \item Añadir un \textit{listener} al botón de configuración, que abrirá una nueva actividad donde se podrá modificar la configuración del emulador.
+\end{enumerate}
+
+En la configuración del \texttt{RecyclerView} se debe establecer el \texttt{LayoutManager}, que es el encargado de gestionar la disposición de los elementos en pantalla. En este caso, se utilizará un \texttt{GridLayoutManager} para mostrar las ROMs en una cuadrícula. También se debe establecer el \texttt{Adapter}, que es el encargado de proporcionar los datos al \texttt{RecyclerView}. Para este último punto, se creará una clase \texttt{RomAdapter} que extenderá de \texttt{RecyclerView.Adapter}.
+\\\\
+A continuación se muestra el código de la actividad principal, donde se inicializa el \texttt{RecyclerView} y se configuran los \textit{listeners}:
+
+\begin{lstlisting}[language=Kotlin, caption={MainActivity - Configuración del RecyclerView.}, label={code:activitymain}]
+    private fun createRecyclerView(){
+
+        RomManagement.loadROMSFromDBIfNeeded(this)
+
+        val spanCount = if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            3
+        } else {
+            2
+        }
+
+        binding.romGrid.layoutManager = GridLayoutManager(this, spanCount)
+        binding.romGrid.itemAnimator = DefaultItemAnimator()
+
+        romAdapter = ROMAdapter(ROMDataSource.roms, spanCount)
+
+        // Click Listener
+        romAdapter.setOnItemClickListener { romPosition ->
+
+            val selectedROMTitle = romAdapter.romList[romPosition].title
+
+            if (selectedROMTitle != null) {
+                val romEntity =
+                    SQLManager.getDatabase(this).romDAO().getROMByTitle(selectedROMTitle)
+
+                if (romEntity != null)
+                    startActivity(
+                        Intent(this, EmuActivity::class.java)
+                            .putExtra(ROM_PATH_EXTRA, romEntity.filePath)
+                    )
+            }
+        }
+
+        romAdapter.setOnLongItemClickListener { romPosition, v ->
+            showPopupMenu(v, romPosition)
+            true
+        }
+
+        binding.romGrid.adapter = romAdapter
+    }
+\end{lstlisting}
+
+Gracias al \texttt{GridLayoutManager}, podemos determinar cuántas ROMs mostrar por fila. Se han definido 2 para el modo \textit{portrait} y 3 para el \textit{landscape}. También se asigna un animador de ítems por defecto para gestionar animaciones al añadir, eliminar o mover elementos.
+\\\\
+Posteriormente, se instancia el adaptador \texttt{ROMAdapter} pasando la lista de ROMs y el número de columnas. Como se ha expuesto antes, se configuran los \textit{listeners} para los dos tipos de clic. Cuando se selecciona una ROM, se obtiene su título y, si está disponible, se consulta a la base de datos para recuperar la entidad correspondiente. Si se encuentra la ROM, se lanza el intent para pasar al \texttt{EmuActivity} y se le pasa la ruta del archivo como extra.
+\\\\
+A continuación, se configura el \textit{listener} para el clic largo. En este caso, se muestra un menú emergente relacionado con la ROM seleccionada. 
+\\\\
+Finalmente, se asigna el adaptador al \texttt{RecyclerView}, completando así la configuración.
+\\\\
+Por otro lado, se deben implementar los \textit{listeners} de los botones que permiten añadir ROMs y entrar a la pantalla de ajustes. Al mismo tiempo que configuramos el \texttt{RecyclerView}, enlazaremos los dos botones definidos en el layout con dos \textit{launchers}.
+\\\\
+El launcher del botón de añadir, comprobará primero si el fichero ya existe en la memoria interna mediante la función \texttt{RomManagement.fileAlreadyExists(context: Context, uri: Uri)}. En caso negativo, copiará y añadirá el fichero a la memoria privada de la aplicación y, si esta operación tiene éxito, la añadirá también al \textit{data source} y a la base de datos. Por último, notificará al \textit{adapter} de que un nuevo objeto se ha insertado para que la vista se actualice correctamente.
+\\\\
+El launcher del botón de ajustes simplemente generará un \textit{intent} que delegará el trabajo en otra actividad, la cual se implementará posteriormente.
+
+\subsection{SQL ROM Data}
+
+Para guardar, obtener y listar todas las ROMs y sus datos, se van a generar los siguientes archivos:
+\begin{itemize}
+    \item \textbf{ROM}: \textit{Data Class} que va a contener un entero como identificador, una cadena de texto para el título y una segunda cadena de texto para la imagen.
+    \item \textbf{ROMDataSource}: Contiene el listado de todas las ROMs en tiempo de ejecución.
+    \item \textbf{ROMManagement}: El manejador de las ROMs, contiene toda la lógica para guardar, eliminar y obtener las ROMs de la memoria privada. Se implementará como un \textbf{singleton}.
+    \item \textbf{ROMDao}: Un \textit{Data Access Object} que define la interfaz SQL. Contendrá funciones para insertar, actualizar, obtener y eliminar ROMs.
+    \item \textbf{ROMEntity}: Un \textit{Data Class} parecido al de ROM, pero con propiedades para la ruta donde se almacena el fichero original, la ruta donde se almacene el archivo de guardado, la fecha en la que la ROM fue añadida, y el tipo (DMG o CGB).
+\end{itemize}
+
+\subsubsection{ROM Management}
+A continuación se explica el \texttt{ROMManagement} más en profundidad:
+\\\\
+La función principal es \texttt{addROM()}, que permite registrar una nueva ROM. Este método limpia el nombre del archivo recibido, eliminando extensiones y caracteres indeseados para generar un título más legible. A continuación, se crea una entidad \texttt{ROMEntity} que representa la ROM con su ruta, título, tipo y fecha de añadido. Esta entidad se guarda en la base de datos y se añade a la lista de ROMs en memoria mediante \texttt{saveROMToDatabaseAndDataSource()}.
+
+\begin{lstlisting}[language=Kotlin, caption={ROM Management - Añadir una ROM.}, label={code:romManagementAddRom}]
+    fun addROM(context: Context, romPath: String, romTitle: String) {
+
+        val title = romTitle.replace(Regex("\\.gbc?"), "").replace(Regex("_"), " ")
+        val type = if(romTitle.contains(".gbc")) "gbc" else "gb"
+
+        val newROM = ROMEntity(
+            filePath = romPath,
+            title = title,
+            imageRes = null,
+            saveFilePath = null,
+            addedDate = System.currentTimeMillis(),
+            type = type
+        )
+
+        saveROMToDatabaseAndDataSource(newROM, context)
+    }
+
+    private fun saveROMToDatabaseAndDataSource(rom: ROMEntity, context: Context) {
+        val db = SQLManager.getDatabase(context)
+        val id = db.romDAO().insertROM(rom)
+
+        ROMDataSource.addROM(ROM(title = rom.title, id = id.toInt()))
+    }
+\end{lstlisting}
+
+En cuanto a la eliminación de ROMs, la función \texttt{deleteRom()} permite borrarlas tanto de la base de datos como del almacenamiento y las preferencias asociadas. Si se elimina correctamente, también se actualiza la fuente de datos en memoria y se informa al usuario con un mensaje emergente. Internamente, este proceso utiliza \texttt{deleteROMFile()}, que se encarga de borrar físicamente los archivos relacionados y actualizar la base de datos.
+\\\\
+Existe una clase llamada \texttt{FileManager}, que podría definirse como una capa inferior en cuanto al mantenimiento de archivos. Contiene una implementación bastante común, por lo que se va a omitir la explicación su código.
+
+\begin{lstlisting}[language=Kotlin, caption={ROM Management - Eliminar una ROM.}, label={code:romManagementDeleteRom}]
+    fun deleteRom(context: Context, rom: ROM, position: Int): Boolean{
+        val dao = SQLManager.getDatabase(context).romDAO()
+        val romEntity = dao.getROMByTitle(rom.title ?: "")
+        if(romEntity != null) {
+            // Delete private file and database entry
+            if(deleteROMFile(context, romEntity)) {
+
+                // Delete from Shared Preferences
+                val preferences = context.getSharedPreferences(romEntity.id.toString(), Context.MODE_PRIVATE)
+                val editor = preferences.edit()
+                editor.clear()
+                editor.apply()
+
+                // Delete from Data Source
+                ROMDataSource.roms.removeAt(position)
+
+                Toast.makeText(context, "${rom.title} has been deleted", Toast.LENGTH_SHORT).show()
+                return true
+            }
+        }
+        Toast.makeText(context, "An error has occurred", Toast.LENGTH_SHORT).show()
+        return false
+    }
+
+    private fun deleteROMFile(context: Context, rom: ROMEntity?) : Boolean {
+        val romDao = SQLManager.getDatabase(context).romDAO()
+
+        // Delete file from private storage
+        if(rom != null) {
+            val filepath = rom.filePath
+            val imagePath = rom.imageRes
+
+            if (filepath.isNotEmpty()) {
+                val file = File(filepath)
+                if (file.exists()) {
+                    file.delete()
+                }
+            }
+            // Delete from DB
+            romDao.deleteROM(rom)
+
+            // Delete game cover if needed
+            if(imagePath != null)
+                FileManager.deleteFileFromPrivateStorage(imagePath)
+
+            return true
+        }
+
+        return false
+    }
+\end{lstlisting}
+
+Por último, la función \texttt{loadROMSFromDBIfNeeded()} sincroniza la fuente de datos en memoria con el contenido de la base de datos. Si el número de ROMs en memoria no coincide con el de la base de datos, las recarga todas, teniendo en cuenta también posibles valores almacenados en \texttt{SharedPreferences}, como portadas personalizadas o nombres editados.
+
+\begin{lstlisting}[language=Kotlin, caption={ROM Management - Recarga de ROMs en Memoria.}, label={code:romManagementReloadRoms}]
+    fun loadROMSFromDBIfNeeded(context: Context){
+        val romDao = SQLManager.getDatabase(context).romDAO()
+        val allRoms = romDao.getAllROMs()
+        if(ROMDataSource.roms.size != allRoms.size){
+            ROMDataSource.roms.clear()
+            allRoms.forEach {
+                val preferences = context.getSharedPreferences(it.id.toString(), Context.MODE_PRIVATE)
+                val prefTitle = preferences.getString(TITLE_KEY, it.title)
+                val prefImage = preferences.getString(COVER_KEY, it.imageRes)
+                ROMDataSource.addROM(ROM(id = it.id, title = prefTitle, imageRes = prefImage))
+            }
+        }
+    }
+\end{lstlisting}
+
+\subsection{ROM Adapter}
+Como se ha explicado ya, el \texttt{ROMAdapter} es el encargado de gestionar la forma en que se muestran las ROMs en el \texttt{RecyclerView}. Este adaptador extiende de \texttt{RecyclerView.Adapter} y se inicializa con una lista de ROMs y el número de columnas que se van a mostrar.
+\\\\
+Contiene una clase interna llamada \texttt{ViewHolder}, que se encarga de gestionar la vista de cada elemento. Esta clase contiene una referencia a la vista de la ROM y a su imagen, así como los métodos para enlazar los datos de la ROM con la vista.
+\\\\
+A cada ROM, por defecto, se le asigna una imagen predeterminada que se encuentra en la carpeta de recursos. Esta imagen se puede cambiar posteriormente a través de un \textit{dialog} que permite al usuario seleccionar una imagen de su galería.
+\\\\
+A cada view se le hace el inflado mediante un layout que define cómo representar cada objeto de forma individual. Este layout se encuentra en la carpeta de recursos y contiene un \texttt{ImageView} y un \texttt{TextView} para mostrar la imagen y el título de la ROM, respectivamente. El layout se infla en el método \texttt{onCreateViewHolder()} del adaptador.
+
+\begin{lstlisting}[language=Kotlin, caption={ROM Adapter.}, label={code:romAdapter}]
+    class ROMAdapter(val romList: MutableList<ROM>, private val spanCount: Int)  :
+        RecyclerView.Adapter<ROMAdapter.ViewHolder?>() {
+
+        [...]
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val v: View = LayoutInflater.from(parent.context).inflate(R.layout.rom_grid_item, parent, false)
+
+            [...]
+
+        class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+            private var name: TextView
+            private var icon: ImageView
+            private val view = v
+
+            fun bind(it: ROM) {
+                name.text = it.title
+
+                icon.setImageResource(R.drawable.rom_icon)
+
+                if(it.imageRes != null) {
+                    val file = File(it.imageRes!!)
+                    if (file.exists())
+                        icon.setImageURI(Uri.fromFile(file))
+                }
+            }
+
+            init {
+                name = view.findViewById(R.id.rom_title)
+                icon = view.findViewById(R.id.rom_image)
+            }
+        }
+\end{lstlisting}
+
+Una vez implementados los puntos anteriores, la aplicación debe permitir añadir y visualizar las ROMs en la página principal:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{include/images/add_rom.png}
+    \caption{MainActivity - Añadir ROMs al Emulador.}\label{figure:addRom}
+\end{figure}
+
+\section{SettingsActivity}
+
 
 \cleardoublepage
