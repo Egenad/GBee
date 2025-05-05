@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2025.2.9)  5 MAY 2025 19:35
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2025.2.9)  5 MAY 2025 21:14
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1855,42 +1855,48 @@ LaTeX Info: Redefining \ttfamily on input line 2.
 
 
 ] [12] [13]
-Overfull \hbox (1.09497pt too wide) detected at line 168
- []\TU/lmss/bx/n/10.95 143
+Underfull \vbox (badness 1789) has occurred while \output is active []
+
+ [14]
+Overfull \hbox (1.09497pt too wide) detected at line 172
+ []\TU/lmss/bx/n/10.95 147
  []
 
 )
 \tf@toc=\write5
 \openout5 = `main.toc'.
 
- [14]
+ [15] [16
+
+
+]
 Package tocbasic Info: character protrusion at lof deactivated on input line 34.
- (./main.lof [15
-
-
-])
+ (./main.lof [17])
 \tf@lof=\write6
 \openout6 = `main.lof'.
 
- [16]
+ [18]
 Package tocbasic Info: character protrusion at lot deactivated on input line 35.
  (./main.lot)
 \tf@lot=\write7
 \openout7 = `main.lot'.
 
- [17
+ [19
 
 
-] [18
+] [20
 
 
 ]
 Package tocbasic Info: character protrusion at lol deactivated on input line 36.
- (./main.lol [19])
+ (./main.lol [21] [22])
 \tf@lol=\write8
 \openout8 = `main.lol'.
 
- [20] (./capitulos/Introduccion.tex
+ [23] [24
+
+
+] (./capitulos/Introduccion.tex
 chapter 1.
 
 Underfull \hbox (badness 10000) in paragraph at lines 10--13
@@ -1903,8 +1909,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 15--18
  []
 
 [1
-
-
 
 
 ] [2
@@ -3130,7 +3134,33 @@ Underfull \hbox (badness 10000) in paragraph at lines 2700--2707
 [141]
 File: include/images/add_rom.png Graphic file (type bmp)
 <include/images/add_rom.png>
- [142]) (./main.bbl
+
+Underfull \hbox (badness 10000) in paragraph at lines 2752--2755
+
+ []
+
+[142] [143]
+Underfull \hbox (badness 10000) in paragraph at lines 2837--2840
+
+ []
+
+
+Underfull \vbox (badness 2671) has occurred while \output is active []
+
+ [144]
+File: include/images/settings_fragments.png Graphic file (type bmp)
+<include/images/settings_fragments.png>
+
+Underfull \hbox (badness 10000) in paragraph at lines 2847--2850
+
+ []
+
+File: include/images/settings_misc.png Graphic file (type bmp)
+<include/images/settings_misc.png>
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [145] [146]) (./main.bbl
 chapter without number
 
 Underfull \hbox (badness 2088) in paragraph at lines 14--26
@@ -3142,12 +3172,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 14--26
 [][][] [] [][][][][][][][][][][][][][][][][][] [] [][][][] [] [][][][] [] [][][] [] [][][][][][][][] [] [][][][][][] [] [][][][] [] [][][] [] [][][][][][][] []
  []
 
-[143
+[147
 
 
 
 
-]) [144] (./main.aux)
+]) [148] (./main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2020/03/25>
@@ -3160,12 +3190,12 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 49492 strings out of 474878
- 1058200 string characters out of 5762517
+ 49587 strings out of 474878
+ 1060308 string characters out of 5762517
  2688627 words of memory out of 5000000
- 70600 multiletter control sequences out of 15000+600000
+ 70693 multiletter control sequences out of 15000+600000
  563777 words of font info for 98 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  113i,21n,134p,11019b,2264s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on main.pdf (164 pages).
+Output written on main.pdf (172 pages).

@@ -87,5 +87,8 @@
 \contentsline {lstlisting}{\numberline {7.77}{\ignorespaces ROM Management - Eliminar una ROM.}}{139}{lstlisting.7.77}%
 \contentsline {lstlisting}{\numberline {7.78}{\ignorespaces ROM Management - Recarga de ROMs en Memoria.}}{140}{lstlisting.7.78}%
 \contentsline {lstlisting}{\numberline {7.79}{\ignorespaces ROM Adapter.}}{141}{lstlisting.7.79}%
+\contentsline {lstlisting}{\numberline {7.80}{\ignorespaces SettingsActivity - Inicialización.}}{143}{lstlisting.7.80}%
+\contentsline {lstlisting}{\numberline {7.81}{\ignorespaces SettingsActivity - Selección de Otro Fragmento.}}{143}{lstlisting.7.81}%
+\contentsline {lstlisting}{\numberline {7.82}{\ignorespaces SettingsActivity - Archivo de Preferencias.}}{144}{lstlisting.7.82}%
 \addvspace {10\p@ }
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

@@ -2749,6 +2749,116 @@ Una vez implementados los puntos anteriores, la aplicación debe permitir añadi
 \end{figure}
 
 \section{SettingsActivity}
+La actividad de configuración es la encargada de gestionar la configuración del emulador. Esta actividad se lanza desde el \texttt{MainActivity} y permite al usuario modificar distintas opciones del emulador, como la paleta de colores o modificar la interfaz de juego. Implementa la interfaz \texttt{OnPreferenceStartFragmentCallback}, lo que permite mostrar fragmentos secundarios de configuración según las interacciones del usuario.
+\\\\
+En el método \texttt{onCreate()} se incluye una barra de herramientas y un contenedor de fragmentos. La barra se configura para permitir la navegación hacia atrás. Por otro lado, se obtiene el valor del identificador de juego a través del \textit{intent} que ha lanzado la actividad anterior. Este identificador determina si se deben mostrar las preferencias asociadas a un juego específico (\texttt{GameSettingsFragment}) o las preferencias generales de la aplicación (\texttt{SettingsFragment}). Si el identificador es distinto de -1, se interpreta que la configuración está vinculada a un juego concreto.
+
+\begin{lstlisting}[language=Kotlin, caption={SettingsActivity - Inicialización.}, label={code:settingsActivityInit}]
+    class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
+
+    private lateinit var binding: ActivitySettingsBinding
+    private var gameId = -1
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
+
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+        }
+
+        gameId = intent.getIntExtra(GAME_ID, -1)
+
+        if (gameId != -1) {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragment_container, GameSettingsFragment(gameId))
+                .commit()
+        } else if (savedInstanceState == null) {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragment_container, SettingsFragment())
+                .commit()
+        }
+
+        [...]
+\end{lstlisting}
+
+La función \texttt{onPreferenceStartFragment()} se ejecuta cuando el usuario selecciona una opción de configuración que abre un nuevo fragmento. En este método se instancia dinámicamente el nuevo fragmento a partir de la clase especificada en la preferencia. Además, se le pasan los extras necesarios, como el identificador visto previamente. El fragmento se añade a la pila de retroceso para que el usuario pueda navegar hacia atrás de forma natural.
+
+\begin{lstlisting}[language=Kotlin, caption={SettingsActivity - Selección de Otro Fragmento.}, label={code:settingsActivitySelect}]
+    override fun onPreferenceStartFragment(
+        caller: PreferenceFragmentCompat,
+        pref: Preference
+    ): Boolean {
+        val fragment = supportFragmentManager.fragmentFactory.instantiate(
+            classLoader,
+            pref.fragment!!
+        )
+
+        pref.extras.putInt(GAME_ID, intent.getIntExtra(GAME_ID, -1))
+
+        fragment.arguments = pref.extras
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .addToBackStack(null)
+            .commit()
+        return true
+    }
+\end{lstlisting}
+
+El \texttt{SettingsFragment} que se utiliza por defecto en la actividad, utiliza un archivo XML de preferencias, donde vienen definidos y enlazados con sus respectivas clases todos los subfragmentos a los que se puede navegar. Además, utilizar fragmentos ofrece la posibilidad de añadir toda la lógica que se necesite según qué situación.
+
+\begin{lstlisting}[language=Kotlin, caption={SettingsActivity - Archivo de Preferencias.}, label={code:settingsActivityPreferences}]
+    <PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <Preference
+            android:key="video_settings"
+            android:title="Video"
+            android:icon="@drawable/video_settings_vector"
+            android:summary="Adjust video settings"
+            android:fragment="es.atm.gbee.core.fragments.VideoSettingsFragment" />
+
+        <Preference
+            android:key="audio_settings"
+            android:title="Audio"
+            android:icon="@drawable/music_note_vector"
+            android:summary="Adjust audio settings"
+            android:fragment="es.atm.gbee.core.fragments.AudioSettingsFragment" />
+
+        [...]
+\end{lstlisting}
+
+Por último, se ha implementado el método \texttt{onSupportNavigateUp()}, el cual se encarga de devolver el control a la actividad anterior cuando el usuario pulsa el botón de retroceso en la barra de herramientas. Se crea un \textit{intent} con el identificador de juego actual para devolverlo como resultado, y se lanza \texttt{onBackPressedDispatcher} para que la navegación hacia atrás se gestione correctamente.
+\\\\
+El resultado es el que se puede ver en las siguientes figuras:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{include/images/settings_fragments.png}
+    \caption{Transición entre Fragmentos en la Pantalla de Ajustes.}\label{figure:settingsFragments}
+\end{figure}
+
+Los ajustes que el usuario tome, tanto de forma general como de forma individual por cada juego, se guardarán mediante \textit{SharedPreferences}. Existen excepciones como la carátula que el usuario quiera configurar a cada juego, que se deben guardar en memoria privada.
+\\\\
+A continuación se muestra un ejemplo en el que el usuario modifica la portada de un juego:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{include/images/settings_misc.png}
+    \caption{Modificación de la Portada de un Juego.}\label{figure:miscFragment}
+\end{figure}
+
+\subsection{Skins}
+
+\section{Diseño}
+\subsection{Skin Predeterminada}
+\subsection{Logotipo}
 
 
 \cleardoublepage
