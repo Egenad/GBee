@@ -66,5 +66,19 @@
 \contentsline {lstlisting}{\numberline {7.56}{\ignorespaces Dibujado de píxeles en Modo 3.}}{119}{lstlisting.7.56}%
 \contentsline {lstlisting}{\numberline {7.57}{\ignorespaces Código principal del FIFO Fetcher.}}{121}{lstlisting.7.57}%
 \contentsline {lstlisting}{\numberline {7.58}{\ignorespaces FIFO Fetcher - Obtención de Tile.}}{122}{lstlisting.7.58}%
+\contentsline {lstlisting}{\numberline {7.59}{\ignorespaces FIFO Fetcher - Obtención de Tile de Background.}}{123}{lstlisting.7.59}%
+\contentsline {lstlisting}{\numberline {7.60}{\ignorespaces FIFO Fetcher - Obtención de Tile de Sprites.}}{123}{lstlisting.7.60}%
+\contentsline {lstlisting}{\numberline {7.61}{\ignorespaces FIFO Fetcher - Obtención de los Bits Bajos o Altos del Tile.}}{124}{lstlisting.7.61}%
+\contentsline {lstlisting}{\numberline {7.62}{\ignorespaces FIFO Fetcher - Obtención de Información de un Sprite en la Línea Actual.}}{125}{lstlisting.7.62}%
+\contentsline {lstlisting}{\numberline {7.63}{\ignorespaces FIFO Fetcher - Sleep.}}{126}{lstlisting.7.63}%
+\contentsline {lstlisting}{\numberline {7.64}{\ignorespaces FIFO Fetcher - Push.}}{126}{lstlisting.7.64}%
+\contentsline {lstlisting}{\numberline {7.65}{\ignorespaces FIFO Fetcher - Push de Píxeles al FIFO.}}{127}{lstlisting.7.65}%
+\contentsline {lstlisting}{\numberline {7.66}{\ignorespaces PPU - Paletas de Color.}}{127}{lstlisting.7.66}%
+\contentsline {lstlisting}{\numberline {7.67}{\ignorespaces Creación del Game Surface View.}}{128}{lstlisting.7.67}%
+\contentsline {lstlisting}{\numberline {7.68}{\ignorespaces Medición y Escalado del Canvas.}}{128}{lstlisting.7.68}%
+\contentsline {lstlisting}{\numberline {7.69}{\ignorespaces Medición y Escalado del Canvas.}}{129}{lstlisting.7.69}%
+\contentsline {lstlisting}{\numberline {7.70}{\ignorespaces Renderizado en el GameThread.}}{130}{lstlisting.7.70}%
+\contentsline {lstlisting}{\numberline {7.71}{\ignorespaces GameSurfaceView en Layout.}}{130}{lstlisting.7.71}%
+\contentsline {lstlisting}{\numberline {7.72}{\ignorespaces Estados de los Botones en el Módulo IO.}}{131}{lstlisting.7.72}%
 \addvspace {10\p@ }
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

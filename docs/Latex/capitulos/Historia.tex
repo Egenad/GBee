@@ -132,7 +132,7 @@ La WRAM es un área de memoria utilizada por el sistema para almacenar variables
 Esta es una copia exacta de la WRAM en las direcciones 0xC000–0xDDFF. Aunque se puede acceder a ella de la misma forma que la RAM original, Nintendo prohíbe su uso, ya que podría causar errores de sincronización o conflictos de acceso.
 
 \subsubsection{OAM: [0xFE00 - 0xFE9F]}\label{mem:oam}
-La OAM es un pequeño bloque de memoria dedicado a almacenar información sobre los sprites que aparecen en pantalla, como su posición, prioridad y patrones de color. Puede contener hasta un total de 40 sprites, cada uno de 8x8 u 8x16 píxeles. Sin embargo, por limitaciones de hardware, solamente se pueden mostrar 10 sprites por scanline.
+La OAM es un pequeño bloque de memoria dedicado a almacenar información sobre los sprites que aparecen en pantalla, como su posición, prioridad y patrones de color. Puede contener hasta un total de 40 sprites, cada uno de 8x8 u 8x16 píxeles. Sin embargo, por limitaciones de hardware, solamente se pueden mostrar 10 sprites por scanline. Además, existe una limitación adicional por la que solamente se pueden evaluar hasta 3 sprites superpuestos en un mismo punto.
 \\\\
 En la siguiente figura, se muestra cómo se guardarían los tiles 4 y 6 en memoria para que en pantalla se muestren de manera continua:
 

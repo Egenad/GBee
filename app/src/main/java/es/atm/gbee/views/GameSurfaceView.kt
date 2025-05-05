@@ -69,9 +69,6 @@ class GameSurfaceView @JvmOverloads constructor(
         setMeasuredDimension(newWidth, newHeight)
     }
 
-    fun update() {
-    }
-
     fun render(canvas: Canvas) {
         if(PPU.lcdIsEnabled()) {
             canvas.drawColor(Color.WHITE) // Background
@@ -183,7 +180,6 @@ class GameThread(private val surfaceHolder: SurfaceHolder, private val gameSurfa
                 canvas = surfaceHolder.lockCanvas()
                 if (canvas != null) {
                     synchronized(surfaceHolder) {
-                        gameSurfaceView.update()
                         gameSurfaceView.render(canvas)
                     }
                 }

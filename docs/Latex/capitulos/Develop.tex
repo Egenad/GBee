@@ -1503,7 +1503,7 @@ Lo que ocurra a continuación depende de la decisión que haya tomado el desarro
 
 \section{Temporizadores / Timers}
 
-La implementación debe simular el comportamiento de los \hyperref[history_timer]{temporizadores} en el hardware original. Para ello se comenzará declarando unas constantes que representen las direcciones de memoria reales y se generarán las funciones de lectura y escritura:
+La implementación debe simular el comportamiento de los \hyperref[history_timer]{temporizadores} en el hardware original. Para ello se comenzará declarando unas constantes que representen las direcciones de memoria reales y se generarán las funciones de lectura y escritura:\label{writeToTimer}
 
 \begin{lstlisting}[language=Kotlin, caption={Lectura y escritura en registros de Timers.}, label={code:timerwriteread}]
     const val DIV   = 0xFF04 // Divider Register (16 bit Register, but only the upper 8 bit (0-7) are public to the developer)
@@ -1686,7 +1686,7 @@ En la PPU debemos antes de nada definir bastantes objetos con los que luego poda
     \item Todas las variables de clase que necesitemos, como el contador de sprites por línea de renderizado, array de bytes para la VRam y la OAM, frame actual, paleta de color seleccionada, etc\ldots
 \end{itemize}
 
-Una vez definidos todos estos objetos, podremos pasar a inicializar la PPU:
+Una vez definidos todos estos objetos, podremos pasar a inicializar la PPU:\label{handleLCDC}
 
 \begin{lstlisting}[language=Kotlin, caption={Inicialización de la PPU.}, label={code:ppuinit}]
     fun init() {
@@ -2016,10 +2016,381 @@ El fetcher determina el tile que debe ser renderizado. Accede al mapa de tiles (
 En primer lugar, la función \texttt{getBGTile()} realiza una lectura de los registros que controlan el desplazamiento y posicionamiento de los elementos gráficos. Estos incluyen el LY, las coordenadas de la ventana (WY y WX) y los valores de scroll (SCX y SCY).
 \\\\
 Posteriormente, la función realiza una evaluación de las posiciones relativas y los estados de los flags de control, para establecer si el tile que está siendo procesado pertenece al Background o al Window. Esta distinción determina qué tilemap debe ser consultado, alternando entre las zonas reservadas \texttt{0x9800} y \texttt{0x9C00} según corresponda.
-\\\\
-El proceso de cálculo de direcciones representa uno de los aspectos más elaborados de esta función. Aquí se transforman las coordenadas globales, expresadas en píxeles, en índices específicos de tiles, teniendo en cuenta que cada elemento gráfico ocupa un área de 8x8 píxeles. Este cálculo no solo considera la posición absoluta en pantalla, sino que también incorpora los efectos de desplazamiento producidos por el scroll y ajusta los valores cuando se trabaja en el modo de direccionamiento "signed" para tiles.
-\\\\
-La implementación de esta función refleja una profunda comprensión de las particularidades del hardware original, especialmente en lo que respecta a las restricciones de acceso a memoria y la sincronización temporal. Cada operación de lectura de VRAM se realiza con precisión cronométrica, emulando los ciclos de máquina del sistema real y respetando los períodos durante los cuales la memoria de video está disponible para su consulta.
 
+\begin{lstlisting}[language=Kotlin, caption={FIFO Fetcher - Obtención de Tile de Background.}, label={code:ppufifogettilebg}]
+    private fun getBGTile(){
+        val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
+        val wy = Memory.getByteOnAddress(WY).toInt() and 0xFF
+        val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
+        val wx = Memory.getByteOnAddress(WX).toInt() and 0xFF - WIN_X_OFFSET
+
+        // Obtain tilemap to use (BG or WIN)
+        val windowTile = isWindowTile()
+        val tilemapToUse = if(windowTile) PPU.getWinTilemapAddr() else PPU.getBGTilemapAddr()
+
+        val xCoordinate = if (windowTile) ((fetchX - wx) / 8) else (mapX / 8) and 0x1F
+        val yCoordinate = if (windowTile) ((ly - wy) / 8) else (mapY / 8)
+
+        val address = tilemapToUse + ((xCoordinate + (yCoordinate * GB_X_TOTAL_TILES)) and 0x3ff)
+        var tile = Memory.getByteOnAddress(address) // 1 Tile == 8 Pixels
+
+        if(PPU.getAddrModeAddr() == SIGNED_TILE_REGION){
+            tile = ((tile.toInt() and 0xFF) + 128).toByte() // Signed Region [-128, 128] --> Transform to [0, 255]
+        }
+        tileData[0] = tile
+    }
+\end{lstlisting}
+
+Se transforman las coordenadas globales, expresadas en píxeles, en índices específicos de tiles, teniendo en cuenta que cada elemento gráfico ocupa un área de 8x8 píxeles. Este cálculo considera tanto la posición absoluta en pantalla como también la incorporación de los efectos de desplazamiento producidos por el scroll.
+\\\\
+Si el modo de direccionamiento de tiles indica que se trata de una región con direcciones firmadas (índices que pueden ir de -128 a +127), se ajusta el valor sumándole 128 para convertirlo a un índice positivo válido. El identificador final del tile se guarda en el array \texttt{tileData}, dejándolo listo para ser usado en la siguiente fase.
+\\\\
+Por otro lado, la función \texttt{getSpriteTile()} se encarga de obtener el índice del tile correspondiente a los sprites visibles en la línea actual. Esta función es similar a la anterior, pero se centra en los sprites y su posición relativa en la pantalla.
+
+\begin{lstlisting}[language=Kotlin, caption={FIFO Fetcher - Obtención de Tile de Sprites.}, label={code:ppufifogettileobj}]
+    private fun getSpriteTile(){
+
+        val fetchedObjs = PPU.getFetchedSpriteEntries()
+
+        for (obj in fetchedObjs) {
+            if(obj != null) {
+                val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
+                val sprX = ((obj.x.toInt() and 0xFF) - OAM_X_OFFSET) + (scx % PIXELS_PER_TILE)
+
+                if ((sprX >= fetchX && sprX < fetchX + OAM_X_OFFSET) ||
+                ((sprX + OAM_X_OFFSET) >= fetchX && (sprX + OAM_X_OFFSET) < fetchX + OAM_X_OFFSET)) {
+                    objTileData[fetchedSprites] = obj
+                    fetchedSprites++
+                }
+
+                if (fetchedSprites >= 3) break
+            }
+        }
+    }
+\end{lstlisting}
+
+La función recorre la lista proporcionada por la PPU \texttt{PPU.getFetchedSpriteEntries()} y comprueba, para cada sprite no nulo, su posición horizontal en pantalla. Para ello, obtiene el valor \texttt{SCX} desde memoria, y calcula la posición horizontal del sprite ajustando el valor original del sprite en el OAM, restando una constante que representa el desfase de coordenadas (\texttt{OAM\_X\_OFFSET}) y sumando un pequeño ajuste basado en el módulo del desplazamiento.
+\\\\
+Con la posición horizontal calculada, se evalúa si dicho sprite se encuentra dentro del rango de píxeles que se están a punto de dibujar, comparándolo con \texttt{fetchX}. Se realiza una doble condición para cubrir tanto la coincidencia exacta como los solapes de píxeles con el ancho de un sprite. Si el sprite cumple estas condiciones de visibilidad, se almacena en el array \texttt{objTileData}, y se incrementa el contador \texttt{fetchedSprites} que indica el número de sprites seleccionados.
+\\\\
+Este proceso continúa hasta que se han encontrado tres sprites coincidentes, momento en el cual el bucle se interrumpe. Esta limitación viene explicada en \hyperref[mem:oam]{el marco teórico}.
+
+\subsubsection{LOW\_DATA\_TILE - HIGH\_DATA\_TILE}
+
+En ambas funciones lo perimero que se realiza es el cálculo del offset vertical dentro del tile. Posteriormente, se accede a la VRAM para recuperar el primer o el segundo byte de datos de línea de ese tile, lo que representa los bits bajos o altos de color para los 8 píxeles de esa fila, respectivamente.
+\\\\
+La dirección a la que accede se compone usando el identificador del tile, el modo de direccionamiento actual, y la posición vertical dentro del tile. Una vez obtenido ese primer byte, se llama a \texttt{loadSpriteData()} con el desplazamiento correspondiente, para que se vayan cargando también los datos de los sprites superpuestos. Finalmente, se cambia el estado del fetcher al siguiente paso, \texttt{HIGH\_DATA\_TILE} o \texttt{SLEEP}, dependiendo del estado actual en el que se encuentre el fetcher.
+
+\begin{lstlisting}[language=Kotlin, caption={FIFO Fetcher - Obtención de los Bits Bajos o Altos del Tile.}, label={code:ppufifogethighlowdata}]
+    private fun getTileLowData(){
+        val offset = calculeTileDataOffset()
+        tileData[1] = Memory.getByteOnAddress(PPU.getAddrModeAddr() + ((tileData[0].toInt() and 0xFF) * 16) + offset)
+        loadSpriteData(0)
+        state = FetcherState.HIGH_DATA_TILE
+    }
+
+    private fun getTileHighData(){
+        val offset = calculeTileDataOffset()
+        tileData[2] = Memory.getByteOnAddress(PPU.getAddrModeAddr() + ((tileData[0].toInt() and 0xFF) * 16) + (offset + 1))
+        loadSpriteData(1)
+        state = FetcherState.SLEEP
+    }
+\end{lstlisting}
+
+Finalmente, \texttt{loadSpriteData()} es la función auxiliar que realiza la lectura de los datos gráficos de los sprites que se van a dibujar sobre la línea actual. Por cada sprite, se calcula la línea dentro del tile que corresponde al valor actual de LY, considerando si el sprite está volteado verticalmente. También se ajusta el índice del tile en caso de sprites de 16 píxeles. Luego, se accede a VRAM para obtener el byte correspondiente a esa línea de píxeles dentro del tile del sprite, y se guarda en el bufer \texttt{objFetchedData}.
+\\\\
+Es una de las funciones que deberían estar separadas en una lógica independiente, pero que por eliminar cierta complejidad se ha incluido en lo que sería el fetcher de background.
+
+\begin{lstlisting}[language=Kotlin, caption={FIFO Fetcher - Obtención de Información de un Sprite en la Línea Actual.}, label={code:ppufifogethighlowdatasprite}]
+    private fun loadSpriteData(offset: Int){
+        val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
+        val spriteHeight = if (LCDCObj.OBJ_SIZE.get(Memory.getByteOnAddress(LCDC_ADDR)) == 1) 16 else 8
+
+        for(i in 0 until fetchedSprites){
+            if(objTileData[i] != null) {
+                val flags = objTileData[i]!!.flags
+                val spriteY = (objTileData[i]!!.y.toInt() and 0xFF) - OAM_Y_OFFSET
+                var tileIndex = objTileData[i]!!.tile.toInt() and 0xFF
+
+                if (spriteHeight == 16)
+                    if ((ObjFlags.Y_FLIP.get(flags) == 0 && (ly - spriteY) >= 8) ||
+                        (ObjFlags.Y_FLIP.get(flags) == 1 && (ly - spriteY) < 8)) {
+                        tileIndex += 1
+                    }
+
+                val baseAddress = VRAM_START + (tileIndex * 16)
+                val tileLine = (ly - spriteY) % 8
+                val address = baseAddress + (tileLine * 2)
+
+                objFetchedData[(i * 2) + offset] = Memory.getByteOnAddress(address + offset)
+            }
+        }
+    }
+\end{lstlisting}
+
+\subsubsection{SLEEP}
+La implementación del estado \texttt{SLEEP} no va a tener nada relevante, simplemente va a dar paso al siguiente estado. Este método se utiliza para simular y representar los tiempos reales del hardware.
+
+\begin{lstlisting}[language=Kotlin, caption={FIFO Fetcher - Sleep.}, label={code:ppufifosleep}]
+    private fun sleepState(){
+        state = FetcherState.PUSH
+    }
+\end{lstlisting}
+
+\subsubsection{PUSH}
+
+En la función \texttt{pushState()} se intenta introducir nuevos píxeles en el FIFO. Si el intento de empujar píxeles al FIFO tiene éxito (lo que significa que la cola tiene espacio suficiente), el estado del fetcher se reinicia para comenzar la obtención del siguiente tile.
+
+\begin{lstlisting}[language=Kotlin, caption={FIFO Fetcher - Push.}, label={code:ppufifopush}]
+    private fun pushState(){
+        val bgPush = pushBGPixelsToFifo()
+
+        if(bgPush){
+            state = FetcherState.OBTAIN_TILE
+        }
+    }
+\end{lstlisting}
+
+La lógica principal ocurre en \texttt{pushBGPixelsToFifo()}, que primero comprueba si el FIFO tiene suficiente espacio libre para recibir una nueva tanda de píxeles, que son ocho por cada tile. Si está lleno, simplemente se detiene y devuelve false, esperando a que se vacíe en futuras iteraciones.
+\\\\
+Si hay espacio, la función calcula la posición horizontal real de dibujo teniendo en cuenta el SCX y una corrección por el offset de los sprites. A continuación, se procesan los píxeles del tile que acaba de ser cargado. Para cada uno, se extraen los bits correspondientes desde los datos de tile almacenados previamente en \texttt{objTileData}, combinando los bits bajos y altos de cada línea para determinar el índice de color del píxel.
+\\\\
+Este índice puede cambiar si los sprites están habilitados en la configuración del sistema. En tal caso, se llama a \texttt{obtainSpriteColor}, que se encarga de comprobar si algún sprite visible debe sobrescribir el color de fondo en esa posición. Esta función recorre los sprites previamente extraídos para el scanline actual y, si alguno se solapa con la posición del píxel en cuestión, evalúa si el sprite tiene prioridad sobre el fondo. También tiene en cuenta atributos como la inversión horizontal y la transparencia. Si se cumplen las condiciones, el color del sprite sobrescribe el del fondo.
+\\\\
+Nuevamente, esta última parte donde se obtienen los valores de los sprites y se hace una mezcla de valores para determinar el color, debería estar de forma independiente y ser añadido a un segundo FIFO.
+\\\\
+Por último se inserta el color en el FIFO de fondo, que es lo que usará el PPU para representar visualmente los píxeles en pantalla. Esto se repite para los ocho píxeles del tile, tras lo cual el método finaliza con éxito
+
+\begin{lstlisting}[language=Kotlin, caption={FIFO Fetcher - Push de Píxeles al FIFO.}, label={code:ppufifopushpixels}]
+    private fun pushBGPixelsToFifo(): Boolean{
+        if(backgroundFifo.getSize() >= 8)
+            return false // Fifo is full
+
+        val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
+        val x = fetchX - (OAM_X_OFFSET - (scx % PIXELS_PER_TILE))
+
+        for(i in 0..7){
+            val bit = 7 - i
+
+            val low = (((tileData[1].toInt() and 0xFF) shr bit) and 1)
+            val high = ((((tileData[2].toInt() and 0xFF) shr bit) and 1) shl 1)
+            var color = if(PPU.bgWinIsEnabled()) PPU.getColorIndex(high or low) else PPU.getColorIndex(0) // Pixel Color
+
+            if(PPU.objsAreEnabled())
+                color = obtainSpriteColor(color)
+
+            if(x >= 0){
+                backgroundFifo.push(color)
+                fifoX++
+            }
+        }
+
+        return true
+    }
+\end{lstlisting}
+
+Los colores vienen definidos como propiedad de clase en la PPU, tratando de simular todas las posibles paletas de color que existen tanto en la GB original como en la CGB. Por defecto, se iniciará con la paleta que imita los colores verdosos del primer modelo DMG.
+
+\begin{lstlisting}[language=Kotlin, caption={PPU - Paletas de Color.}, label={code:ppucolorpalettes}]
+    // Colors follows as: White - Light Gray - Dark Gray - Black
+    private val palettes: HashMap<PALETTE_TYPE, IntArray> = hashMapOf(
+        Pair(PALETTE_TYPE.BASIC_PL, intArrayOf(0xFFFFFFFF.toInt(), 0xFFAAAAAA.toInt(), 0xFF555555.toInt(), 0xFF000000.toInt())),
+        Pair(PALETTE_TYPE.GREENER_PL, intArrayOf(0xFFE0F8D0.toInt(), 0xFF88C070.toInt(), 0xFF346856.toInt(), 0xFF081820.toInt())),
+        [...]
+    )
+
+    private var selectedPalette = PALETTE_TYPE.GREENER_PL
+\end{lstlisting}
+
+\section{Game Surface View}
+
+El \texttt{GameSurfaceView} es la clase encargada de gestionar la representación gráfica de la consola. Esta clase se encarga de crear un canvas y dibujar los píxeles en él, utilizando el búfer de video proporcionado por la PPU. La implementación de esta clase es bastante sencilla, ya que solo se encarga de crear un canvas y dibujar los píxeles en él.
+\\\\
+La clase hereda de \texttt{SurfaceView} y está diseñada para funcionar de forma independiente gracias a un hilo (\texttt{GameThread}) que se encarga del renderizado continuo. Además implementa \texttt{SurfaceHolder.Callback}, lo cual permite controlar cuándo se crea, cambia o destruye el canvas.
+
+\begin{lstlisting}[language=Kotlin, caption={Creación del Game Surface View.}, label={code:surfaceview}]
+    class GameSurfaceView @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null
+    ) : SurfaceView(context, attrs), SurfaceHolder.Callback {
+
+        private var scale : Float = 0f
+        var debugMode = false
+        private var gameThread: GameThread? = null
+
+        init {
+            holder.addCallback(this)
+            gameThread = GameThread(holder, this)
+        }
+
+        [...]
+
+\end{lstlisting}
+
+El método \texttt{onMeasure()} se encarga de calcular las dimensiones basándose en la resolución original de la GB (160x144 píxeles) y en el tamaño disponible en pantalla. La idea es mantener la relación de aspecto original sin deformar la imagen. En función del ancho y alto del dispositivo, se calcula un factor de escala que se utilizará para transformar los píxeles al tamaño físico del dispositivo Android.
+
+\begin{lstlisting}[language=Kotlin, caption={Medición y Escalado del Canvas.}, label={code:surfaceonmeasure}]
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val width = MeasureSpec.getSize(widthMeasureSpec) // Android phone total width
+        val height = MeasureSpec.getSize(heightMeasureSpec)  // Android phone total height
+
+        val aspectRatio = GB_X_RESOLUTION.toFloat() / GB_Y_RESOLUTION.toFloat() // GB Aspect Ratio
+
+        val newWidth: Int
+        val newHeight: Int
+
+        if (width / height > aspectRatio) { // Landscape
+            newWidth = (height * aspectRatio).toInt()
+            newHeight = height
+            scale = height / GB_Y_RESOLUTION.toFloat()
+        } else { // Straight
+            newWidth = width
+            newHeight = (width / aspectRatio).toInt()
+            scale = width / GB_X_RESOLUTION.toFloat()
+        }
+
+        setMeasuredDimension(newWidth, newHeight)
+    }
+    
+\end{lstlisting}
+
+Durante el renderizado, el método \texttt{render()} decide si debe dibujarse el bufer final donde la PPU guarda los colores o si se debe entrar en el modo depuración en el que se muestran los tiles disponibles en memoria. Si el LCD está deshabilitado, simplemente se pinta la pantalla de negro.
+\\\\
+Cuando se renderiza la VRAM, se recorre la matriz de píxeles que la PPU ha rellenado y se dibujan los píxeles uno por uno. Para cada tile, se leen 16 bytes de memoria. A partir de estos bytes, se reconstruye el color de cada píxel del tile utilizando la lógica de combinación de bits, y se pinta como un pequeño rectángulo en el canvas.
+
+\begin{lstlisting}[language=Kotlin, caption={Medición y Escalado del Canvas.}, label={code:surfaceonmeasure}]
+    private fun renderVRam(canvas: Canvas){
+        val paint = Paint()
+
+        for (lineNum in 0 until GB_Y_RESOLUTION) {
+            for (x in 0 until GB_X_RESOLUTION) {
+                val left = Math.round(x * scale).toFloat()
+                val top = Math.round(lineNum * scale).toFloat()
+                val right = left + ceil(scale.toDouble()).toFloat()
+                val bottom = top + ceil(scale.toDouble()).toFloat()
+
+                val color = PPU.getBufferPixelFromIndex(x + (lineNum * GB_X_RESOLUTION))
+                paint.color = color
+
+                canvas.drawRect(left, top, right, bottom, paint)
+            }
+        }
+    }
+    
+\end{lstlisting}
+
+Por último, el \texttt{GameThread} estará constantemente renderizando mientras que el flag \texttt{running} esté activado. Para hacer este render, primero bloquea el Canvas para ejecutar el método de renderizado del \texttt{GameSurfaceView} y finalmente libera el Canvas para que el sistema lo dibuje en pantalla.
+
+\begin{lstlisting}[language=Kotlin, caption={Renderizado en el GameThread.}, label={code:surfacerenderthread}]
+    override fun run() {
+        while (running) {
+            var canvas: Canvas? = null
+            try {
+                canvas = surfaceHolder.lockCanvas()
+                if (canvas != null) {
+                    synchronized(surfaceHolder) {
+                        gameSurfaceView.render(canvas)
+                    }
+                }
+            }catch (ex: Exception){
+                ex.printStackTrace()
+            } finally {
+                if (canvas != null) {
+                    surfaceHolder.unlockCanvasAndPost(canvas)
+                }
+            }
+        }
+    }
+\end{lstlisting}
+
+\subsection{Layout}
+
+Ahora el EmuActivity contendrá el \texttt{GameSurfaceView} como variable privada de clase. Para hacerlo funcionar, se necesita también añadir la vista al layout y enlazarla con la variable en el \texttt{onCreate()}. Se puede insertar, por ejemplo, dentro de un \texttt{FrameLayout}:
+
+\begin{lstlisting}[language=Kotlin, caption={GameSurfaceView en Layout.}, label={code:surfacelayout}]
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="match_parent"
+        android:layout_centerInParent="true"
+        android:padding="16dp"
+        android:layout_height="wrap_content" >
+
+        <es.atm.gbee.views.GameSurfaceView
+            android:id="@+id/gameSurface"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            />
+    </FrameLayout>
+\end{lstlisting}
+
+De manera automática, se puede comenzar a ver resultados por pantalla. Aquí distintos resultados obtenidos según se han ido depurando errores, ordenados de forma cronológica:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{include/images/render_surface_view.png}
+    \caption{Renderizado de Tiles en SurfaceView}\label{figure:surface_view}
+\end{figure}
+
+\section{I/O}
+
+Al igual que con el resto de módulos, se debe implementar el encargado de escribir y leer los registros de entrada y salida. Se definirán también un enumerador que indique a qué bit va asignado cada botón del joypad y un objeto que facilite hacer un seguimiento de cuáles están pulsados.
+
+\begin{lstlisting}[language=Kotlin, caption={Estados de los Botones en el Módulo IO.}, label={code:iojoypad}]
+    enum class GamePadBits(val bit: Int) {
+        A_BUTTON(0),
+        RIGHT_PAD(0),
+        B_BUTTON(1),
+        LEFT_PAD(1),
+        SELECT_BUTTON(2),
+        UP_PAD(2),
+        START_BUTTON(3),
+        DOWN_PAD(3),
+        SELECT_DPAD(4),
+        SELECT_BUTTONS(5);
+
+        fun get(value: Byte): Int {
+            return (value.toInt() and 0xFF) and (0b1 shl bit)
+        }
+    }
+
+    object IO {
+
+        private var serialData = ByteArray(2)
+
+        data class GamepadState(
+            var start: Boolean = false,
+            var select: Boolean = false,
+            var a: Boolean = false,
+            var b: Boolean = false,
+            var up: Boolean = false,
+            var down: Boolean = false,
+            var left: Boolean = false,
+            var right: Boolean = false
+        )
+
+        private val gamePadState = GamepadState()
+
+        [...]
+\end{lstlisting}
+
+Los métodos de lectura y escritura son muy similares al resto de módulos que ya se han explicado previamente, por lo que se van a omitir en esta explicación para evitar redundancias. Los puntos que se deben tener en cuenta son:
+
+\begin{itemize}
+    \item Si se escribe en el rango [0xFF40\-0xFF40], se delega a la PPU su comportamiento. En general, los casos especiales serán el inicio del DMA o cambios de \hyperref[handleLCDC]{comportamiento en el LCDC}.
+    \item Si se escribe en el rango [0xFF04\-0xFF07], se delega al Timer su comportamiento, el cual ya se ha visto en su \hyperref[writeToTimer]{apartado correspondiente}.
+\end{itemize}
+
+El caso importante que se debe controlar en el propio módulo, es el del Joypad. La lógica a seguir es la siguiente:
+
+\begin{enumerate}
+    \item El \texttt{EmuActivity} nos dice que el jugador ha pulsado o dejado de pulsar un botón definido en el layout.
+    \item 
+\end{enumerate}
 
 \cleardoublepage
