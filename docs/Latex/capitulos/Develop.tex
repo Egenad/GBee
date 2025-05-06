@@ -2856,9 +2856,37 @@ A continuación se muestra un ejemplo en el que el usuario modifica la portada d
 
 \subsection{Skins}
 
-\section{Diseño}
-\subsection{Skin Predeterminada}
-\subsection{Logotipo}
+El emulador permite al usuario cambiar la apariencia de la interfaz de juego. Para ello, se ha implementado un sistema de \textit{skins} que permite personalizar la apariencia del emulador. Cada skin se define mediante una entidad SQL que contiene los colores, imágenes y estilos de los distintos elementos de la interfaz.
+\\\\
+El sistema de \textit{skins} se basa en el uso de \texttt{SharedPreferences} para almacenar la configuración de la skin seleccionada por el usuario. Al iniciar el emulador, se carga la skin seleccionada y se aplican los estilos correspondientes a los distintos elementos de la interfaz.
+\\\\
+De la misma manera que se ha hecho con la página principal que muestra todas las ROMs, se ha generado las siguientes clases y estructuras:
 
+\begin{itemize}
+    \item \textbf{Skin}: \textit{Data Class} que contiene un entero como identificador, una cadena de texto para el título, un color para el fondo, y un array de bytes para cada uno de los botones.
+    \item \textbf{SkinDataSource}: Contiene el listado de todas las skins en tiempo de ejecución.
+    \item \textbf{SkinManagement}: El manejador de las skins, contiene toda la lógica para guardar, eliminar y obtener las skins de la base de datos. Se implementa también como un \textbf{singleton}.
+    \item \textbf{SkinDao}: Un \textit{Data Access Object} que define la interfaz SQL. Contiene funciones para insertar, actualizar, obtener y eliminar skins.
+    \item \textbf{SkinEntity}: Un \textit{Data Class} muy similar al modelo de Skin.
+    \item \textbf{SkinAdapter}: Un adaptador para el \texttt{RecyclerView} que muestra las skins disponibles. Contiene la lógica de cómo se van a mostrar las skins en pantalla.
+    \item \textbf{Skin Item}: Un layout para cada elemento del \texttt{RecyclerView}, que contendrá una imágen y el nombre de la skin.
+    \item \textbf{CustomSkinsActivity}: Una actividad que permite al usuario seleccionar una skin personalizada. Contiene un \texttt{RecyclerView} que muestra todas las skins disponibles y permite al usuario seleccionar una de ellas.
+    \item \textbf{CreateCustomSkinActivity}: Una actividad que permite al usuario crear una skin personalizada. Muestra un layout por defecto en el que el usuario puede seleccionar los colores y las imágenes de los distintos elementos de la interfaz.
+\end{itemize}
+
+La diferencia con el \texttt{ROMAdapter} es que no se va a utilizar un \texttt{GridLayoutManager}, ya que se van a listar en forma de lista. Además, siempre aparecerá una skin por defecto, que vendrá preconfigurada con la aplicación y que los usuarios pueden utilizar pero no eliminar ni editar.
+\\\\
+La lógica del manejador de skins es muy similar a la de las ROMs, con la diferencia de que no se están manejando ficheros, solamente entidades SQL. Por otro lado, la configuración del \textit{RecyclerView} y los \textit{listeners} también sigue el mismo patrón. Por ello, vamos a obviar la parte de código para evitar redundancias.
+\\\\
+El emulador comenzará utilizando la skin predeterminada, pero el usuario podrá cambiarla en cualquier momento tanto por otra skin que genere como por el diseño original que utiliza botones comunes de Android.
+
+\subsection{Diseño de Skin Predeterminada}
+Para la skin predeterminada se ha optado por un diseño sencillo, que no sature al usuario y que permita una buena visibilidad de los elementos. Se ha utilizado un fondo amarillo con un color negro para los botones. Dar las gracias a Carla Maciá Díez por la ayuda proporcionada con todos los elementos. A continuación se muestra el diseño de todos los elementos de la skin predeterminada:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{include/images/new_design_elements.png}
+    \caption{Nuevos Diseños para los Elementos de la Interfaz de Juego.}\label{figure:newDesignElements}
+\end{figure}
 
 \cleardoublepage
