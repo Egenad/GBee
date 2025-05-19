@@ -35,3 +35,19 @@ Satoru Iwata.
 }
 \end{flushright}
 \cleardoublepage
+
+\chapter*{Resumen}
+\label{resumen}
+\textbf{GBee} es una aplicación que funciona como \textbf{emulador de Game Boy}, desarrollado específicamente de forma nativa para dispositivos \textbf{Android} mediante el lenguaje de programación Kotlin, utilizando Android Studio como entorno de desarrollo, y se estructura en módulos que reflejan los componentes esenciales de la arquitectura de la consola.
+\\\\
+El proyecto nace de la curiosidad por entender los aspectos técnicos y arquitectónicos de una consola, y cómo estos pueden ser emulados en un entorno moderno. A lo largo del trabajo, se abordan temas clave como la gestión de la Unidad Central de Procesamiento (CPU), la Unidad de Procesamiento de Gráficos (PPU), y la sincronización de ciclos para garantizar una emulación precisa.
+\\\\
+El núcleo del sistema es la CPU, que implementa las instrucciones del procesador Sharp LR35902, un derivado del Z80 de 8 bits. Para ello se ha realizado una interpretación directa de los opcodes, controlando ciclos de máquina y de reloj, y gestionando interrupciones. Además, se ha implementado un sistema de temporización precisa, basada en la frecuencia original, clave para asegurar una ejecución sincronizada con el resto de los subsistemas.
+\\\\
+Uno de los componentes más complejos es la PPU, encargada del renderizado del fondo, la ventana y los sprites. Se ha replicado el comportamiento por estados, respetando los tiempos de cada uno y ajustando los cambios de modo en función de la línea de escaneo y otros registros. Se utiliza un SurfaceView para dibujar en pantalla, implementando una rutina de renderizado en bucle sincronizada con los 60 fotogramas por segundo que produce el hardware original.
+\\\\
+El sistema de memoria incluye módulos para la RAM interna, RAM externa, I/O, video RAM, y memoria de cartucho, incluyendo soporte para bancos de memoria. Esto permite gestionar juegos más complejos que utilizan paginación de memoria tanto para la ROM como para la RAM.
+\\\\
+En cuanto a la interacción con el usuario, se ha diseñado una interfaz de usuario intuitiva, con botones táctiles superpuestos al juego. El usuario puede seleccionar una ROM desde el almacenamiento del dispositivo mediante una funcionalidad de Android que permite navegar por el sistema de archivos.
+
+\cleardoublepage

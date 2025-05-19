@@ -4,37 +4,67 @@
 % Realizado por: Ángel Jesús Terol Martínez
 % Contacto: jtm37@alu.ua.es
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\chapter{Resumen}
-\label{resumen}
-\textbf{GBee} es una aplicación que funciona como \textbf{emulador de Game Boy}, desarrollado específicamente de forma nativa para dispositivos \textbf{Android}. Los usuarios podrán cargar sus ROMs, guardar el estado de sus partidas, y configurar a su gusto la interfaz gráfica.
+\chapter{Introducción}
+Desde su lanzamiento, la Game Boy se consolidó como una de las consolas portátiles más icónicas de la historia, marcando un hito en la industria de los videojuegos. Su diseño compacto y su amplia biblioteca de juegos la convirtieron en un fenómeno cultural, estableciendo un estándar para futuras consolas portátiles. Hoy en día, a pesar de la evoluición tecnológica y la aparición de consolas más potentes, existe un gran interés por parte de desarrolladores y aficionados en revivir la experiencia de jugar a estos clásicos.
 \\\\
-El proyecto nace de la curiosidad por entender los aspectos técnicos y arquitectónicos de una consola, y cómo estos pueden ser emulados en un entorno moderno. A lo largo del trabajo, se abordan temas clave como la gestión de la Unidad Central de Procesamiento (CPU), la Unidad de Procesamiento de Gráficos (PPU), y la sincronización de ciclos para garantizar una emulación precisa.
-{\let\clearpage\relax\chapter*{Abstract}}
-
-\textbf{GBee} is an application that functions as a \textbf{Game Boy emulator}, developed natively for \textbf{Android} devices. Users can load their ROMs, save their game states, and customize the graphical interface to their liking.
+En paralelo, la emulación de consolas ha ganado popularidad, permitiendo a los usuarios disfrutar de juegos antiguos en plataformas modernas. La emulación no solo preserva la historia de los videojuegos, sino que también ofrece una oportunidad para explorar y comprender la arquitectura y el funcionamiento interno de estas consolas.
 \\\\
-The project stems from a curiosity to understand the technical and architectural aspects of a console, and how these can be emulated in a modern environment. Throughout the development, key topics such as the management of the Central Processing Unit (CPU), the Graphics Processing Unit (PPU), and cycle synchronization are addressed to ensure accurate emulation.
-\cleardoublepage
+Aunque existen múltiples emuladores de Game Boy disponibles, muchos de ellos son de código cerrado y no permiten a los desarrolladores aprender sobre su funcionamiento interno.
+\\\\
+Otro punto importante es el sistema de monetización de las aplicaciones. La mayoría de los emuladores disponibles en la Play Store o bien son de pago, lo que limita su accesibilidad, o bien están llenos de anuncios y funciones limitadas que dificultan la experiencia del usuario. Esto puede llevar a los usuarios a buscar alternativas no oficiales, que pueden no ser seguras o legales.
+\\\\
+Este proyecto plantea el desarrollo de un emulador de Nintendo Game Boy para dispositivos Android, con el objetivo principal de replicar el comportamiento del hardware original de manera precisa y comprensible. La aplicación, llamada GBee, está diseñada desde cero en Kotlin y busca ofrecer una experiencia funcional y fiel a la consola original, permitiendo cargar y ejecutar ROMs reales en un entorno móvil.
+\\\\
+Desde el punto de vista de desarrollador, la creación de un emulador completo es un reto técnico que engloba conocimientos de arquitectura de sistemas, sincronización de procesos, representación gráfica y diseño de interfaces táctiles. Se concibe como una herramienta de estudio, documentación y comprensión del funcionamiento interno de la consola, lo que lo hace especialmente útil como trabajo de fin de máster, y como base para futuras mejoras o estudios más profundos.
 
-\chapter{Objetivos}
+\section{Motivación}
+El principal motivo de iniciar este proyecto ha sido el deseo de entender a fondo cómo puede llegar a simularse el comportamiento de una consola y entender el funcionamiento de la Game Boy a un nivel más profundo. "Asimismo, me resulta especialmente gratificante poder contribuir a que otras personas interesadas en este u otros proyectos similares encuentren en esta memoria una guía útil que les sirva de orientación.
+\\\\
+Existe un valor personal y ha representa un reto técnico, tocando áreas como la programación de bajo nivel, el diseño gráfico y la interacción en dispositivos móviles.
+
+\section{Objetivos}
 \label{objetivos}
 
-Un \textbf{ingeniero} debe ser capaz en todo momento de \textbf{resolver los problemas} que se le planteen por si mismo y no basarse en buscar la solución de alguien anónimo.\\ \\
-Las arquitecturas de las máquinas actuales son \textbf{complejas y muy potentes} para que una persona les pueda sacar todo el potencial en un corto período de tiempo. Por ello, lo ideal es empezar por una consola más antigua como punto de partida, como lo puede ser la propia \textbf{Game Boy}.\\ \\
-La razón de escogerla como la consola sobre la que desarrollar este proyecto ha sido \textbf{subjetiva} debido al afecto que le tengo. Perfectamente podría haber escogido cualquier otra como la \textit{NES} o la \textit{Master System}. Por otro lado, con la documentación de esta memoria pretendo \textbf{ser de ayuda para más personas} que se propongan en un futuro realizar un emulador para dicha consola.\\ \\
-A grandes rasgos, los objetivos serían los siguientes:\\
+El principal objetivo es desarrollar un emulador funcional de la consola portátil Game Boy para dispositivos Android. Este emulador, denominado GBee, tiene como finalidad reproducir de manera fiel el comportamiento de la consola original, permitiendo ejecutar ROMs comerciales y homebrew, manteniendo una experiencia lo más cercana posible a la que ofrecía el hardware original de Nintendo.
+\\\\
+Para alcanzar este objetivo principal, se establecen los siguientes objetivos específicos:
+
 \begin{itemize}
-    \item \textbf{Entender y replicar el funcionamiento interno de la consola Game Boy.}
-    \item \textbf{Desarrollar una aplicación nativa en Android.}
+    \item \textbf{Comprender funcionamiento interno de la consola Game Boy.}
     \item \textbf{Analizar librerías y frameworks existentes.}
-    \item \textbf{Comprender y aplicar la integración de un emulador con las interfaces gráficas de Android.}
+    \item \textbf{Diseñar una arquitectura modular}, dividiendo el proyecto en componentes independientes como la CPU o la PPU.
+    \item \textbf{Diseñar una interfaz gráfica funcional en Android}, que permita al usuario seleccionar una ROM, iniciar la emulación, visualizar la pantalla de la consola y controlar el juego mediante botones táctiles.
+    \item \textbf{Ofrecer y garantizar el funcionamiento correcto en un conjunto representativo de juegos.}
+    \item \textbf{Documentar el desarrollo del proyecto.}
+    \item \textbf{Publicar la aplicación en la Play Store.}
 \end{itemize}
 
-Objetivos secundarios:
+\section{Metodología}
+
+Para llevar a cabo el desarrollo el proyecto, se va a seguir una metodología de trabajo basada en fases iterativas y progresivas. Esta estrategia permite abordar de forma estructurada tanto los aspectos más técnicos como los de diseño. A continuación, se describen las principales etapas a seguir:
 
 \begin{itemize}
-	\item \textbf{Publicar la aplicación en la Play Store.}
+    \item \textbf{Estudio de mercado:} Investigar el estado actual de los emuladores ya existentes, tanto de plataformas de escritorio como móviles. Esto permite identificar patrones, puntos de interés y carencias de aplicaciones imilares a la que se pretende desarrollar.
+    \item \textbf{Diseño de la arquitectura:} Se define la estructura interna del emulador. Verificar si dividiendo el sistema en componentes independientes como CPU, PPU, Memoria, etc. puede favorecer la escalabilidad y facilitar el aislamiento de errores durante el desarrollo.
+    \item \textbf{Selección de tecnologías:} Definir si el proyecto se va a implementar completamente en lenguaje Kotlin, o usar tecnologías adyacentes como Ionic. Estudiar también cómo se puede implementar el manejo de gráficos.
+    \item \textbf{Implementación por fases:} Realizar la implementación de cada uno de los módulos de forma independiente, comenzando por los más sencillos y avanzando hacia los más complejos. Esto permite realizar pruebas unitarias y asegurar que cada componente funciona correctamente antes de integrarlo en el sistema completo.
+    \item \textbf{Pruebas y validación:} Realizar pruebas exhaustivas de cada módulo y del sistema completo, asegurando que la emulación es precisa y que se pueden cargar y ejecutar juegos sin problemas.
+    \item \textbf{Diseño de la interfaz de usuario:} Crear una interfaz gráfica intuitiva y fácil de usar, que permita a los usuarios interactuar con el emulador de manera sencilla. Esto incluye la implementación de controles táctiles y la visualización de la pantalla de la consola.
+    \item \textbf{Mejoras:} Una vez que el emulador esté funcionando correctamente, se pueden implementar mejoras adicionales, como la optimización del rendimiento, la adición de funciones avanzadas (como guardado de estados o soporte para diferentes tipos de ROMs) y la corrección de errores.
+\end{itemize}
+
+\section{Estructura del documento}
+La presente memoria se encuentra organizada en varios capítulos que abordan de manera progresiva los distintos aspectos relacionados con el desarrollo del emulador de Game Boy en Android. A continuación, se detalla brevemente el contenido de cada uno de ellos:
+
+\begin{itemize}
+    \item \textbf{Capítulo 1: Introducción.} En este capítulo se presenta el contexto del proyecto, la motivación detrás de su desarrollo y los objetivos que se pretenden alcanzar.
+    \item \textbf{Capítulo 2: Terminología.} Se definen los términos y acrónimos utilizados a lo largo del documento, facilitando la comprensión de conceptos técnicos y específicos relacionados con la emulación y el desarrollo de software.
+    \item \textbf{Capítulo 3: Marco Teórico.} En este capítulo se presenta un análisis de la historia de la Game Boy y su evolución a lo largo del tiempo. Se abordan aspectos técnicos relevantes que implican sobre todo aspectos de hardware. Se definen y explica el funcionamiento de los registros más importantes que se deben tener en cuenta a la hora de implementar el emulador.
+    \item \textbf{Capítulo 4: Metodología y Planificación.} Se describe la metodología ágil de trabajo seguida durante el desarrollo, así como los requerimientos, herramientas a utilizar y etapas del proyecto.
+    \item \textbf{Capítulo 5: Diseño.} En este capítulo se hace un estudio de los emuladores ya existentes que se van a utilizar como referentes durante el desarrollo. También se presenta un diseño inicial de la interfaz gráfica del emulador y cómo va a ser el flujo de trabajo del usuario.
+    \item \textbf{Capítulo 6: Desarrollo.} Se detalla el proceso de desarrollo del emulador, incluyendo la implementación de los diferentes módulos y componentes. Se procura ofrecer ejemplos de código y explicaciones sobre las decisiones tomadas durante el desarrollo. Es el capítulo más extenso y técnico del documento.
+    \item \textbf{Capítulo 7: Resultados.} En este capítulo se presentan los resultados obtenidos tras la implementación del emulador, incluyendo pruebas realizadas y su rendimiento en diferentes dispositivos Android.
+    \item \textbf{Capítulo 8: Conclusiones.} Se detallan unas conclusiones finales sobre todo el proceso de desarrollo y se detallan unas posibles mejoras a futuro.
 \end{itemize}
 
 \cleardoublepage

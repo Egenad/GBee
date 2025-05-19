@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2025.2.9)  6 MAY 2025 12:14
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2025.5.13)  19 MAY 2025 20:39
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1845,17 +1845,51 @@ Underfull \hbox (badness 10000) in paragraph at lines 14--17
 ] [10
 
 
+]
+Underfull \hbox (badness 10000) in paragraph at lines 41--52
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 41--52
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 41--52
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 41--52
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 41--52
+
+ []
+
+[11
+
+
+] [12
+
+
 ])
 Package tocbasic Info: character protrusion at toc deactivated on input line 33.
  (./main.toc
 LaTeX Info: Redefining \rmfamily on input line 2.
 LaTeX Info: Redefining \sffamily on input line 2.
 LaTeX Info: Redefining \ttfamily on input line 2.
- [11
+ [13
 
 
-] [12] [13]
-Overfull \hbox (1.09497pt too wide) detected at line 170
+] [14] [15]
+Underfull \vbox (badness 1789) has occurred while \output is active []
+
+ [16]
+Overfull \hbox (1.09497pt too wide) detected at line 173
  []\TU/lmss/bx/n/10.95 149
  []
 
@@ -1863,89 +1897,85 @@ Overfull \hbox (1.09497pt too wide) detected at line 170
 \tf@toc=\write5
 \openout5 = `main.toc'.
 
- [14] [15] [16
+ [17] [18
 
 
 ]
 Package tocbasic Info: character protrusion at lof deactivated on input line 34.
- (./main.lof [17])
+ (./main.lof [19])
 \tf@lof=\write6
 \openout6 = `main.lof'.
 
- [18]
+ [20]
 Package tocbasic Info: character protrusion at lot deactivated on input line 35.
  (./main.lot)
 \tf@lot=\write7
 \openout7 = `main.lot'.
 
- [19
+ [21
 
 
-] [20
+] [22
 
 
 ]
 Package tocbasic Info: character protrusion at lol deactivated on input line 36.
- (./main.lol [21] [22])
+ (./main.lol [23] [24])
 \tf@lol=\write8
 \openout8 = `main.lol'.
 
- [23] [24
+ [25] [26
 
 
 ] (./capitulos/Introduccion.tex
 chapter 1.
 
-Underfull \hbox (badness 10000) in paragraph at lines 10--13
+Underfull \hbox (badness 10000) in paragraph at lines 8--19
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 15--18
+Underfull \hbox (badness 10000) in paragraph at lines 8--19
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8--19
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8--19
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8--19
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 21--24
 
  []
 
 [1
 
 
-] [2
-
-
 ]
+Underfull \hbox (badness 10000) in paragraph at lines 28--31
+
+ []
+
+[2] [3] [4]
 chapter 2.
-
-Underfull \hbox (badness 10000) in paragraph at lines 23--27
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 23--27
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 23--27
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 23--27
-
- []
-
-[3
-
-
-] [4
-
-
-]
-chapter 3.
 [5
 
 
+
+
 ] [6]) (./capitulos/Historia.tex
-chapter 4.
+chapter 3.
 
 Underfull \hbox (badness 10000) in paragraph at lines 5--6
 
@@ -2491,7 +2521,7 @@ File: include/images/fifo_mixer.png Graphic file (type bmp)
 
 
 ]) (./capitulos/Methodology.tex
-chapter 5.
+chapter 4.
 [57
 
 
@@ -2518,7 +2548,7 @@ File: include/images/herramientas.png Graphic file (type bmp)
 
 
 ]) (./capitulos/Design.tex
-chapter 6.
+chapter 5.
 
 Underfull \hbox (badness 10000) in paragraph at lines 9--14
 
@@ -2643,7 +2673,7 @@ File: include/images/mockgame.jpg Graphic file (type bmp)
 
 
 ]) (./capitulos/Develop.tex
-chapter 7.
+chapter 6.
 
 Underfull \hbox (badness 10000) in paragraph at lines 4--7
 
@@ -3212,12 +3242,12 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 49595 strings out of 474878
- 1060695 string characters out of 5762517
+ 49598 strings out of 474878
+ 1060716 string characters out of 5762516
  2688627 words of memory out of 5000000
- 70700 multiletter control sequences out of 15000+600000
+ 70703 multiletter control sequences out of 15000+600000
  563777 words of font info for 98 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  113i,21n,134p,11019b,2264s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on main.pdf (174 pages).
+Output written on main.pdf (176 pages).
