@@ -1,37 +1,12 @@
 \chapter{Metodología y Planificación}
 \label{planificacion}
+
+Este capítulo presenta la metodología seguida para el desarrollo del proyecto, así como la planificación temporal y técnica. En primer lugar, se expone el enfoque metodológico adoptado, justificando su idoneidad según el tipo de proyecto y sus objetivos. A continuación, se detallan las distintas etapas en las que se ha estructurado el desarrollo, desde la fase inicial de planificación hasta los resultados y conclusiones.
+\\\\
+También se hace referencia al concepto de Mínimo Producto Viable, fundamental para establecer una primera versión funcional del emulador que pueda ejecutarse y evaluarse con éxito. Por último, se describen las herramientas empleadas a lo largo del proyecto para el desarrollo de la aplicación.
+
 \section{Metodología Aplicada}
 La metodología adoptada para la planificación del proyecto es ágil, un enfoque que, si bien es comúnmente utilizado en proyectos colaborativos, resulta igualmente eficaz en proyectos individuales. La clave de esta metodología radica en la gestión eficiente del tiempo, permitiendo que cada tarea sea ejecutada dentro de un plazo bien definido, con el objetivo de maximizar los resultados y cumplir con los plazos establecidos.
-
-\section{Requerimientos}
-
-A continuación se detallan los requerimientos funcionales y no funcionales que rigen el diseño y la implementación del proyecto. Estos requerimientos han sido definidos a partir del análisis de las necesidades del usuario final y de las restricciones técnicas:
-
-\subsection{Requerimientos Funcionales}
-
-Estos requerimientos son las capacidades específicas que la aplicación debe cumplir para garantizar que su funcionamiento sea acorde a los objetivos establecidos:
-
-\begin{itemize}
-    \item \textbf{Carga de ROMs}: El usuario debe poder seleccionar y cargar archivos .gb o .gbc desde su dispositivo.
-    \item \textbf{Emulación}: Debe replicar fielmente el comportamiento del hardware original.
-    \item \textbf{Interfaz táctil}: Proveer botones virtuales que simulen los originales.
-    \item \textbf{Audio}: Emular el sonido original de la consola.
-    \item \textbf{Gestión de estado}: Guardar y cargar partidas.
-    \item \textbf{Compatibilidad}: Dar soporte para ROMs de DMG y CGB.
-    \item \textbf{Configuraciones}: Permitir al usuario ajustar las características del emulador, como la velocidad y los controles.
-\end{itemize}
-
-\subsection{Requerimientos No Funcionales}
-
-Estos requerimientos se enfocan en aspectos de calidad de la aplicación, como el rendimiento o la usabilidad, con el objetivo de asegurar una experiencia fluida y eficiente.
-
-\begin{itemize}
-    \item \textbf{Rendimiento}: La emulación debe ir a la frecuencia original de la consola en la mayoría de los dispositivos Android.
-    \item \textbf{Compatibilidad}: Funcionar en dispositivos Android 8.0 o superior.
-    \item \textbf{Eficiencia}: Consumo de batería optimizado durante la ejecución.
-    \item \textbf{Usabilidad}: La interfaz debe ser intuitiva y accesible para el usuario.
-    \item \textbf{Mantenimiento}: Código modular, que sea fácil de escalar y el cual disponga de una buena documentación para facilitar futuras mejoras.
-\end{itemize}
 
 \section{Etapas del Proyecto}
 El proyecto está dividido en distintas etapas o iteraciones, cada una de las cuales ofrece la oportunidad de aprender y aplicar nuevos conocimientos relacionados con la emulación y el desarrollo. Al final de cada iteración, se lleva a cabo una revisión exhaustiva del progreso, lo que permite identificar áreas de mejora o posibles errores, minimizando así el tiempo perdido en futuras fases del desarrollo.
@@ -75,19 +50,6 @@ Entrando en detalle en algunas etapas del proeycto:
 \section{Mínimo Producto Viable}
 
 Lo normal en todo proyecto es que ocurran imprevistos que hagan al programador perder más tiempo en una tarea o incluso paralizar por completo el proyecto. Además, esto se junta con el hecho de que aquí no hay nadie que pueda ocupar nuestro puesto mientras ese problema se soluciona. Por esta razón, es importante tener en mente un \textbf{producto mínimo viable}, con el cual obtener un producto usable de en el tiempo disponible.
-
-\section{Casos de Uso}
-
-Los casos de uso permiten identificar y documentar cómo los usuarios interactuarán con el sistema, destacando las funcionalidades clave y sus flujos de ejecución.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{include/images/casosuso.png}
-    \caption{Diagrama de Casos de Uso}
-    \label{figure:usecases}
-\end{figure}
-
-El usuario tiene acceso directo al menú principal al entrar en la aplicación. Desde ahí, el usuario puede realizar diferentes acciones como añadir o seleccionar una ROM o configurar de forma general el emulador. La selección de una ROM incluye los procesos de carga y emulación. Además, durante la emulación, el usuario puede cargar o guardar el estado y configurar el juego. Las relaciones entre los casos de uso se estructuran con inclusiones para acciones necesarias y extensiones para funcionalidades opcionales.
 
 \section{Herramientas utilizadas}
 

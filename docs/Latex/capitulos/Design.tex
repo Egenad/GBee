@@ -1,5 +1,11 @@
-\chapter{Diseño}
-\label{design}
+\chapter{Revisión del Mercado de Aplicaciones}
+\label{chap:mercado}
+
+Antes de abordar el desarrollo del emulador, resulta fundamental analizar el panorama actual de aplicaciones similares disponibles en el mercado. Este capítulo tiene como objetivo estudiar y comparar distintas soluciones existentes que permiten emular juegos de Game Boy en dispositivos Android, identificando sus características, puntos fuertes y limitaciones.
+\\\\
+La revisión se centra en emuladores reconocidos como My OldBoy! y GBCC, prestando especial atención a aspectos como el rendimiento, la interfaz de usuario, las opciones de configuración y el sistema de monetización.
+\\\\
+Este análisis no solo proporciona una visión general del estado de la tecnología en este ámbito, sino que también permite identificar oportunidades de mejora y justificar las decisiones de diseño adoptadas en el presente proyecto.
 
 \section{Referencias}
 En esta sección se encuentran aquellas aplicaciones que, tras una revisión de los mismos, se cree que han sido de utilidad por su parecido a la hora de desarrollar este proyecto:
@@ -12,14 +18,14 @@ El emulador es altamente valorado por su interfaz intuitiva y las múltiples opc
 \\\\
 Sin embargo, tiene algunas limitaciones. Por ejemplo, puede generar archivos de guardado duplicados, carece de un sistema de autoguardado periódico y no ha recibido actualizaciones recientes para las versiones más nuevas de Android, lo que puede afectar su compatibilidad en dispositivos más modernos.
 
+\clearpage
+
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.4\textwidth]{include/images/myoldboy.png}
+    \includegraphics[width=0.25\textwidth]{include/images/myoldboy.png}
     \caption{My OldBoy! - Logotipo.}
     \label{figure:oldboylogo}
 \end{figure}
-
-\clearpage
 
 La pantalla principal de la aplicación presenta un explorador de archivos que muestra, en formato de lista, los documentos almacenados en la carpeta especificada de la memoria interna del dispositivo. Los archivos se organizan automáticamente por orden alfabético, ofreciendo una visualización clara y estructurada para facilitar su navegación y selección. Dispone de dos botones, uno para recargar la carpeta actual y otro para acceder a los ajustes de sistema. 
 \\\\
@@ -27,7 +33,7 @@ En los ajustes, podremos modificar distintos aspectos agrupados en las categorí
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.65\textwidth]{include/images/myoldboy2.jpg}
+    \includegraphics[width=0.55\textwidth]{include/images/myoldboy2.jpg}
     \caption{My OldBoy! - Menú de inicio y pantalla de ajustes.}
     \label{figure:oldboy2}
 \end{figure}
@@ -120,7 +126,60 @@ A pesar de sus problemas, algunos usuarios apreciaron lo fácil que era configur
     \label{figure:igbagame}
 \end{figure}
 
-\clearpage
+
+\cleardoublepage
+
+\chapter{Análisis y Diseño}
+\label{design}
+
+Este capítulo recoge el proceso de análisis y diseño previo al desarrollo del emulador, donde se definen los requisitos que debe cumplir la aplicación y se plantean las primeras decisiones estructurales y visuales del proyecto.
+\\\\
+En primer lugar, se detallan los requisitos funcionales y no funcionales, los cuales especifican tanto las funcionalidades que debe ofrecer la aplicación como las restricciones de calidad, rendimiento o usabilidad que debe respetar. A continuación, se presentan los casos de uso, acompañados de su correspondiente diagrama, para ilustrar de manera clara la interacción entre el usuario y el sistema.
+\\\\
+Finalmente, se incluyen una serie de mockups que representan visualmente la interfaz de usuario en sus distintas pantallas, ayudando a anticipar la experiencia del usuario final y facilitando una primera validación del diseño.
+
+\section{Requerimientos}
+
+A continuación se detallan los requerimientos funcionales y no funcionales que rigen el diseño y la implementación del proyecto. Estos requerimientos han sido definidos a partir del análisis de las necesidades del usuario final y de las restricciones técnicas:
+
+\subsection{Requerimientos Funcionales}
+
+Estos requerimientos son las capacidades específicas que la aplicación debe cumplir para garantizar que su funcionamiento sea acorde a los objetivos establecidos:
+
+\begin{itemize}
+    \item \textbf{Carga de ROMs}: El usuario debe poder seleccionar y cargar archivos .gb o .gbc desde su dispositivo.
+    \item \textbf{Emulación}: Debe replicar fielmente el comportamiento del hardware original.
+    \item \textbf{Interfaz táctil}: Proveer botones virtuales que simulen los originales.
+    \item \textbf{Audio}: Emular el sonido original de la consola.
+    \item \textbf{Gestión de estado}: Guardar y cargar partidas.
+    \item \textbf{Compatibilidad}: Dar soporte para ROMs de DMG y CGB.
+    \item \textbf{Configuraciones}: Permitir al usuario ajustar las características del emulador, como la velocidad y los controles.
+\end{itemize}
+
+\subsection{Requerimientos No Funcionales}
+
+Estos requerimientos se enfocan en aspectos de calidad de la aplicación, como el rendimiento o la usabilidad, con el objetivo de asegurar una experiencia fluida y eficiente.
+
+\begin{itemize}
+    \item \textbf{Rendimiento}: La emulación debe ir a la frecuencia original de la consola en la mayoría de los dispositivos Android.
+    \item \textbf{Compatibilidad}: Funcionar en dispositivos Android 8.0 o superior.
+    \item \textbf{Eficiencia}: Consumo de batería optimizado durante la ejecución.
+    \item \textbf{Usabilidad}: La interfaz debe ser intuitiva y accesible para el usuario.
+    \item \textbf{Mantenimiento}: Código modular, que sea fácil de escalar y el cual disponga de una buena documentación para facilitar futuras mejoras.
+\end{itemize}
+
+\section{Casos de Uso}
+
+Los casos de uso permiten identificar y documentar cómo los usuarios interactuarán con el sistema, destacando las funcionalidades clave y sus flujos de ejecución.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{include/images/casosuso.png}
+    \caption{Diagrama de Casos de Uso}
+    \label{figure:usecases}
+\end{figure}
+
+El usuario tiene acceso directo al menú principal al entrar en la aplicación. Desde ahí, el usuario puede realizar diferentes acciones como añadir o seleccionar una ROM o configurar de forma general el emulador. La selección de una ROM incluye los procesos de carga y emulación. Además, durante la emulación, el usuario puede cargar o guardar el estado y configurar el juego. Las relaciones entre los casos de uso se estructuran con inclusiones para acciones necesarias y extensiones para funcionalidades opcionales.
 
 \section{Mockup}
 

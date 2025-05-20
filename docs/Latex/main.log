@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2025.5.13)  19 MAY 2025 20:39
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2025.5.13)  20 MAY 2025 18:16
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1150,11 +1150,8 @@ Package scrhack Info: redefining \lstlistoflistings on input line 157.
 Package scrhack Info: patching \lst@MakeCaption on input line 157.
 )
 Package: listings 2023/02/27 1.9 (Carsten Heinz)
-)) (./include/config.tex) (./main.aux
-
-LaTeX Warning: Label `code:surfaceonmeasure' multiply defined.
-
-)
+)) (./include/config.tex)
+No file main.aux.
 \openout1 = `main.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 26.
@@ -1167,7 +1164,7 @@ LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 26.
 LaTeX Font Info:    ... okay on input line 26.
 LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 26.
 LaTeX Font Info:    Trying to load font information for TS1+cmr on input line 26.
- (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd
+(/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 2023/04/13 v2.5m Standard LaTeX font definitions
 )
 LaTeX Font Info:    ... okay on input line 26.
@@ -1296,9 +1293,12 @@ Package caption Info: rotating package is loaded.
 Package caption Info: supertabular package is loaded.
 Package caption Info: End \AtBeginDocument code.
 Package hyperref Info: Link coloring OFF on input line 26.
- (./main.out) (./main.out)
 \@outlinefile=\write4
 \openout4 = `main.out'.
+
+
+
+Package hyperref Warning: Rerun to get /PageLabels entry.
 
 Class scrbook Info: loading recommended package `bookmark'.
 (scrbook)           Using `bookmark' together with `hyperref' is recommended,
@@ -1308,7 +1308,7 @@ Class scrbook Info: loading recommended package `bookmark'.
 (scrbook)           you can avoid this message adding:
 (scrbook)             \usepackage{bookmark}
 (scrbook)           before \begin{document} on input line 26.
- (/usr/share/texlive/texmf-dist/tex/latex/bookmark/bookmark.sty
+(/usr/share/texlive/texmf-dist/tex/latex/bookmark/bookmark.sty
 Package: bookmark 2023-12-10 v1.31 PDF bookmarks (HO)
  (/usr/share/texlive/texmf-dist/tex/latex/bookmark/bkm-dvipdfm.def
 File: bkm-dvipdfm.def 2023-12-10 v1.31 bookmark driver for dvipdfm (HO)
@@ -1878,53 +1878,44 @@ Underfull \hbox (badness 10000) in paragraph at lines 41--52
 
 ])
 Package tocbasic Info: character protrusion at toc deactivated on input line 33.
- (./main.toc
-LaTeX Info: Redefining \rmfamily on input line 2.
-LaTeX Info: Redefining \sffamily on input line 2.
-LaTeX Info: Redefining \ttfamily on input line 2.
- [13
 
-
-] [14] [15]
-Underfull \vbox (badness 1789) has occurred while \output is active []
-
- [16]
-Overfull \hbox (1.09497pt too wide) detected at line 173
- []\TU/lmss/bx/n/10.95 149
- []
-
-)
+No file main.toc.
 \tf@toc=\write5
 \openout5 = `main.toc'.
 
- [17] [18
+[13
+
+
+] [14
 
 
 ]
 Package tocbasic Info: character protrusion at lof deactivated on input line 34.
- (./main.lof [19])
+
+No file main.lof.
 \tf@lof=\write6
 \openout6 = `main.lof'.
 
- [20]
+[15] [16
+
+
+]
 Package tocbasic Info: character protrusion at lot deactivated on input line 35.
- (./main.lot)
+
+No file main.lot.
 \tf@lot=\write7
 \openout7 = `main.lot'.
 
- [21
-
-
-] [22
+[17] [18
 
 
 ]
 Package tocbasic Info: character protrusion at lol deactivated on input line 36.
- (./main.lol [23] [24])
+ (./main.lol [19] [20])
 \tf@lol=\write8
 \openout8 = `main.lol'.
 
- [25] [26
+ [21] [22
 
 
 ] (./capitulos/Introduccion.tex
@@ -1977,285 +1968,332 @@ chapter 2.
 ] [6]) (./capitulos/Historia.tex
 chapter 3.
 
-Underfull \hbox (badness 10000) in paragraph at lines 5--6
+Underfull \hbox (badness 10000) in paragraph at lines 4--11
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 4--11
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 4--11
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 13--14
 
  []
 
 File: include/images/gb.jpg Graphic file (type bmp)
 <include/images/gb.jpg>
-
-Underfull \hbox (badness 10000) in paragraph at lines 14--19
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 14--19
-
- []
-
-File: include/images/gbs.jpg Graphic file (type bmp)
-<include/images/gbs.jpg>
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [7
+[7
 
 
 
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 29--30
+Underfull \hbox (badness 10000) in paragraph at lines 24--29
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 33--33
+Underfull \hbox (badness 10000) in paragraph at lines 24--29
+
+ []
+
+File: include/images/gbs.jpg Graphic file (type bmp)
+<include/images/gbs.jpg>
+[8
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 41--42
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 45--45
 []|\TU/lmr/bx/n/10.95 Game Boy
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 33--34
+Underfull \hbox (badness 10000) in paragraph at lines 45--46
 []|\TU/lmr/bx/n/10.95 Game Boy
  []
 
 
-Overfull \hbox (5.4944pt too wide) in alignment at lines 31--35
+Overfull \hbox (5.4944pt too wide) in alignment at lines 43--47
  [] [] [] [] [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 39--39
+Underfull \hbox (badness 10000) in paragraph at lines 51--51
 []|\TU/lmr/bx/n/10.95 Game Boy
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 39--40
+Underfull \hbox (badness 10000) in paragraph at lines 51--52
 []|\TU/lmr/bx/n/10.95 Game Boy
  []
 
 
-Overfull \hbox (5.4944pt too wide) in alignment at lines 35--41
+Overfull \hbox (5.4944pt too wide) in alignment at lines 47--53
  [] [] [] [] [] 
  []
 
 
-Overfull \hbox (5.4944pt too wide) in alignment at lines 41--43
+Overfull \hbox (5.4944pt too wide) in alignment at lines 53--55
  [] [] [] [] [] 
  []
 
 
-Overfull \hbox (5.4944pt too wide) in alignment at lines 43--45
+Overfull \hbox (5.4944pt too wide) in alignment at lines 55--57
  [] [] [] [] [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 49--49
+Underfull \hbox (badness 10000) in paragraph at lines 61--61
 []|\TU/lmr/bx/n/10.95 Frecuencia
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 49--50
+Underfull \hbox (badness 10000) in paragraph at lines 61--62
 []|\TU/lmr/m/n/10.95 Hasta
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 49--50
+Underfull \hbox (badness 10000) in paragraph at lines 61--62
 \TU/lmr/m/n/10.95 8.388608
  []
 
 
-Underfull \hbox (badness 1163) in paragraph at lines 57--57
+Underfull \hbox (badness 1163) in paragraph at lines 69--69
 \TU/lmr/m/n/10.95 tro de 256 ×
  []
 
 
-Underfull \hbox (badness 4739) in paragraph at lines 61--62
+Underfull \hbox (badness 4739) in paragraph at lines 73--74
 []|\TU/lmr/m/n/10.95 BG: 8 × 4,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 65--65
+Underfull \hbox (badness 10000) in paragraph at lines 77--77
 []|\TU/lmr/bx/n/10.95 Sincronización
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 67--67
+Underfull \hbox (badness 10000) in paragraph at lines 79--79
 []|\TU/lmr/bx/n/10.95 Sincronización
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 71--71
+Underfull \hbox (badness 10000) in paragraph at lines 83--83
 []|\TU/lmr/m/n/10.95 Alimentado
  []
 
 
-Overfull \hbox (5.4944pt too wide) in alignment at lines 45--76
+Overfull \hbox (5.4944pt too wide) in alignment at lines 57--88
  [] [] [] [] [] 
  []
 
-[8] [9]
-Underfull \hbox (badness 10000) in paragraph at lines 109--112
 
- []
+Underfull \vbox (badness 7451) has occurred while \output is active []
 
+ [9
+
+] [10]
 File: include/images/mem_vram.png Graphic file (type bmp)
 <include/images/mem_vram.png>
-[10]
-Underfull \hbox (badness 10000) in paragraph at lines 135--138
+
+
+Package natbib Warning: Citation `goldensacra' on page 11 undefined on input line 133.
+
+
+Package natbib Warning: Citation `goldensacra' on page 11 undefined on input line 133.
+
+[11
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 149--152
 
  []
 
 File: include/images/oam_tiles.png Graphic file (type bmp)
 <include/images/oam_tiles.png>
+
+Package natbib Warning: Citation `goldensacra' on page 12 undefined on input line 156.
+
+
+Package natbib Warning: Citation `goldensacra' on page 12 undefined on input line 156.
+
 File: include/images/y_position.png Graphic file (type bmp)
 <include/images/y_position.png>
-[11]
-Underfull \hbox (badness 10000) in paragraph at lines 173--178
+
+Package natbib Warning: Citation `newpandocs' on page 12 undefined on input line 168.
+
+
+Package natbib Warning: Citation `newpandocs' on page 12 undefined on input line 168.
+
+
+Underfull \vbox (badness 1838) has occurred while \output is active []
+
+ [12
+
+]
+
+LaTeX Warning: Hyper reference `mem:vram_1' on page 13 undefined on input line 173.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 187--192
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 173--178
-
- []
-
-[12]
-Underfull \hbox (badness 10000) in paragraph at lines 181--184
+Underfull \hbox (badness 10000) in paragraph at lines 187--192
 
  []
 
 [13]
-Underfull \hbox (badness 10000) in paragraph at lines 206--209
+Underfull \hbox (badness 10000) in paragraph at lines 195--198
+
+ []
+
+[14] [15]
+Underfull \hbox (badness 10000) in paragraph at lines 264--273
 
  []
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [14]
-Underfull \hbox (badness 10000) in paragraph at lines 252--261
+Underfull \hbox (badness 10000) in paragraph at lines 264--273
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 252--261
+Underfull \hbox (badness 10000) in paragraph at lines 264--273
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 252--261
+Underfull \hbox (badness 10000) in paragraph at lines 264--273
+
+ []
+
+[16]
+Underfull \hbox (badness 10000) in paragraph at lines 296--301
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 252--261
+Underfull \hbox (badness 10000) in paragraph at lines 296--301
 
  []
 
-[15]
-Underfull \hbox (badness 10000) in paragraph at lines 282--287
+[17
 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 282--287
-
- []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [16] [17] [18]
+] [18]
 File: include/images/opcodes_1.jpg Graphic file (type bmp)
 <include/images/opcodes_1.jpg>
+
+
+Package natbib Warning: Citation `opcodes' on page 19 undefined on input line 375.
+
+
+Package natbib Warning: Citation `opcodes' on page 19 undefined on input line 375.
+
 File: include/images/opcodes_2.jpg Graphic file (type bmp)
 <include/images/opcodes_2.jpg>
+
+Package natbib Warning: Citation `opcodes' on page 19 undefined on input line 382.
+
+
+Package natbib Warning: Citation `opcodes' on page 19 undefined on input line 382.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
  [19]
-Underfull \hbox (badness 10000) in paragraph at lines 383--390
+Underfull \hbox (badness 10000) in paragraph at lines 397--404
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 383--390
+Underfull \hbox (badness 10000) in paragraph at lines 397--404
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 383--390
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 400--420
+Underfull \hbox (badness 10000) in paragraph at lines 397--404
 
  []
 
 [20]
-Underfull \hbox (badness 10000) in paragraph at lines 422--429
+Underfull \hbox (badness 10000) in paragraph at lines 414--434
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 422--429
+Underfull \hbox (badness 10000) in paragraph at lines 436--443
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 422--429
+Underfull \hbox (badness 10000) in paragraph at lines 436--443
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 431--442
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 431--442
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 431--442
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 431--442
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 431--442
+Underfull \hbox (badness 10000) in paragraph at lines 436--443
 
  []
 
 [21]
-Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 453.
+Underfull \hbox (badness 10000) in paragraph at lines 445--456
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 445--456
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 445--456
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 445--456
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 445--456
+
+ []
+
+
+Underfull \vbox (badness 4254) has occurred while \output is active []
+
+ [22]
+Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 467.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `lmtt' (encoding: TU).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
- [22]
 File: include/images/dibujado_logo_n.jpg Graphic file (type bmp)
 <include/images/dibujado_logo_n.jpg>
 
-Underfull \hbox (badness 10000) in paragraph at lines 473--476
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 478--481
-
- []
-
-[23]
+ [23]
 Underfull \hbox (badness 10000) in paragraph at lines 487--490
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 496--499
+Underfull \hbox (badness 10000) in paragraph at lines 492--495
 
  []
 
@@ -2264,341 +2302,464 @@ Underfull \hbox (badness 10000) in paragraph at lines 501--504
 
  []
 
-[24] [25]
-Underfull \hbox (badness 10000) in paragraph at lines 578--581
-
- []
-
-[26]
-Underfull \hbox (badness 10000) in paragraph at lines 640--643
+[24]
+Underfull \hbox (badness 10000) in paragraph at lines 510--513
 
  []
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [27]
-Underfull \hbox (badness 10000) in paragraph at lines 671--674
+Underfull \hbox (badness 10000) in paragraph at lines 515--518
 
  []
 
-[28] [29] [30] [31]
-Underfull \hbox (badness 10000) in paragraph at lines 834--836
+[25] [26]
+Underfull \hbox (badness 10000) in paragraph at lines 592--595
+
+ []
+
+[27]
+Underfull \hbox (badness 10000) in paragraph at lines 654--657
+
+ []
+
+
+Underfull \vbox (badness 1297) has occurred while \output is active []
+
+ [28]
+Underfull \hbox (badness 10000) in paragraph at lines 685--688
+
+ []
+
+[29] [30] [31]
+Underfull \vbox (badness 1946) has occurred while \output is active []
+
+ [32]
+Underfull \hbox (badness 10000) in paragraph at lines 848--850
 
  []
 
 File: include/images/cart.jpg Graphic file (type bmp)
 <include/images/cart.jpg>
-
-Underfull \vbox (badness 1642) has occurred while \output is active []
-
- [32]
+[33]
 File: include/images/nombc.jpg Graphic file (type bmp)
 <include/images/nombc.jpg>
 
-Underfull \hbox (badness 10000) in paragraph at lines 860--863
+
+Package natbib Warning: Citation `hardwaredatabase' on page 34 undefined on input line 870.
+
+
+Package natbib Warning: Citation `hardwaredatabase' on page 34 undefined on input line 870.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 874--877
 
  []
 
-[33]
 File: include/images/mbc1.jpg Graphic file (type bmp)
 <include/images/mbc1.jpg>
 
-Underfull \hbox (badness 10000) in paragraph at lines 881--886
+Package natbib Warning: Citation `hardwaredatabase' on page 34 undefined on input line 881.
+
+
+Package natbib Warning: Citation `hardwaredatabase' on page 34 undefined on input line 881.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [34]
+Underfull \hbox (badness 10000) in paragraph at lines 895--900
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 881--886
+Underfull \hbox (badness 10000) in paragraph at lines 895--900
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 889--892
-
- []
-
-[34]
-Underfull \hbox (badness 10000) in paragraph at lines 894--897
+Underfull \hbox (badness 10000) in paragraph at lines 903--906
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 898--907
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 898--907
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 898--907
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 898--907
+Underfull \hbox (badness 10000) in paragraph at lines 908--911
 
  []
 
 [35]
+
+LaTeX Warning: Hyper reference `par:rom0bank' on page 36 undefined on input line 914.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 912--921
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 912--921
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 912--921
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 912--921
+
+ []
+
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <8> not available
-(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 910.
-
-Underfull \hbox (badness 10000) in paragraph at lines 928--931
-
- []
-
+(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 924.
 [36]
-Underfull \hbox (badness 10000) in paragraph at lines 943--948
+Underfull \hbox (badness 10000) in paragraph at lines 942--945
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 943--948
+Underfull \hbox (badness 10000) in paragraph at lines 957--962
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 957--960
+Underfull \hbox (badness 10000) in paragraph at lines 957--962
 
  []
 
-[37] [38] [39]
+[37]
+Underfull \hbox (badness 10000) in paragraph at lines 971--974
+
+ []
+
+[38] [39]
+
+LaTeX Warning: Hyper reference `interrupttype' on page 40 undefined on input line 1043.
+
+[40]
 File: include/images/tmatactima.jpg Graphic file (type bmp)
 <include/images/tmatactima.jpg>
 
 
-LaTeX Warning: `h' float specifier changed to `ht'.
+Package natbib Warning: Citation `newpandocs' on page 41 undefined on input line 1071.
 
 
-Underfull \hbox (badness 1803) in paragraph at lines 1088--1088
+Package natbib Warning: Citation `newpandocs' on page 41 undefined on input line 1071.
+
+[41]
+Underfull \hbox (badness 1803) in paragraph at lines 1102--1102
 []|\TU/lmr/m/n/10.95 Control LCD, estado, posi-
  []
 
-[40]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [41]
 File: include/images/joypad.png Graphic file (type bmp)
 <include/images/joypad.png>
 
-Underfull \hbox (badness 10000) in paragraph at lines 1110--1113
+Package natbib Warning: Citation `goldensacra' on page 42 undefined on input line 1120.
+
+
+Package natbib Warning: Citation `goldensacra' on page 42 undefined on input line 1120.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [42]
+Underfull \hbox (badness 10000) in paragraph at lines 1124--1127
 
  []
 
-[42]
-Underfull \hbox (badness 10000) in paragraph at lines 1116--1119
+
+Underfull \hbox (badness 10000) in paragraph at lines 1130--1133
 
  []
 
 File: include/images/link_cable.png Graphic file (type bmp)
 <include/images/link_cable.png>
 
-Underfull \hbox (badness 10000) in paragraph at lines 1129--1132
+Package natbib Warning: Citation `linkcablewiki' on page 43 undefined on input line 1137.
+
+
+Package natbib Warning: Citation `linkcablewiki' on page 43 undefined on input line 1137.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [43]
+Underfull \hbox (badness 10000) in paragraph at lines 1143--1146
 
  []
 
 
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1149--1152
+Underfull \hbox (badness 10000) in paragraph at lines 1163--1166
 
  []
 
-[43]
+[44]
 File: include/images/ppu_modes.png Graphic file (type bmp)
 <include/images/ppu_modes.png>
- [44]
-Underfull \hbox (badness 10000) in paragraph at lines 1187--1194
+
+
+Package natbib Warning: Citation `goldensacra' on page 45 undefined on input line 1195.
+
+
+Package natbib Warning: Citation `goldensacra' on page 45 undefined on input line 1195.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1201--1208
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1187--1194
+Underfull \hbox (badness 10000) in paragraph at lines 1201--1208
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1187--1194
+Underfull \hbox (badness 10000) in paragraph at lines 1201--1208
 
  []
 
+[45]
 File: include/images/colores_bits_tile.png Graphic file (type bmp)
 <include/images/colores_bits_tile.png>
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [45]
+Package natbib Warning: Citation `newpandocs' on page 46 undefined on input line 1212.
+
+
+Package natbib Warning: Citation `newpandocs' on page 46 undefined on input line 1212.
+
 File: include/images/layers.png Graphic file (type bmp)
 <include/images/layers.png>
+
+Package natbib Warning: Citation `goldensacra' on page 46 undefined on input line 1223.
+
+
+Package natbib Warning: Citation `goldensacra' on page 46 undefined on input line 1223.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [46]
 File: include/images/grid_bg.png Graphic file (type bmp)
 <include/images/grid_bg.png>
 
-Underfull \vbox (badness 5446) has occurred while \output is active []
 
- [46]
+Package natbib Warning: Citation `gbedg' on page 47 undefined on input line 1234.
+
+
+Package natbib Warning: Citation `gbedg' on page 47 undefined on input line 1234.
+
+
+Underfull \vbox (badness 1259) has occurred while \output is active []
+
+ [47]
 File: include/images/scrolling_diagram.png Graphic file (type bmp)
 <include/images/scrolling_diagram.png>
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [47]
-Underfull \hbox (badness 10000) in paragraph at lines 1237--1240
+Package natbib Warning: Citation `newpandocs' on page 48 undefined on input line 1245.
+
+
+Package natbib Warning: Citation `newpandocs' on page 48 undefined on input line 1245.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1251--1254
 
  []
 
 File: include/images/grid_window.png Graphic file (type bmp)
 <include/images/grid_window.png>
 
+Package natbib Warning: Citation `gbedg' on page 48 undefined on input line 1258.
+
+
+Package natbib Warning: Citation `gbedg' on page 48 undefined on input line 1258.
+
+
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [48]
-Underfull \hbox (badness 10000) in paragraph at lines 1248--1253
+Underfull \hbox (badness 10000) in paragraph at lines 1262--1267
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1248--1253
+Underfull \hbox (badness 10000) in paragraph at lines 1262--1267
 
  []
 
 File: include/images/window_pokemon.png Graphic file (type bmp)
 <include/images/window_pokemon.png>
 
-Underfull \hbox (badness 10000) in paragraph at lines 1261--1264
+Package natbib Warning: Citation `goldensacra' on page 49 undefined on input line 1271.
+
+
+Package natbib Warning: Citation `goldensacra' on page 49 undefined on input line 1271.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1275--1278
 
  []
 
-[49] [50]
-Underfull \hbox (badness 10000) in paragraph at lines 1308--1311
+[49]
+
+LaTeX Warning: Hyper reference `mem:oam' on page 50 undefined on input line 1281.
+
+[50]
+Underfull \hbox (badness 10000) in paragraph at lines 1322--1325
 
  []
 
 File: include/images/render_gb.png Graphic file (type bmp)
 <include/images/render_gb.png>
+
+Package natbib Warning: Citation `newpandocs' on page 51 undefined on input line 1334.
+
+
+Package natbib Warning: Citation `newpandocs' on page 51 undefined on input line 1334.
+
 [51]
-Underfull \hbox (badness 10000) in paragraph at lines 1325--1328
+Underfull \hbox (badness 10000) in paragraph at lines 1339--1342
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1330--1333
+Underfull \hbox (badness 10000) in paragraph at lines 1344--1347
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1335--1338
+Underfull \hbox (badness 10000) in paragraph at lines 1349--1352
 
  []
 
 [52]
-Underfull \hbox (badness 10000) in paragraph at lines 1356--1361
+
+LaTeX Warning: Hyper reference `lcd_control' on page 53 undefined on input line 1355.
+
+
+LaTeX Warning: Hyper reference `ppu:mode3' on page 53 undefined on input line 1372.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1370--1375
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1356--1361
+Underfull \hbox (badness 10000) in paragraph at lines 1370--1375
 
  []
 
 [53]
-Underfull \hbox (badness 10000) in paragraph at lines 1407--1410
+Underfull \hbox (badness 10000) in paragraph at lines 1421--1424
 
  []
 
 [54]
-Underfull \hbox (badness 10000) in paragraph at lines 1415--1418
+Underfull \hbox (badness 10000) in paragraph at lines 1429--1432
 
  []
 
 File: include/images/fifo_mixer.png Graphic file (type bmp)
 <include/images/fifo_mixer.png>
+
+Package natbib Warning: Citation `gbedg' on page 55 undefined on input line 1440.
+
+
+Package natbib Warning: Citation `gbedg' on page 55 undefined on input line 1440.
+
 [55] [56
 
 
 ]) (./capitulos/Methodology.tex
 chapter 4.
+
+Underfull \hbox (badness 10000) in paragraph at lines 4--7
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 12--17
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 12--17
+
+ []
+
 [57
 
 
-]
-Underfull \hbox (badness 10000) in paragraph at lines 37--42
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 37--42
-
- []
-
-[58]
-File: include/images/casosuso.png Graphic file (type bmp)
-<include/images/casosuso.png>
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [59]
+] [58]
 File: include/images/herramientas.png Graphic file (type bmp)
 <include/images/herramientas.png>
- [60] [61] [62
+ [59] [60
 
 
 ]) (./capitulos/Design.tex
 chapter 5.
 
-Underfull \hbox (badness 10000) in paragraph at lines 9--14
+Underfull \hbox (badness 10000) in paragraph at lines 4--9
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 9--14
+Underfull \hbox (badness 10000) in paragraph at lines 4--9
 
  []
 
-File: include/images/myoldboy.png Graphic file (type bmp)
-<include/images/myoldboy.png>
-[63
+
+Underfull \hbox (badness 10000) in paragraph at lines 15--20
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 15--20
+
+ []
+
+[61
 
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 24--27
+File: include/images/myoldboy.png Graphic file (type bmp)
+<include/images/myoldboy.png>
+
+Underfull \hbox (badness 10000) in paragraph at lines 30--33
 
  []
 
 File: include/images/myoldboy2.jpg Graphic file (type bmp)
 <include/images/myoldboy2.jpg>
-[64
+[62
 
 ]
 File: include/images/myoldboy3.jpg Graphic file (type bmp)
 <include/images/myoldboy3.jpg>
 File: include/images/myoldboyportrait.jpg Graphic file (type bmp)
 <include/images/myoldboyportrait.jpg>
- [65
+ [63
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 55--62
+Underfull \hbox (badness 10000) in paragraph at lines 61--68
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 55--62
+Underfull \hbox (badness 10000) in paragraph at lines 61--68
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 55--62
+Underfull \hbox (badness 10000) in paragraph at lines 61--68
 
  []
 
 File: include/images/gbcclogo.png Graphic file (type bmp)
 <include/images/gbcclogo.png>
 
-Underfull \hbox (badness 10000) in paragraph at lines 70--73
+Underfull \hbox (badness 10000) in paragraph at lines 76--79
 
  []
 
@@ -2612,10 +2773,10 @@ File: include/images/gbccgameportrait.png Graphic file (type bmp)
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[66
+[64
 
-] [67]
-Underfull \hbox (badness 10000) in paragraph at lines 92--95
+] [65]
+Underfull \hbox (badness 10000) in paragraph at lines 98--101
 
  []
 
@@ -2623,12 +2784,12 @@ File: include/images/igbalogo.png Graphic file (type bmp)
 <include/images/igbalogo.png>
 Missing character: There is no ​ (U+200B) in font [lmroman10-regular]:mapping=tex-text;!
 
-Underfull \hbox (badness 10000) in paragraph at lines 103--108
+Underfull \hbox (badness 10000) in paragraph at lines 109--114
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 103--108
+Underfull \hbox (badness 10000) in paragraph at lines 109--114
 
  []
 
@@ -2642,44 +2803,63 @@ File: include/images/iGBAgame.png Graphic file (type bmp)
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[68
+[66
 
-] [69]
-Underfull \hbox (badness 10000) in paragraph at lines 127--132
+] [67] [68
+
+
+]
+chapter 6.
+
+Underfull \hbox (badness 10000) in paragraph at lines 135--140
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 127--132
+Underfull \hbox (badness 10000) in paragraph at lines 135--140
 
  []
 
+[69
+
+
+]
+File: include/images/casosuso.png Graphic file (type bmp)
+<include/images/casosuso.png>
+
+Underfull \hbox (badness 10000) in paragraph at lines 186--191
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 186--191
+
+ []
+
+[70]
 File: include/images/mockup_menu.jpg Graphic file (type bmp)
 <include/images/mockup_menu.jpg>
 
-Underfull \hbox (badness 10000) in paragraph at lines 140--143
+Underfull \hbox (badness 10000) in paragraph at lines 199--202
 
  []
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [70
-
-]
+ [71]
 File: include/images/mockgame.jpg Graphic file (type bmp)
 <include/images/mockgame.jpg>
- [71] [72
-
-
-]) (./capitulos/Develop.tex
-chapter 6.
+ [72]) (./capitulos/Develop.tex
+chapter 7.
 
 Underfull \hbox (badness 10000) in paragraph at lines 4--7
 
  []
 
 [73
+
+
 
 
 ]
@@ -2727,6 +2907,10 @@ Underfull \hbox (badness 10000) in paragraph at lines 198--205
  []
 
 [78]
+
+LaTeX Warning: Reference `instrLd' on page 79 undefined on input line 244.
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 240--245
 
  []
@@ -2750,7 +2934,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 301--304
  []
 
 
-Underfull \vbox (badness 3240) has occurred while \output is active []
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [80]
 Underfull \hbox (badness 10000) in paragraph at lines 322--325
@@ -2857,6 +3041,10 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [101] [102] [103]
+
+LaTeX Warning: Hyper reference `history_mbcs' on page 104 undefined on input line 1306.
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 1306--1311
 
  []
@@ -2876,7 +3064,11 @@ Underfull \hbox (badness 10000) in paragraph at lines 1456--1461
 
  []
 
-[107] [108] [109]
+[107] [108]
+
+LaTeX Warning: Hyper reference `history_timer' on page 109 undefined on input line 1506.
+
+[109]
 Underfull \hbox (badness 10000) in paragraph at lines 1539--1544
 
  []
@@ -2887,14 +3079,25 @@ Underfull \hbox (badness 10000) in paragraph at lines 1539--1544
  []
 
 [110]
+
+LaTeX Warning: Hyper reference `history_mbcs' on page 111 undefined on input line 1581.
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 1581--1584
 
  []
 
 [111]
+
+LaTeX Warning: Hyper reference `rom:read_write' on page 112 undefined on input line 1637.
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 1635--1638
 
  []
+
+
+LaTeX Warning: Hyper reference `dma' on page 112 undefined on input line 1641.
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 1641--1644
@@ -2943,6 +3146,9 @@ Underfull \hbox (badness 10000) in paragraph at lines 1928--1931
  []
 
 
+Package natbib Warning: Citation `lld' on page 120 undefined on input line 1936.
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 1934--1939
 
  []
@@ -2986,6 +3192,10 @@ Underfull \hbox (badness 10000) in paragraph at lines 2044--2049
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [123]
+
+LaTeX Warning: Hyper reference `mem:oam' on page 124 undefined on input line 2076.
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 2072--2077
 
  []
@@ -3050,6 +3260,13 @@ Underfull \vbox (badness 3240) has occurred while \output is active []
 File: include/images/render_surface_view.png Graphic file (type bmp)
 <include/images/render_surface_view.png>
  [131]
+
+LaTeX Warning: Hyper reference `handleLCDC' on page 132 undefined on input line 2385.
+
+
+LaTeX Warning: Hyper reference `writeToTimer' on page 132 undefined on input line 2386.
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 2397--2404
 
  []
@@ -3079,6 +3296,10 @@ Underfull \vbox (badness 2932) has occurred while \output is active []
  [134]
 File: include/images/transition_title.png Graphic file (type bmp)
 <include/images/transition_title.png>
+
+
+LaTeX Warning: Hyper reference `figure:mockupmenu' on page 135 undefined on input line 2508.
+
 
 Underfull \hbox (badness 10000) in paragraph at lines 2506--2509
 
@@ -3229,25 +3450,43 @@ Underfull \hbox (badness 10000) in paragraph at lines 14--26
 
 
 
-]) [150] (./main.aux)
+])
+
+Package natbib Warning: There were undefined citations.
+
+[150] (./main.aux
+
+Package natbib Warning: Citation(s) may have changed.
+(natbib)                Rerun to get citations correct.
+
+)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2020/03/25>
  ***********
 
 
-LaTeX Warning: There were multiply-defined labels.
+LaTeX Warning: There were undefined references.
 
-Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
+Package rerunfilecheck Warning: File `main.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `main.out':
+(rerunfilecheck)             Before: <no file>
+(rerunfilecheck)             After:  D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 49598 strings out of 474878
- 1060716 string characters out of 5762516
+ 49569 strings out of 474878
+ 1060167 string characters out of 5762516
  2688627 words of memory out of 5000000
- 70703 multiletter control sequences out of 15000+600000
+ 70686 multiletter control sequences out of 15000+600000
  563777 words of font info for 98 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 113i,21n,134p,11019b,2264s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 113i,21n,134p,11019b,2135s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on main.pdf (176 pages).
+Output written on main.pdf (172 pages).

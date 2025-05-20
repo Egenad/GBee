@@ -3,22 +3,23 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \contentsline {table}{\numberline {3.1}{\ignorespaces Especificaciones técnicas de la Game Boy.}}{9}{table.3.1}%
-\contentsline {table}{\numberline {3.2}{\ignorespaces Mapa de memoria de Game Boy}}{9}{table.caption.11}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Mapa de memoria de Game Boy}}{10}{table.caption.11}%
 \contentsline {table}{\numberline {3.3}{\ignorespaces Comparación de opcodes entre Z80 y Sharp LR35902}}{15}{table.caption.15}%
 \contentsline {table}{\numberline {3.4}{\ignorespaces Función de los bits del registro F o Flags}}{16}{table.caption.16}%
 \contentsline {table}{\numberline {3.5}{\ignorespaces Resumen de las variaciones de las secuencias de arranque}}{21}{table.caption.19}%
-\contentsline {table}{\numberline {3.6}{\ignorespaces Código de licencia y su editor.}}{26}{table.3.6}%
-\contentsline {table}{\numberline {3.7}{\ignorespaces Tipos de mapeadores (MBC) y sus códigos}}{27}{table.3.7}%
-\contentsline {table}{\numberline {3.8}{\ignorespaces Tamaño y número de bancos de ROM según el valor especificado.}}{27}{table.caption.21}%
+\contentsline {table}{\numberline {3.6}{\ignorespaces Código de licencia y su editor.}}{27}{table.3.6}%
+\contentsline {table}{\numberline {3.7}{\ignorespaces Tipos de mapeadores (MBC) y sus códigos}}{28}{table.3.7}%
+\contentsline {table}{\numberline {3.8}{\ignorespaces Tamaño y número de bancos de ROM según el valor especificado.}}{28}{table.caption.21}%
 \contentsline {table}{\numberline {3.9}{\ignorespaces Tamaño de SRAM según el código del cartucho.}}{28}{table.caption.22}%
 \contentsline {table}{\numberline {3.10}{\ignorespaces Antiguos códigos de licencia y su editor.}}{32}{table.3.10}%
-\contentsline {table}{\numberline {3.11}{\ignorespaces Incrementos del registro DIV según ciclos de máquina y de reloj}}{39}{table.caption.26}%
+\contentsline {table}{\numberline {3.11}{\ignorespaces Incrementos del registro DIV según ciclos de máquina y de reloj}}{40}{table.caption.26}%
 \contentsline {table}{\numberline {3.12}{\ignorespaces Selección de modos de reloj y sus frecuencias.}}{40}{table.caption.27}%
 \contentsline {table}{\numberline {3.13}{\ignorespaces Registros de I/O mapeados en memoria de la Game Boy.}}{42}{table.caption.29}%
 \contentsline {table}{\numberline {3.14}{\ignorespaces Bits del registro SC (Serial Control) de la Game Boy}}{44}{table.caption.32}%
-\contentsline {table}{\numberline {3.15}{\ignorespaces Frecuencias del Reloj Interno.}}{44}{table.caption.33}%
+\contentsline {table}{\numberline {3.15}{\ignorespaces Frecuencias del Reloj Interno.}}{45}{table.caption.33}%
 \addvspace {10\p@ }
 \contentsline {table}{\numberline {4.1}{\ignorespaces Planificación de contenidos y fechas límite}}{58}{table.caption.43}%
+\addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
