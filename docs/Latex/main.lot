@@ -13,7 +13,7 @@
 \contentsline {table}{\numberline {3.9}{\ignorespaces Tamaño de SRAM según el código del cartucho.}}{28}{table.caption.22}%
 \contentsline {table}{\numberline {3.10}{\ignorespaces Antiguos códigos de licencia y su editor.}}{32}{table.3.10}%
 \contentsline {table}{\numberline {3.11}{\ignorespaces Incrementos del registro DIV según ciclos de máquina y de reloj}}{40}{table.caption.26}%
-\contentsline {table}{\numberline {3.12}{\ignorespaces Selección de modos de reloj y sus frecuencias.}}{40}{table.caption.27}%
+\contentsline {table}{\numberline {3.12}{\ignorespaces Selección de modos de reloj y sus frecuencias.}}{41}{table.caption.27}%
 \contentsline {table}{\numberline {3.13}{\ignorespaces Registros de I/O mapeados en memoria de la Game Boy.}}{42}{table.caption.29}%
 \contentsline {table}{\numberline {3.14}{\ignorespaces Bits del registro SC (Serial Control) de la Game Boy}}{44}{table.caption.32}%
 \contentsline {table}{\numberline {3.15}{\ignorespaces Frecuencias del Reloj Interno.}}{45}{table.caption.33}%

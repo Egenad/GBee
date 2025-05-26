@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2025.5.13)  20 MAY 2025 18:16
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2025.5.13)  26 MAY 2025 20:53
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1150,8 +1150,11 @@ Package scrhack Info: redefining \lstlistoflistings on input line 157.
 Package scrhack Info: patching \lst@MakeCaption on input line 157.
 )
 Package: listings 2023/02/27 1.9 (Carsten Heinz)
-)) (./include/config.tex)
-No file main.aux.
+)) (./include/config.tex) (./main.aux
+
+LaTeX Warning: Label `code:surfaceonmeasure' multiply defined.
+
+)
 \openout1 = `main.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 26.
@@ -1164,7 +1167,7 @@ LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 26.
 LaTeX Font Info:    ... okay on input line 26.
 LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 26.
 LaTeX Font Info:    Trying to load font information for TS1+cmr on input line 26.
-(/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd
+ (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 2023/04/13 v2.5m Standard LaTeX font definitions
 )
 LaTeX Font Info:    ... okay on input line 26.
@@ -1293,12 +1296,9 @@ Package caption Info: rotating package is loaded.
 Package caption Info: supertabular package is loaded.
 Package caption Info: End \AtBeginDocument code.
 Package hyperref Info: Link coloring OFF on input line 26.
+ (./main.out) (./main.out)
 \@outlinefile=\write4
 \openout4 = `main.out'.
-
-
-
-Package hyperref Warning: Rerun to get /PageLabels entry.
 
 Class scrbook Info: loading recommended package `bookmark'.
 (scrbook)           Using `bookmark' together with `hyperref' is recommended,
@@ -1308,7 +1308,7 @@ Class scrbook Info: loading recommended package `bookmark'.
 (scrbook)           you can avoid this message adding:
 (scrbook)             \usepackage{bookmark}
 (scrbook)           before \begin{document} on input line 26.
-(/usr/share/texlive/texmf-dist/tex/latex/bookmark/bookmark.sty
+ (/usr/share/texlive/texmf-dist/tex/latex/bookmark/bookmark.sty
 Package: bookmark 2023-12-10 v1.31 PDF bookmarks (HO)
  (/usr/share/texlive/texmf-dist/tex/latex/bookmark/bkm-dvipdfm.def
 File: bkm-dvipdfm.def 2023-12-10 v1.31 bookmark driver for dvipdfm (HO)
@@ -1878,44 +1878,50 @@ Underfull \hbox (badness 10000) in paragraph at lines 41--52
 
 ])
 Package tocbasic Info: character protrusion at toc deactivated on input line 33.
+ (./main.toc
+LaTeX Info: Redefining \rmfamily on input line 2.
+LaTeX Info: Redefining \sffamily on input line 2.
+LaTeX Info: Redefining \ttfamily on input line 2.
+ [13
 
-No file main.toc.
+
+] [14] [15] [16]
+Overfull \hbox (1.09497pt too wide) detected at line 174
+ []\TU/lmss/bx/n/10.95 149
+ []
+
+)
 \tf@toc=\write5
 \openout5 = `main.toc'.
 
-[13
-
-
-] [14
+ [17] [18
 
 
 ]
 Package tocbasic Info: character protrusion at lof deactivated on input line 34.
-
-No file main.lof.
+ (./main.lof [19])
 \tf@lof=\write6
 \openout6 = `main.lof'.
 
-[15] [16
-
-
-]
+ [20]
 Package tocbasic Info: character protrusion at lot deactivated on input line 35.
-
-No file main.lot.
+ (./main.lot)
 \tf@lot=\write7
 \openout7 = `main.lot'.
 
-[17] [18
+ [21
+
+
+] [22
 
 
 ]
 Package tocbasic Info: character protrusion at lol deactivated on input line 36.
- (./main.lol [19] [20])
+ (./main.lol [23] [24])
 \tf@lol=\write8
 \openout8 = `main.lol'.
 
- [21] [22
+ [25] [26
 
 
 ] (./capitulos/Introduccion.tex
@@ -2106,14 +2112,7 @@ Underfull \vbox (badness 7451) has occurred while \output is active []
 ] [10]
 File: include/images/mem_vram.png Graphic file (type bmp)
 <include/images/mem_vram.png>
-
-
-Package natbib Warning: Citation `goldensacra' on page 11 undefined on input line 133.
-
-
-Package natbib Warning: Citation `goldensacra' on page 11 undefined on input line 133.
-
-[11
+ [11
 
 ]
 Underfull \hbox (badness 10000) in paragraph at lines 149--152
@@ -2122,30 +2121,14 @@ Underfull \hbox (badness 10000) in paragraph at lines 149--152
 
 File: include/images/oam_tiles.png Graphic file (type bmp)
 <include/images/oam_tiles.png>
-
-Package natbib Warning: Citation `goldensacra' on page 12 undefined on input line 156.
-
-
-Package natbib Warning: Citation `goldensacra' on page 12 undefined on input line 156.
-
 File: include/images/y_position.png Graphic file (type bmp)
 <include/images/y_position.png>
 
-Package natbib Warning: Citation `newpandocs' on page 12 undefined on input line 168.
-
-
-Package natbib Warning: Citation `newpandocs' on page 12 undefined on input line 168.
-
-
-Underfull \vbox (badness 1838) has occurred while \output is active []
+Underfull \vbox (badness 1776) has occurred while \output is active []
 
  [12
 
 ]
-
-LaTeX Warning: Hyper reference `mem:vram_1' on page 13 undefined on input line 173.
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 187--192
 
  []
@@ -2195,23 +2178,10 @@ Underfull \hbox (badness 10000) in paragraph at lines 296--301
 ] [18]
 File: include/images/opcodes_1.jpg Graphic file (type bmp)
 <include/images/opcodes_1.jpg>
-
-
-Package natbib Warning: Citation `opcodes' on page 19 undefined on input line 375.
-
-
-Package natbib Warning: Citation `opcodes' on page 19 undefined on input line 375.
-
 File: include/images/opcodes_2.jpg Graphic file (type bmp)
 <include/images/opcodes_2.jpg>
 
-Package natbib Warning: Citation `opcodes' on page 19 undefined on input line 382.
-
-
-Package natbib Warning: Citation `opcodes' on page 19 undefined on input line 382.
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 5403) has occurred while \output is active []
 
  [19]
 Underfull \hbox (badness 10000) in paragraph at lines 397--404
@@ -2273,10 +2243,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 445--456
 
  []
 
-
-Underfull \vbox (badness 4254) has occurred while \output is active []
-
- [22]
+[22]
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on input line 467.
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `lmtt' (encoding: TU).
@@ -2344,29 +2311,13 @@ File: include/images/cart.jpg Graphic file (type bmp)
 File: include/images/nombc.jpg Graphic file (type bmp)
 <include/images/nombc.jpg>
 
-
-Package natbib Warning: Citation `hardwaredatabase' on page 34 undefined on input line 870.
-
-
-Package natbib Warning: Citation `hardwaredatabase' on page 34 undefined on input line 870.
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 874--877
 
  []
 
 File: include/images/mbc1.jpg Graphic file (type bmp)
 <include/images/mbc1.jpg>
-
-Package natbib Warning: Citation `hardwaredatabase' on page 34 undefined on input line 881.
-
-
-Package natbib Warning: Citation `hardwaredatabase' on page 34 undefined on input line 881.
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [34]
+[34]
 Underfull \hbox (badness 10000) in paragraph at lines 895--900
 
  []
@@ -2387,10 +2338,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 908--911
  []
 
 [35]
-
-LaTeX Warning: Hyper reference `par:rom0bank' on page 36 undefined on input line 914.
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 912--921
 
  []
@@ -2412,7 +2359,10 @@ Underfull \hbox (badness 10000) in paragraph at lines 912--921
 
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <8> not available
 (Font)              Font shape `TU/lmtt/b/n' tried instead on input line 924.
-[36]
+
+Underfull \vbox (badness 2564) has occurred while \output is active []
+
+ [36]
 Underfull \hbox (badness 10000) in paragraph at lines 942--945
 
  []
@@ -2433,63 +2383,40 @@ Underfull \hbox (badness 10000) in paragraph at lines 971--974
  []
 
 [38] [39]
+Underfull \vbox (badness 4341) has occurred while \output is active []
 
-LaTeX Warning: Hyper reference `interrupttype' on page 40 undefined on input line 1043.
-
-[40]
+ [40]
 File: include/images/tmatactima.jpg Graphic file (type bmp)
 <include/images/tmatactima.jpg>
-
-
-Package natbib Warning: Citation `newpandocs' on page 41 undefined on input line 1071.
-
-
-Package natbib Warning: Citation `newpandocs' on page 41 undefined on input line 1071.
-
-[41]
+ [41]
 Underfull \hbox (badness 1803) in paragraph at lines 1102--1102
 []|\TU/lmr/m/n/10.95 Control LCD, estado, posi-
  []
 
+[42]
 File: include/images/joypad.png Graphic file (type bmp)
 <include/images/joypad.png>
 
-Package natbib Warning: Citation `goldensacra' on page 42 undefined on input line 1120.
-
-
-Package natbib Warning: Citation `goldensacra' on page 42 undefined on input line 1120.
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [42]
-Underfull \hbox (badness 10000) in paragraph at lines 1124--1127
+Underfull \hbox (badness 10000) in paragraph at lines 1126--1129
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1130--1133
+Underfull \hbox (badness 10000) in paragraph at lines 1132--1135
 
  []
 
 File: include/images/link_cable.png Graphic file (type bmp)
 <include/images/link_cable.png>
+[43
 
-Package natbib Warning: Citation `linkcablewiki' on page 43 undefined on input line 1137.
-
-
-Package natbib Warning: Citation `linkcablewiki' on page 43 undefined on input line 1137.
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [43]
-Underfull \hbox (badness 10000) in paragraph at lines 1143--1146
+]
+Underfull \hbox (badness 10000) in paragraph at lines 1145--1148
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1163--1166
+Underfull \hbox (badness 10000) in paragraph at lines 1165--1168
 
  []
 
@@ -2497,177 +2424,113 @@ Underfull \hbox (badness 10000) in paragraph at lines 1163--1166
 File: include/images/ppu_modes.png Graphic file (type bmp)
 <include/images/ppu_modes.png>
 
-
-Package natbib Warning: Citation `goldensacra' on page 45 undefined on input line 1195.
-
-
-Package natbib Warning: Citation `goldensacra' on page 45 undefined on input line 1195.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1201--1208
+Underfull \hbox (badness 10000) in paragraph at lines 1203--1210
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1201--1208
+Underfull \hbox (badness 10000) in paragraph at lines 1203--1210
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1201--1208
+Underfull \hbox (badness 10000) in paragraph at lines 1203--1210
 
  []
 
 [45]
 File: include/images/colores_bits_tile.png Graphic file (type bmp)
 <include/images/colores_bits_tile.png>
-
-
-Package natbib Warning: Citation `newpandocs' on page 46 undefined on input line 1212.
-
-
-Package natbib Warning: Citation `newpandocs' on page 46 undefined on input line 1212.
-
+ [46]
 File: include/images/layers.png Graphic file (type bmp)
 <include/images/layers.png>
-
-Package natbib Warning: Citation `goldensacra' on page 46 undefined on input line 1223.
-
-
-Package natbib Warning: Citation `goldensacra' on page 46 undefined on input line 1223.
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [46]
 File: include/images/grid_bg.png Graphic file (type bmp)
 <include/images/grid_bg.png>
 
+Underfull \vbox (badness 1831) has occurred while \output is active []
 
-Package natbib Warning: Citation `gbedg' on page 47 undefined on input line 1234.
+ [47
 
-
-Package natbib Warning: Citation `gbedg' on page 47 undefined on input line 1234.
-
-
-Underfull \vbox (badness 1259) has occurred while \output is active []
-
- [47]
+]
 File: include/images/scrolling_diagram.png Graphic file (type bmp)
 <include/images/scrolling_diagram.png>
 
-
-Package natbib Warning: Citation `newpandocs' on page 48 undefined on input line 1245.
-
-
-Package natbib Warning: Citation `newpandocs' on page 48 undefined on input line 1245.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1251--1254
+Underfull \hbox (badness 10000) in paragraph at lines 1255--1258
 
  []
 
 File: include/images/grid_window.png Graphic file (type bmp)
 <include/images/grid_window.png>
 
-Package natbib Warning: Citation `gbedg' on page 48 undefined on input line 1258.
-
-
-Package natbib Warning: Citation `gbedg' on page 48 undefined on input line 1258.
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 5231) has occurred while \output is active []
 
  [48]
-Underfull \hbox (badness 10000) in paragraph at lines 1262--1267
+Underfull \hbox (badness 10000) in paragraph at lines 1266--1271
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1262--1267
+Underfull \hbox (badness 10000) in paragraph at lines 1266--1271
 
  []
 
 File: include/images/window_pokemon.png Graphic file (type bmp)
 <include/images/window_pokemon.png>
 
-Package natbib Warning: Citation `goldensacra' on page 49 undefined on input line 1271.
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-
-Package natbib Warning: Citation `goldensacra' on page 49 undefined on input line 1271.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1275--1278
+ [49]
+Underfull \hbox (badness 10000) in paragraph at lines 1281--1284
 
  []
 
-[49]
+[50
 
-LaTeX Warning: Hyper reference `mem:oam' on page 50 undefined on input line 1281.
-
-[50]
-Underfull \hbox (badness 10000) in paragraph at lines 1322--1325
+]
+Underfull \hbox (badness 10000) in paragraph at lines 1328--1331
 
  []
 
+[51]
 File: include/images/render_gb.png Graphic file (type bmp)
 <include/images/render_gb.png>
 
-Package natbib Warning: Citation `newpandocs' on page 51 undefined on input line 1334.
-
-
-Package natbib Warning: Citation `newpandocs' on page 51 undefined on input line 1334.
-
-[51]
-Underfull \hbox (badness 10000) in paragraph at lines 1339--1342
+Underfull \hbox (badness 10000) in paragraph at lines 1345--1348
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1344--1347
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1349--1352
+Underfull \hbox (badness 10000) in paragraph at lines 1350--1353
 
  []
 
 [52]
-
-LaTeX Warning: Hyper reference `lcd_control' on page 53 undefined on input line 1355.
-
-
-LaTeX Warning: Hyper reference `ppu:mode3' on page 53 undefined on input line 1372.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1370--1375
+Underfull \hbox (badness 10000) in paragraph at lines 1355--1358
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1370--1375
+Underfull \hbox (badness 10000) in paragraph at lines 1376--1381
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1376--1381
 
  []
 
 [53]
-Underfull \hbox (badness 10000) in paragraph at lines 1421--1424
+Underfull \hbox (badness 10000) in paragraph at lines 1427--1430
 
  []
 
 [54]
-Underfull \hbox (badness 10000) in paragraph at lines 1429--1432
+Underfull \hbox (badness 10000) in paragraph at lines 1435--1438
 
  []
 
 File: include/images/fifo_mixer.png Graphic file (type bmp)
 <include/images/fifo_mixer.png>
-
-Package natbib Warning: Citation `gbedg' on page 55 undefined on input line 1440.
-
-
-Package natbib Warning: Citation `gbedg' on page 55 undefined on input line 1440.
-
 [55] [56
 
 
@@ -2907,10 +2770,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 198--205
  []
 
 [78]
-
-LaTeX Warning: Reference `instrLd' on page 79 undefined on input line 244.
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 240--245
 
  []
@@ -2934,7 +2793,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 301--304
  []
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 3240) has occurred while \output is active []
 
  [80]
 Underfull \hbox (badness 10000) in paragraph at lines 322--325
@@ -3041,10 +2900,6 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [101] [102] [103]
-
-LaTeX Warning: Hyper reference `history_mbcs' on page 104 undefined on input line 1306.
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 1306--1311
 
  []
@@ -3064,11 +2919,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 1456--1461
 
  []
 
-[107] [108]
-
-LaTeX Warning: Hyper reference `history_timer' on page 109 undefined on input line 1506.
-
-[109]
+[107] [108] [109]
 Underfull \hbox (badness 10000) in paragraph at lines 1539--1544
 
  []
@@ -3079,25 +2930,14 @@ Underfull \hbox (badness 10000) in paragraph at lines 1539--1544
  []
 
 [110]
-
-LaTeX Warning: Hyper reference `history_mbcs' on page 111 undefined on input line 1581.
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 1581--1584
 
  []
 
 [111]
-
-LaTeX Warning: Hyper reference `rom:read_write' on page 112 undefined on input line 1637.
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 1635--1638
 
  []
-
-
-LaTeX Warning: Hyper reference `dma' on page 112 undefined on input line 1641.
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 1641--1644
@@ -3146,9 +2986,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 1928--1931
  []
 
 
-Package natbib Warning: Citation `lld' on page 120 undefined on input line 1936.
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 1934--1939
 
  []
@@ -3192,10 +3029,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 2044--2049
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [123]
-
-LaTeX Warning: Hyper reference `mem:oam' on page 124 undefined on input line 2076.
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 2072--2077
 
  []
@@ -3260,13 +3093,6 @@ Underfull \vbox (badness 3240) has occurred while \output is active []
 File: include/images/render_surface_view.png Graphic file (type bmp)
 <include/images/render_surface_view.png>
  [131]
-
-LaTeX Warning: Hyper reference `handleLCDC' on page 132 undefined on input line 2385.
-
-
-LaTeX Warning: Hyper reference `writeToTimer' on page 132 undefined on input line 2386.
-
-
 Underfull \hbox (badness 10000) in paragraph at lines 2397--2404
 
  []
@@ -3296,10 +3122,6 @@ Underfull \vbox (badness 2932) has occurred while \output is active []
  [134]
 File: include/images/transition_title.png Graphic file (type bmp)
 <include/images/transition_title.png>
-
-
-LaTeX Warning: Hyper reference `figure:mockupmenu' on page 135 undefined on input line 2508.
-
 
 Underfull \hbox (badness 10000) in paragraph at lines 2506--2509
 
@@ -3450,43 +3272,25 @@ Underfull \hbox (badness 10000) in paragraph at lines 14--26
 
 
 
-])
-
-Package natbib Warning: There were undefined citations.
-
-[150] (./main.aux
-
-Package natbib Warning: Citation(s) may have changed.
-(natbib)                Rerun to get citations correct.
-
-)
+]) [150] (./main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2020/03/25>
  ***********
 
 
-LaTeX Warning: There were undefined references.
+LaTeX Warning: There were multiply-defined labels.
 
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
-
-Package rerunfilecheck Warning: File `main.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `main.out':
-(rerunfilecheck)             Before: <no file>
-(rerunfilecheck)             After:  D41D8CD98F00B204E9800998ECF8427E;0.
+Package rerunfilecheck Info: File `main.out' has not changed.
+(rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 49569 strings out of 474878
- 1060167 string characters out of 5762516
+ 49600 strings out of 474878
+ 1060737 string characters out of 5762516
  2688627 words of memory out of 5000000
- 70686 multiletter control sequences out of 15000+600000
+ 70705 multiletter control sequences out of 15000+600000
  563777 words of font info for 98 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  113i,21n,134p,11019b,2135s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on main.pdf (172 pages).
+Output written on main.pdf (176 pages).

@@ -91,7 +91,7 @@ Cuando pensamos en programar un emulador que simule una máquina en concreto lo 
 
 \subsection{Mapa de Memoria}
 
-La Game Boy dispone de 64 Kb de memoria y utiliza direcciones de memoria de 16 bits, lo que le da la posibilidad de utilizar el rango de 0x0000 hasta 0xFFFF (65.535 bytes en total). Además, esta memoria se organiza en diferentes áreas para que el procesador pueda acceder a recursos clave como el código del juego, la memoria de video, la RAM y los registros de control. Cada una de estas áreas tiene una función específica, y algunas de ellas están sujetas a restricciones o condiciones de acceso durante la ejecución del sistema.
+La Game Boy dispone de \textbf{64 Kb de memoria y utiliza direcciones de memoria de 16 bits}, lo que le da la posibilidad de \textbf{utilizar el rango de 0x0000 hasta 0xFFFF} (65.535 bytes en total). Además, esta memoria se organiza en diferentes áreas para que el procesador pueda acceder a recursos clave como el código del juego, la memoria de video, la RAM y los registros de control. Cada una de estas áreas tiene una función específica, y algunas de ellas están sujetas a restricciones o condiciones de acceso durante la ejecución del sistema.
 
 \begin{table}[h]
 \centering
@@ -115,10 +115,10 @@ FFFF & FFFF & Registro de habilitación de interrupciones (IE) \\ \hline
 \end{table}
 
 \subsubsection{ROM: [0x0000 - 0x7FFF]}
-En las primeras direcciones del mapa de memoria (0x0000–0x7FFF) se encuentran los bancos de memoria ROM, que almacenan el código del juego cargado desde el cartucho. La sección entre 0x0000 y 0x3FFF es el banco fijo de 16 KiB que se carga automáticamente al encender la consola. Por último, la sección entre 0x4000 y 0x7FFF corresponde a bancos de ROM adicionales que pueden ser intercambiados (si el tipo de cartucho lo permite) para ofrecer acceso a más de 32 KiB de memoria.
+En las primeras direcciones del mapa de memoria (0x0000–0x7FFF) se encuentran los bancos de memoria ROM, que \textbf{almacenan el código del juego cargado desde el cartucho}. La \textbf{sección entre 0x0000 y 0x3FFF} es el \textbf{banco fijo de 16 KiB} que se carga automáticamente al encender la consola. Por último, la \textbf{sección entre 0x4000 y 0x7FFF} corresponde a \textbf{bancos de ROM adicionales} que pueden ser intercambiados (si el tipo de cartucho lo permite) para ofrecer \textbf{acceso a más de 32 KiB de memoria}.
 
 \subsubsection{VRAM: [0x8000 - 0x9FFF]}\label{mem:vram}
-La VRAM es una memoria de 8 KiB que se utiliza para almacenar datos gráficos, como los sprites y tiles que se dibujan en pantalla. En los modelos CGB, esta sección de la memoria tiene dos bancos, con la posibilidad de intercambiarlos entre ellos y almacenar gráficos adicionales.
+La VRAM es una \textbf{memoria de 8 KiB} que se utiliza para \textbf{almacenar datos gráficos}, como los sprites y tiles que se dibujan en pantalla. En los \textbf{modelos CGB}, esta sección de la memoria tiene \textbf{dos bancos}, con la \textbf{posibilidad de intercambiarlos} entre ellos y almacenar gráficos adicionales.
 \clearpage
 Se divide en tres secciones:
 \begin{itemize}
@@ -135,15 +135,15 @@ Se divide en tres secciones:
 \end{figure}
 
 \subsubsection{RAM Externa: [0xA000 - 0xBFFF]}
-Algunos cartuchos incluyen RAM adicional que se usa principalmente para guardar datos o estados del juego, como partidas guardadas. Esta RAM externa, que varía en tamaño según el cartucho, se puede acceder a través de esta región de memoria.
+\textbf{Algunos cartuchos incluyen RAM adicional} que se usa principalmente para guardar datos o estados del juego, como partidas guardadas. Esta RAM externa, que varía en tamaño según el cartucho, se puede acceder a través de esta región de memoria.
 
 \clearpage
 
 \subsubsection{Work RAM: [0xC000 - 0xDFFF]}
-La WRAM es un área de memoria utilizada por el sistema para almacenar variables temporales, datos en proceso, y otra información necesaria para la ejecución de los programas. Está dividida en dos secciones de 4 KiB cada una. En los modelos CGB, la segunda parte (0xD000–0xDFFF) también puede ser conmutada entre diferentes bancos para aumentar la capacidad de almacenamiento.
+La WRAM es un área de memoria utilizada por el sistema para \textbf{almacenar variables temporales, datos en proceso, y otra información necesaria} para la ejecución de los programas. Está dividida en \textbf{dos secciones de 4 KiB} cada una. En los \textbf{modelos CGB}, la \textbf{segunda parte} (0xD000–0xDFFF) también \textbf{puede ser conmutada entre diferentes bancos} para aumentar la capacidad de almacenamiento.
 
 \subsubsection{Echo RAM: [0xE000 - 0xFDFF]}
-Esta es una copia exacta de la WRAM en las direcciones 0xC000–0xDDFF. Aunque se puede acceder a ella de la misma forma que la RAM original, Nintendo prohíbe su uso, ya que podría causar errores de sincronización o conflictos de acceso.
+Esta es una \textbf{copia exacta de la WRAM en las direcciones 0xC000–0xDDFF}. Aunque se puede acceder a ella de la misma forma que la RAM original, \textbf{Nintendo prohíbe su uso}, ya que podría causar errores de sincronización o conflictos de acceso.
 
 \subsubsection{OAM: [0xFE00 - 0xFE9F]}\label{mem:oam}
 La OAM es un pequeño bloque de memoria dedicado a almacenar información sobre los sprites que aparecen en pantalla, como su posición, prioridad y patrones de color. Puede contener hasta un total de 40 sprites, cada uno de 8x8 u 8x16 píxeles. Sin embargo, por limitaciones de hardware, solamente se pueden mostrar 10 sprites por scanline. Además, existe una limitación adicional por la que solamente se pueden evaluar hasta 3 sprites superpuestos en un mismo punto.
@@ -169,8 +169,8 @@ A continuación se describen los datos de forma más específica:
         \label{figure:y_positions}
     \end{figure}
 
-    \item \textbf{Byte 1 - Posición X}, el cual tiene un offset de 8 píxeles.
-    \item \textbf{Byte 2 - Índice de tile}. En el modo 8x8, este byte especifica un índice único de tile, dentro del rango [0x00-0xFF]. La consola selecciona internamente el tile en la VRAM, dentro de la región de memoria \hyperref[mem:vram_1]{0x8000 - 0x97FF}. En el modo 8x16, este índice corresponde al tile superior del objeto, y la consola utiliza el tile contiguo en memoria para el tile inferior, ajustando automáticamente la referencia en memoria. En modo CGB el índice se puede referir a los bancos 0 o 1 de VRAM, dependiendo del bit 3 del byte 3.
+    \item \textbf{Byte 1 - Posición X}, el cual tiene un \textbf{offset de 8 píxeles}.
+    \item \textbf{Byte 2 - Índice de tile}. En el \textbf{modo 8x8}, este byte especifica un \textbf{índice único de tile}, dentro del rango [0x00-0xFF]. La consola selecciona internamente el tile en la VRAM, dentro de la región de memoria \hyperref[mem:vram_1]{0x8000 - 0x97FF}. En el \textbf{modo 8x16}, este índice corresponde al \textbf{tile superior del objeto}, y la consola utiliza el tile contiguo en memoria para el tile inferior, ajustando automáticamente la referencia en memoria. En \textbf{modo CGB} el índice se puede referir a los \textbf{bancos 0 o 1 de VRAM}, dependiendo del bit 3 del byte 3.
     \item \textbf{Byte 3 - Atributos}. Aplican ciertos efectos o ajustes al sprite:
         \begin{itemize}
             \item \textbf{Bit 7:} Control de la prioridad del sprite. Si su valor es 1, los tiles de Background y Window cuyos índices de color vayan del 1 al 3 se renderizarán por encima del objeto.
@@ -184,40 +184,40 @@ A continuación se describen los datos de forma más específica:
 \end{itemize}
 
 \label{dma}
-\paragraph{DMA - 0xFF46:} Mecanismo que permite la transferencia eficiente de datos desde la memoria ROM o RAM hacia la memoria OAM sin la intervención directa de la CPU. En lugar de copiar los datos byte a byte mediante instrucciones de la CPU, un controlador dedicado se encarga de mover grandes bloques de datos de manera optimizada.
+\paragraph{DMA - 0xFF46:} \textbf{Mecanismo} que permite la \textbf{transferencia eficiente de datos desde la memoria ROM o RAM} hacia la memoria OAM sin la intervención directa de la CPU. En lugar de copiar los datos byte a byte mediante instrucciones de la CPU, un controlador dedicado se encarga de mover grandes bloques de datos de manera optimizada.
 \\\\
-Para iniciar una transferencia DMA, se debe escribir cualquier valor en el registro 0xFF46. El valor insertado se interpretará como la parte alta de la dirección de origen y se multiplicará por 0x100. Por ejemplo, si se escribe 0x80, la transferencia comenzará desde 0x8000, mientras que si se introduce 0xC2, se iniciará desde 0xC200.
+Para \textbf{iniciar una transferencia DMA}, se debe \textbf{escribir cualquier valor en el registro 0xFF46}. El valor insertado se interpretará como la parte alta de la dirección de origen y se multiplicará por 0x100. Por ejemplo, si se escribe 0x80, la transferencia comenzará desde 0x8000, mientras que si se introduce 0xC2, se iniciará desde 0xC200.
 \\\\
 Este proceso copia un total de \textbf{160 bytes} y requiere \textbf{160 ciclos de máquina}. En el modo \textit{CGB Double Speed}, este tiempo se reduce a la mitad. Durante la transferencia, la \textbf{CPU queda inactiva y no puede ejecutar código alojado en ROM}, ya que solo mantiene acceso a la \textbf{HRAM} (0xFF80 - 0xFFFE).
 
 
 \subsubsection{No utilizable: [0xFEA0 - 0xFEFF]}
-Esta pequeña área de memoria no se utiliza y está reservada. Cualquier intento de leer o escribir en esta región puede provocar comportamientos inesperados en el sistema.
+Esta pequeña área de memoria \textbf{no se utiliza y está reservada}. Cualquier intento de leer o escribir en esta región puede provocar \textbf{comportamientos inesperados} en el sistema.
 \\\\
 Si se intenta acceder a la región, devolverá un valor 0xFF cuando el OAM está bloqueado, y de lo contrario, dependerá de la revisión del hardware:
 
 \begin{itemize}
-    \item En DMG, MGB, SGB y SGB2, las lecturas durante el bloqueo de OAM provocan corrupción de OAM. De otra forma devolverán 0x00.
-    \item En la revisión E de CGB, y los modelos AGB, AGS y GBP, devuelve el nibble alto del byte de la dirección inferior dos veces; por ejemplo, 0xFFA0 devuelve 0xAA, 0xFFB1 devuelve 0xBB, y así sucesivamente.
-    \item En el resto de revisiones de CGB (0-D), la región es una sección de RAM única, pero enmascarada con un valor específico.
+    \item En \textbf{DMG, MGB, SGB y SGB2}, las lecturas durante el bloqueo de OAM provocan \textbf{corrupción de OAM}. De otra forma devolverán 0x00.
+    \item En la \textbf{revisión E de CGB, y los modelos AGB, AGS y GBP}, devuelve el \textbf{nibble alto del byte de la dirección inferior dos veces}; por ejemplo, 0xFFA0 devuelve 0xAA, 0xFFB1 devuelve 0xBB, y así sucesivamente.
+    \item En el \textbf{resto de revisiones de CGB} (0-D), la región es una \textbf{sección de RAM única}, pero enmascarada con un valor específico.
 \end{itemize}
 
 \subsubsection{I/O: [0xFEA0 - 0xFEFF]}
-Estos registros se utilizan para controlar diferentes aspectos del hardware de la Game Boy, como la pantalla, los botones de entrada, el sonido y otros componentes del sistema. Acceder a estos registros permite al software interactuar directamente con el hardware.
+Estos registros se utilizan para \textbf{controlar diferentes aspectos del hardware} de la Game Boy, como la pantalla, los botones de entrada, el sonido y otros componentes del sistema. Acceder a estos registros permite al software interactuar directamente con el hardware.
 
 \subsubsection{HRAM: [0xFF80 - 0xFFFE]}
-La HRAM es un pequeño bloque de memoria de alta velocidad que contiene datos críticos que el procesador necesita acceder de manera rápida y frecuente.
+La HRAM es un pequeño bloque de memoria de alta velocidad que \textbf{contiene datos críticos} que el procesador necesita acceder de manera rápida y frecuente.
 
 \subsubsection{IE: 0xFFFF}
-Registro de habilitación de interrupciones (Interrupt Enable), que permite activar o desactivar interrupciones específicas del sistema, cruciales para el manejo de eventos como temporizadores o actualizaciones gráficas.
+Registro de habilitación de interrupciones (Interrupt Enable), que \textbf{permite activar o desactivar interrupciones específicas} del sistema, cruciales para el manejo de eventos como temporizadores o actualizaciones gráficas.
 
 \section{CPU}
 
-También conocida como la Unidad Central de Procesamiento, que constituye el núcleo principal del sistema. Es la encargada de ejecutar los opcodes, que definen el comportamiento del software en la consola original.
+También conocida como la Unidad Central de Procesamiento, que constituye el \textbf{núcleo principal del sistema}. Es la encargada de ejecutar los opcodes, que definen el comportamiento del software en la consola original.
 
 \subsection{Diferencias}
 
-LA Game Boy cuenta con un procesador único conocido como Sharp LR35902 y, como viene indicado en su nombre, fue desarrollado por la empresa Sharp Corporation. Esta CPU era una mezcla entre la conocida Zilog Z80 y el Intel 8080, a la cual se añadieron y eliminaron distintas instrucciones. Una diferencia importante, es que la Sharp no tiene instrucciones propias de I/O, a diferencia de las otras dos. En este caso, se puede acceder a los puertos de entrada/salida mediante comandos simples de carga (LD).
+La \textbf{Game Boy} cuenta con un \textbf{procesador único} conocido como \textbf{Sharp LR35902} y, como viene indicado en su nombre, fue desarrollado por la empresa Sharp Corporation. Esta CPU era una mezcla entre la conocida Zilog Z80 y el Intel 8080, a la cual se añadieron y eliminaron distintas instrucciones. Una diferencia importante, es que la \textbf{Sharp no tiene instrucciones propias de I/O}, a diferencia de las otras dos. En este caso, se puede acceder a los puertos de entrada/salida mediante comandos simples de carga (LD).
 
 \begin{table}[H]
     \centering
@@ -261,13 +261,13 @@ Los opcodes que se indican con un "-" significan que han sido eliminados. Si int
 
 \subsection{Registros}
 
-Un registro es una pequeña unidad de almacenamiento en un procesador utilizada para guardar temporalmente datos o instrucciones durante la ejecución de operaciones. Los registros que se emplean son: A, F, B, C, D, E, H y L, cada uno capaz de almacenar 1 byte de información. Estos registros también pueden agruparse en pares para manejar 2 bytes: AF, BC, DE y HL. Adicionalmente, los registros SP (Stack Pointer) y PC (Program Counter) desempeñan funciones específicas dentro de la CPU.
+Un \textbf{registro} es una \textbf{pequeña unidad de almacenamiento} en un procesador utilizada para \textbf{guardar temporalmente datos o instrucciones} durante la ejecución de operaciones. Los registros que se emplean son: \textbf{A, F, B, C, D, E, H y L}, cada uno capaz de almacenar \textbf{1 byte} de información. Estos registros también pueden agruparse en pares para manejar 2 bytes: AF, BC, DE y HL. Adicionalmente, los registros SP (Stack Pointer) y PC (Program Counter) desempeñan funciones específicas dentro de la CPU.
 \\\\
-El primer registro a destacar es el registro A, conocido como el Acumulador, donde se almacena la mayoría de los datos procesados por la CPU. Es un registro al que se le pueden asignar valores de forma directa, al igual que ocurre con los registros B, C, D, E, H y L.
+El primer registro a destacar es el \textbf{registro A}, conocido como el \textbf{\textit{Acumulador}}, donde se \textbf{almacena la mayoría de los datos} procesados por la CPU. Es un registro al que se le pueden asignar valores de forma directa, al igual que ocurre con los registros B, C, D, E, H y L.
 \\\\
-Los registros B y C son comúnmente utilizados como contadores, mientras que los registros D y E se suelen emplear en pares para almacenar direcciones de memoria, facilitando operaciones de copia de datos. Sin embargo, el uso de estos registros no está limitado a estos propósitos; su aplicación depende de las necesidades y la conveniencia del programador.
+Los \textbf{registros B y C} son comúnmente utilizados como \textbf{contadores}, mientras que los \textbf{registros D y E} se suelen emplear en \textbf{pares} para \textbf{almacenar direcciones de memoria}, facilitando operaciones de copia de datos. Sin embargo, el uso de estos registros no está limitado a estos propósitos; su aplicación depende de las necesidades y la conveniencia del programador.
 \\\\
-El registro F o Flags es responsable de almacenar el estado actual del procesador, y es de solo lectura. Aunque no se puede modificar directamente, su combinación con el registro A es clave para realizar diversas operaciones. Su principal utilidad radica en la evaluación de los resultados de la instrucción anterior, siendo esencial para la toma de decisiones en la ejecución del programa.
+El \textbf{registro F} o Flags es responsable de almacenar el \textbf{estado actual del procesador}, y es de \textbf{solo lectura}. Aunque no se puede modificar directamente, su combinación con el registro A es clave para realizar diversas operaciones. Su \textbf{principal utilidad} radica en la \textbf{evaluación} de los \textbf{resultados de la instrucción anterior}, siendo esencial para la toma de decisiones en la ejecución del programa.
 \\\\
 En la siguiente tabla podemos ver el desglose del valor atribuido a cada bit del registro F:
 
@@ -293,81 +293,81 @@ En la siguiente tabla podemos ver el desglose del valor atribuido a cada bit del
 
 \clearpage
 
-Por su parte, los registros H y L se utilizan para el acceso indirecto a una dirección de memoria. Este acceso indirecto se refiere al valor de 16 bits contenido en la pareja de registros HL, y resulta especialmente útil para recorrer arrays o acceder secuencialmente a posiciones de memoria.
+Por su parte, los \textbf{registros H y L} se utilizan para el \textbf{acceso indirecto a una dirección de memoria}. Este acceso indirecto se refiere al valor de 16 bits contenido en la pareja de registros HL, y resulta especialmente \textbf{útil para recorrer arrays o acceder secuencialmente a posiciones de memoria}.
 \\\\
-El registro SP (Stack Pointer) señala la posición de memoria que se utiliza durante las llamadas a subrutinas. Al ejecutar una instrucción call, la pila aumenta, y al realizar un ret, la pila disminuye, permitiendo mantener el control del flujo de ejecución.
+El \textbf{registro SP} (Stack Pointer) \textbf{señala la posición de memoria que se utiliza durante las llamadas a subrutinas} Al ejecutar una instrucción call, la pila aumenta, y al realizar un ret, la pila disminuye, permitiendo mantener el control del flujo de ejecución.
 \\\\
-Finalmente, el registro PC (Program Counter) indica la dirección de memoria donde se encuentra la próxima instrucción que será ejecutada por la CPU, siendo esencial para el flujo de control del programa.
+Finalmente, el \textbf{registro PC} (Program Counter) indica la \textbf{dirección de memoria donde se encuentra la próxima instrucción} que será ejecutada por la CPU, siendo esencial para el flujo de control del programa.
 
 \subsection{Opcodes}
 
-Los opcodes (códigos de operación) son las instrucciones que un procesador entiende y ejecuta directamente. Representan la parte de una instrucción de máquina que especifica la operación a realizar, como cargar datos en un registro, realizar una operación matemática o mover datos entre la memoria y el procesador. Cada opcode tiene un formato específico y puede estar compuesto por varios bytes que definen tanto la operación como los operandos involucrados.
+Los opcodes (códigos de operación) son las \textbf{instrucciones que un procesador entiende y ejecuta} directamente. Representan la parte de una instrucción de máquina que especifica la operación a realizar, como cargar datos en un registro, realizar una operación matemática o mover datos entre la memoria y el procesador. Cada opcode tiene un \textbf{formato específico} y puede estar compuesto por varios bytes que definen tanto la operación como los operandos involucrados.
 
 \subsubsection{Categorías}
 
-En total, existen 510 instrucciones diferentes, las cuales pueden ser agrupadas en las siguientes categorías:
+En total, \textbf{existen 510 instrucciones} diferentes, las cuales pueden ser agrupadas en las siguientes categorías:
 \begin{itemize}
   \item \textbf{Operaciones de carga (LD)}
   \begin{itemize}
-  \item LD A, (HL): Carga el valor de la dirección de memoria en el registro A.
-  \item LD (HL), B: Carga el valor del registro B en la memoria apuntada por HL.
+  \item \textbf{LD A, (HL)}: Carga el valor de la dirección de memoria en el registro A.
+  \item \textbf{LD (HL), B}: Carga el valor del registro B en la memoria apuntada por HL.
   \end{itemize}
   \item \textbf{Operaciones aritméticas y lógicas}
   \begin{itemize}
-  \item ADD A, B: Suma el contenido de B al registro A.
-  \item AND A: Realiza una operación lógica AND en el registro A.
-  \item SUB A, B: Resta el valor de B del registro A.
-  \item XOR A: Realiza una operación XOR entre el registro A consigo mismo, lo que siempre da como resultado 0. Este comando se utiliza para limpiar o reiniciar el registro A.
-  \item OR A: Realiza una operación OR del registro A consigo mismo, dejando el valor de A sin cambios. No afecta el valor, pero puede modificar los flags.
-  \item CP A: Compara el valor del registro A con el valor de otro registro o inmediato, estableciendo los flags según el resultado de la comparación. La operación es similar a una resta (A - valor) y no modifica el contenido de A.
-  \item CPL: Complementa el valor del registro A, invirtiendo todos sus bits. Esta operación afecta el flag de medio acarreo (H) y establece el flag de negativo (N).
-  \item CCF: Cambia el estado del flag de acarreo (C). Si el flag de acarreo está establecido, se limpia; si está limpio, se establece. Esta operación no afecta a los demás flags.
-  \item DAA: Ajusta el contenido del registro A para que represente un valor decimal válido, teniendo en cuenta el estado de los flags de acarreo (C) y medio acarreo (H). Esta operación es útil después de realizar operaciones aritméticas en el modo BCD.
-  \item SCF: Establece el flag de acarreo (C) y limpia el flag de acarreo (H). Esta operación no afecta a los demás flags y es útil para preparar operaciones que requieren un estado de acarreo conocido.
+  \item \textbf{ADD A, B}: Suma el contenido de B al registro A.
+  \item \textbf{AND A}: Realiza una operación lógica AND en el registro A.
+  \item \textbf{SUB A, B}: Resta el valor de B del registro A.
+  \item \textbf{XOR A}: Realiza una operación XOR entre el registro A consigo mismo, lo que siempre da como resultado 0. Este comando se utiliza para limpiar o reiniciar el registro A.
+  \item \textbf{OR A}: Realiza una operación OR del registro A consigo mismo, dejando el valor de A sin cambios. No afecta el valor, pero puede modificar los flags.
+  \item \textbf{CP A}: Compara el valor del registro A con el valor de otro registro o inmediato, estableciendo los flags según el resultado de la comparación. La operación es similar a una resta (A - valor) y no modifica el contenido de A.
+  \item \textbf{CPL}: Complementa el valor del registro A, invirtiendo todos sus bits. Esta operación afecta el flag de medio acarreo (H) y establece el flag de negativo (N).
+  \item \textbf{CCF}: Cambia el estado del flag de acarreo (C). Si el flag de acarreo está establecido, se limpia; si está limpio, se establece. Esta operación no afecta a los demás flags.
+  \item \textbf{DAA}: Ajusta el contenido del registro A para que represente un valor decimal válido, teniendo en cuenta el estado de los flags de acarreo (C) y medio acarreo (H). Esta operación es útil después de realizar operaciones aritméticas en el modo BCD.
+  \item \textbf{SCF}: Establece el flag de acarreo (C) y limpia el flag de acarreo (H). Esta operación no afecta a los demás flags y es útil para preparar operaciones que requieren un estado de acarreo conocido.
   \end{itemize}
   \item \textbf{Operaciones de control de flujo}
   \begin{itemize}
-  \item JP nn: Salta a la dirección de memoria nn.
-  \item CALL nn: Llama a una subrutina en la dirección nn.
-  \item RET: Retorna de una subrutina.
+  \item \textbf{JP nn}: Salta a la dirección de memoria nn.
+  \item \textbf{CALL nn}: Llama a una subrutina en la dirección nn.
+  \item \textbf{RET}: Retorna de una subrutina.
   \end{itemize}
   \item \textbf{Operaciones de rotación y desplazamiento}
   \begin{itemize}
-  \item RL A: Rota los bits del registro A hacia la izquierda a través del carry.
-  \item SLA B: Desplaza los bits de B hacia la izquierda.
-  \item RR A: Rota los bits del registro A hacia la derecha a través del carry, trasladando el bit menos significativo al carry y el carry al bit más significativo.
-  \item RLC A: Rota los bits del registro A hacia la izquierda, desplazando el bit más significativo al carry y reiniciando el bit más significativo con el valor original del carry.
-  \item RRC A: Rota los bits del registro A hacia la derecha, moviendo el bit menos significativo al carry y llenando el bit más significativo con el valor del carry.
-  \item SRA B: Desplaza los bits de B hacia la derecha, manteniendo el bit más significativo (signo) constante y colocando el bit menos significativo en el carry.
-  \item SWAP B: Intercambia los cuatro bits más significativos con los cuatro menos significativos del registro B.
-  \item SRL B: Desplaza los bits de B hacia la derecha, moviendo el bit menos significativo al carry y rellenando el bit más significativo con 0.
+  \item \textbf{RL A}: Rota los bits del registro A hacia la izquierda a través del carry.
+  \item \textbf{SLA B}: Desplaza los bits de B hacia la izquierda.
+  \item \textbf{RR A}: Rota los bits del registro A hacia la derecha a través del carry, trasladando el bit menos significativo al carry y el carry al bit más significativo.
+  \item \textbf{RLC A}: Rota los bits del registro A hacia la izquierda, desplazando el bit más significativo al carry y reiniciando el bit más significativo con el valor original del carry.
+  \item \textbf{RRC A}: Rota los bits del registro A hacia la derecha, moviendo el bit menos significativo al carry y llenando el bit más significativo con el valor del carry.
+  \item \textbf{SRA B}: Desplaza los bits de B hacia la derecha, manteniendo el bit más significativo (signo) constante y colocando el bit menos significativo en el carry.
+  \item \textbf{SWAP B}: Intercambia los cuatro bits más significativos con los cuatro menos significativos del registro B.
+  \item \textbf{SRL B}: Desplaza los bits de B hacia la derecha, moviendo el bit menos significativo al carry y rellenando el bit más significativo con 0.
   \end{itemize}
   \item \textbf{Operaciones de manipulación de bits}
   \begin{itemize}
-  \item BIT 0, A: Prueba si el bit 0 de A está establecido.
-  \item SET 1, (HL): Establece el bit 1 en la dirección de memoria HL.
-  \item RES 0, A: Reinicia (pone a 0) el LSB del registro A, dejando los demás bits sin cambios.
+  \item \textbf{BIT 0, A}: Prueba si el bit 0 de A está establecido.
+  \item \textbf{SET 1, (HL)}: Establece el bit 1 en la dirección de memoria HL.
+  \item \textbf{RES 0, A}: Reinicia (pone a 0) el LSB del registro A, dejando los demás bits sin cambios.
   \end{itemize}
   \item \textbf{Operaciones especiales de sistema}
   \begin{itemize}
-  \item NOP: No realiza ninguna operación.
-  \item DI: Deshabilita interrupciones.
-  \item EI: Habilita interrupciones.
+  \item \textbf{NOP}: No realiza ninguna operación.
+  \item \textbf{DI}: Deshabilita interrupciones.
+  \item \textbf{EI}: Habilita interrupciones.
   \end{itemize}
   \item \textbf{Operaciones con pila}
   \begin{itemize}
-  \item PUSH BC: Empuja el contenido del registro BC en la pila.
-  \item POP AF: Restaura el contenido de AF desde la pila.
+  \item \textbf{PUSH BC}: Empuja el contenido del registro BC en la pila.
+  \item \textbf{POP AF}: Restaura el contenido de AF desde la pila.
   \end{itemize}
   \item \textbf{Operaciones I/O}
   \begin{itemize}
-  \item LD (FF00+n), A: Carga el valor de A en la dirección de I/O FF00+n.
-  \item LD A, (FF00+C): Carga el valor de la dirección FF00+C en A.
+  \item \textbf{LD (FF00+n), A}: Carga el valor de A en la dirección de I/O FF00+n.
+  \item \textbf{LD A, (FF00+C)}: Carga el valor de la dirección FF00+C en A.
   \end{itemize}
 \end{itemize}
 
 \subsubsection{Listado}
-Para poder empezar a implementar todos los opcodes, debemos hacer uso de la documentación (oficial o no) que nos indique qué Byte hace referencia a qué opcode. Las siguientes tablas suelen ser de gran ayuda para verlo de forma clara y concisa:
+Para poder empezar a \textbf{implementar todos los opcodes}, debemos hacer uso de la \textbf{documentación} (oficial o no) que nos \textbf{indique qué Byte hace referencia a qué opcode}. Las siguientes tablas suelen ser de gran ayuda para verlo de forma clara y concisa:
 
 \begin{figure}[H]
 \centering
@@ -394,26 +394,26 @@ Con estas tablas obtenemos las siguientes características de cada instrucción:
 
 \subsection{Ciclos}
 
-Los ciclos de CPU son unidades de tiempo en las que se realizan instrucciones. Son utilizadas para saber con exactitud cuánto tiempo dura la ejecución de una instrucción concreta en el hardware original. Hay dos conceptos distintos en este contexto: ciclos de máquina y ciclos de reloj.
+Los ciclos de CPU son \textbf{unidades de tiempo en las que se realizan instrucciones}. Son utilizadas para saber con exactitud cuánto tiempo dura la ejecución de una instrucción concreta en el hardware original. Hay \textbf{dos conceptos distintos} en este contexto: \textbf{ciclos de máquina} y \textbf{ciclos de reloj}.
 \\\\
-Cada componente, como la CPU, la memoria, el PPU y el APU, opera en función de los ciclos de reloj. La coordinación precisa entre estos módulos asegura que las instrucciones se ejecuten en el momento adecuado y que los datos se transfieran de manera eficiente.
+\textbf{Cada componente}, como la CPU, la memoria, el PPU y el APU, \textbf{opera en función de los ciclos de reloj}. La coordinación precisa entre estos módulos asegura que las instrucciones se ejecuten en el momento adecuado y que los datos se transfieran de manera eficiente.
 \\\\
 Por ejemplo, el procesador necesita esperar que el PPU complete la renderización de un cuadro antes de actualizar la pantalla, lo que implica un control cuidadoso del tiempo. Si un módulo se desincroniza, puede resultar en fallos gráficos, sonido entrecortado o un rendimiento general deficiente. Por lo tanto, la medición de ciclos de reloj permite establecer un ritmo de operación coherente, asegurando que todos los componentes funcionen armónicamente, lo que es fundamental para la experiencia de juego fluida y efectiva que caracteriza a la Game Boy.
 \\\\
-Para la Game Boy, 1 ciclo de máquina equivale a 4 ciclos de reloj.
+Para la Game Boy, \textbf{1 ciclo de máquina equivale a 4 ciclos de reloj}.
 
 \subsubsection{Ciclos de Máquina}
-Los ciclos de máquina se refieren a la cantidad de ciclos de CPU necesarios para ejecutar una instrucción específica. Cada instrucción puede requerir un número diferente de ciclos de máquina, dependiendo de su complejidad.
+Los ciclos de máquina se refieren a la \textbf{cantidad de ciclos de CPU necesarios para ejecutar una instrucción específica}. Cada instrucción puede requerir un número diferente de ciclos de máquina, dependiendo de su complejidad.
 
 \subsubsection{Ciclos de Reloj}
-Los ciclos de reloj, por otro lado, son las unidades de tiempo que marcan el ritmo del funcionamiento del procesador. Cada ciclo de reloj representa un pulso generado por un oscilador interno en el procesador, que sincroniza las operaciones del mismo. La frecuencia del reloj, medida en hertzios (Hz), determina cuántos ciclos de reloj se producen por segundo.
+Los ciclos de reloj, por otro lado, son las \textbf{unidades de tiempo} que \textbf{marcan el ritmo} del funcionamiento del procesador. \textbf{Cada ciclo} de reloj representa un \textbf{pulso generado por un oscilador interno} en el procesador, que sincroniza las operaciones del mismo. La frecuencia del reloj, medida en hertzios (Hz), determina cuántos ciclos de reloj se producen por segundo.
 
 \section{ROM}
 \subsection{Secuencia de Arranque}
 
-Existe una secuencia de arranque, conocido como \textbf{Boot ROM}, guardado dentro de la propia CPU. Esta secuencia de arranque comienza su ejecución en la dirección de memoria 0x000, y no en la oficial de 0x100. Este programa es responsable de la animación de arranque que se reproduce antes de que el control sea transferido a la ROM del cartucho, además de inicializar distintos registros y direcciones de memoria.
+Existe una secuencia de arranque, conocido como \textbf{Boot ROM}, guardado dentro de la propia CPU. Esta secuencia de arranque \textbf{comienza su ejecución en la dirección de memoria 0x000}, y no en la oficial de 0x100. Este programa es responsable de la \textbf{animación de arranque} que se reproduce antes de que el control sea transferido a la ROM del cartucho, además de inicializar distintos registros y direcciones de memoria.
 \\\\
-Existen en total 9 programas de boot (conocidos hasta la fecha):
+Existen en total \textbf{9 programas de boot} (conocidos hasta la fecha):
 \begin{table}[h!]
 \centering
 \begin{tabular}{|l|c|}
@@ -433,36 +433,36 @@ AGB  & 256 + 1792 \\ \hline
 \end{table}
 
 \subsubsection{DMG / MGB}
-Lo primero que hacen es leer el logo desde el cartucho, descomprimirlo en VRAM y comenzar a desplazarlo lentamente hacia abajo. Dado que las lecturas de un cartucho ausente generalmente devuelven 0xFF, esto explica por qué, al encender la consola sin un cartucho, aparece un cuadro negro desplazándose. Además, conexiones defectuosas o sucias pueden hacer que los datos leídos se corrompan, lo que resulta en un logo desordenado.
+Lo primero que hacen es \textbf{leer} el logo desde el \textbf{cartucho}, \textbf{descomprimirlo en VRAM y} comenzar a \textbf{desplazarlo} lentamente hacia abajo. Dado que las \textbf{lecturas de un cartucho ausente} generalmente \textbf{devuelven 0xFF}, esto explica por qué, al encender la \textbf{consola sin un cartucho, aparece un cuadro negro} desplazándose. Además, conexiones defectuosas o sucias pueden hacer que los datos leídos se corrompan, lo que resulta en un logo desordenado.
 \\\\
-Una vez que el logo ha terminado de desplazarse, la boot ROM reproduce el famoso sonido \textit{"ba-ding!”} y vuelve a leer el logo, esta vez comparándolo con una copia almacenada en ROM. También calcula el checksum del encabezado y lo compara con el checksum almacenado en el encabezado. Si alguna de estas verificaciones falla, la boot ROM se bloquea y nunca se transfiere el control a la ROM del cartucho.
+Una vez que el logo ha terminado de desplazarse, la boot ROM reproduce el famoso sonido \textit{"ba-ding!”} y vuelve a leer el logo, esta vez comparándolo con una copia almacenada en ROM. \textbf{También calcula el checksum del encabezado y lo compara con el checksum almacenado en el encabezado}. \textbf{Si} alguna de estas verificaciones \textbf{falla, la boot ROM se bloquea} y nunca se transfiere el control a la ROM del cartucho.
 \\\\
-Finalmente, la boot ROM escribe en el registro BANK en 0xFF50, lo que desasigna la boot ROM.
+\textbf{Finalmente}, la boot ROM \textbf{escribe} en el registro BANK en \textbf{0xFF5}, lo que \textbf{desasigna la boot ROM}.
 \\\\
 Las diferencias con DMG0 (algunos primeros modelos de DMG), es que al fallar el checksum, la pantalla empieza a parpadear a la hora de bloquear la ROM, y que el logo de Nintendo no tiene el símbolo ®.
 
 \subsubsection{CGB / AGB}
-Estas secuencias de arranque son mucho más complejas, en especial por su comportamiento de retro-compatibilidad.
+Estas \textbf{secuencias de arranque} son mucho \textbf{más complejas}, en especial por su \textbf{comportamiento de retro-compatibilidad}.
 \\\\
-La ROM de arranque es más grande. Aún debe ser mapeada comenzando en 0x0000, ya que es donde comienza la CPU, pero también debe acceder al encabezado del cartucho en 0x0100-0x014F. Por lo tanto, la ROM de arranque se divide en dos partes: una de 0x0000-0x00FF y otra de 0x0200-0x08FF.
+La \textbf{ROM de arranque es más grande}. Aún debe ser mapeada comenzando en 0x0000, ya que es donde comienza la CPU, pero también \textbf{debe acceder al encabezado del cartucho en 0x0100-0x014F}. Por lo tanto, la ROM de arranque se divide en \textbf{dos partes}: una de \textbf{0x0000-0x00FF y otra de 0x0200-0x08FF}.
 \\\\
-Primero, las ROMs de arranque descomponen el logo de Nintendo en VRAM, al igual que los modelos antiguos, y copian el logo a un búfer en HRAM al mismo tiempo.
+\textbf{Primero}, las ROMs de arranque \textbf{descomponen el logo de Nintendo en VRAM}, al igual que los modelos antiguos, \textbf{y copian} el logo \textbf{a un búfer en HRAM} al mismo tiempo.
 \\\\
-Luego, el logo se lee y descomprime nuevamente, pero sin redimensionamiento, lo que produce un logo mucho más pequeño colocado debajo del gran \textit{"GAME BOY"}. La ROM de arranque luego configura las paletas de compatibilidad, como se describe más adelante, y reproduce la animación del logo con el sonido de \textit{"ba-ding!"}.
+Luego, \textbf{el logo se lee y descomprime nuevamente}, pero sin redimensionamiento, lo que produce un logo mucho más pequeño colocado debajo del gran \textit{"GAME BOY"}. La ROM de arranque \textbf{configura las paletas de compatibilidad}, como se describe más adelante, \textbf{y reproduce la animación} con el sonido de \textit{"ba-ding!"}.
 \\\\
-Durante la animación del logo, se permite al usuario elegir una paleta para anular la seleccionada para compatibilidad (con distintas secuencias de botones). Cada nueva elección evita que la animación termine durante 30 fotogramas, lo que retrasa el checksum y la transición final.
+Durante la animación, \textbf{se permite al usuario elegir una paleta} para anular la seleccionada para compatibilidad (con distintas secuencias de botones). \textbf{Cada nueva elección evita que la animación termine durante 30 fotogramas}, lo que retrasa el checksum y la transición final.
 \\\\
-Finalmente, la ROM de arranque desvanece todas las paletas de Background a blanco y establece el hardware en modo de compatibilidad (recordemos que existen juegos como Pokémon Oro/Plata que son de GBC pero se pueden jugar en DMG). En función del valor del byte de compatibilidad CGB, los valores a insertar en distintos registros de CGB variarán.
+\textbf{Finalmente, la ROM} de arranque \textbf{desvanece todas las paletas} de Background a blanco \textbf{y establece el hardware en modo de compatibilidad} (recordemos que existen juegos como Pokémon Oro/Plata que son de GBC pero se pueden jugar en DMG). En función del valor del byte de compatibilidad CGB, los valores a insertar en distintos registros de CGB variarán.
 
 \subsection{Cabecera del Cartucho}
 
-Todos los cartuchos de Game Boy contienen una cabecera ubicada en el rango de direcciones 0x100-0x14F. Esta cabecera contiene información esencial para el funcionamiento del juego y del sistema, permitiendo a los desarrolladores configurar diversos parámetros que describen las características del cartucho. Entre estos parámetros se incluyen el título del juego, el código de licencia, el tipo de cartucho (que define si utiliza RAM, batería, o expansión como MBC), y otros datos relevantes. A continuación, se detallan los registros presentes en este rango de direcciones:
+\textbf{Todos los cartuchos} de Game Boy \textbf{contienen una cabecera ubicada} en el rango de direcciones \textbf{0x100-0x14F}. Esta cabecera contiene \textbf{información esencial} para el funcionamiento del juego y del sistema, permitiendo a los desarrolladores configurar diversos parámetros que describen las características del cartucho. Entre estos parámetros se incluyen el título del juego, el código de licencia, el tipo de cartucho (que define si utiliza RAM, batería, o expansión como MBC), y otros datos relevantes. A continuación, se detallan los registros presentes en este rango de direcciones:
 
 \subsubsection{0x0100 - 0x0103: Punto de entrada}
-Después de mostrar el logotipo de Nintendo, el PC salta a la dirección 0x0100, para a posterior saltar al inicio del programa del juego. La mayoría de los desarrolladores llenan esta área de 4 bytes con una instrucción NOP seguida de un JP 0x0150.
+Después de mostrar el logotipo de Nintendo, el PC salta a la dirección 0x0100, para a posterior saltar al inicio del programa del juego. La \textbf{mayoría de los desarrolladores llenan esta área de 4 bytes con una instrucción NOP seguida de un JP 0x0150}.
 
 \subsubsection{0x0104 - 0x0133: Nintendo logo}
-Esta área contiene una imagen en mapa de bits que se muestra cuando se enciende la consola. Debe coincidir con el siguiente volcado (en hexadecimal); de lo contrario, la ROM de arranque no permitirá que el juego se ejecute:
+Esta área contiene una \textbf{imagen en mapa de bits} que se muestra cuando se enciende la consola. Debe coincidir con el siguiente volcado (en hexadecimal); de lo contrario, la ROM de arranque no permitirá que el juego se ejecute:
 
 \begin{lstlisting}[language=Kotlin, caption={Nintendo Logo - Mapa de Bits}, label={code:nintendologobits}]
     CE ED 66 66 CC 0D 00 0B 03 73 00 83 00 0C 00 0D
@@ -489,30 +489,30 @@ El procedimiento de arranque de la Game Boy primero muestra el logo y luego veri
 Los modelos a partir del CGB solo verifican la mitad superior (los primeros 18 bytes).
 
 \subsubsection{0x0134 - 0x0143: Título}
-Esta región de bytes contienen el título del juego, con carácteres ASCII y completamente en mayúsculas. Si el título tiene menos de 16 carácteres, el resto de bytes deberán rellenarse con 0x00's. 
+Esta región de bytes contienen el \textbf{título del juego, con carácteres ASCII y completamente en mayúsculas}. Si el título tiene menos de 16 carácteres, el resto de bytes deberán rellenarse con 0x00's.
 \\\\
-En versiones posteriores de los cartuchos, partes de esta área tienen un significado diferente, lo que reduce el tamaño real a 15 u 11 carácteres (siempre empezando en la dirección 0x134).
+En \textbf{versiones posteriores} de los cartuchos, \textbf{partes de esta área tienen un significado diferente}, lo que reduce el tamaño real a 15 u 11 carácteres (siempre empezando en la dirección 0x134).
 
 \subsubsection{0x013F - 0x0142: Código de fabricante}
 
-En los cartuchos más antiguos, estos bytes formaban parte del título. En los cartuchos más nuevos, contienen un código de fabricante de 4 caracteres (en mayúsculas ASCII). Se desconoce su propósito.
+En los \textbf{cartuchos más antiguos}, estos bytes formaban \textbf{parte del título}. En los \textbf{cartuchos más nuevos}, contienen un \textbf{código de fabricante de 4 caracteres} (en mayúsculas ASCII). Se desconoce su propósito.
 
 \subsubsection{0x0143: CGB Flag}
-Este byte, al igual que con el código de fabricante, formaba parte del título. Los modelos CGB y posteriores lo interpretan para decidir si habilitan el modo Color ("Modo CGB") o si retroceden al modo de compatibilidad monocromático ("Modo no CGB").
+Este byte, al igual que con el código de fabricante, \textbf{formaba parte del título}. Los modelos CGB y posteriores lo interpretan para \textbf{decidir si habilitan el modo Color} ("Modo CGB") \textbf{o si retroceden al modo de compatibilidad} monocromático ("Modo no CGB").
 \\\\
 Los valores más típicos son: 
 \begin{itemize}
-    \item 0x00: No indicaría nada realmente, lo que implica que el juego solamente funciona en modelos DMG/MGB.
-    \item 0x80: Indica que el juego admite mejoras propias del modelo CGB, pero es retro-compatible con modelos anteriores (DMG, MGB, etc...).
-    \item 0xC0: El juego solamente funciona en CGB.
+    \item \textbf{0x00}: No indicaría nada realmente, lo que implica que el juego solamente funciona en modelos DMG/MGB.
+    \item \textbf{0x80}: Indica que el juego admite mejoras propias del modelo CGB, pero es retro-compatible con modelos anteriores (DMG, MGB, etc\ldots).
+    \item \textbf{0xC0}: El juego solamente funciona en CGB.
 \end{itemize}
 
-Valores que tengan activados los bits 7, 3 o 2, activarán un estado poco utilizado, conocido como "Modo PGB" (Pseudo Game Boy Mode). Es una especie de modo intermedio que brinda compatibilidad con juegos diseñados para el Game Boy Color cuando se ejecutan en un Game Boy original o en un Super Game Boy, pero con mejoras visuales muy limitadas en comparación con el modo CGB completo.
+\textbf{Valores que tengan activados los bits 7, 3 o 2, activarán un estado poco utilizado, conocido como "Modo PGB"} (Pseudo Game Boy Mode). Es una especie de modo intermedio que brinda compatibilidad con juegos diseñados para el Game Boy Color cuando se ejecutan en un Game Boy original o en un Super Game Boy, pero con mejoras visuales muy limitadas en comparación con el modo CGB completo.
 \\\\
-Hay poca información al respecto de este modo y varias fuentes agradecen su estudio y documentación.
+Hay \textbf{poca información al respecto} de este modo y varias fuentes agradecen su estudio y documentación.
 
 \subsubsection{0x0144 – 0x0145: Nuevo código de licencia}
-Esta región contiene un código representado por dos carácteres ASCII, el cual indica el editor/desarrollador del juego. Solamente se utiliza en caso de que el antiguo código de licencia tenga un valor de 0x33 (suele ser el caso para los juegos publicados después de la salida de SGB).
+Esta región contiene un \textbf{código representado por dos carácteres ASCII}, el cual \textbf{indica el editor/desarrollador} del juego. Solamente se utiliza en caso de que el antiguo código de licencia tenga un valor de 0x33 (suele ser el caso para los juegos publicados después de la salida de SGB).
 \\\\
 Los códigos son los siguientes:
 \begin{longtable}{|c|l|}
@@ -586,10 +586,10 @@ DK              & Kodansha                       \\ \hline
 \end{longtable}
 
 \subsubsection{0x0146: SGB Flag}
-Especifica si el juego es compatible con funciones del modelo SGB. El SGB ignorará cualquier transferencia de datos si el valor de este byte no es 0x03.
+Especifica \textbf{si el juego es compatible con funciones del modelo SGB}. El SGB ignorará cualquier transferencia de datos si el valor de este byte no es 0x03.
 
 \subsubsection{0x0147: Tipo de cartucho}
-Especifica qué tipo de hardware está presente en el cartucho (para ser más especifico, su \textit{mapper}).
+Especifica \textbf{qué tipo de hardware está presente en el cartucho} (para ser más especifico, su \textit{mapper}).
 \\\\
 Los mappers son los siguientes:
 \begin{longtable}{|c|l|}
@@ -628,7 +628,7 @@ Los mappers son los siguientes:
 \end{longtable}
 
 \subsubsection{0x0148: Tamaño de ROM}
-Indica el tamaño de ROM en el cartucho. En la mayoría de casos, se calcula como $32 KiB * (1 << valor)$. Los valores conocidos son:
+Indica el \textbf{tamaño de ROM en el cartucho}. En la mayoría de casos, se calcula como $32 KiB * (1 << valor)$. Los valores conocidos son:
 
 \begin{table}[h]
     \centering
@@ -651,7 +651,7 @@ Indica el tamaño de ROM en el cartucho. En la mayoría de casos, se calcula com
 \end{table}
 
 \subsubsection{0x0149: Tamaño de RAM}
-Indica el tamaño de RAM (si lo hay). Si el tipo de cartucho no incluye "RAM" en su nombre, el valor de este registro debe ser 0x00. 
+Indica el \textbf{tamaño de RAM} (si lo hay). Si el tipo de cartucho no incluye "RAM" en su nombre, el valor de este registro debe ser 0x00. 
 \\\\
 Los posibles tamaños son los siguientes:
 
@@ -674,15 +674,15 @@ Los posibles tamaños son los siguientes:
 El valor 0x01 aparece en algunos documentos no oficiales con un tamaño de 2KiB. Sin embargo, jamás se llegó a utilizar un chip de RAM con este tamaño. Algunas ROMs de dominio público utilizan este valor, aunque en su código no hacen uso de ningún tipo de RAM de cartucho.
 
 \subsubsection{0x014A: Destino}
-Especifica si el juego está destinado a ser vendido en Japón o en cualquier otro lugar del mundo. Existen dos posibles valores:
+Especifica \textbf{si el juego está destinado a ser vendido en Japón o en cualquier otro lugar del mundo}. Existen dos posibles valores:
 
 \begin{itemize}
-    \item 0x00: Japón. Se puede vender en el extranjero.
-    \item 0x01: Solamente en el extranjero.
+    \item \textbf{0x00}: Japón. Se puede vender en el extranjero.
+    \item \textbf{0x01}: Solamente en el extranjero.
 \end{itemize}
 
 \subsubsection{0x014B: Antiguo código de licencia}
-Utilizado en cartuchos anteriores al lanzamiento del SGB. Al igual que el nuevo (0x0144-0x0145), especifica el editor/publisher. Si el valor es 0x33, se deberán utilizar los nuevos códigos.
+Utilizado en \textbf{cartuchos anteriores al lanzamiento del SGB}. Al igual que el nuevo (0x0144-0x0145), \textbf{especifica el editor/publisher}. \textbf{Si el valor es 0x33}, se deberán \textbf{utilizar} los \textbf{nuevos códigos}.
 \\\\
 A continuación la lista de códigos y sus editores:
 \begin{longtable}{|c|l|}
@@ -839,21 +839,21 @@ FF & LJN \\\hline
 \end{longtable}
 
 \subsubsection{0x014C: Número de versión de ROM}
-Este byte especifica el número de versión del juego. Generalmente es 0x00. Puede ser útil para los desarrolladores y emuladores, por ejemplo, para aplicar parches o actualizaciones específicas que se hayan diseñado para esa versión (importante en juegos que recibieron revisiones).
+Este byte \textbf{especifica el número de versión del juego}. Generalmente es 0x00. Puede ser útil para los desarrolladores y emuladores, por ejemplo, para aplicar parches o actualizaciones específicas que se hayan diseñado para esa versión (importante en juegos que recibieron revisiones).
 
 \subsubsection{0x014D: Checksum}
-Este byte contiene una suma de verificación de 8 bits calculada a partir de los bytes de cabecera del cartucho 0x0134–0x014C. Si el byte en este registro no coincide con los 8 bits inferiores de la suma de verificación, la ROM de arranque se bloqueará y el programa en el cartucho no se ejecutará.
+Este byte contiene una \textbf{suma de verificación de 8 bits calculada a partir de los bytes de cabecera del cartucho 0x0134–0x014C}. \textbf{Si el byte} en este registro \textbf{no coincide con los 8 bits inferiores de la suma de verificación, la ROM de arranque se bloqueará} y el programa en el cartucho no se ejecutará.
 
 \subsubsection{0x014E - 0x014F: Checksum global}
-Estos bytes contienen una suma de verificación de 16 bits que se calcula simplemente como la suma de todos los bytes de la ROM del cartucho (excepto estos dos bytes).\\\\
+Estos bytes contienen una \textbf{suma de verificación de 16 bits} que se calcula simplemente como la suma de todos los bytes de la ROM del cartucho (excepto estos dos bytes).\\\\
 Solamente se ha llegado a utilizar en Pokémon Stadium (N64) para detectar errores del Transfer Pak con los Pokémon Verde/Rojo/Azul/Amarillo (DMG) y Plata/Oro/Cristal (CGB).
 
 \section{MBCs}
 \label{history_mbcs}
 
-Los MBCs se utilizan para expandir la memoria limitada de la Game Boy, tanto en términos de ROM como de RAM. Estos controladores son chips que se encuentran en el cartucho del juego, no en la consola misma. El MBC1 es el chip más antiguo, lanzado en 1989 junto a la propia consola. En contraste, el MBC7 es el más reciente, con un lanzamiento estimado en 1997 junto a la Game Boy Color.
+Los MBCs se utilizan para \textbf{expandir la memoria} limitada de la Game Boy, \textbf{tanto en} términos de \textbf{ROM como de RAM}. Estos controladores son \textbf{chips que se encuentran en el cartucho} del juego, no en la consola misma. El \textbf{MBC1} es el \textbf{chip más antiguo}, lanzado en 1989 junto a la propia consola. En contraste, el MBC7 es el más reciente, con un lanzamiento estimado en 1997 junto a la Game Boy Color.
 \\
-Cada juego especifica qué tipo de controlador utiliza mediante el registro 0x0147, como se ha visto en el apartado anterior. Se va a describir a continuación el funcionamiento de dos tipos de MBC, lo que para este proyecto es suficiente.
+Cada juego especifica qué \textbf{tipo de controlador} utiliza mediante el \textbf{registro 0x0147}, como se ha visto en el apartado anterior. Se va a describir a continuación el funcionamiento de dos tipos de MBC, lo que para este proyecto es suficiente.
 
 \begin{figure}[H]
     \centering
@@ -862,7 +862,7 @@ Cada juego especifica qué tipo de controlador utiliza mediante el registro 0x01
     \label{figure:cart_gameboy}
 \end{figure}
 
-\subsection{No MBC: 0x00} Los juegos pequeños, que tienen un tamaño de ROM de hasta 32 KiB, no necesitan un utilizar bancos de memoria. En su lugar, la ROM se coloca directamente en la memoria en el rango de direcciones 0x0000-0x7FFF. Además, si se requiere RAM adicional (hasta 8 KiB), se puede conectar en el rango 0xA000-0xBFFF utilizando un circuito lógico.
+\subsection{No MBC: 0x00} Los juegos pequeños, que tienen un \textbf{tamaño de ROM de hasta 32 KiB}, no necesitan un utilizar bancos de memoria. En su lugar, la \textbf{ROM} se coloca \textbf{directamente en la memoria} en el rango de direcciones \textbf{0x0000-0x7FFF}. Además, si se requiere \textbf{RAM adicional} (hasta 8 KiB), se puede conectar en el rango 0xA000-0xBFFF utilizando un \textbf{circuito lógico}.
 
 \begin{figure}[H]
     \centering
@@ -871,9 +871,9 @@ Cada juego especifica qué tipo de controlador utiliza mediante el registro 0x01
     \label{figure:cart_no_mbc}
 \end{figure}
 
-\subsection{MBC1: 0x01-0x03} Es el modelo de chip más antiguo. Pese a ello, trabaja de forma muy similar a los más recientes, lo que facilitó la actualización de los juegos o la posibilidad de hacerlos retro-compatibles.
+\subsection{MBC1: 0x01-0x03} Es el modelo de \textbf{chip más antiguo}. Pese a ello, trabaja de forma muy similar a los más recientes, lo que facilitó la actualización de los juegos o la posibilidad de hacerlos retro-compatibles.
 \\\\
-En la configuración predeterminada (valor 0x00) el MBC1 soporta hasta 512KiB de ROM y un total de 32KiB de RAM mediante el uso de bancos. Esta configuración puede cambiar, por ejemplo para utilizar la parte de RAM como ROM, aumentando esta última hasta 2MiBs. Es importante tener en cuenta que la memoria en el rango de direcciones 0x0000–0x7FFF se usa tanto para leer desde la ROM como para escribir en los registros de control del MBC.
+En la configuración predeterminada (valor 0x00) el MBC1 \textbf{soporta hasta 512KiB de ROM y un total de 32KiB de RAM mediante el uso de bancos}. Esta configuración puede cambiar, por ejemplo para utilizar la parte de RAM como ROM, aumentando esta última hasta 2MiBs. Es importante tener en cuenta que la memoria en el rango de direcciones 0x0000–0x7FFF se usa tanto para leer desde la ROM como para escribir en los registros de control del MBC.
 
 \begin{figure}[H]
     \centering
@@ -886,38 +886,38 @@ En la configuración predeterminada (valor 0x00) el MBC1 soporta hasta 512KiB de
 
 \paragraph{Banco de ROM 0x00: 0x0000-0x3FFF}
 \label{par:rom0bank}
-Esta región usualmente contiene los primeros 16KiB de ROM del cartucho (suele ser fija, es decir, no cambia).
+Esta región usualmente contiene los \textbf{primeros 16KiB de ROM del cartucho} (suele ser fija, es decir, no cambia).
 
 \paragraph{Bancos de ROM 0x01-0x7F: 0x4000-0x7FFF}
-Esta región puede contener cualquiera de los bancos de 16KiB posibles. La elección del banco se realiza a través del registro 0x2000-0x3FFF.
+Esta región \textbf{puede contener cualquiera de los bancos de 16KiB} posibles. La \textbf{elección del banco} se realiza a través del \textbf{registro 0x2000-0x3FFF}.
 
 \paragraph{Banco de RAM 0x00-0x03: 0xA000-0xBFFF}
-Esta región se utiliza para leer o escribir en la RAM externa presente en algunos cartuchos (generalmente de tipo 0x02 o 0x03). El acceso a esta RAM solo es posible si está activada mediante la escritura en los registros de control del MBC; de lo contrario, las lecturas devolverán un valor indefinido (comúnmente 0xFF) y las escrituras serán ignoradas.
+Esta región se utiliza para \textbf{leer o escribir en la RAM externa} presente en algunos cartuchos (generalmente de tipo 0x02 o 0x03). El acceso a esta RAM \textbf{solo es posible si está activada mediante la escritura en los registros de control del MBC}; de lo contrario, las lecturas devolverán un valor indefinido (comúnmente 0xFF) y las escrituras serán ignoradas.
 \\\\
-Los tamaños disponibles de RAM son 8 KiB (que cubre toda la región mapeada) o 32 KiB, distribuidos en 4 bancos de 8 KiB cada uno. La segunda opción solo está disponible en cartuchos con ROM de hasta 512 KiB.
+Los \textbf{tamaños disponibles de RAM son 8 KiB} (que cubre toda la región mapeada) \textbf{o 32 KiB, distribuidos en 4 bancos de 8 KiB} cada uno. La segunda opción solo está disponible en cartuchos con ROM de hasta 512 KiB.
 \\\\
-La RAM externa suele estar alimentada por una batería, lo que permite el almacenamiento de datos incluso cuando la consola está apagada. Esta batería, normalmente una celda de botón soldada en la placa del cartucho, garantiza la persistencia de los datos. Además, dado que la velocidad de la RAM externa es comparable a la RAM interna de la Game Boy, algunos desarrolladores la utilizan como memoria de trabajo adicional (WRAM), aunque esto puede limitar el espacio disponible para el almacenamiento de datos.
+La \textbf{RAM externa suele estar alimentada por una batería}, lo que permite el almacenamiento de datos incluso cuando la consola está apagada. Esta batería, normalmente una \textbf{celda de botón soldada} en la placa del cartucho, garantiza la persistencia de los datos. Además, dado que la velocidad de la RAM externa es comparable a la RAM interna de la Game Boy, algunos desarrolladores la utilizan como memoria de trabajo adicional (WRAM), aunque esto puede limitar el espacio disponible para el almacenamiento de datos.
 
 \subsubsection{Registros}
 
-Las siglas ROM hacen referencia a la Read Only Memory, es decir, memoria de solo lectura. Este tipo de memoria tiene la característica de ser no modificable durante la ejecución del programa. En el caso de la Game Boy, a pesar de que algunas regiones de la memoria ROM se comportan como registros, no se puede escribir en ellas directamente. La diferencia radica en que, aunque las instrucciones pueden apuntar a estas regiones como si se tratase de registros, los valores no se almacenan físicamente en la ROM. En su lugar, la operación tiene efecto según la región designada, sin que el valor sea guardado en esa área específica de la ROM. Este comportamiento es gestionado por el controlador, que permite la alternancia entre distintas partes de la ROM en ciertos momentos durante la ejecución del juego, sin modificar el contenido original de la memoria.
+Las siglas ROM hacen referencia a la Read Only Memory, es decir, \textbf{memoria de solo lectura}. Este tipo de memoria tiene la característica de ser no modificable durante la ejecución del programa. En el caso de la Game Boy, a pesar de que \textbf{algunas regiones} de la memoria ROM \textbf{se comportan como registros}, no se puede escribir en ellas directamente. La diferencia radica en que, aunque las instrucciones pueden apuntar a estas regiones como si se tratase de registros, los valores no se almacenan físicamente en la ROM. En su lugar, \textbf{la operación tiene efecto según la región designada}, sin que el valor sea guardado en esa área específica de la ROM. Este comportamiento es gestionado por el controlador, que permite la alternancia entre distintas partes de la ROM en ciertos momentos durante la ejecución del juego, sin modificar el contenido original de la memoria.
 \\\\
 Todos estos registros tienen por defecto el valor 0x00. Para el banco de ROM será tratado como 0x01.
 
 \paragraph{Habilitar RAM Externa: 0x0000-0x1FFF}
-Para poder acceder a la RAM externa, antes debe ser activada mediante este registro. La forma de hacerlo es escribir en la región cualquier valor cuyos 4 nibbles inferiores sean el valor 0xA.
+Para poder \textbf{acceder a la RAM externa}, antes \textbf{debe ser activada} mediante \textbf{este registro}. La forma de hacerlo es \textbf{escribir} en la región \textbf{cualquier valor cuyos 4 nibbles inferiores sean el valor 0xA}.
 \\\\
-Se recomienda a los desarrolladores dehabilitar la RAM externa una vez se haya accedido a ella, ya que si se extrae el cartucho o se apaga la consola se pueden corromper los datos.
+\textbf{Se recomienda} a los desarrolladores \textbf{dehabilitar la RAM externa una vez se haya accedido a ella}, ya que si se extrae el cartucho o se apaga la consola \textbf{se pueden corromper los datos}.
 
-\paragraph{Número de Banco ROM: 0x2000–0x3FFF} Este registro considera únicamente los primeros 5 bits del valor escrito, lo que implica que los valores efectivos estarán en el rango de 0x01 a 0x1F.
+\paragraph{Número de Banco ROM: 0x2000–0x3FFF} Este registro \textbf{considera} únicamente los \textbf{primeros 5 bits} del valor escrito, lo que implica que los \textbf{valores efectivos} estarán en el \textbf{rango de 0x01 a 0x1F}.
 \\\\
-En caso de que se intente escribir el valor 0x00, el sistema lo interpretará como 0x01, debido a que el \hyperref[par:rom0bank]{banco fijo de ROM} no puede ser duplicado en ambas regiones de memoria.
+En caso de que se intente escribir el \textbf{valor 0x00}, el sistema lo \textbf{interpretará como 0x01}, debido a que el \hyperref[par:rom0bank]{banco fijo de ROM} \textbf{no puede ser duplicado} en ambas regiones de memoria.
 \\\\
-Si se selecciona un número de banco mayor que el número de bancos disponibles en el cartucho, el valor del banco se ajustará (enmascarará) al número máximo permitido. Por ejemplo, en un cartucho de 256 KiB, que solo requiere 4 bits para direccionar uno de sus 16 bancos, el bit 5 será ignorado.
+Si se selecciona un \textbf{número de banco mayor que} el número de bancos \textbf{disponibles} en el cartucho, el valor del banco se \textbf{ajustará} (enmascarará) \textbf{al número máximo permitido}. Por ejemplo, en un cartucho de 256 KiB, que solo requiere 4 bits para direccionar uno de sus 16 bancos, el bit 5 será ignorado.
 \\\\
-En el caso de ROMs más pequeñas, que no requieren el uso completo de los 5 bits, existe una excepción que permite duplicar el banco 0 en la región 0x4000-0x7FFF. Si se escribe el valor 0x10, los primeros 4 bits indicarán la selección del banco 0, que normalmente se traduciría al banco 1. Sin embargo, dado que el bit 5 está activado, el valor completo no será interpretado como 0x00, lo que evita la traducción 00→01. Esto permite tener el banco 0 mapeado tanto en las regiones de memoria 0x0000–0x3FFF como en 0x4000–0x7FFF.
+En el caso de \textbf{ROMs más pequeñas}, que no requieren el uso completo de los 5 bits, existe una \textbf{excepción que permite duplicar el banco 0} en la región 0x4000-0x7FFF. Si se escribe el valor 0x10, los primeros 4 bits indicarán la selección del banco 0, que normalmente se traduciría al banco 1. Sin embargo, dado que el bit 5 está activado, el valor completo no será interpretado como 0x00, lo que evita la traducción 00→01. Esto permite tener el banco 0 mapeado tanto en las regiones de memoria 0x0000–0x3FFF como en 0x4000–0x7FFF.
 \\\\
-En los casos en que la ROM es muy grande y utilice parte de la RAM para llegar a un máximo de 2MiB, se podrá llegar a utilizar un total de 128 bancos. Con 5 bits, no es posible representar todos ellos (el máximo es 0x1F). Para poder hacerlo, se deberán utilizar los dos bits del registro de la región 0x4000–0x5FFF de forma complementaria. El banco de ROM resultante se calcularía de la siguiente manera: $BancoSeleccionado = (RegistroSecundario << 5) + BancoROM$.
+En los casos en que la \textbf{ROM} es \textbf{muy grande y utilice parte de la RAM para llegar a un máximo de 2MiB}, se podrá llegar a \textbf{utilizar un total de 128 bancos}. Con 5 bits, no es posible representar todos ellos (el máximo es 0x1F). Para poder hacerlo, se deberán utilizar los dos bits del registro de la región 0x4000–0x5FFF de forma complementaria. El banco de ROM resultante se calcularía de la siguiente manera: $BancoSeleccionado = (RegistroSecundario << 5) + BancoROM$.
 
 Por ejemplo, si se quisiese seleccionar el banco número 101, nuestro registro secundario debería tener un valor de 0x03 y el registro de ROM un 0x05:
 
@@ -930,13 +930,13 @@ Por ejemplo, si se quisiese seleccionar el banco número 101, nuestro registro s
       0110 0101 = 101 en decimal
 \end{lstlisting}
 
-\paragraph{Número de Banco RAM / Complementario de Banco ROM: 0x4000–0x5FFF} Registro de 2 bits que se utiliza para seleccionar el número de banco de RAM (0x00-0x03) o especificar de forma complementaria el banco de ROM. Si la ROM y la RAM no son lo suficientemente grandes, este registro no tiene ningún uso.
+\paragraph{Número de Banco RAM / Complementario de Banco ROM: 0x4000–0x5FFF} Registro de 2 bits que se utiliza para \textbf{seleccionar el número de banco de RAM} (0x00-0x03) \textbf{o especificar de forma complementaria el banco de ROM}. Si la ROM y la RAM no son lo suficientemente grandes, este registro no tiene ningún uso.
 
-\paragraph{Modo de Banco: 0x6000–0x7FFF} Este registro de 1 bit controla el comportamiento del registro de 2 bit mencionado anteriormente. Los dos comportamientos pueden ser:
+\paragraph{Modo de Banco: 0x6000–0x7FFF} Este registro de 1 bit \textbf{controla el comportamiento del registro de 2 bit} mencionado anteriormente. Los dos comportamientos pueden ser:
 
 \begin{itemize}
-    \item \textbf{0x00:} Modo por defecto. Los dos bits del registro 0x4000–0x5FFF se utilizan como bits superiores en la selección del banco de ROM. En este modo solamente se puede acceder al banco 0 de RAM. Este modo permite acceder a un tamaño máximo de 8KiB de RAM y 2MiB de ROM.
-    \item \textbf{0x01:} Modo avanzado en el que las regiones 0x0000-0x3FFF y 0xA000-0xBFFF no son fijas. Los dos bits del registro 0x4000–0x5FFF se utilizan para seleccionar el banco de RAM. Esto permite un máximo de 32KiB de RAM y 512KiB de ROM. Solamente se podrán acceder a los bancos del 0x00 al 0x1F de ROM.
+    \item \textbf{0x00:} \textbf{Modo por defecto}. Los dos bits del registro 0x4000–0x5FFF se utilizan como bits superiores en la selección del banco de ROM. En este modo \textbf{solamente se puede acceder al banco 0 de RAM}. Este modo permite acceder a un tamaño máximo de 8KiB de RAM y 2MiB de ROM.
+    \item \textbf{0x01:} \textbf{Modo avanzado} en el que las regiones 0x0000-0x3FFF y 0xA000-0xBFFF no son fijas. Los \textbf{dos bits} del registro 0x4000–0x5FFF \textbf{se utilizan para seleccionar el banco de RAM}. Esto permite un máximo de 32KiB de RAM y 512KiB de ROM. Solamente se podrán acceder a los bancos del 0x00 al 0x1F de ROM.
 \end{itemize}
 
 La forma en la que estos modos funcionan es mediante unas puertas AND que el controlador tiene entre los dos registros de selección de bancos y el segundo bit más alto de la dirección de memoria. Estas puertas en el modo 1 se deshabilitan. Un ejemplo del modo 0 a continuación:
@@ -950,13 +950,13 @@ Supongamos que el registro de banco ROM contiene un 5, siendo la región de memo
         00000 (resultado, siempre 0)
 \end{lstlisting}
 
-\textbf{Resultado:} Siempre se accede al banco 0 en esta región de memoria, sin importar el valor del registro de banco. Es por ello que esta región es "fija". Con la región de RAM 0xA000–0xBFFF pasa exactamente lo mismo, debido a que el segundo bit más alto de la dirección 0xA000 es 0.
+\textbf{Resultado:} \textbf{Siempre se accede al banco 0} en esta región de memoria, sin importar el valor del registro de banco. Es por ello que esta región es "fija". Con la región de RAM 0xA000–0xBFFF pasa exactamente lo mismo, debido a que el segundo bit más alto de la dirección 0xA000 es 0.
 
 \section{Interrupciones}
 
-Las interrupciones son mecanismos que permiten a la CPU pausar temporalmente la ejecución del programa principal para saltar a una posición específica de memoria, conocida como vector de interrupción. Este proceso resulta útil porque puede ocurrir en cualquier parte del código, lo que facilita la respuesta a eventos externos en tiempo real.
+Las interrupciones son \textbf{mecanismos que permiten a la CPU pausar temporalmente la ejecución del programa principal para saltar a una posición específica de memoria}, conocida como vector de interrupción. Este proceso resulta útil porque puede ocurrir en cualquier parte del código, lo que facilita la respuesta a eventos externos en tiempo real.
 \\\\
-En la mayoría de las CPU, existe un \textit{master flag} para controlar las interrupciones, y la CPU Z80 de la Game Boy no es una excepción. Sin embargo, además de este flag, la Game Boy cuenta con registros específicos para gestionar las interrupciones. El registro maestro es el Interrupt Master Enable (IME), que se desactiva con el opcode DI, evitando que ocurra cualquier interrupción. Por el contrario, el opcode EI activa el IME, permitiendo que se procesen las interrupciones especificadas en el registro Interrupt Enable (IE, ubicado en 0xFFFF). Complementariamente, existe el registro Interrupt Flag (IF, ubicado en 0xFF0F), que marca qué interrupción en particular ha sido activada.
+En la mayoría de las CPU, existe un \textit{master flag} para controlar las interrupciones, y la CPU Z80 de la Game Boy no es una excepción. Sin embargo, además de este flag, la Game Boy cuenta con \textbf{registros específicos para gestionar las interrupciones}. El \textbf{registro maestro} es el Interrupt Master Enable (\textbf{IME}), que se desactiva con el opcode DI, evitando que ocurra cualquier interrupción. Por el contrario, el opcode EI activa el IME, permitiendo que se procesen las interrupciones especificadas en el registro Interrupt Enable (IE, ubicado en 0xFFFF). Complementariamente, \textbf{existe el registro} Interrupt Flag (\textbf{IF}, ubicado en 0xFF0F), que \textbf{marca qué interrupción en particular ha sido activada}.
 \\\\
 Cuando ocurre una interrupción, se sigue el siguiente procedimiento:
 
@@ -968,9 +968,9 @@ Cuando ocurre una interrupción, se sigue el siguiente procedimiento:
     \item La CPU salta al vector de la interrupción correspondiente, ejecutando el código específico para manejar ese evento.
 \end{itemize}
     
-Este procedimiento garantiza que las interrupciones se gestionen de forma controlada, evitando conflictos y permitiendo que la CPU responda adecuadamente a eventos críticos en tiempo real.
+Este procedimiento \textbf{garantiza que las interrupciones se gestionen de forma controlada}, evitando conflictos y permitiendo que la CPU responda adecuadamente a eventos críticos en tiempo real.
 \\\\
-Cuando se producen varias solicitudes de interrupción de forma simultánea, se otorga prioridad a aquellas con un valor de bit menor. En este esquema de prioridades, el bit 0 (interrupción de VBlank) tiene la mayor prioridad, mientras que el bit 5 (interrupción del Joypad) posee la prioridad más baja.
+Cuando se producen \textbf{varias solicitudes} de interrupción \textbf{de forma simultánea}, se otorga \textbf{prioridad a aquellas con un valor de bit menor}. En este esquema de prioridades, el bit 0 (interrupción de VBlank) tiene la mayor prioridad, mientras que el bit 5 (interrupción del Joypad) posee la prioridad más baja.
 
 \subsection{Tipos}
 
@@ -986,7 +986,7 @@ Cuando se producen varias solicitudes de interrupción de forma simultánea, se 
 \subsection{Registros}
 
 \subsubsection{IME (Interrupt Master Enable)}
-Se trata de un flag interno de solo escritura (no está enlazado a ninguna dirección de memoria). Controla que cualquier tipo de interrupción se pueda lanzar. Al inicio de ejecución de cualquier juego, está deshabilitada. Se maneja a través de las operaciones:
+Se trata de un \textbf{flag interno de solo escritura} (no está enlazado a ninguna dirección de memoria). Controla que cualquier tipo de interrupción se pueda lanzar. Al inicio de ejecución de cualquier juego, está deshabilitada. Se maneja a través de las operaciones:
 \begin{itemize}
     \item \textbf{EI}: Habilita las interrupciones (IME = 1). No toma efecto hasta la ejecución de la siguiente instrucción.
     \item \textbf{DI}: Deshabilita las interrupciones (IME = 0).
@@ -995,7 +995,7 @@ Se trata de un flag interno de solo escritura (no está enlazado a ninguna direc
 \end{itemize}
 
 \subsubsection{IE (Interrupt Enable - 0xFFFF)}
-Registro de 5 bits que controla qué interrupciones \textbf{pueden} ser lanzadas:
+\textbf{Registro de 5 bits} que controla qué interrupciones \textbf{pueden} ser lanzadas:
 \begin{itemize}
     \item \textbf{Bit 0}: VBlank.
     \item \textbf{Bit 1}: LCD STAT.
@@ -1005,15 +1005,15 @@ Registro de 5 bits que controla qué interrupciones \textbf{pueden} ser lanzadas
 \end{itemize}
 
 \subsubsection{IF (Interrupt Flag - 0xFF0F)}
-Registro de 5 bits que indica qué interrupciones \textbf{deben} ser lanzadas. Los bits se corresponden con los del IE.
+\textbf{Registro de 5 bits} que indica qué interrupciones \textbf{deben} ser lanzadas. Los bits se corresponden con los del IE.
 Una vez la CPU maneja la interrupción, el valor del bit vuelve de manera automática a 0.
 
 \section{Temporizadores / Timers}
 \label{history_timer}
-Los temporizadores son mecanismos esenciales para la sincronización y el control de eventos en el sistema. Ayudan a la CPU a gestionar y coordinar actividades en el juego, como controlar la velocidad de animaciones, gestionar el conteo de frames y mantener la precisión en la ejecución de instrucciones de tiempo crítico.
+Los temporizadores son \textbf{mecanismos esenciales para la sincronización y el control de eventos} en el sistema. Ayudan a la CPU a \textbf{gestionar y coordinar actividades} en el juego, como controlar la velocidad de animaciones, gestionar el conteo de frames y mantener la precisión en la ejecución de instrucciones de tiempo crítico.
 
 \subsection{DIV (Divisor de reloj - 0xFF04)}
-Contador general de 16 bits que incrementa a una frecuencia fija de 16384Hz (incrementa cada 256 ciclos de la CPU) y aproximadamente 16779Hz en SGB. Al intentar escribir cualquier valor en el registro, se restablecen los 8 primeros bits a 0x00. En caso de que se ejecute una instrucción STOP, dejará de actualizarse hasta que se reinicie la ejecución. Solamente los 8 bits más altos (8-15) son visibles para el desarrollador, los cuales son únicamente de lectura.
+\textbf{Contador general de 16 bits} que \textbf{incrementa} a una \textbf{frecuencia fija de 16384Hz} (incrementa cada 256 ciclos de la CPU) y aproximadamente 16779Hz en SGB. Al intentar \textbf{escribir cualquier valor} en el registro, se \textbf{restablecen los 8 primeros bits a 0x00}. En caso de que se ejecute una instrucción STOP, dejará de actualizarse hasta que se reinicie la ejecución. Solamente los 8 bits más altos (8-15) son visibles para el desarrollador, los cuales son únicamente de lectura.
 \begin{table}[H]
     \centering
     \begin{tabular}{|c|c|c|}
@@ -1040,13 +1040,13 @@ Contador general de 16 bits que incrementa a una frecuencia fija de 16384Hz (inc
 \end{table}
 
 \subsection{Temporizador de contador (TIMA - 0xFF05)}
-Temporizador principal que permite ejecutar acciones basadas en su cuenta. Esto es útil para activar eventos en el juego, como cambios de pantalla o actualizaciones de elementos en pantalla. Se incrementa en base a la frecuencia definida por el registro TAC (0xFF07). Cuando su valor supera 0xFF, se restrablece al valor especificado en el registro TMA (0xFF06) y se genera \hyperref[interrupttype]{su interrupción}.
+\textbf{Temporizador principal} que \textbf{permite ejecutar acciones basadas en su cuenta}. Esto es útil para \textbf{activar eventos} en el juego, como cambios de pantalla o actualizaciones de elementos en pantalla. Se \textbf{incrementa} en base a la \textbf{frecuencia definida por el registro TAC (0xFF07)}. Cuando su valor supera 0xFF, se restrablece al valor especificado en el registro TMA (0xFF06) y se genera \hyperref[interrupttype]{su interrupción}.
 
 \subsection{Temporizador de módulo (TMA - 0xFF06)}
-Este registro almacena el valor al cual se restablece el temporizador TIMA cuando se produce un desbordamiento. Cuando TIMA llega a 0xFF y genera una interrupción, este toma el valor de TMA para continuar con el conteo.
+Este registro almacena el \textbf{valor} al cual se \textbf{restablece el temporizador TIMA} cuando se produce un desbordamiento. Cuando TIMA llega a 0xFF y genera una interrupción, este toma el valor de TMA para continuar con el conteo.
 
 \subsection{Controlador de temporizador (TAC - 0xFF07)}
-Su bit 2 controla que el contador TIMA pueda ser incrementado (0 = Pausado, 1 = Habilitado). Los bits del 3 al 7 no tienen utilidad. Por último, con los bits 0 y 1 se puede controlar la frecuencia a la que el contador avanza:
+Su \textbf{bit 2 controla} que el \textbf{contador TIMA pueda ser incrementado} (0 = Pausado, 1 = Habilitado). Los bits del 3 al 7 no tienen utilidad. Por último, con los \textbf{bits 0 y 1} se puede \textbf{controlar} la \textbf{frecuencia} a la que el contador avanza:
 
 \begin{table}[h!]
     \centering
@@ -1110,9 +1110,11 @@ Los registros pertenecientes al rango de I/O (0xFF00-0xFF70) son los siguientes:
     \label{tab:memory_io_registers}
 \end{table}
 
+\clearpage
+
 \subsection{Joypad: 0xFF00}
 
-Para el control de los botones en la Game Boy, se utiliza un único registro mapeado en memoria en la dirección 0xFF00, también conocido como el registro P1. Este registro encapsula el estado de los 8 botones (A, B, Start, Select, Arriba, Abajo, Izquierda, Derecha) en un único byte, estructurado como una matriz. Cada bit representa un botón o conjunto de botones, permitiendo identificar cuál ha sido presionado.
+Para el \textbf{control de los botones} en la Game Boy, se utiliza un único registro mapeado en memoria en la dirección 0xFF00, también conocido como el \textbf{registro P1}. Este registro encapsula el estado de los 8 botones (A, B, Start, Select, Arriba, Abajo, Izquierda, Derecha) en un único byte, \textbf{structurado como una matriz}. Cada bit representa un botón o conjunto de botones, permitiendo identificar cuál ha sido presionado.
 
 \begin{figure}[H]
     \centering
@@ -1123,11 +1125,11 @@ Para el control de los botones en la Game Boy, se utiliza un único registro map
 
 La notación P1N en las especificaciones se refiere a “Player 1” seguido del número del bit correspondiente. Por ejemplo, si se desea consultar el estado de los botones A, B, Start o Select, es necesario configurar el bit 5 en 1 y el bit 4 en 0. Esto selecciona la línea correspondiente a estos botones en la matriz virtual que el registro simula.
 \\\\
-Es importante destacar que el registro opera con lógica inversa: un botón presionado se representa con un valor 0, mientras que un botón sin presionar es un 1. Para trabajar de manera más intuitiva con estos valores, se puede realizar una operación complementaria, invirtiendo los bits, lo que facilita el manejo de la información en la lógica habitual (donde 1 indica botón presionado y 0 lo contrario).
+Es importante destacar que el registro opera con \textbf{lógica inversa}: un botón \textbf{presionado} se representa con un \textbf{valor 0}, mientras que un botón \textbf{sin presionar} es un \textbf{1}. Para trabajar de manera más intuitiva con estos valores, se puede realizar una operación complementaria, invirtiendo los bits, lo que facilita el manejo de la información en la lógica habitual (donde 1 indica botón presionado y 0 lo contrario).
 
 \subsection{Transferencia Serie: 0xFF01-0xFF02}
 
-Estos registros tienen relación directa con la comunicación entre dos consolas, la cual se realiza mediante un Cable Link, byte a byte. Se utiliza el protocolo SPI, en la que una de las consolas actua como "maestro" y genera una señal de reloj interna, que controla el momento exacto en que ocurre el intercambio con el resto de consolas.
+Estos registros tienen relación directa con la \textbf{comunicación entre dos consolas}, la cual se realiza \textbf{mediante un Cable Link, byte a byte}. Se utiliza el \textbf{protocolo SPI}, en la que una de las consolas actua como "maestro" y genera una señal de reloj interna, que controla el momento exacto en que ocurre el intercambio con el resto de consolas.
 \\\\
 Si la consola esclava no ha cargado el siguiente byte de datos cuando comienza la transferencia, el último byte enviado será retransmitido. Por el contrario, si la consola esclava está lista para enviar un nuevo byte pero la transferencia anterior aún no ha concluido, no podrá transmitir hasta que el proceso en curso haya finalizado.
 
@@ -1187,7 +1189,7 @@ El reloj externo de forma general lo aporta la otra consola, pero si se conectar
 
 \section{PPU}
 
-La GPU o comunmente conocida como PPU en la Game Boy es el componente encargado de gestionar la información que se muestra por pantalla. Maneja la representación de tiles para sprites y fondos, utilizando para ello una paleta de 4 colores. La resolución de la pantalla es de 160x144 píxeles, con una tasa de refresco de 59.7Hz. Para gestionar el dibujo de cada pixel, la PPU opera en diferentes modos, conocidos como \textit{H-Blank} (Modo 0), \textit{V-Blank} (Modo 1), \textit{OAM Scan} (Modo 2) y \textit{Drawing Pixels} (Modo 3, también conocido como \textit{H-Draw}).
+La GPU o comunmente conocida como PPU en la Game Boy es el \textbf{componente encargado de gestionar la información que se muestra por pantalla}. Maneja la \textbf{representación de tiles para sprites y fondos}, utilizando para ello una \textbf{paleta de 4 colores}. La \textbf{resolución} de la pantalla es de \textbf{160x144 píxeles}, con una tasa de refresco de 59.7Hz. Para gestionar el dibujo de cada pixel, la PPU opera en diferentes modos, conocidos como \textit{H-Blank} (Modo 0), \textit{V-Blank} (Modo 1), \textit{OAM Scan} (Modo 2) y \textit{Drawing Pixels} (Modo 3, también conocido como \textit{H-Draw}).
 
 \begin{figure}[H]
     \centering
@@ -1198,9 +1200,9 @@ La GPU o comunmente conocida como PPU en la Game Boy es el componente encargado 
 
 \subsection{Tiles}
 
-Los tiles son la base de la representación gráfica en la Game Boy. Cada tile tiene un tamaño de 8x8 píxeles (16 bytes en total, 2 bytes por línea) y puede ser representado por un máximo de 4 colores. De esta forma, se evita procesar los pixeles de forma individual, lo que reduce la carga de trabajo de la CPU y permite una representación más eficiente de los gráficos.
+Los tiles son la base de la \textbf{representación gráfica en la Game Boy}. Cada tile tiene un tamaño de \textbf{8x8 píxeles (16 bytes en total, 2 bytes por línea)} y puede ser representado por un \textbf{máximo de 4 colores}. De esta forma, se evita procesar los pixeles de forma individual, lo que reduce la carga de trabajo de la CPU y permite una representación más eficiente de los gráficos.
 \\\\
-El color de cada pixel se obtiene de un índice de 2 bits. Este índice se utiliza para acceder a la paleta de colores, que contiene un total de 4 colores. A este formato se le denomina comunmente \textbf{2BPP}, el cual hace referencia a "2 bits por pixel". La paleta de colores es compartida por todos los tiles, lo que permite una mayor eficiencia en el uso de la memoria.
+El \textbf{color de cada pixel} se obtiene de un \textbf{índice de 2 bits}. Este índice se utiliza para acceder a la paleta de colores, que contiene un total de 4 colores. A este formato se le denomina comunmente \textbf{2BPP}, el cual hace referencia a "2 bits por pixel". La paleta de colores es compartida por todos los tiles, lo que permite una mayor eficiencia en el uso de la memoria.
 \\\\ 
 Para obtener el índice correcto para cada pixel, se deben leer de forma simultánea 2 líneas distintas de la memoria de tiles. La primera línea contiene los bits menos significativos, mientras que la segunda línea contiene los bits más significativos.
 \\\\
@@ -1208,10 +1210,12 @@ Tomando como ejemplo el siguiente tile: \textit{\$3C \$7E \$42 \$42 \$42 \$42 \$
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{include/images/colores_bits_tile.png}
+    \includegraphics[width=1\textwidth]{include/images/colores_bits_tile.png}
     \caption{Obtención de colores para un tile (\cite{newpandocs})}
     \label{figure:tile_colors}
 \end{figure}
+
+\clearpage
 
 \subsection{Capas}
 
@@ -1235,9 +1239,9 @@ La pantalla principal es la que sirve de fondo, es decir, cualquier cosa que no 
     \label{figure:bg_layer}
 \end{figure}
 
-Está compuesto por 32x32 tiles (256x256 pixeles). De esos tiles totales, solamente una sección de 20x18 tiles (160x144 pixeles) puede ser renderizada en pantalla (\textit{LCD} en la figura previa). Esa sección se puede mover utilizando los registros SCX y SCY, las cuales establecen un offset de la posición inicial (esquina superior izquierda).
+Está \textbf{compuesto por 32x32 tiles (256x256 pixeles)}. De esos tiles totales, solamente \textbf{una sección de 20x18 tiles} (160x144 pixeles) \textbf{puede ser renderizada en pantalla} (\textit{LCD} en la figura previa). Esa sección se puede \textbf{mover} utilizando los \textbf{registros SCX y SCY}, las cuales establecen un offset de la posición inicial (esquina superior izquierda).
 
-\paragraph{SCY, SCX: 0xFF42 - 0xFF43:} Estos registros definen un desplazamiento (\textit{offset}) para la posición inicial de la pantalla. Los valores pueden superar los límites inferior y derecho, pero no el superior ni el izquierdo, ya que los valores no pueden salir del rango 0-255. Si la pantalla LCD excede estos límites, la imagen se repetirá en bucle desde la posición inicial.
+\paragraph{SCY, SCX: 0xFF42 - 0xFF43:} Estos registros \textbf{definen un desplazamiento} (\textit{offset}) para la posición inicial de la pantalla. Los valores pueden superar los límites inferior y derecho, pero no el superior ni el izquierdo, ya que los valores no pueden salir del rango 0-255. Si la pantalla LCD excede estos límites, la imagen se repetirá en bucle desde la posición inicial.
 
 \begin{figure}[H]
     \centering
@@ -1248,13 +1252,13 @@ Está compuesto por 32x32 tiles (256x256 pixeles). De esos tiles totales, solame
 
 \subsubsection{Window}
 
-Inicialmente, la ventana (Window) será invisible ya que no tendrá ninguna información a mostrar. En los videojuegos, se utiliza comúnmente para mostrar el HUD (barras de estado, menús emergentes, etc.).
+Inicialmente, la ventana (Window) será invisible ya que no tendrá ninguna información a mostrar. En los videojuegos, se utiliza \textbf{comúnmente para mostrar el HUD} (barras de estado, menús emergentes, etc.).
 \\\\
-Su posición en pantalla está determinada por los registros WX y WY, donde WX incluye un desplazamiento de 7 píxeles (equivalente a un tile). Por lo tanto, si WX = 7, WY = 0, SCX = 0 y SCY = 0, la ventana se alineará exactamente sobre el Background.
+Su \textbf{posición} en pantalla está \textbf{determinada} por los \textbf{registros WX y WY}, donde WX incluye un desplazamiento de 7 píxeles (equivalente a un tile). Por lo tanto, si WX = 7, WY = 0, SCX = 0 y SCY = 0, la ventana se alineará exactamente sobre el Background.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.4\textwidth]{include/images/grid_window.png}
+    \includegraphics[width=0.5\textwidth]{include/images/grid_window.png}
     \caption{Capa de HUD de la PPU (\cite{gbedg})}
     \label{figure:window_layer}
 \end{figure}
@@ -1272,13 +1276,15 @@ La principal ventaja de este mecanismo es la posibilidad de mostrar ventanas eme
     \label{figure:window_pokemon}
 \end{figure}
 
-\paragraph{WY, WX: 0xFF4A - 0xFF4B}: Especifican el offset de la ventana respecto de la esquina superior izquierda. Los valores que pueden tomar están dentro de los siguientes rangos: 0-166 para WX y 0-143 para WY. Mencionado previamente, WX tiene un offset de 7 pixeles. 
+\clearpage
+
+\paragraph{WY, WX: 0xFF4A - 0xFF4B}: Especifican el \textbf{offset de la ventana} respecto de la esquina superior izquierda. Los valores que pueden tomar están dentro de los siguientes rangos: \textbf{0-166 para WX y 0-143 para WY}. Mencionado previamente, \textbf{WX tiene un offset de 7 pixeles}. 
 \\\\
 Hay bugs conocidos con los siguientes valores: si se establece en 0, la ventana tendrá un efecto de \textit{temblor} horizontal cuando se modifique el registro SCX. Por otro lado, si se establece en 166, la ventana se dibujará en la siguiente línea del scanline.
 
 \subsubsection{Sprites}
 
-Los sprites de manera general son 8x8 pixeles (2x2 tiles) que no están limitados y se mueven de forma independiente del Background y el Window. Se pueden definir también como 8x16 pixeles (2x4 tiles). La información de ellos, como se ha explicado previamente, se almacena en la memoria \hyperref[mem:oam]{OAM}.
+Los sprites de manera general son \textbf{8x8 pixeles (2x2 tiles) que no están limitados y se mueven de forma independiente del Background y el Window}. Se pueden definir también como 8x16 pixeles (2x4 tiles). La información de ellos, como se ha explicado previamente, se almacena en la memoria \hyperref[mem:oam]{OAM}.
 
 \subsection{Registros}
 
@@ -1299,13 +1305,13 @@ El registro principal que controla el LCD. Permite decidir qué elementos se mue
 \end{itemize}
 
 \subsubsection{Coordenada Y del LCD: 0xFF44}
-Nombrado generalmente como \textit{LY}, indica la línea actual de renderizado o \textit{scanline} que va a ser renderizada. Puede contener cualquier valor en el rango [0-153], donde los valores en el rango [144-153] forman parte del período de V-Blank.
+Nombrado generalmente como \textit{LY}, indica la \textbf{línea actual de renderizado} o \textit{scanline} que va a ser renderizada. Puede contener cualquier valor en el rango [0-153], donde los valores en el rango [144-153] forman parte del período de V-Blank.
 
 \subsubsection{Comparación de LY: 0xFF45}
-Internamente la consola compara constantemente el valor de LY con el de este registro, conocido de forma general como LYC. Cuando ambos registros coinciden (y si está habilitado), la interrupción de STAT es solicitada.
+Internamente la consola \textbf{compara constantemente el valor de LY} con el de este registro, conocido de forma general como LYC. Cuando ambos registros \textbf{coinciden} (y si está habilitado), la \textbf{interrupción} de \textbf{STAT} es solicitada.
 
 \subsubsection{Estado del LCD: 0xFF41}
-Habilita ciertas interrupciones y ofrece información acerca del estado actual de la pantalla.
+\textbf{Habilita ciertas interrupciones} y ofrece información acerca del estado actual de la pantalla.
 
 \begin{itemize}
     \item \textbf{Bit 7}: No es utilizado.
@@ -1319,7 +1325,7 @@ Habilita ciertas interrupciones y ofrece información acerca del estado actual d
 
 \subsection{Modos}
 
-Los modos de PPU definen cómo se dibujan los píxeles en pantalla. Cada uno de ellos se activa en un momento específico del ciclo de renderizado, permitiendo que la PPU realice las operaciones necesarias para mostrar la información en pantalla.
+Los modos de PPU \textbf{definen cómo se dibujan los píxeles en pantalla}. Cada uno de ellos se activa en un momento específico del ciclo de renderizado, permitiendo que la PPU realice las operaciones necesarias para mostrar la información en pantalla.
 \\\\
 Como se muestra en la figura, el renderizado completo de la pantalla tarda 70,224 ciclos de reloj, lo que equivale a 17,556 ciclos de máquina. Dado que la CPU de la Game Boy opera a 4.194304 MHz (4,194,304 ciclos de reloj por segundo), podemos calcular la tasa de fotogramas por segundo (FPS) de la siguiente manera:
 
@@ -1336,7 +1342,7 @@ Como se muestra en la figura, el renderizado completo de la pantalla tarda 70,22
 \end{figure}
 
 \subsubsection{Modo 0: H-Blank}
-Ocupa el tiempo restante de la línea de renderizado después de que se hayan dibujado los píxeles. En este modo, la PPU no realiza ninguna operación, permitiendo que la CPU acceda a la memoria de vídeo sin interferencias.
+Ocupa el tiempo restante de la línea de renderizado después de que se hayan dibujado los píxeles. En este modo, la \textbf{PPU no realiza ninguna operación}, permitiendo que la CPU acceda a la memoria de vídeo sin interferencias.
 \\\\
 Si el valor de LY alcanza 144 en la siguiente línea de renderizado, se generará automáticamente la interrupción de V-Blank (si está habilitada por el desarrollador).
 
@@ -1346,7 +1352,7 @@ Similar a H-Blank en el sentido de que la PPU no dibuja píxeles en pantalla. Si
 De forma similar al final de la última línea (y si está habilitado), se producirá la interrupción que indica que el proceso de OAM da comienzo.
 
 \subsubsection{Modo 2: OAM Scan}
-Se activa al inicio de cada línea de renderizado (excepto durante el modo V-Blank), justo antes de que los píxeles comiencen a dibujarse en pantalla. Durante este modo, la PPU busca sprites en la memoria OAM que deban ser renderizados en la línea actual, guardándolos posteriormente en un buffer.
+\textbf{Se activa al inicio de cada línea de renderizado} (excepto durante el modo V-Blank), justo antes de que los píxeles comiencen a dibujarse en pantalla. Durante este modo, \textbf{la PPU busca sprites en la memoria OAM} que deban ser renderizados en la línea actual, guardándolos posteriormente en un buffer.
 \\\\
 Para decidir qué sprites se guardan en buffer se toman en cuenta las siguientes condiciones:
 \begin{itemize}
@@ -1357,21 +1363,21 @@ Para decidir qué sprites se guardan en buffer se toman en cuenta las siguientes
 \end{itemize}
 
 \subsubsection{Modo 3: Drawing Pixels} \label{ppu:mode3}
-Modo durante el cual la PPU transfiere los colores correspondientes de cada píxel a la pantalla LCD. La duración varía según el número de sprites en la línea de renderizado actual, si se deben renderizar tiles de Window, etc.
+Modo durante el cual \textbf{la PPU transfiere los colores correspondientes de cada píxel a la pantalla LCD}. La duración varía según el número de sprites en la línea de renderizado actual, si se deben renderizar tiles de Window, etc.
 
 \subsection{Pixel FIFO}
 
-La Game Boy renderiza los píxeles de forma individual y los envía uno por uno a la pantalla LCD. Para lograrlo, utiliza dos Pixel FIFOs.
+La Game Boy \textbf{renderiza los píxeles de forma individual} y los envía uno por uno a la pantalla LCD. Para lograrlo, utiliza dos Pixel FIFOs.
 \begin{itemize}
     \item \textbf{Background FIFO}: Almacena los píxeles del Background y del Window.
     \item \textbf{Sprite FIFO}: Almacena los píxeles de los sprites.
 \end{itemize}
 
-Estos dos FIFOs son independientes y no comparten información entre ellos. El único momento en el que ambos se utilizan de forma simultánea es al mezclar los píxeles extraídos para ser enviados a la pantalla LCD. Cada uno puede almacenar hasta 16 píxeles, y el proceso debe garantizar que ambos contengan siempre al menos 8 píxeles en cualquier momento.
+\textbf{Estos dos FIFOs son independientes} y no comparten información entre ellos. El único momento en el que ambos se utilizan de forma simultánea es al mezclar los píxeles extraídos para ser enviados a la pantalla LCD. Cada uno puede almacenar hasta 16 píxeles, y el proceso debe garantizar que ambos contengan siempre al menos 8 píxeles en cualquier momento.
 \\\\
-La manipulación de los dos FIFOs solamente ocurre durante el \hyperref[ppu:mode3]{modo 3}.
+La \textbf{manipulación} de los dos \textbf{FIFOs} solamente ocurre durante el \textbf{\hyperref[ppu:mode3]{modo 3}}.
 \\\\
-En cada FIFO, los píxeles van acompañados de una serie de atributos o propiedades:
+En cada FIFO, los \textbf{píxeles} van \textbf{acompañados} de una serie de \textbf{atributos o propiedades}:
 \begin{itemize}
     \item \textbf{Color}: Índice de color del píxel.
     \item \textbf{Paleta}: Paleta de colores a la que pertenece el píxel.
@@ -1381,7 +1387,7 @@ En cada FIFO, los píxeles van acompañados de una serie de atributos o propieda
 
 \subsubsection{Pixel FIFO Fetcher}
 
-El proceso de \textit{Pixel Fetching} consta de 5 pasos:
+El proceso de \textit{Pixel Fetching} consta de \textbf{5 pasos}:
 
 \begin{enumerate}
     \item \textbf{Obtención de Tile}
@@ -1391,13 +1397,13 @@ El proceso de \textit{Pixel Fetching} consta de 5 pasos:
     \item \textbf{Push}
 \end{enumerate}
 
-\paragraph{Obtención de Tile:} Determina qué tile de Background o Window va a ser utilizado para obtener los píxeles. Por defecto el tilemap utilizado es el 0x9800. Las siguientes condiciones se deben tener en cuenta:
+\paragraph{Obtención de Tile:} \textbf{Determina qué tile de Background o Window va a ser utilizado} para obtener los píxeles. Por defecto el tilemap utilizado es el 0x9800. Las siguientes condiciones se deben tener en cuenta:
 \begin{itemize}
     \item Si el bit 3 del LCDC está habilitado y la coordenada X de la línea de renderizado actual no está dentro del Window, entonces el tilemap 0x9C00 es utilizado.
     \item Si el bit 6 del LCDC está habilitado y la coordenada X de la línea de renderizado actual está dentro del Window, entonces el tilemap 0x9C00 es utilizado.
 \end{itemize}
 
-El fetcher hace un seguimiento constante de las coordenadas X e Y del tile sobre el que está operando:
+El \textbf{fetcher} hace un \textbf{seguimiento} constante de las \textbf{coordenadas X e Y del tile} sobre el que está operando:
 
 \begin{itemize}
     \item \textbf{Coordenada X}:
@@ -1418,21 +1424,21 @@ El fetcher hace un seguimiento constante de las coordenadas X e Y del tile sobre
     \end{itemize}
 \end{itemize}
 
-\paragraph{Obtención de datos bajos del Tile:} Se verifica el bit 4 del LCDC para determinar qué tilemap se debe utilizar. En modo CGB, se debe determinar también el banco correspondiente de VRAM y si el tile esta volteado verticalmente.
+\paragraph{Obtención de datos bajos del Tile:} Se \textbf{verifica el bit 4 del LCDC para determinar qué tilemap se debe utilizar}. En modo CGB, se debe determinar también el banco correspondiente de VRAM y si el tile esta volteado verticalmente.
 \\\\
 Utilizando el numero de Tile obtenido en la operacion anterior, el fetcher obtiene el primer byte de la información en VRAM y la almacena. El offset a utilizar dependerá de si es de Background ($2*((LY + SCY) \% 8)$) o de Window ($2*((LY - WY) \% 8)$).
 
 \paragraph{Obtención de datos altos del Tile:} Este paso es el mismo que el anterior, con la diferencia de que se lee el siguiente byte de la dirección previamente recuperada.
 
-\paragraph{Sleep:} La consola espera durante dos ciclos de reloj sin realizar ninguna operación.
+\paragraph{Sleep:} La consola \textbf{espera durante dos ciclos de reloj} sin realizar ninguna operación.
 
-\paragraph{Push:} Los datos de los 8 píxeles pertenecientes al tile obtenido previamente se decodifican y se cargan en el FIFO correspondiente.
+\paragraph{Push:} Los \textbf{datos de los 8 píxeles} pertenecientes al tile obtenido previamente se \textbf{decodifican y se cargan en el FIFO} correspondiente.
 \\\\
 Si en los atributos se indica que el tile está volteado horizontalmente, los píxeles se insertarán de LSB a MSB.
 
 \subsubsection{Administrar Píxeles a la Pantalla LCD}
 
-Cada ciclo de reloj, la PPU intenta enviár un píxel al LCD. Este proceso solo se inicia si el FIFO de Background contiene píxeles. Los píxeles del FIFO de sprites sirven para ser mezclados con los demás.
+Cada ciclo de reloj, la PPU intenta \textbf{enviar un píxel al LCD}. Este proceso solo se inicia si el FIFO de Background contiene píxeles. Los píxeles del FIFO de sprites sirven para ser mezclados con los demás.
 
 \begin{figure}[H]
     \centering
