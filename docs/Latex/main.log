@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2025.5.13)  26 MAY 2025 20:53
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2025.5.13)  31 MAY 2025 21:13
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -2602,6 +2602,9 @@ File: include/images/myoldboy3.jpg Graphic file (type bmp)
 <include/images/myoldboy3.jpg>
 File: include/images/myoldboyportrait.jpg Graphic file (type bmp)
 <include/images/myoldboyportrait.jpg>
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
  [63
 
 ]
@@ -2751,10 +2754,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 161--166
 
  []
 
-
-Underfull \vbox (badness 7415) has occurred while \output is active []
-
- [77]
+[77]
 Underfull \hbox (badness 10000) in paragraph at lines 198--205
 
  []
@@ -2891,7 +2891,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 1079--1084
 File: include/images/openfile.jpg Graphic file (type bmp)
 <include/images/openfile.jpg>
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 1742) has occurred while \output is active []
 
  [99]
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -3287,7 +3287,7 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 Here is how much of TeX's memory you used:
  49600 strings out of 474878
  1060737 string characters out of 5762516
- 2688627 words of memory out of 5000000
+ 2690627 words of memory out of 5000000
  70705 multiletter control sequences out of 15000+600000
  563777 words of font info for 98 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191

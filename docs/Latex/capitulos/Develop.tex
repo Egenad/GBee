@@ -1,13 +1,13 @@
 \chapter{Desarrollo}
 \label{develop}
 
-El desarrollo del emulador se estructura en diversas fases que abordan los principales componentes de la consola, comenzando por la CPU, continuando con la gestión de gráficos (GPU/PPU) y memoria (RAM/ROM), y concluyendo con la implementación de las interfaces de entrada y salida (I/O). Cada uno de estos módulos es fundamental para asegurar una emulación fiel al hardware original, por lo que se prestará especial atención a la precisión y al rendimiento.
+El desarrollo del emulador se estructura en diversas fases que abordan los \textbf{principales componentes de la consola}, comenzando por la CPU, continuando con la gestión de gráficos (GPU/PPU) y memoria (RAM/ROM), y concluyendo con la implementación de las interfaces de entrada y salida (I/O). Cada uno de estos módulos es fundamental para asegurar una emulación fiel al hardware original, por lo que se prestará \textbf{especial atención a la precisión y al rendimiento}.
 \\\\
-La primera fase se centrará en la implementación de la CPU, que es responsable de ejecutar las instrucciones del juego. Cada paso del desarrollo irá acompañado de pruebas y validaciones para garantizar que el emulador reproduzca el comportamiento de la consola original de manera eficiente. Esto último se conseguirá mediante la implementación de pruebas unitarias que verifiquen el correcto comportamiento de los opcodes.
+La \textbf{primera fase} se centrará en la \textbf{implementación de la CPU}, que es responsable de ejecutar las instrucciones del juego. Cada paso del desarrollo irá acompañado de \textbf{pruebas y validaciones} para garantizar que el emulador reproduzca el comportamiento de la consola original de manera eficiente. Esto último se conseguirá mediante la implementación de \textbf{pruebas unitarias} que verifiquen el correcto comportamiento de los opcodes.
 
 \section{Módulos / Estructura del Proyecto}
 
-El emulador que se va a implementar constará de distintos módulos, cada uno con una función específica y clara, lo que facilitará tanto su comprensión como el desarrollo de cada uno de los aspectos del emulador. A continuación, se describen brevemente los módulos principales del proyecto:
+El emulador que se va a implementar constará de \textbf{distintos módulos}, cada uno con una \textbf{función específica} y clara, lo que facilitará tanto su comprensión como el desarrollo de cada uno de los aspectos del emulador. A continuación, se describen brevemente los \textbf{módulos principales del proyecto}:
 
 \begin{itemize} 
     \item \textbf{Emulator}: Este módulo centraliza la gestión de los otros componentes, coordinando su interacción y asegurando que el ciclo de emulación se ejecute correctamente. Controla el flujo general del programa.
@@ -26,10 +26,10 @@ El emulador que se va a implementar constará de distintos módulos, cada uno co
 
 \section{CPU}
 
-El desarrollo comienza con la implementación de la Unidad Central de Procesamiento. Debido a su papel fundamental en la correcta reproducción del funcionamiento del sistema, esta etapa se centra en implementar todas las instrucciones para asegurar que el emulador pueda procesar cada byte de información con precisión.
+El desarrollo comienza con la implementación de la \textbf{Unidad Central de Procesamiento}. Debido a su papel fundamental en la correcta reproducción del funcionamiento del sistema, esta etapa se centra en \textbf{implementar todas las instrucciones} para asegurar que el emulador pueda procesar cada byte de información con precisión.
 
 \subsection{Registros}
-Para definirlos en nuestro programa, utilizaremos el tipo Byte o UByte de Kotlin. En mi caso por desconocimiento del segundo tipo, comencé a programarlo con Byte. La diferencia entre ambos es que Byte utiliza el rango de [-128:128] y UByte el de [0:255] (igual que la GB). Podemos hacer uso de cualquiera de los dos mientras tengamos en mente que, si el primero lo convertimos a Integer, será un valor distinto al original. En cuanto a PC y SP, optaremos por utilizar Integers, ya que son valores de 2 bytes y siempre contienen una dirección de memoria.
+Para definirlos en nuestro programa, \textbf{utilizaremos el tipo Byte} o UByte de Kotlin. En mi caso por desconocimiento del segundo tipo, comencé a programarlo con Byte. La diferencia entre ambos es que Byte utiliza el rango de [-128:128] y UByte el de [0:255] (igual que la GB). Podemos hacer uso de cualquiera de los dos mientras tengamos en mente que, si el primero lo convertimos a Integer, será un valor distinto al original. \textbf{En cuanto a PC y SP}, optaremos por \textbf{utilizar Integers}, ya que son \textbf{valores de 2 bytes y siempre contienen una dirección de memoria}.
 
 \begin{lstlisting}[language=Kotlin, caption={Declaración de Registros}, label={code:kotlinregistros}]
     var A: Byte = 0
@@ -46,7 +46,7 @@ Para definirlos en nuestro programa, utilizaremos el tipo Byte o UByte de Kotlin
     var PC: Int = 0             // Program Counter
 \end{lstlisting}
 
-Para operar con ellos a nivel de byte, deberemos pasarlos a Integer, aplicarles una operación AND con el valor 0xFF (para eliminar el signo en caso de se utilice el tipo Byte originalmente), se ejecutarían las operaciones necesarias y al resultado se le aplicaría el mismo AND, para justo después volver a convertirlo a Byte:
+\textbf{Para operar con ellos a nivel de byte}, deberemos \textbf{pasarlos a Integer}, aplicarles una \textbf{operación AND con el valor 0xFF} (para eliminar el signo en caso de se utilice el tipo Byte originalmente), se ejecutarían las operaciones necesarias y al \textbf{resultado se le aplicaría el mismo AND}, para justo después \textbf{volver a convertirlo a Byte}:
 
 \begin{lstlisting}[language=Kotlin, caption={Ejemplo de Opcode}, label={code:kotlinexample}]
     fun add_a_c(): Int{
@@ -61,7 +61,7 @@ Para operar con ellos a nivel de byte, deberemos pasarlos a Integer, aplicarles 
     }
 \end{lstlisting}
 
-Para la actualización de los flags, se implementarán funciones específicas que gestionarán su estado de manera adecuada. Adicionalmente, se declararán constantes que facilitarán la identificación del estado de cada flag en cualquier momento. Estas constantes corresponden a los bits asociados con un valor de 1 en formato hexadecimal (por ejemplo, 0x80 corresponde a 0b10000000).
+Para la \textbf{actualización de los flags}, se implementarán \textbf{funciones específicas que gestionarán su estado} de manera adecuada. Adicionalmente, se declararán constantes que facilitarán la identificación del estado de cada flag en cualquier momento. Estas constantes corresponden a los bits asociados con un valor de 1 en formato hexadecimal (por ejemplo, 0x80 corresponde a 0b10000000).
 
 \begin{lstlisting}[language=Kotlin, caption={Actualización de Flags}, label={code:kotlinflags}]
 
@@ -96,7 +96,7 @@ Para la actualización de los flags, se implementarán funciones específicas qu
 
 \subsection{Opcodes}
 
-Lo primero es identificar qué operación ejecutar dependiendo del byte que nos llegue. Podemos hacerlo de muchas maneras, en este caso lo vamos a manejar mediante un switch:
+Lo primero es \textbf{identificar qué operación ejecutar dependiendo del byte} que nos llegue. Podemos hacerlo de muchas maneras, en este caso lo vamos a manejar mediante un switch:
 
 \begin{lstlisting}[language=Kotlin, caption={Identificación de Opcode}, label={code:kotlinwhen}]
     fun execute(opcode: Byte): Int {
@@ -124,7 +124,7 @@ Para las \textbf{instrucciones extendidas}, se implementará otro switch que, de
 \\\\
 En caso de que el input que nos llegue por parámetro no represente ninguna instrucción conocida, el emulador lanzará una excepción y finalizará la ejecución.
 \\\\
-Por cada instrucción, como ya hemos visto, deberemos tener en cuenta las características mencionadas previamente. Vamos a mostrar ejemplos de instrucciones ya implementadas por cada categoría:
+Por cada instrucción, como ya hemos visto, deberemos tener en cuenta las características mencionadas previamente. Vamos a mostrar \textbf{ejemplos de instrucciones} ya implementadas por cada categoría:
 
 \paragraph{Funciones comunes:}
 Algunas funciones comunes que la gran mayoría de instrucciones van a utilizar.
@@ -158,9 +158,9 @@ Algunas funciones comunes que la gran mayoría de instrucciones van a utilizar.
     }
 \end{lstlisting}
 
-La función \textit{fetch()} tiene como objetivo principal obtener el byte almacenado en la dirección de memoria señalada por el PC, e incrementarlo posteriormente (si no se produce el fallo de la CPU, que será explicado más adelante). 
+La \textbf{función \textit{fetch()}} tiene como objetivo principal \textbf{obtener el byte almacenado en la dirección de memoria señalada por el PC}, e incrementarlo posteriormente (si no se produce el fallo de la CPU, que será explicado más adelante). 
 \\\\
-Por su parte, \textit{fetch16()} realiza dos llamadas consecutivas a \textit{fetch()} y combina los dos bytes obtenidos mediante la función \textit{get\_16bit\_address()}, que utiliza las operaciones SHL y OR. 
+Por su parte, \textbf{\textit{fetch16()} realiza dos llamadas consecutivas a \textit{fetch()}} y combina los dos bytes obtenidos mediante la función \textit{get\_16bit\_address()}, que utiliza las operaciones SHL y OR. 
 \\\\
 Finalmente, la función \textit{set\_16bit\_address\_value()}, recibe una dirección como parámetro y delega al módulo de memoria la escritura del valor proporcionado, si es posible hacerlo.
 
@@ -203,7 +203,7 @@ La tercera función (LD [HL], B) es justo lo contrario a la segunda. En este cas
 \\\\
 Por último, en la cuarta función (LD [HL], NN), no nos viene especificado un registro, si no que debemos obtener los dos siguientes bytes del PC. Hay que recordar que los bytes se guardan en memoria en \textbf{Little Endian}, por lo que el primero que se obtiene es el Low. Asignamos al registro H el High y al registro L el Low, y al devolver los ciclos correspondientes quedaría implementada la instrucción.
 
-\paragraph{Aritméticas y Lógicas:} En esta categoría entran todas las instrucciones de ADD, ADC, AND, SUB, SBC, DEC, INC, XOR, OR, CP, CPL, CCF, DAA y SCF. Vamos a ver algunos ejemplos de cada una de ellas:
+\paragraph{Aritméticas y Lógicas:} En esta categoría entran todas las \textbf{instrucciones de ADD, ADC, AND, SUB, SBC, DEC, INC, XOR, OR, CP, CPL, CCF, DAA y SCF}. Vamos a ver algunos ejemplos de cada una de ellas:
 
 \begin{lstlisting}[language=Kotlin, caption={Operaciones ADD y ADC}, label={code:kotlinaddc}]
     fun updateAddOperationFlags(val1: Int, val2: Int, result: Int){
@@ -239,7 +239,7 @@ Por último, en la cuarta función (LD [HL], NN), no nos viene especificado un r
 
 Para la instrucción \textbf{ADD} (en este caso \textbf{ADD A, B}), la operación consiste en convertir ambos registros a enteros sin signo y sumar sus valores.
 \\\\
-La diferencia entre ADD y ADC reside en que en este último al resultado también se le suma el valor del carry y, por ende, se debe tener en cuenta en la actualización del flag Half-Carry.
+La \textbf{diferencia entre ADD y ADC} reside en que en \textbf{este último al resultado también se le suma el valor del carry} y, por ende, se debe tener en cuenta en la actualización del flag Half-Carry.
 \\\\
 En los casos que impliquen el uso de direcciones de memoria (operaciones de 2 bytes), se puede emplear el código utilizado en las instrucciones de carga (LD) \ref{instrLd} como referencia.
 
@@ -279,7 +279,7 @@ En los casos que impliquen el uso de direcciones de memoria (operaciones de 2 by
     }
 \end{lstlisting}
 
-Las instrucciones de INC y DEC son muy similares. INC suma 1 al valor y afecta los flags del procesador: el Zero (Z) se activa si el resultado es 0, el Half-carry (H) se activa si hay un acarreo entre los bits 3 y 4, y el Subtract (N) siempre se borra. Por su parte, DEC resta 1 al valor y afecta los mismos flags, pero siempre activa el Subtract (N) ya que es una operación de sustracción. Ambos opcodes no afectan el Carry flag (C) y se utilizan tanto para registros de 8 bits como para posiciones de memoria.
+Las instrucciones de INC y DEC son muy similares. \textbf{INC suma 1 al valor} y afecta los flags del procesador: el Zero (Z) se activa si el resultado es 0, el Half-carry (H) se activa si hay un acarreo entre los bits 3 y 4, y el Subtract (N) siempre se borra. Por su parte, \textbf{DEC resta 1 al valor} y afecta los mismos flags, pero siempre activa el Subtract (N) ya que es una operación de sustracción. Ambos opcodes no afectan el Carry flag (C) y se utilizan tanto para registros de 8 bits como para posiciones de memoria.
 
 \begin{lstlisting}[language=Kotlin, caption={Operación XOR}, label={code:kotlinxor}]
     fun xor_b(): Int{
@@ -294,11 +294,11 @@ Las instrucciones de INC y DEC son muy similares. INC suma 1 al valor y afecta l
     }
 \end{lstlisting}
 
-La operación XOR se realizan siempre al registro A, utilizando su valor y el del registro indicado por el opcode (en este caso B). Tras la operación, verifica si el resultado es cero para activar el flag Z, y limpia los flags N, H y C, ya que no son relevantes.
+La \textbf{operación XOR} se realizan \textbf{siempre al registro A}, utilizando su valor y el del registro indicado por el opcode (en este caso B). Tras la operación, verifica si el resultado es cero para activar el flag Z, y limpia los flags N, H y C, ya que no son relevantes.
 \\\\
 Las operaciones OR son idénticas en Kotlin, simplemente deberemos cambiar el operando 'xor' por 'or'.
 
-\paragraph{Control de flujo:} Las instrucciones de control de flujo, como CALL, JP y RETI, permiten modificar la secuencia de ejecución del programa. Estas instrucciones desvían el flujo normal de instrucciones al saltar a direcciones específicas de memoria o retornar desde subrutinas o interrupciones. Tenemos instrucciones como CALL, JP o JR que son utilizadas para saltar a una nueva dirección, con CALL almacenando la dirección de retorno en la pila para permitir volver al punto de origen.
+\paragraph{Control de flujo:} Las \textbf{instrucciones de control de flujo}, como CALL, JP y RETI, \textbf{permiten modificar la secuencia de ejecución del programa}. Estas instrucciones desvían el flujo normal de instrucciones al saltar a direcciones específicas de memoria o retornar desde subrutinas o interrupciones. Tenemos instrucciones como CALL, JP o JR que son utilizadas para saltar a una nueva dirección, con CALL almacenando la dirección de retorno en la pila para permitir volver al punto de origen.
 \\\\
 Vamos a analizarlas de una en una:
 \begin{lstlisting}[language=Kotlin, caption={Operación CALL}, label={code:kotlincall}]
@@ -319,7 +319,7 @@ Vamos a analizarlas de una en una:
     }
 \end{lstlisting}
 
-La instrucción \textbf{CALL} salta a una subrutina especificada, guardando la dirección de retorno en la pila. El PC se actualiza con la dirección de destino, y tras ejecutar la subrutina, el programa puede volver al punto original usando la instrucción RET, restaurando la dirección desde la pila. Esta último instrucción no se implementa en el propio CALL, si no que debe ser gestionada a posterior por parte del desarrollador, utilizando el valor previo del PC (guardado en el SP antes de su actualización).
+La instrucción \textbf{CALL salta a una subrutina especificada}, guardando la dirección de retorno en la pila. El PC se actualiza con la dirección de destino, y tras ejecutar la subrutina, el programa puede volver al punto original usando la instrucción RET, restaurando la dirección desde la pila. Esta último instrucción no se implementa en el propio CALL, si no que debe ser gestionada a posterior por parte del desarrollador, utilizando el valor previo del PC (guardado en el SP antes de su actualización).
 \\\\
 Además, en el ejemplo expuesto, se nos indica que el CALL solamente se debe ejecutar si el Flag Z no está activo. En caso contrario, lo único que haría son 2 \textit{fetch()} seguidos y se hace uso de menos ciclos de reloj.
 
@@ -339,9 +339,9 @@ Además, en el ejemplo expuesto, se nos indica que el CALL solamente se debe eje
 
 Las instrucciones \textbf{JR} y \textbf{JP} son similares a CALL, pero no almacenan el valor actual del PC en el stack. 
 \\\\
-La instrucción JP salta directamente a una dirección de memoria especificada, actualizando el PC, lo que permite saltos largos a cualquier posición en la memoria. 
+La instrucción \textbf{JP salta directamente a una dirección de memoria especificada}, actualizando el PC, lo que permite saltos largos a cualquier posición en la memoria. 
 \\\\
-JR, en cambio, realiza un salto relativo, ajustando el PC en función de un desplazamiento positivo o negativo, permitiendo saltos más cortos dentro de un rango cercano. Dado que los \textbf{saltos relativos} pueden cubrir un \textbf{máximo de 0xFF bytes} hacia arriba o abajo, JR consume menos ciclos de reloj.
+\textbf{JR}, en cambio, realiza un \textbf{salto relativo}, ajustando el PC en función de un desplazamiento positivo o negativo, permitiendo saltos más cortos dentro de un rango cercano. Dado que los saltos relativos pueden cubrir un \textbf{máximo de 0xFF bytes} hacia arriba o abajo, \textbf{JR consume menos ciclos de reloj}.
 
 \begin{lstlisting}[language=Kotlin, caption={Operaciones RET y RETI}, label={code:kotlinreti}]
     fun executeRetOperation(){
@@ -365,7 +365,7 @@ JR, en cambio, realiza un salto relativo, ajustando el PC en función de un desp
     }
 \end{lstlisting}
 
-Las instrucciones \textbf{RET} y \textbf{RETI} se utilizan para retornar de una subrutina, recuperando la dirección de retorno almacenada en el stack. RET restaura el valor del registro PC desde el stack, permitiendo así continuar la ejecución desde donde se dejó al llamar a la subrutina. En contraste, RETI realiza la misma operación, pero se utiliza específicamente para el retorno de una interrupción, asegurando que se manejen correctamente las interrupciones pendientes antes de restaurar el flujo de ejecución.
+Las instrucciones \textbf{RET} y \textbf{RETI} se utilizan para \textbf{retornar de una subrutina}, recuperando la dirección de retorno almacenada en el stack. RET restaura el valor del registro PC desde el stack, permitiendo así continuar la ejecución desde donde se dejó al llamar a la subrutina. En contraste, \textbf{RETI} realiza la misma operación, pero se utiliza específicamente para el \textbf{retorno de una interrupción}, asegurando que se manejen correctamente las interrupciones pendientes antes de restaurar el flujo de ejecución.
 
 \begin{lstlisting}[language=Kotlin, caption={Operación CP}, label={code:kotlincp}]
     fun cp_b(): Int{
@@ -383,7 +383,7 @@ Las instrucciones \textbf{RET} y \textbf{RETI} se utilizan para retornar de una 
     }
 \end{lstlisting}
 
-La función CP B (Compare B) se encarga de comparar el valor del registro A con el valor del registro B, estableciendo los flags correspondientes según el resultado de la comparación. Primero, convierte los registros A y B a enteros de 8 bits, luego calcula el resultado de la resta entre A y B, enmascarando el resultado para asegurarse de que se mantenga dentro del rango de 8 bits. A continuación, actualiza el flag Z si el resultado es igual a cero, establece el flag N para indicar que se realizó una comparación, y determina el estado del flag H al verificar si el nibble menos significativo de A es menor que el de B. Por último, establece el flag C si el valor de A es menor que el de B.
+La función \textbf{CP B} (Compare B) se encarga de \textbf{comparar el valor del registro A con el valor del registro B}, estableciendo los flags correspondientes según el resultado de la comparación. Primero, convierte los registros A y B a enteros de 8 bits, luego calcula el resultado de la resta entre A y B, enmascarando el resultado para asegurarse de que se mantenga dentro del rango de 8 bits. A continuación, actualiza el flag Z si el resultado es igual a cero, establece el flag N para indicar que se realizó una comparación, y determina el estado del flag H al verificar si el nibble menos significativo de A es menor que el de B. Por último, establece el flag C si el valor de A es menor que el de B.
 
 \begin{lstlisting}[language=Kotlin, caption={Operación CPL}, label={code:kotlincpl}]
     fun cpl(): Int{
@@ -397,7 +397,7 @@ La función CP B (Compare B) se encarga de comparar el valor del registro A con 
     }
 \end{lstlisting}
 
-La función CPL (Complementary) se encarga de complementar el valor del registro A, invirtiendo todos sus bits mediante una operación XOR con 0xFF. Esto transforma todos los bits de A en sus opuestos, cambiando ceros por unos y viceversa. Después de realizar la operación, la función establece el flag N para indicar que se ha realizado una operación que afecta al signo del número, y también establece el flag H para indicar que puede haber un acarreo en la operación.
+La \textbf{función CPL} (Complementary) se encarga de \textbf{complementar el valor del registro A, invirtiendo todos sus bits mediante una operación XOR con 0xFF}. Esto transforma todos los bits de A en sus opuestos, cambiando ceros por unos y viceversa. Después de realizar la operación, la función establece el flag N para indicar que se ha realizado una operación que afecta al signo del número, y también establece el flag H para indicar que puede haber un acarreo en la operación.
 
 \begin{lstlisting}[language=Kotlin, caption={Operación CCF}, label={code:kotlinccf}]
     fun ccf(): Int{
@@ -411,7 +411,7 @@ La función CPL (Complementary) se encarga de complementar el valor del registro
     }
 \end{lstlisting}
 
-La función CCF (Complement Carry Flag) se encarga de complementar el valor del flag C. Primero, verifica si el flag de acarreo está actualmente activado; si no lo está, lo activa, y si lo está, lo desactiva, utilizando el operador lógico AND para determinar su estado anterior. Además, establece los flags H y N como activos.
+La \textbf{función CCF} (Complement Carry Flag) se encarga de \textbf{complementar el valor del flag C}. Primero, verifica si el flag de acarreo está actualmente activado; si no lo está, lo activa, y si lo está, lo desactiva, utilizando el operador lógico AND para determinar su estado anterior. Además, establece los flags H y N como activos.
 
 \begin{lstlisting}[language=Kotlin, caption={Operación DAA}, label={code:kotlindaa}]
     fun daa(): Int{
@@ -445,7 +445,7 @@ La función CCF (Complement Carry Flag) se encarga de complementar el valor del 
     }
 \end{lstlisting}
 
-La función DAA (Decimal Adjust for Addition) es una implementación que ajusta el valor del registro A para operaciones aritméticas en formato decimal después de una suma o resta. El método primero convierte el valor de A a un entero de 8 bits, luego verifica si la operación anterior fue una suma o una resta basándose en el estado del flag N.
+La \textbf{función DAA} (Decimal Adjust for Addition) es una implementación que \textbf{ajusta el valor del registro A para operaciones aritméticas en formato decimal} después de una suma o resta. El método primero convierte el valor de A a un entero de 8 bits, luego verifica si la operación anterior fue una suma o una resta basándose en el estado del flag N.
 
 \begin{lstlisting}[language=Kotlin, caption={Operación SCF}, label={code:kotlinscf}]
     fun scf(): Int{
@@ -458,9 +458,9 @@ La función DAA (Decimal Adjust for Addition) es una implementación que ajusta 
     }
 \end{lstlisting}
 
-La función SCF (Set Carry Flag) establece el flag C a 1 y borra los flags N y H, lo que indica que el próximo cálculo tendrá en cuenta que se ha producido un acarreo.
+La \textbf{función SCF} (Set Carry Flag) \textbf{establece el flag C a 1 y borra los flags N y H}, lo que indica que el próximo cálculo tendrá en cuenta que se ha producido un acarreo.
 
-\paragraph{Rotación y desplazamiento:} En esta categoría tenemos las instrucciones de RL, RR, RLC, RRC, SLA, SRA, SWAP y SRL. Vamos a ver algunos ejemplos de cada una de ellas:
+\paragraph{Rotación y desplazamiento:} En esta categoría tenemos las \textbf{instrucciones de RL, RR, RLC, RRC, SLA, SRA, SWAP y SRL}. Vamos a ver algunos ejemplos de cada una de ellas:
 
 \begin{lstlisting}[language=Kotlin, caption={Operaciones RL y RR}, label={code:kotlinrlrr}]
     fun rl_b(): Int{
@@ -494,7 +494,7 @@ La función SCF (Set Carry Flag) establece el flag C a 1 y borra los flags N y H
     }
 \end{lstlisting}
 
-Las funciones RL B y RR B realizan rotaciones de bits en el registro B, pero difieren en la dirección y el manejo del carry. La función RL rota los bits hacia la izquierda; el MSB se desplaza a la izquierda y se introduce en el LSB, utilizando el valor del carry anterior para completar la rotación. En cambio, RR rota los bits hacia la derecha; el LSB se mueve al carry y el carry anterior se coloca en el MSB. Ambas funciones actualizan los indicadores de estado, como el flag Z si el resultado es cero, y el flag C según el bit que se desplaza.
+Las \textbf{funciones RL B y RR B realizan rotaciones de bits en el registro B}, pero difieren en la dirección y el manejo del carry. La \textbf{función RL rota los bits hacia la izquierda}; el MSB se desplaza a la izquierda y se introduce en el LSB, utilizando el valor del carry anterior para completar la rotación. En cambio, \textbf{RR rota los bits hacia la derecha}; el LSB se mueve al carry y el carry anterior se coloca en el MSB. Ambas funciones actualizan los indicadores de estado, como el flag Z si el resultado es cero, y el flag C según el bit que se desplaza.
 
 \begin{lstlisting}[language=Kotlin, caption={Operaciones RLC y RRC}, label={code:kotlinrlcrrc}]
     fun rlc_b(): Int{
@@ -524,7 +524,7 @@ Las funciones RL B y RR B realizan rotaciones de bits en el registro B, pero dif
     }
 \end{lstlisting}
 
-La función RLC B realiza una rotación a la izquierda del registro B, desplazando el MSB hacia el LSB y estableciendo el nuevo valor del MSB en el carry. Actualiza todos los flags en función del resultado. En contraste, la función RRC B efectúa una rotación a la derecha, desplazando el LSB hacia el MSB y estableciendo su nuevo valor en el carry.
+La \textbf{función RLC B} realiza una \textbf{rotación a la izquierda del registro B}, desplazando el MSB hacia el LSB y estableciendo el nuevo valor del MSB en el carry. Actualiza todos los flags en función del resultado. En contraste, la función RRC B efectúa una rotación a la derecha, desplazando el LSB hacia el MSB y estableciendo su nuevo valor en el carry.
 
 \begin{lstlisting}[language=Kotlin, caption={Operaciones SLA, SRA y SRL}, label={code:kotlinslasrasrl}]
     fun sla_b(): Int{
@@ -569,7 +569,7 @@ La función RLC B realiza una rotación a la izquierda del registro B, desplazan
     }
 \end{lstlisting}
 
-La función SLA B realiza un desplazamiento lógico a la izquierda del registro B, moviendo todos los bits una posición a la izquierda y estableciendo el LSB en 0, mientras que el nuevo carry se toma del antiguo MSB. En contraste, SRA B realiza un desplazamiento aritmético a la derecha, manteniendo el bit más significativo y moviendo el resto de los bits hacia la derecha, con el nuevo carry tomado del antiguo LSB. Por otro lado, SRL B también realiza un desplazamiento lógico a la derecha, pero establece el MSB en 0 y mueve los bits a la derecha, con el nuevo carry tomado del antiguo LSB.
+La \textbf{función SLA B} realiza un \textbf{desplazamiento lógico a la izquierda del registro B}, moviendo todos los bits una posición a la izquierda y estableciendo el LSB en 0, mientras que el nuevo carry se toma del antiguo MSB. En contraste, \textbf{SRA B realiza un desplazamiento aritmético a la derecha}, manteniendo el bit más significativo y moviendo el resto de los bits hacia la derecha, con el nuevo carry tomado del antiguo LSB. Por otro lado, \textbf{SRL B} también \textbf{realiza un desplazamiento lógico a la derecha}, pero establece el MSB en 0 y mueve los bits a la derecha, con el nuevo carry tomado del antiguo LSB.
 
 \begin{lstlisting}[language=Kotlin, caption={Operación SWAP}, label={code:kotlinswap}]
     fun swap_b(): Int{
@@ -587,7 +587,7 @@ La función SLA B realiza un desplazamiento lógico a la izquierda del registro 
     }
 \end{lstlisting}
 
-La función SWAP B intercambia los nibbles (4 bits) del registro B, moviendo los 4 bits menos significativos a la posición de los 4 bits más significativos y viceversa. Actualiza el flag Z si el nuevo valor es cero, y limpia los flags N, H y C.
+La \textbf{función SWAP B intercambia los nibbles (4 bits) del registro B}, moviendo los 4 bits menos significativos a la posición de los 4 bits más significativos y viceversa. Actualiza el flag Z si el nuevo valor es cero, y limpia los flags N, H y C.
 
 \paragraph{Manipulación de bits:} Encontramos las instrucciones BIT, RES y SET.
 
@@ -627,7 +627,7 @@ La función SWAP B intercambia los nibbles (4 bits) del registro B, moviendo los
     }
 \end{lstlisting}
 
-La operación BIT verifica el estado de un bit específico (de 0 a 7) en un registro determinado (de 1 a 8). Utiliza condiciones para identificar qué registro se está evaluando y calcula si el bit indicado está apagado (0) o encendido (1). Si el registro es 7, que representa una dirección de memoria, obtiene el byte correspondiente desde esa dirección, y el tiempo de ciclo se ajusta a 16. Posteriormente, actualiza el flag Z, limpia el flag N y establece el flag H. Al final, devuelve el tiempo de ciclo correspondiente, que es 8 para los registros de 1 a 6 y el 8, y 16 para el registro 7.
+La \textbf{operación BIT verifica el estado de un bit específico (de 0 a 7) en un registro determinado (de 1 a 8)}. Utiliza condiciones para identificar qué registro se está evaluando y calcula si el bit indicado está apagado (0) o encendido (1). Si el registro es 7, que representa una dirección de memoria, obtiene el byte correspondiente desde esa dirección, y el tiempo de ciclo se ajusta a 16. Posteriormente, actualiza el flag Z, limpia el flag N y establece el flag H. Al final, devuelve el tiempo de ciclo correspondiente, que es 8 para los registros de 1 a 6 y el 8, y 16 para el registro 7.
 
 \begin{lstlisting}[language=Kotlin, caption={Operación RES}, label={code:kotlinres}]
     fun res_operation(register: Int, bitNumber: Int): Int{
@@ -658,7 +658,7 @@ La operación BIT verifica el estado de un bit específico (de 0 a 7) en un regi
     }
 \end{lstlisting}
 
-La operación RES se encarga de reiniciar (poner a 0) un bit específico (de 0 a 7) en un registro determinado (de 1 a 8). Utiliza condiciones para determinar cuál registro se está manipulando y genera una máscara de bit que apaga el bit correspondiente. Si el registro es 7, la función obtiene la dirección de memoria desde los registros H y L, lee el byte almacenado en esa dirección, reinicia el bit correspondiente y escribe el nuevo valor de vuelta en memoria. El tiempo de ciclo se gestiona de la misma manera que en la operación BIT.
+La \textbf{operación RES} se encarga de \textbf{reiniciar (poner a 0) un bit específico (de 0 a 7) en un registro determinado} (de 1 a 8). Utiliza condiciones para determinar cuál registro se está manipulando y genera una máscara de bit que apaga el bit correspondiente. Si el registro es 7, la función obtiene la dirección de memoria desde los registros H y L, lee el byte almacenado en esa dirección, reinicia el bit correspondiente y escribe el nuevo valor de vuelta en memoria. El tiempo de ciclo se gestiona de la misma manera que en la operación BIT.
 
 \begin{lstlisting}[language=Kotlin, caption={Operación SET}, label={code:kotlinset}]
     fun set_operation(register: Int, bitNumber: Int): Int{
@@ -689,7 +689,7 @@ La operación RES se encarga de reiniciar (poner a 0) un bit específico (de 0 a
     }
 \end{lstlisting}
 
-La operación SET se encarga de establecer (poner a 1) un bit específico (de 0 a 7) en un registro determinado (de 1 a 8). Utiliza condiciones para identificar qué registro se está manipulando y genera una máscara de bit que activa el bit correspondiente. Si el registro es 7, la función obtiene la dirección de memoria a partir de los registros H y L, lee el byte almacenado en esa dirección, activa el bit correspondiente y escribe el nuevo valor de vuelta en la memoria. El tiempo de ciclo se gestiona de la misma manera que en la operación BIT.
+La \textbf{operación SET} se encarga de \textbf{establecer (poner a 1) un bit específico (de 0 a 7) en un registro determinado (de 1 a 8)}. Utiliza condiciones para identificar qué registro se está manipulando y genera una máscara de bit que activa el bit correspondiente. Si el registro es 7, la función obtiene la dirección de memoria a partir de los registros H y L, lee el byte almacenado en esa dirección, activa el bit correspondiente y escribe el nuevo valor de vuelta en la memoria. El tiempo de ciclo se gestiona de la misma manera que en la operación BIT.
 
 \paragraph{Especiales de sistema:} Encontramos las instrucciones NOP, DI y EI:
 
@@ -699,7 +699,7 @@ La operación SET se encarga de establecer (poner a 1) un bit específico (de 0 
     }
 \end{lstlisting}
 
-La operación NOP (No Operation) realiza una operación que no tiene efecto en el estado del procesador; es decir, no cambia los registros, la memoria o los flags. Su principal función es ocupar espacio en el ciclo de ejecución, permitiendo la sincronización en la ejecución de instrucciones o como un marcador para pausas en el código. A la hora de implementarlo, simplemente devolvemos los ciclos correspondientes.
+La \textbf{operación NOP} (No Operation) realiza una operación que \textbf{no tiene efecto en el estado del procesador}; es decir, no cambia los registros, la memoria o los flags. Su principal función es ocupar espacio en el ciclo de ejecución, permitiendo la sincronización en la ejecución de instrucciones o como un marcador para pausas en el código. A la hora de implementarlo, simplemente devolvemos los ciclos correspondientes.
 
 \begin{lstlisting}[language=Kotlin, caption={Operaciones DI, EI}, label={code:kotlindiei}]
     private var pendingEI = false
@@ -717,11 +717,11 @@ La operación NOP (No Operation) realiza una operación que no tiene efecto en e
     }
 \end{lstlisting}
 
-El opcode EI habilita las interrupciones en el procesador (se detallará más adelante). Es importante destacar que las interrupciones no se activan de manera inmediata; en su lugar, deben esperar hasta el siguiente ciclo de la CPU para entrar en efecto. Por esta razón, se utiliza una variable para almacenar el estado de las interrupciones.
+El \textbf{opcode EI habilita las interrupciones en el procesador} (se detallará más adelante). Es importante destacar que \textbf{las interrupciones no se activan de manera inmediata}; en su lugar, deben esperar hasta el siguiente ciclo de la CPU para entrar en efecto. Por esta razón, se utiliza una variable para almacenar el estado de las interrupciones.
 \\\\
-Por otro lado, DI deshabilita las interrupciones en el procesador, bloqueando la capacidad del sistema para responder a señales externas hasta que se vuelvan a habilitar mediante un EI. En este caso, los cambios si que tienen efecto inmediato.
+Por otro lado, \textbf{DI deshabilita las interrupciones en el procesador}, bloqueando la capacidad del sistema para responder a señales externas hasta que se vuelvan a habilitar mediante un EI. En este caso, los cambios si que tienen efecto inmediato.
 
-\paragraph{Con pila:} Encontramos las instrucciones PUSH y POP:
+\paragraph{Con pila:} Encontramos las \textbf{instrucciones PUSH y POP}:
 
 \begin{lstlisting}[language=Kotlin, caption={Operaciones PUSH, POP}, label={code:kotlinpushpop}]
     fun push_bc(): Int{
@@ -744,9 +744,9 @@ Por otro lado, DI deshabilita las interrupciones en el procesador, bloqueando la
     }
 \end{lstlisting}
 
-La función PUSH BC almacena los valores de los registros B y C en la pila. Primero, decrece el puntero de la pila (SP) en 1 y escribe el contenido de B en la dirección de memoria apuntada, luego vuelve a decrecer la pila y escribe el contenido de C. Esta operación asegura que el registro C se almacene en la parte baja de la pila y B en la parte alta.
+La \textbf{función PUSH BC almacena los valores de los registros B y C en la pila}. Primero, decrece el puntero de la pila (SP) en 1 y escribe el contenido de B en la dirección de memoria apuntada, luego vuelve a decrecer la pila y escribe el contenido de C. Esta operación asegura que el registro C se almacene en la parte baja de la pila y B en la parte alta.
 
-Por otro lado, la función POP BC recupera los valores de los registros B y C desde la pila. Comienza leyendo el byte almacenado en la dirección de memoria apuntada por SP y lo asigna al registro C, luego incrementa la pila para apuntar al siguiente byte. A continuación, lee el byte en la nueva dirección y lo asigna al registro B, y nuevamente incrementa SP.
+Por otro lado, la función \textbf{POP BC recupera los valores de los registros B y C desde la pila}. Comienza leyendo el byte almacenado en la dirección de memoria apuntada por SP y lo asigna al registro C, luego incrementa la pila para apuntar al siguiente byte. A continuación, lee el byte en la nueva dirección y lo asigna al registro B, y nuevamente incrementa SP.
 
 \begin{lstlisting}[language=Kotlin, caption={Operaciones I/O}, label={code:kotlinio}]
     fun ldh_n_a(): Int{
@@ -765,14 +765,14 @@ Por otro lado, la función POP BC recupera los valores de los registros B y C de
     }
 \end{lstlisting}
 
-La función LDH N, A carga el valor del registro A en una dirección de memoria específica determinada por un byte que se obtiene mediante la función fetch(). Este byte se suma a la dirección base 0xFF00 (dirección en la que empiezan los registros de I/O) para formar la dirección final donde se almacenará el valor de A.
+La \textbf{función LDH N, A carga el valor del registro A en una dirección de memoria} específica determinada por un byte que se obtiene mediante la función fetch(). Este byte se suma a la dirección base 0xFF00 (dirección en la que empiezan los registros de I/O) para formar la dirección final donde se almacenará el valor de A.
 \\\\
-Por otro lado, la función LD CN, A almacena el valor del registro A en una dirección de memoria también basada en el registro C. Aquí, se suma el valor de C a la dirección base 0xFF00 para calcular la dirección final, donde se escribirá el valor de A.
+Por otro lado, la \textbf{función LD CN, A almacena el valor del registro A en una dirección de memoria} también basada en el registro C. Aquí, se suma el valor de C a la dirección base 0xFF00 para calcular la dirección final, donde se escribirá el valor de A.
 \\\\
 Ambas funciones son importantes para la manipulación de datos en la memoria del sistema.
 
 \section{Memory}
-El módulo de memoria actúa como un bus de datos que redirecciona las operaciones de lectura y escritura hacia otros módulos del emulador, como la CPU, la ROM y otros componentes. Además de su función de interconexión, este módulo contiene toda la memoria virtual principal de nuestro emulador, que abarca los 64 KB de espacio de memoria direccionable. Esto incluye tanto la memoria de trabajo, como la RAM, como la memoria de mapeo de la ROM, que se utiliza para cargar los juegos.
+El \textbf{módulo de memoria} actúa como un bus de datos que \textbf{redirecciona las operaciones de lectura y escritura} hacia otros módulos del emulador, como la CPU, la ROM y otros componentes. Además de su función de interconexión, este módulo \textbf{contiene toda la memoria virtual} principal de nuestro emulador, que abarca los 64 KB de espacio de memoria direccionable. Esto incluye tanto la memoria de trabajo, como la RAM, como la memoria de mapeo de la ROM, que se utiliza para cargar los juegos.
 \\\\
 Comenzaremos la implementación declarando algunas constantes y la variable correspondiente que reservará esos 64KB de memoria:
 
@@ -804,7 +804,7 @@ Comenzaremos la implementación declarando algunas constantes y la variable corr
 
 \subsection{Lectura / Escritura}
 
-Al realizar operaciones de lectura y escritura, no podemos simplemente asignar un valor directamente a la dirección proporcionada como parámetro. Existen áreas de memoria donde los desarrolladores tienen restricciones para escribir y otras a las que no se puede acceder en determinados momentos de la ejecución. Por esta razón, delegaremos las funciones de acceso a los módulos apropiados según la región de memoria correspondiente a la dirección que se pase como parámetro.
+Al realizar operaciones de lectura y escritura, \textbf{no se puede} simplemente \textbf{asignar un valor directamente} a la dirección proporcionada como parámetro. Existen áreas de memoria donde los desarrolladores tienen restricciones para escribir y otras a las que no se puede acceder en determinados momentos de la ejecución. Por esta razón, \textbf{delegaremos las funciones de acceso a los módulos apropiados según la región de memoria correspondiente} a la dirección que se pase como parámetro.
 \\\\
 Por ejemplo, si la dirección solicitada es menor de la dirección en la que empieza la VRAM (0x8000), querrá decir que se está intentando escribir en ROM (0x0000 - 0x7FFF).
 
@@ -870,11 +870,11 @@ Por ejemplo, si la dirección solicitada es menor de la dirección en la que emp
     }
 \end{lstlisting}
 
-Las últimas dos funciones son las que leen o escriben directamente de nuestra memoria virtual, y serán utilizadas en última instancia por los módulos delegados una vez hayan verificado que se pueden ejecutar.
+Las \textbf{últimas dos funciones} son las que leen o escriben directamente de nuestra memoria virtual, y serán \textbf{utilizadas en última instancia} por los módulos delegados una vez hayan verificado que se pueden ejecutar.
 
 \subsection{Secuencia de Arranque}
 
-La secuencia de arranque o boot lo vamos a guardar en este módulo, ya que van a ser datos fijos que deberemos copiar al inicio del programa en nuestra ROM. Existen varias versiones del boot ya desensambladas por internet, siguiendo paso a paso las instrucciones originales. Lo que nosotros vamos a hacer es guardarnos todos los bytes para ejecutarlos más en adelante:
+La \textbf{secuencia de arranque} o boot lo vamos a guardar en este módulo, ya que van a ser \textbf{datos fijos} que deberemos \textbf{copiar al inicio del programa} en nuestra ROM. Existen varias versiones del boot ya desensambladas por internet, siguiendo paso a paso las instrucciones originales. Lo que va a hacer es guardar todos los bytes para ejecutarlos más en adelante:
 
 \begin{lstlisting}[language=Kotlin, caption={Secuencia de arranque y logo de Nintendo}, label={code:kotlinboot}]
     private val nintendoLogo: ByteArray = byteArrayOf(
@@ -1012,7 +1012,7 @@ La secuencia de arranque o boot lo vamos a guardar en este módulo, ya que van a
         0xE0.toByte(), 0x50.toByte())                   // LDH [0xFF00 + 0x50], A
 \end{lstlisting}
 
-Todas esas instrucciones se deberán insertar al inicio del programa a partir de la dirección 0x0000, terminando en 0x00FF (255 Bytes en total). Ello lo podemos hacer de forma muy sencilla con un bucle:
+Todas esas instrucciones se deberán \textbf{insertar} al inicio del programa \textbf{a partir de la dirección 0x0000, terminando en 0x00FF} (255 Bytes en total). Esto se puede hacer de forma muy sencilla con un bucle:
 
 \begin{lstlisting}[language=Kotlin, caption={Copiado del Boot en memoria}, label={code:kotlinbootcopy}]
     fun insertBootstrapToMemory(){
@@ -1026,23 +1026,23 @@ Se deben implementar otros módulos antes de que la secuencia de Boot pueda func
 
 \section{ROM}
 
-Las principales funciones de nuestro módulo ROM serán:
+Las \textbf{principales funciones} de nuestro módulo ROM serán:
 
 \begin{itemize}
-    \item Abrir y leer el contenido de un archivo GB o GBC.
-    \item Obtener datos básicos como el título de juego, el tipo de cartucho, el tipo de consola, etc...
-    \item Dependiendo del tipo de cartucho, gestionar de forma correcta la escritura a ROM o External RAM.
+    \item \textbf{Abrir y leer el contenido} de un archivo GB o GBC.
+    \item \textbf{Obtener datos básicos} como el título de juego, el tipo de cartucho, el tipo de consola, etc...
+    \item Dependiendo del tipo de cartucho, \textbf{gestionar de forma correcta la escritura a ROM o RAM externa}.
 \end{itemize}
 
-La escritura en la external RAM se implementa en el módulo de ROM porque muchas de las ROMs de los juegos de Game Boy utilizan cartuchos que incluyen su propia memoria RAM externa. Esta memoria se utiliza, entre otras cosas, para guardar el progreso del juego (mediante la funcionalidad de "batería" en los cartuchos).
+\textbf{La escritura en la RAM externa se implementa en el módulo de ROM} porque muchas de las ROMs de los juegos de Game Boy utilizan cartuchos que incluyen su propia memoria RAM externa. Esta memoria se utiliza, entre otras cosas, para guardar el progreso del juego (mediante la funcionalidad de "batería" en los cartuchos).
 \\\\
-En este contexto, el módulo de ROM se encarga no solo de la lectura de los datos de la ROM, sino también de la gestión de la RAM externa. Esto se debe a que el cartucho puede incluir tanto la ROM del juego como una porción de RAM adicional para almacenar información temporal. Esta información temporal la deberemos guardar en un fichero temporal con la nomenclatura \textit{Titulo\_Del\_Juego.battery}.
+En este contexto, \textbf{el módulo de ROM se encarga} no solo de la \textbf{lectura de los datos de la ROM}, sino también de la \textbf{gestión de la RAM externa}. Esto se debe a que el cartucho puede incluir tanto la ROM del juego como una porción de RAM adicional para almacenar información temporal. Esta información temporal la deberemos guardar en un fichero temporal con la nomenclatura \textit{Titulo\_Del\_Juego.battery}.
 
 \subsection{Lectura de ROM}
 
-Para poder abrir un fichero en Android, lo primero que se debe preparar es un Activity para que el usuario sea capaz de seleccionar un fichero guardado en la memoria interna de su dispositivo.
+Para poder \textbf{abrir un fichero en Android}, lo primero que se debe \textbf{preparar es un Activity} para que el usuario sea capaz de \textbf{seleccionar un fichero} guardado en la memoria interna de su dispositivo.
 \\\\
-De momento crearemos en el MainActivity un botón que al pulsarlo y seleccionar un fichero, inmediatamente lo pasará como parámetro en el intent a otro Activity llamado EmuActivity:
+De momento se implementará en el MainActivity un botón que al pulsarlo y seleccionar un fichero, inmediatamente lo pasará como parámetro en el intent a otro Activity llamado EmuActivity:
 
 \begin{lstlisting}[language=Kotlin, caption={Abrir archivos binarios en un Activity}, label={code:kotlinopenfile}]
     private lateinit var selectRomButton: Button
