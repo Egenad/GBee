@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2025.5.13)  1 JUN 2025 13:02
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2025.5.13)  1 JUN 2025 21:29
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1154,6 +1154,9 @@ Package: listings 2023/02/27 1.9 (Carsten Heinz)
 
 LaTeX Warning: Label `code:surfaceonmeasure' multiply defined.
 
+
+LaTeX Warning: Label `develop' multiply defined.
+
 )
 \openout1 = `main.aux'.
 
@@ -1886,8 +1889,18 @@ LaTeX Info: Redefining \ttfamily on input line 2.
 
 
 ] [14] [15] [16]
-Overfull \hbox (1.09497pt too wide) detected at line 174
- []\TU/lmss/bx/n/10.95 151
+Overfull \hbox (1.09497pt too wide) detected at line 175
+ []\TU/lmss/bx/n/10.95 153
+ []
+
+
+Overfull \hbox (1.09497pt too wide) detected at line 176
+ []\TU/lmss/bx/n/10.95 155
+ []
+
+
+Overfull \hbox (1.09497pt too wide) detected at line 177
+ []\TU/lmss/bx/n/10.95 157
  []
 
 )
@@ -1956,7 +1969,10 @@ Underfull \hbox (badness 10000) in paragraph at lines 21--24
 
  []
 
-[1
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [1
 
 
 ]
@@ -3071,69 +3087,63 @@ Underfull \hbox (badness 10000) in paragraph at lines 2097--2100
  []
 
 [126]
-Underfull \hbox (badness 10000) in paragraph at lines 2151--2160
+Underfull \hbox (badness 10000) in paragraph at lines 2151--2156
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2151--2160
+Underfull \hbox (badness 10000) in paragraph at lines 2151--2156
+
+ []
+
+[127
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 2157--2160
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2151--2160
+Underfull \hbox (badness 10000) in paragraph at lines 2202--2205
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 2151--2160
-
- []
-
-[127]
-Underfull \hbox (badness 10000) in paragraph at lines 2204--2207
-
- []
-
-[128]
-Underfull \vbox (badness 3219) has occurred while \output is active []
-
- [129]
-Underfull \hbox (badness 10000) in paragraph at lines 2254--2257
-
- []
-
-
-Overfull \hbox (0.58603pt too wide) in paragraph at lines 2279--2280
-[]\TU/lmr/m/n/10.95 Por último, el \TU/lmtt/m/n/10.95 GameThread \TU/lmr/m/n/10.95 estará constantemente renderizando mientras que el flag \TU/lmtt/m/n/10.95 running
- []
-
-[130]
-File: include/images/render_surface_view.png Graphic file (type bmp)
-<include/images/render_surface_view.png>
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [131] [132]
-Underfull \hbox (badness 10000) in paragraph at lines 2394--2401
+ [128
+
+]
+Underfull \vbox (badness 3826) has occurred while \output is active []
+
+ [129]
+Underfull \hbox (badness 10000) in paragraph at lines 2252--2255
+
+ []
+
+[130] [131
+
+]
+File: include/images/render_surface_view.png Graphic file (type bmp)
+<include/images/render_surface_view.png>
+ [132
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 2392--2399
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2394--2401
+Underfull \hbox (badness 10000) in paragraph at lines 2392--2399
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2394--2401
+Underfull \hbox (badness 10000) in paragraph at lines 2392--2399
 
  []
 
-[133]
-Underfull \hbox (badness 10000) in paragraph at lines 2435--2438
-
- []
-
+[133] [134]
 File: include/images/design_1_1.png Graphic file (type bmp)
 <include/images/design_1_1.png>
 File: include/images/design_1_2.png Graphic file (type bmp)
@@ -3141,85 +3151,83 @@ File: include/images/design_1_2.png Graphic file (type bmp)
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [134]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+ [135
 
- [135]
+]
 File: include/images/transition_title.png Graphic file (type bmp)
 <include/images/transition_title.png>
-
-Underfull \hbox (badness 10000) in paragraph at lines 2503--2506
-
- []
-
-[136]
-Underfull \hbox (badness 10000) in paragraph at lines 2519--2522
+ [136]
+Underfull \hbox (badness 10000) in paragraph at lines 2517--2520
 
  []
 
+[137
 
-Overfull \hbox (11.99475pt too wide) in paragraph at lines 2519--2522
-\TU/lmr/m/n/10.95 A continuación se muestra el código de la actividad principal, donde se inicializa el \TU/lmtt/m/n/10.95 RecyclerView
- []
-
-[137]
-Underfull \hbox (badness 10000) in paragraph at lines 2565--2578
+]
+Underfull \hbox (badness 10000) in paragraph at lines 2563--2576
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2565--2578
+Underfull \hbox (badness 10000) in paragraph at lines 2563--2576
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2565--2578
+Underfull \hbox (badness 10000) in paragraph at lines 2563--2576
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2565--2578
+Underfull \hbox (badness 10000) in paragraph at lines 2563--2576
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2565--2578
+Underfull \hbox (badness 10000) in paragraph at lines 2563--2576
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2565--2578
+Underfull \hbox (badness 10000) in paragraph at lines 2563--2576
 
  []
 
-[138]
-Underfull \hbox (badness 10000) in paragraph at lines 2591--2594
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [138]
+Underfull \hbox (badness 10000) in paragraph at lines 2589--2593
 
  []
 
 [139]
-Underfull \hbox (badness 10000) in paragraph at lines 2621--2624
+Underfull \hbox (badness 10000) in paragraph at lines 2620--2623
 
  []
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 1348) has occurred while \output is active []
 
- [140]
-Underfull \vbox (badness 2150) has occurred while \output is active []
+ [140
 
- [141]
-Underfull \hbox (badness 10000) in paragraph at lines 2697--2704
+] [141]
+Overfull \hbox (24.70395pt too wide) in paragraph at lines 2696--2703
+\TU/lmr/bx/n/10.95 se muestran las ROMs \TU/lmr/m/n/10.95 en el \TU/lmtt/m/n/10.95 RecyclerView\TU/lmr/m/n/10.95 . Este adaptador extiende de \TU/lmtt/m/n/10.95 RecyclerView.Adapter
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2696--2703
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2697--2704
+Underfull \hbox (badness 10000) in paragraph at lines 2696--2703
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2697--2704
+Underfull \hbox (badness 10000) in paragraph at lines 2696--2703
 
  []
 
@@ -3227,63 +3235,113 @@ Underfull \hbox (badness 10000) in paragraph at lines 2697--2704
 File: include/images/add_rom.png Graphic file (type bmp)
 <include/images/add_rom.png>
 
-Underfull \hbox (badness 10000) in paragraph at lines 2749--2752
-
- []
-
-[143]
-Underfull \vbox (badness 3219) has occurred while \output is active []
-
- [144]
-Underfull \hbox (badness 10000) in paragraph at lines 2834--2837
+Underfull \hbox (badness 10000) in paragraph at lines 2748--2751
 
  []
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
+ [143] [144]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
  [145]
+Underfull \hbox (badness 10000) in paragraph at lines 2833--2836
+
+ []
+
 File: include/images/settings_fragments.png Graphic file (type bmp)
 <include/images/settings_fragments.png>
 
-Underfull \hbox (badness 10000) in paragraph at lines 2844--2847
+Underfull \hbox (badness 10000) in paragraph at lines 2843--2846
 
  []
 
 File: include/images/settings_misc.png Graphic file (type bmp)
 <include/images/settings_misc.png>
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 6110) has occurred while \output is active []
 
  [146]
-Underfull \hbox (badness 10000) in paragraph at lines 2856--2861
+Underfull \hbox (badness 10000) in paragraph at lines 2855--2860
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2856--2861
+Underfull \hbox (badness 10000) in paragraph at lines 2855--2860
 
  []
 
 [147]
-Underfull \hbox (badness 10000) in paragraph at lines 2874--2879
+Underfull \hbox (badness 10000) in paragraph at lines 2873--2878
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2874--2879
+Underfull \hbox (badness 10000) in paragraph at lines 2873--2878
 
  []
 
+[148]
 File: include/images/new_design_elements.png Graphic file (type bmp)
 <include/images/new_design_elements.png>
+ [149]
+File: include/images/default_skin.png Graphic file (type bmp)
+<include/images/default_skin.png>
+
+Underfull \hbox (badness 10000) in paragraph at lines 2916--2919
+
+ []
+
+File: include/images/skin_pink.png Graphic file (type bmp)
+<include/images/skin_pink.png>
+
+Underfull \hbox (badness 10000) in paragraph at lines 2928--2935
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2928--2935
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2928--2935
+
+ []
+
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [148] [149] [150
+ [150
+
+]
+File: include/images/logo_sketches.png Graphic file (type bmp)
+<include/images/logo_sketches.png>
+ [151]
+File: include/images/gbee.png Graphic file (type bmp)
+<include/images/gbee.png>
+File: include/images/logo_app.png Graphic file (type bmp)
+<include/images/logo_app.png>
+ [152]) (./capitulos/Results.tex
+chapter 8.
+[153
 
 
-]) (./main.bbl
+
+
+] [154
+
+
+]
+chapter 9.
+) (./main.bbl [155
+
+
+] [156
+
+
+]
 chapter without number
 
 Underfull \hbox (badness 2088) in paragraph at lines 14--26
@@ -3295,10 +3353,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 14--26
 [][][] [] [][][][][][][][][][][][][][][][][][] [] [][][][] [] [][][][] [] [][][] [] [][][][][][][][] [] [][][][][][] [] [][][][] [] [][][] [] [][][][][][][] []
  []
 
-[151
-
-
-]) [152] (./main.aux)
+[157]) [158] (./main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2020/03/25>
@@ -3311,12 +3366,12 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 49600 strings out of 474878
- 1060737 string characters out of 5762516
+ 49713 strings out of 474878
+ 1063375 string characters out of 5762516
  2692627 words of memory out of 5000000
- 70705 multiletter control sequences out of 15000+600000
+ 70810 multiletter control sequences out of 15000+600000
  563777 words of font info for 98 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  113i,21n,134p,11019b,2133s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on main.pdf (178 pages).
+Output written on main.pdf (184 pages).

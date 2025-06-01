@@ -77,18 +77,21 @@
 \contentsline {lstlisting}{\numberline {7.67}{\ignorespaces Creación del Game Surface View.}}{129}{lstlisting.7.67}%
 \contentsline {lstlisting}{\numberline {7.68}{\ignorespaces Medición y Escalado del Canvas.}}{129}{lstlisting.7.68}%
 \contentsline {lstlisting}{\numberline {7.69}{\ignorespaces Medición y Escalado del Canvas.}}{130}{lstlisting.7.69}%
-\contentsline {lstlisting}{\numberline {7.70}{\ignorespaces Renderizado en el GameThread.}}{130}{lstlisting.7.70}%
+\contentsline {lstlisting}{\numberline {7.70}{\ignorespaces Renderizado en el GameThread.}}{131}{lstlisting.7.70}%
 \contentsline {lstlisting}{\numberline {7.71}{\ignorespaces GameSurfaceView en Layout.}}{131}{lstlisting.7.71}%
 \contentsline {lstlisting}{\numberline {7.72}{\ignorespaces Estados de los Botones en el Módulo IO.}}{132}{lstlisting.7.72}%
-\contentsline {lstlisting}{\numberline {7.73}{\ignorespaces Escritura de los Estados de los Botones del Joypad}}{133}{lstlisting.7.73}%
+\contentsline {lstlisting}{\numberline {7.73}{\ignorespaces Escritura de los Estados de los Botones del Joypad}}{134}{lstlisting.7.73}%
 \contentsline {lstlisting}{\numberline {7.74}{\ignorespaces Enlace y Lógica de los Botones en la Actividad}}{135}{lstlisting.7.74}%
 \contentsline {lstlisting}{\numberline {7.75}{\ignorespaces MainActivity - Configuración del RecyclerView.}}{137}{lstlisting.7.75}%
-\contentsline {lstlisting}{\numberline {7.76}{\ignorespaces ROM Management - Añadir una ROM.}}{139}{lstlisting.7.76}%
+\contentsline {lstlisting}{\numberline {7.76}{\ignorespaces ROM Management - Añadir una ROM.}}{140}{lstlisting.7.76}%
 \contentsline {lstlisting}{\numberline {7.77}{\ignorespaces ROM Management - Eliminar una ROM.}}{140}{lstlisting.7.77}%
 \contentsline {lstlisting}{\numberline {7.78}{\ignorespaces ROM Management - Recarga de ROMs en Memoria.}}{141}{lstlisting.7.78}%
 \contentsline {lstlisting}{\numberline {7.79}{\ignorespaces ROM Adapter.}}{142}{lstlisting.7.79}%
 \contentsline {lstlisting}{\numberline {7.80}{\ignorespaces SettingsActivity - Inicialización.}}{144}{lstlisting.7.80}%
-\contentsline {lstlisting}{\numberline {7.81}{\ignorespaces SettingsActivity - Selección de Otro Fragmento.}}{144}{lstlisting.7.81}%
+\contentsline {lstlisting}{\numberline {7.81}{\ignorespaces SettingsActivity - Selección de Otro Fragmento.}}{145}{lstlisting.7.81}%
 \contentsline {lstlisting}{\numberline {7.82}{\ignorespaces SettingsActivity - Archivo de Preferencias.}}{145}{lstlisting.7.82}%
+\contentsline {lstlisting}{\numberline {7.83}{\ignorespaces Configuración de la Skin predeterminada}}{148}{lstlisting.7.83}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
 \addvspace {10\p@ }
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

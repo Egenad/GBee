@@ -1993,7 +1993,7 @@ La función \textbf{\texttt{fetch()} implementa una máquina de estados}, en el 
 \end{itemize}
 
 \subsubsection{OBTAIN\_TILE}
-El fetcher determina el tile que debe ser renderizado. Accede al mapa de tiles (ubicado en \$9800-\$9BFF o \$9C00-\$9FFF, dependiendo de los flags del registro LCDC) para leer el índice del tile correspondiente a las coordenadas mapX y mapY. Este acceso a memoria es fundamental, ya que define los datos que se procesarán en los estados siguientes.
+El fetcher \textbf{determina el tile que debe ser renderizado}. Accede al mapa de tiles (ubicado en \$9800-\$9BFF o \$9C00-\$9FFF, dependiendo de los flags del registro LCDC) para leer el índice del tile correspondiente a las coordenadas mapX y mapY. Este acceso a memoria es fundamental, ya que \textbf{define los datos que se procesarán en los siguientes estados}.
 
 \begin{lstlisting}[language=Kotlin, caption={FIFO Fetcher - Obtención de Tile.}, label={code:ppufifogettile}]
     private fun getTile(){
@@ -2010,9 +2010,9 @@ El fetcher determina el tile que debe ser renderizado. Accede al mapa de tiles (
     }
 \end{lstlisting}
 
-En primer lugar, la función \texttt{getBGTile()} realiza una lectura de los registros que controlan el desplazamiento y posicionamiento de los elementos gráficos. Estos incluyen el LY, las coordenadas de la ventana (WY y WX) y los valores de scroll (SCX y SCY).
+En primer lugar, la función \textbf{\texttt{getBGTile()} realiza una lectura de los registros que controlan el desplazamiento y posicionamiento} de los elementos gráficos. Estos incluyen el LY, las coordenadas de la ventana (WY y WX) y los valores de scroll (SCX y SCY).
 \\\\
-Posteriormente, la función realiza una evaluación de las posiciones relativas y los estados de los flags de control, para establecer si el tile que está siendo procesado pertenece al Background o al Window. Esta distinción determina qué tilemap debe ser consultado, alternando entre las zonas reservadas \texttt{0x9800} y \texttt{0x9C00} según corresponda.
+Posteriormente, la función realiza una \textbf{evaluación de las posiciones relativas y los estados de los flags de control}, para establecer si el tile que está siendo procesado pertenece al Background o al Window. Esta distinción \textbf{determina qué tilemap debe ser consultado}, alternando entre las zonas reservadas \texttt{0x9800} y \texttt{0x9C00} según corresponda.
 
 \begin{lstlisting}[language=Kotlin, caption={FIFO Fetcher - Obtención de Tile de Background.}, label={code:ppufifogettilebg}]
     private fun getBGTile(){
@@ -2038,11 +2038,11 @@ Posteriormente, la función realiza una evaluación de las posiciones relativas 
     }
 \end{lstlisting}
 
-Se transforman las coordenadas globales, expresadas en píxeles, en índices específicos de tiles, teniendo en cuenta que cada elemento gráfico ocupa un área de 8x8 píxeles. Este cálculo considera tanto la posición absoluta en pantalla como también la incorporación de los efectos de desplazamiento producidos por el scroll.
+Se \textbf{transforman las coordenadas} globales, expresadas en píxeles, \textbf{en índices específicos de tiles}, teniendo en cuenta que cada elemento gráfico ocupa un área de 8x8 píxeles. Este cálculo considera tanto la posición absoluta en pantalla como también la incorporación de los efectos de desplazamiento producidos por el scroll.
 \\\\
-Si el modo de direccionamiento de tiles indica que se trata de una región con direcciones firmadas (índices que pueden ir de -128 a +127), se ajusta el valor sumándole 128 para convertirlo a un índice positivo válido. El identificador final del tile se guarda en el array \texttt{tileData}, dejándolo listo para ser usado en la siguiente fase.
+Si el modo de direccionamiento de tiles indica que se trata de una \textbf{región con direcciones firmadas} (índices que pueden ir de -128 a +127), \textbf{se ajusta el valor sumándole 128} para convertirlo a un índice positivo válido. El \textbf{identificador final del tile se guarda en el array \texttt{tileData}}, dejándolo listo para ser usado en la siguiente fase.
 \\\\
-Por otro lado, la función \texttt{getSpriteTile()} se encarga de obtener el índice del tile correspondiente a los sprites visibles en la línea actual. Esta función es similar a la anterior, pero se centra en los sprites y su posición relativa en la pantalla.
+Por otro lado, la \textbf{función \texttt{getSpriteTile()} se encarga de obtener el índice del tile correspondiente a los sprites visibles en la línea actual}. Esta función es similar a la anterior, pero se centra en los sprites y su posición relativa en la pantalla.
 
 \begin{lstlisting}[language=Kotlin, caption={FIFO Fetcher - Obtención de Tile de Sprites.}, label={code:ppufifogettileobj}]
     private fun getSpriteTile(){
@@ -2066,17 +2066,17 @@ Por otro lado, la función \texttt{getSpriteTile()} se encarga de obtener el ín
     }
 \end{lstlisting}
 
-La función recorre la lista proporcionada por la PPU \texttt{PPU.getFetchedSpriteEntries()} y comprueba, para cada sprite no nulo, su posición horizontal en pantalla. Para ello, obtiene el valor \texttt{SCX} desde memoria, y calcula la posición horizontal del sprite ajustando el valor original del sprite en el OAM, restando una constante que representa el desfase de coordenadas (\texttt{OAM\_X\_OFFSET}) y sumando un pequeño ajuste basado en el módulo del desplazamiento.
+La función \textbf{recorre la lista} proporcionada por la PPU \texttt{PPU.getFetchedSpriteEntries()} y \textbf{comprueba, para cada sprite} no nulo, su \textbf{posición horizontal en pantalla}. Para ello, obtiene el valor \texttt{SCX} desde memoria, y calcula la posición horizontal del sprite ajustando el valor original del sprite en el OAM, restando una constante que representa el desfase de coordenadas (\texttt{OAM\_X\_OFFSET}) y sumando un pequeño ajuste basado en el módulo del desplazamiento.
 \\\\
-Con la posición horizontal calculada, se evalúa si dicho sprite se encuentra dentro del rango de píxeles que se están a punto de dibujar, comparándolo con \texttt{fetchX}. Se realiza una doble condición para cubrir tanto la coincidencia exacta como los solapes de píxeles con el ancho de un sprite. Si el sprite cumple estas condiciones de visibilidad, se almacena en el array \texttt{objTileData}, y se incrementa el contador \texttt{fetchedSprites} que indica el número de sprites seleccionados.
+Con la posición horizontal calculada, se \textbf{evalúa si dicho sprite se encuentra dentro del rango de píxeles} que están a punto de ser dibujados, comparándolo con \texttt{fetchX}. Se realiza una doble condición para cubrir tanto la coincidencia exacta como los solapes de píxeles con el ancho de un sprite. Si el sprite cumple estas condiciones de visibilidad, \textbf{se almacena en el array \texttt{objTileData}, y se incrementa el contador \texttt{fetchedSprites}} que indica el número de sprites seleccionados.
 \\\\
-Este proceso continúa hasta que se han encontrado tres sprites coincidentes, momento en el cual el bucle se interrumpe. Esta limitación viene explicada en \hyperref[mem:oam]{el marco teórico}.
+\textbf{Este proceso continúa hasta que se han encontrado tres sprites coincidentes}, momento en el cual el bucle se interrumpe. Esta limitación viene explicada en \hyperref[mem:oam]{el marco teórico}.
 
 \subsubsection{LOW\_DATA\_TILE - HIGH\_DATA\_TILE}
 
-En ambas funciones lo perimero que se realiza es el cálculo del offset vertical dentro del tile. Posteriormente, se accede a la VRAM para recuperar el primer o el segundo byte de datos de línea de ese tile, lo que representa los bits bajos o altos de color para los 8 píxeles de esa fila, respectivamente.
+En ambas funciones lo primero que se realiza es el \textbf{cálculo del offset vertical dentro del tile}. Posteriormente, se \textbf{accede a la VRAM para recuperar el primer o el segundo byte} de datos de línea de ese tile, lo que \textbf{representa los bits bajos o altos de color} para los 8 píxeles de esa fila, respectivamente.
 \\\\
-La dirección a la que accede se compone usando el identificador del tile, el modo de direccionamiento actual, y la posición vertical dentro del tile. Una vez obtenido ese primer byte, se llama a \texttt{loadSpriteData()} con el desplazamiento correspondiente, para que se vayan cargando también los datos de los sprites superpuestos. Finalmente, se cambia el estado del fetcher al siguiente paso, \texttt{HIGH\_DATA\_TILE} o \texttt{SLEEP}, dependiendo del estado actual en el que se encuentre el fetcher.
+La \textbf{dirección} a la que accede \textbf{se obtiene} utilizando el \textbf{identificador del tile, el modo de direccionamiento actual, y la posición vertical dentro del tile}. Una vez obtenido ese primer byte, se llama a \textbf{\texttt{loadSpriteData()}} con el desplazamiento correspondiente, para \textbf{cargar también los datos de los sprites superpuestos}. Finalmente, se \textbf{cambia el estado del fetcher} al siguiente paso, \texttt{HIGH\_DATA\_TILE} o \texttt{SLEEP}, dependiendo del estado actual en el que se encuentre.
 
 \begin{lstlisting}[language=Kotlin, caption={FIFO Fetcher - Obtención de los Bits Bajos o Altos del Tile.}, label={code:ppufifogethighlowdata}]
     private fun getTileLowData(){
@@ -2094,7 +2094,7 @@ La dirección a la que accede se compone usando el identificador del tile, el mo
     }
 \end{lstlisting}
 
-Finalmente, \texttt{loadSpriteData()} es la función auxiliar que realiza la lectura de los datos gráficos de los sprites que se van a dibujar sobre la línea actual. Por cada sprite, se calcula la línea dentro del tile que corresponde al valor actual de LY, considerando si el sprite está volteado verticalmente. También se ajusta el índice del tile en caso de sprites de 16 píxeles. Luego, se accede a VRAM para obtener el byte correspondiente a esa línea de píxeles dentro del tile del sprite, y se guarda en el bufer \texttt{objFetchedData}.
+Finalmente, \textbf{\texttt{loadSpriteData()}} es la función auxiliar que \textbf{realiza la lectura de los datos gráficos de los sprites que se van a dibujar} sobre la línea actual. Por cada sprite, se calcula la línea dentro del tile que corresponde al valor actual de LY, considerando si el sprite está volteado verticalmente. También se ajusta el índice del tile en caso de sprites de 16 píxeles. Luego, se \textbf{accede a VRAM para obtener el byte correspondiente} a esa línea de píxeles dentro del tile del sprite, \textbf{y se guarda en el búfer \texttt{objFetchedData}}.
 \\\\
 Es una de las funciones que deberían estar separadas en una lógica independiente, pero que por eliminar cierta complejidad se ha incluido en lo que sería el fetcher de background.
 
@@ -2124,9 +2124,9 @@ Es una de las funciones que deberían estar separadas en una lógica independien
         }
     }
 \end{lstlisting}
-
+\clearpage
 \subsubsection{SLEEP}
-La implementación del estado \texttt{SLEEP} no va a tener nada relevante, simplemente va a dar paso al siguiente estado. Este método se utiliza para simular y representar los tiempos reales del hardware.
+La implementación del estado \texttt{SLEEP} no va a tener \textbf{nada relevante}, simplemente va a \textbf{dar paso al siguiente estado}. Este método se utiliza para simular y representar los tiempos reales del hardware.
 
 \begin{lstlisting}[language=Kotlin, caption={FIFO Fetcher - Sleep.}, label={code:ppufifosleep}]
     private fun sleepState(){
@@ -2136,7 +2136,7 @@ La implementación del estado \texttt{SLEEP} no va a tener nada relevante, simpl
 
 \subsubsection{PUSH}
 
-En la función \texttt{pushState()} se intenta introducir nuevos píxeles en el FIFO. Si el intento de empujar píxeles al FIFO tiene éxito (lo que significa que la cola tiene espacio suficiente), el estado del fetcher se reinicia para comenzar la obtención del siguiente tile.
+En la función \textbf{\texttt{pushState()}} se intenta \textbf{introducir nuevos píxeles en el FIFO}. \textbf{Si} el intento de empujar píxeles al FIFO \textbf{tiene éxito} (lo que significa que la cola tiene espacio suficiente), \textbf{el estado del fetcher se reinicia} para comenzar la obtención del siguiente tile.
 
 \begin{lstlisting}[language=Kotlin, caption={FIFO Fetcher - Push.}, label={code:ppufifopush}]
     private fun pushState(){
@@ -2148,15 +2148,15 @@ En la función \texttt{pushState()} se intenta introducir nuevos píxeles en el 
     }
 \end{lstlisting}
 
-La lógica principal ocurre en \texttt{pushBGPixelsToFifo()}, que primero comprueba si el FIFO tiene suficiente espacio libre para recibir una nueva tanda de píxeles, que son ocho por cada tile. Si está lleno, simplemente se detiene y devuelve false, esperando a que se vacíe en futuras iteraciones.
+La \textbf{lógica principal} ocurre en \textbf{\texttt{pushBGPixelsToFifo()}}, que primero \textbf{comprueba si el FIFO tiene suficiente espacio} libre para recibir una nueva tanda de píxeles, que son ocho por cada tile. Si está lleno, simplemente se detiene y devuelve false, esperando a que se vacíe en futuras iteraciones.
 \\\\
-Si hay espacio, la función calcula la posición horizontal real de dibujo teniendo en cuenta el SCX y una corrección por el offset de los sprites. A continuación, se procesan los píxeles del tile que acaba de ser cargado. Para cada uno, se extraen los bits correspondientes desde los datos de tile almacenados previamente en \texttt{objTileData}, combinando los bits bajos y altos de cada línea para determinar el índice de color del píxel.
+Si hay espacio, la función \textbf{calcula la posición horizontal real de dibujo teniendo en cuenta el SCX y una corrección por el offset de los sprites}. A continuación, se \textbf{procesan los píxeles del tile} que acaba de ser cargado. Para cada uno, \textbf{se extraen los bits correspondientes desde los datos de tile} almacenados previamente en \texttt{objTileData}, \textbf{combinando los bits bajos y altos} de cada línea \textbf{para determinar el índice de color} del píxel.
 \\\\
-Este índice puede cambiar si los sprites están habilitados en la configuración del sistema. En tal caso, se llama a \texttt{obtainSpriteColor}, que se encarga de comprobar si algún sprite visible debe sobrescribir el color de fondo en esa posición. Esta función recorre los sprites previamente extraídos para el scanline actual y, si alguno se solapa con la posición del píxel en cuestión, evalúa si el sprite tiene prioridad sobre el fondo. También tiene en cuenta atributos como la inversión horizontal y la transparencia. Si se cumplen las condiciones, el color del sprite sobrescribe el del fondo.
+Este índice \textbf{puede cambiar si los sprites están habilitados} en la configuración del sistema. En tal caso, se llama a \textbf{\texttt{obtainSpriteColor}}, que se encarga de \textbf{comprobar si algún sprite visible debe sobrescribir el color} de fondo en esa posición. Esta función recorre los sprites previamente extraídos para el scanline actual y, \textbf{si alguno se solapa} con la posición del píxel en cuestión, \textbf{evalúa si el sprite tiene prioridad sobre el fondo}. También tiene en cuenta atributos como la inversión horizontal y la transparencia. Si se cumplen las condiciones, el color del sprite sobrescribe el del fondo.
+\clearpage
+Nuevamente, \textbf{esta última parte} donde se obtienen los valores de los sprites y se hace una mezcla de valores para determinar el color, \textbf{debería estar de forma independiente} y ser añadido a un segundo FIFO.
 \\\\
-Nuevamente, esta última parte donde se obtienen los valores de los sprites y se hace una mezcla de valores para determinar el color, debería estar de forma independiente y ser añadido a un segundo FIFO.
-\\\\
-Por último se inserta el color en el FIFO de fondo, que es lo que usará el PPU para representar visualmente los píxeles en pantalla. Esto se repite para los ocho píxeles del tile, tras lo cual el método finaliza con éxito
+\textbf{Por último se inserta el color en el FIFO de fondo}, que es lo que usará el PPU para representar visualmente los píxeles en pantalla. Esto \textbf{se repite para los ocho píxeles del tile}, tras lo cual el método finaliza con éxito.
 
 \begin{lstlisting}[language=Kotlin, caption={FIFO Fetcher - Push de Píxeles al FIFO.}, label={code:ppufifopushpixels}]
     private fun pushBGPixelsToFifo(): Boolean{
@@ -2189,19 +2189,17 @@ Por último se inserta el color en el FIFO de fondo, que es lo que usará el PPU
 Los colores vienen definidos como propiedad de clase en la PPU, tratando de simular todas las posibles paletas de color que existen tanto en la GB original como en la CGB. Por defecto, se iniciará con la paleta que imita los colores verdosos del primer modelo DMG.
 
 \begin{lstlisting}[language=Kotlin, caption={PPU - Paletas de Color.}, label={code:ppucolorpalettes}]
-    // Colors follows as: White - Light Gray - Dark Gray - Black
     private val palettes: HashMap<PALETTE_TYPE, IntArray> = hashMapOf(
         Pair(PALETTE_TYPE.BASIC_PL, intArrayOf(0xFFFFFFFF.toInt(), 0xFFAAAAAA.toInt(), 0xFF555555.toInt(), 0xFF000000.toInt())),
         Pair(PALETTE_TYPE.GREENER_PL, intArrayOf(0xFFE0F8D0.toInt(), 0xFF88C070.toInt(), 0xFF346856.toInt(), 0xFF081820.toInt())),
         [...]
     )
-
     private var selectedPalette = PALETTE_TYPE.GREENER_PL
 \end{lstlisting}
 
 \section{Game Surface View}
 
-El \texttt{GameSurfaceView} es la clase encargada de gestionar la representación gráfica de la consola. Esta clase se encarga de crear un canvas y dibujar los píxeles en él, utilizando el búfer de video proporcionado por la PPU. La implementación de esta clase es bastante sencilla, ya que solo se encarga de crear un canvas y dibujar los píxeles en él.
+El \textbf{\texttt{GameSurfaceView}} es la clase \textbf{encargada de gestionar la representación gráfica} de la consola. Esta clase se encarga de crear un canvas y dibujar los píxeles en él, utilizando el búfer de video proporcionado por la PPU. La implementación de esta clase es bastante sencilla, ya que solo se encarga de crear un canvas y dibujar los píxeles en él.
 \\\\
 La clase hereda de \texttt{SurfaceView} y está diseñada para funcionar de forma independiente gracias a un hilo (\texttt{GameThread}) que se encarga del renderizado continuo. Además implementa \texttt{SurfaceHolder.Callback}, lo cual permite controlar cuándo se crea, cambia o destruye el canvas.
 
@@ -2224,7 +2222,7 @@ La clase hereda de \texttt{SurfaceView} y está diseñada para funcionar de form
 
 \end{lstlisting}
 
-El método \texttt{onMeasure()} se encarga de calcular las dimensiones basándose en la resolución original de la GB (160x144 píxeles) y en el tamaño disponible en pantalla. La idea es mantener la relación de aspecto original sin deformar la imagen. En función del ancho y alto del dispositivo, se calcula un factor de escala que se utilizará para transformar los píxeles al tamaño físico del dispositivo Android.
+El método \textbf{\texttt{onMeasure()} se encarga de calcular las dimensiones basándose en la resolución original de la GB (160x144 píxeles) y en el tamaño disponible en pantalla}. La idea es mantener la relación de aspecto original sin deformar la imagen. En función del ancho y alto del dispositivo, se calcula un factor de escala que se utilizará para transformar los píxeles al tamaño físico del dispositivo Android.
 
 \begin{lstlisting}[language=Kotlin, caption={Medición y Escalado del Canvas.}, label={code:surfaceonmeasure}]
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -2251,9 +2249,9 @@ El método \texttt{onMeasure()} se encarga de calcular las dimensiones basándos
     
 \end{lstlisting}
 
-Durante el renderizado, el método \texttt{render()} decide si debe dibujarse el bufer final donde la PPU guarda los colores o si se debe entrar en el modo depuración en el que se muestran los tiles disponibles en memoria. Si el LCD está deshabilitado, simplemente se pinta la pantalla de negro.
+Durante el renderizado, el método \texttt{render()} decide si debe dibujarse el búfer final donde la PPU guarda los colores o si se debe entrar en el modo depuración en el que se muestran los tiles disponibles en memoria. Si el LCD está deshabilitado, simplemente se pinta la pantalla de negro.
 \\\\
-Cuando se renderiza la VRAM, se recorre la matriz de píxeles que la PPU ha rellenado y se dibujan los píxeles uno por uno. Para cada tile, se leen 16 bytes de memoria. A partir de estos bytes, se reconstruye el color de cada píxel del tile utilizando la lógica de combinación de bits, y se pinta como un pequeño rectángulo en el canvas.
+Cuando se renderiza la VRAM, se recorre la matriz de píxeles que la PPU ha rellenado y se dibujan los píxeles uno por uno. \textbf{Para cada tile, se leen 16 bytes de memoria}. A partir de estos bytes, se \textbf{reconstruye el color} de cada píxel del tile utilizando la lógica de combinación de bits, y se pinta como un pequeño rectángulo en el canvas.
 
 \begin{lstlisting}[language=Kotlin, caption={Medición y Escalado del Canvas.}, label={code:surfaceonmeasure}]
     private fun renderVRam(canvas: Canvas){
@@ -2276,8 +2274,8 @@ Cuando se renderiza la VRAM, se recorre la matriz de píxeles que la PPU ha rell
     
 \end{lstlisting}
 
-Por último, el \texttt{GameThread} estará constantemente renderizando mientras que el flag \texttt{running} esté activado. Para hacer este render, primero bloquea el Canvas para ejecutar el método de renderizado del \texttt{GameSurfaceView} y finalmente libera el Canvas para que el sistema lo dibuje en pantalla.
-
+Por último, el \textbf{\texttt{GameThread} renderizará de forma constantemente mientras que el flag \texttt{running} esté activado}. Para hacer este render, primero bloquea el Canvas para ejecutar el método de renderizado del \texttt{GameSurfaceView} y finalmente libera el Canvas para que el sistema lo dibuje en pantalla.
+\clearpage
 \begin{lstlisting}[language=Kotlin, caption={Renderizado en el GameThread.}, label={code:surfacerenderthread}]
     override fun run() {
         while (running) {
@@ -2302,7 +2300,7 @@ Por último, el \texttt{GameThread} estará constantemente renderizando mientras
 
 \subsection{Layout}
 
-Ahora el EmuActivity contendrá el \texttt{GameSurfaceView} como variable privada de clase. Para hacerlo funcionar, se necesita también añadir la vista al layout y enlazarla con la variable en el \texttt{onCreate()}. Se puede insertar, por ejemplo, dentro de un \texttt{FrameLayout}:
+Ahora el \textbf{EmuActivity contendrá el \texttt{GameSurfaceView} como variable privada de clase}. Para hacerlo funcionar, se necesita también \textbf{añadir la vista al layout y enlazarla con la variable} en el \texttt{onCreate()}. Se puede insertar, por ejemplo, dentro de un \texttt{FrameLayout}:
 
 \begin{lstlisting}[language=Kotlin, caption={GameSurfaceView en Layout.}, label={code:surfacelayout}]
     <FrameLayout
@@ -2325,7 +2323,7 @@ Ahora el EmuActivity contendrá el \texttt{GameSurfaceView} como variable privad
             />
     </FrameLayout>
 \end{lstlisting}
-
+\clearpage
 De manera automática, se puede comenzar a ver resultados por pantalla. Aquí distintos resultados obtenidos según se han ido depurando errores, ordenados de forma cronológica:
 
 \begin{figure}[H]
@@ -2336,7 +2334,7 @@ De manera automática, se puede comenzar a ver resultados por pantalla. Aquí di
 
 \section{I/O}
 
-Al igual que con el resto de módulos, se debe implementar el encargado de escribir y leer los registros de entrada y salida. Se definirán también un enumerador que indique a qué bit va asignado cada botón del joypad y un objeto que facilite hacer un seguimiento de cuáles están pulsados.
+Al igual que con el resto de módulos, se debe implementar el encargado de escribir y leer los registros de entrada y salida. Se definirá también un \textbf{enumerador que indique a qué bit va asignado cada botón del joypad} y un objeto que facilite hacer un seguimiento de cuáles están pulsados.
 
 \begin{lstlisting}[language=Kotlin, caption={Estados de los Botones en el Módulo IO.}, label={code:iojoypad}]
     enum class GamePadBits(val bit: Int) {
@@ -2376,24 +2374,24 @@ Al igual que con el resto de módulos, se debe implementar el encargado de escri
         [...]
 \end{lstlisting}
 
-Los métodos de lectura y escritura son muy similares al resto de módulos que ya se han explicado previamente, por lo que se van a omitir en esta explicación para evitar redundancias. Los puntos que se deben tener en cuenta son:
+Los métodos de lectura y escritura son muy similares al resto de módulos que ya se han explicado previamente, por lo que se van a omitir en esta explicación para evitar redundancias. Los \textbf{puntos que se deben tener en cuenta} son:
 
 \begin{itemize}
     \item Si se escribe en el rango [0xFF40\-0xFF40], se delega a la PPU su comportamiento. En general, los casos especiales serán el inicio del DMA o cambios de \hyperref[handleLCDC]{comportamiento en el LCDC}.
     \item Si se escribe en el rango [0xFF04\-0xFF07], se delega al Timer su comportamiento, el cual ya se ha visto en su \hyperref[writeToTimer]{apartado correspondiente}.
 \end{itemize}
 
-El caso importante que se debe controlar en el propio módulo, es el del Joypad. La lógica a seguir es la siguiente:
+El \textbf{caso importante} que se debe controlar en el propio módulo, es el del \textbf{Joypad}. La lógica a seguir es la siguiente:
 
 \begin{enumerate}
-    \item El \texttt{EmuActivity} indica que el jugador ha pulsado o dejado de pulsar un botón definido en el layout.
-    \item Se actualiza la propiedad de la variable de clase con el nuevo valor.
-    \item Se actualiza el valor en la memoria interna del emulador teniendo en cuenta el funcionamiento matricial original.
+    \item El \textbf{\texttt{EmuActivity} indica que el jugador ha pulsado o dejado de pulsar un botón} definido en el layout.
+    \item Se \textbf{actualiza la propiedad} de la variable de clase con el nuevo valor.
+    \item Se \textbf{actualiza el valor en la memoria interna} del emulador teniendo en cuenta el funcionamiento matricial original.
 \end{enumerate}
 
 A la hora de leer el joypad, simplemente se devuelve el valor almacenado en la memoria interna.
 \\\\
-En cuanto a la escritura, la función \texttt{updateJoyPadReadOnlyValues(value: Byte)} es el principal encargado. Empieza extrayendo los bits 4 y 5 del valor de entrada; estos bits indican qué grupo de botones se quiere consultar: los botones de dirección (arriba, abajo, izquierda, derecha) o los botones de acción (A, B, Start, Select). Esta selección se hace a través de los bits \texttt{SELECT\_DPAD} y \texttt{SELECT\_BUTTONS}.
+En cuanto a la escritura, la función \texttt{updateJoyPadReadOnlyValues(value: Byte)} es el principal encargado. \textbf{Empieza extrayendo los bits 4 y 5 del valor de entrada}; estos bits \textbf{indican qué grupo de botones se quiere consultar}: los botones de dirección (arriba, abajo, izquierda, derecha) o los botones de acción (A, B, Start, Select). Esta selección se hace a través de los bits \texttt{SELECT\_DPAD} y \texttt{SELECT\_BUTTONS}.
 \\\\
 Si ambos selectores son iguales, no se selecciona ningún grupo concreto, y se ponen todos los bits de botones como "no presionados".
 \\\\
@@ -2432,9 +2430,9 @@ Si solo uno de los dos selectores está activo, se determina cuál y se leen los
 
 \section{Joypad}
 
-Con la implementación del módulo de entrada/salida, es posible incorporar los controles en la actividad. Lo primero es añadir los botones al layout. Además, se deben tener en cuenta los distintos tamaños de pantalla de los dispositivos, así como la orientación del mismo, ya sea en modo \textit{portrait} (vertical) o \textit{landscape} (horizontal). En otras palabras, el layout debe ser \textit{responsive}.
-\\\\
-Se trata de una tarea principalmente de diseño, que puede implicar una gran extensión a nivel de código. Por ello, en este apartado se presentará únicamente un diseño inicial, representado de forma gráfica, sobre el cual se puede seguir trabajando y refinando.
+Con la implementación del módulo de entrada/salida, es posible incorporar los controles en la actividad. Lo primero es añadir los botones al layout. Además, se deben \textbf{tener en cuenta los distintos tamaños de pantalla} de los dispositivos, \textbf{así como la orientación} del mismo, ya sea en modo \textit{portrait} (vertical) o \textit{landscape} (horizontal). En otras palabras, \textbf{el layout debe ser \textit{responsive}}.
+\clearpage
+Se trata de una \textbf{tarea principalmente de diseño} que puede implicar una gran extensión a nivel de código. Por ello, en este apartado se presentará únicamente un diseño inicial, representado de forma gráfica, sobre el cual se puede seguir trabajando y refinando.
 
 \begin{figure}[H]
     \centering
@@ -2453,7 +2451,7 @@ Se trata de una tarea principalmente de diseño, que puede implicar una gran ext
     \end{minipage}
 \end{figure}
 
-En la actividad se implementará una función llamada \texttt{configureButtons()}, cuya finalidad será, por un lado, enlazar cada botón del \textit{layout} con una constante que identifique qué botón representa y, por otro, delegar en la función \texttt{setButton(button: View, name: String)} la inicialización de los correspondientes \textit{listeners}.
+En la actividad se implementará una función llamada \textbf{\texttt{configureButtons()}}, cuya finalidad será, por un lado, \textbf{enlazar cada botón} del \textit{layout} con una constante que identifique qué botón representa y, por otro, \textbf{delegar en la función \texttt{setButton(button: View, name: String)}} la inicialización de los correspondientes \textit{listeners}.
 
 \begin{lstlisting}[language=Kotlin, caption={Enlace y Lógica de los Botones en la Actividad}, label={code:activityjoypad}]
     private fun configureButtons(){
@@ -2501,24 +2499,24 @@ Ahora, utilizando nuevamente el juego \textit{Golden Sacra}, al pulsar el botón
 \section{MainActivity}
 
 A partir de este apartado se enfocará la memoria en lo que es la parte púramente de Android a nivel de aplicación. Se dará comienzo por lo primero que se ve al iniciar la aplicación: el \textit{MainActivity}.
-\\\\
+\clearpage
 Haciendo uso del \hyperref[figure:mockupmenu]{diseño original}, se procede a generar las siguientes clases, estructuras o modificaciones:
 
 \begin{enumerate}
-    \item Añadir un Toolbar al layout que tenga dos botones, uno para añadir una ROM y otro para entrar a la configuración.
-    \item Añadir un RecyclerView al layout, el cual quedará configurado en el \texttt{onCreate()}.
-    \item Generar un Adapter para el RecyclerView, que contendrá la lógica de cómo se van a mostrar las ROMs en pantalla.
-    \item Crear un layout para cada elemento del RecyclerView, que contendrá una imágen y el nombre de la ROM.
-    \item Aádir dos \textit{listeners}, el primero (clics corto) que indicará que un usuario quiere iniciar una ROM, y otro (clics largos) que indicará que el usuario quiere hacer algo (eliminar o modificar) esa ROM.
-    \item Añadir un \textit{listener} al botón de añadir ROM, que abrirá un explorador de archivos para que el usuario seleccione la ROM que quiere añadir.
-    \item Copiar y guardar las ROMs añadidas por el usuario en la memoria interna de la aplicación, para que se mantengan entre sesiones, independientemente de si el usuario la ha borrado de la carpeta original a posteriori.
-    \item Generar un modelo de SQLite para guardar la información de las ROMs en la base de datos. De esta forma el usuario podrá modificar el título y la imagen utilizada como carátula. 
-    \item Añadir un \textit{listener} al botón de configuración, que abrirá una nueva actividad donde se podrá modificar la configuración del emulador.
+    \item \textbf{Añadir un Toolbar} al layout que tenga \textbf{dos botones}, uno para añadir una ROM y otro para entrar a la configuración.
+    \item \textbf{Añadir un RecyclerView} al layout, el cual quedará configurado en el \texttt{onCreate()}.
+    \item \textbf{Generar un Adapter para el RecyclerView}, que contendrá la lógica de cómo se van a mostrar las ROMs en pantalla.
+    \item \textbf{Crear un layout para cada elemento del RecyclerView}, que contendrá una imágen y el nombre de la ROM.
+    \item \textbf{Aádir dos \textit{listeners}}, el primero (clics corto) que indicará que un usuario quiere iniciar una ROM, y otro (clics largos) que indicará que el usuario quiere hacer algo (eliminar o modificar) esa ROM.
+    \item \textbf{Añadir un \textit{listener} al botón de añadir ROM}, que \textbf{abrirá un explorador de archivos} para que el usuario seleccione la ROM que quiere añadir.
+    \item \textbf{Copiar y guardar las ROMs} añadidas por el usuario \textbf{en la memoria interna} de la aplicación, para que se mantengan entre sesiones, independientemente de si el usuario la ha borrado de la carpeta original a posteriori.
+    \item \textbf{Generar un modelo de SQLite} para guardar la información de las ROMs en la base de datos. De esta forma el usuario podrá modificar el título y la imagen utilizada como carátula. 
+    \item \textbf{Añadir un \textit{listener} al botón de configuración}, que abrirá una nueva actividad donde se podrá modificar la configuración del emulador.
 \end{enumerate}
 
-En la configuración del \texttt{RecyclerView} se debe establecer el \texttt{LayoutManager}, que es el encargado de gestionar la disposición de los elementos en pantalla. En este caso, se utilizará un \texttt{GridLayoutManager} para mostrar las ROMs en una cuadrícula. También se debe establecer el \texttt{Adapter}, que es el encargado de proporcionar los datos al \texttt{RecyclerView}. Para este último punto, se creará una clase \texttt{RomAdapter} que extenderá de \texttt{RecyclerView.Adapter}.
+En la configuración del \texttt{RecyclerView} se debe establecer el \texttt{LayoutManager}, que es el encargado de gestionar la disposición de los elementos en pantalla. En este caso, \textbf{se utilizará un \texttt{GridLayoutManager}} para mostrar las ROMs en una cuadrícula. También se debe establecer el \texttt{Adapter}, que es el encargado de proporcionar los datos al \texttt{RecyclerView}. Para este último punto, se creará una clase \texttt{RomAdapter} que extenderá de \texttt{RecyclerView.Adapter}.
 \\\\
-A continuación se muestra el código de la actividad principal, donde se inicializa el \texttt{RecyclerView} y se configuran los \textit{listeners}:
+A continuación se muestra el \textbf{código de la actividad principal}, donde se \textbf{inicializa el \texttt{RecyclerView} y se configuran los \textit{listeners}}:
 
 \begin{lstlisting}[language=Kotlin, caption={MainActivity - Configuración del RecyclerView.}, label={code:activitymain}]
     private fun createRecyclerView(){
@@ -2562,9 +2560,9 @@ A continuación se muestra el código de la actividad principal, donde se inicia
     }
 \end{lstlisting}
 
-Gracias al \texttt{GridLayoutManager}, podemos determinar cuántas ROMs mostrar por fila. Se han definido 2 para el modo \textit{portrait} y 3 para el \textit{landscape}. También se asigna un animador de ítems por defecto para gestionar animaciones al añadir, eliminar o mover elementos.
+Gracias al \texttt{GridLayoutManager}, \textbf{podemos determinar cuántas ROMs mostrar por fila}. Se han definido 2 para el modo \textit{portrait} y 3 para el \textit{landscape}. También se asigna un animador de ítems por defecto para gestionar animaciones al añadir, eliminar o mover elementos.
 \\\\
-Posteriormente, se instancia el adaptador \texttt{ROMAdapter} pasando la lista de ROMs y el número de columnas. Como se ha expuesto antes, se configuran los \textit{listeners} para los dos tipos de clic. Cuando se selecciona una ROM, se obtiene su título y, si está disponible, se consulta a la base de datos para recuperar la entidad correspondiente. Si se encuentra la ROM, se lanza el intent para pasar al \texttt{EmuActivity} y se le pasa la ruta del archivo como extra.
+Posteriormente, s\textbf{e instancia el adaptador \texttt{ROMAdapter} pasando la lista de ROMs y el número de columnas}. Como se ha expuesto antes, se configuran los \textit{listeners} para los dos tipos de clic. Cuando se selecciona una ROM, se obtiene su título y, si está disponible, se consulta a la base de datos para recuperar la entidad correspondiente. Si se encuentra la ROM, se lanza el intent para pasar al \texttt{EmuActivity} y se le pasa la ruta del archivo como extra.
 \\\\
 A continuación, se configura el \textit{listener} para el clic largo. En este caso, se muestra un menú emergente relacionado con la ROM seleccionada. 
 \\\\
@@ -2572,9 +2570,9 @@ Finalmente, se asigna el adaptador al \texttt{RecyclerView}, completando así la
 \\\\
 Por otro lado, se deben implementar los \textit{listeners} de los botones que permiten añadir ROMs y entrar a la pantalla de ajustes. Al mismo tiempo que configuramos el \texttt{RecyclerView}, enlazaremos los dos botones definidos en el layout con dos \textit{launchers}.
 \\\\
-El launcher del botón de añadir, comprobará primero si el fichero ya existe en la memoria interna mediante la función \texttt{RomManagement.fileAlreadyExists(context: Context, uri: Uri)}. En caso negativo, copiará y añadirá el fichero a la memoria privada de la aplicación y, si esta operación tiene éxito, la añadirá también al \textit{data source} y a la base de datos. Por último, notificará al \textit{adapter} de que un nuevo objeto se ha insertado para que la vista se actualice correctamente.
+\textbf{El launcher del botón de añadir, comprobará primero si el fichero ya existe en la memoria interna mediante la función \texttt{RomManagement.fileAlreadyExists(context: Context, uri: Uri)}}. En caso negativo, copiará y añadirá el fichero a la memoria privada de la aplicación y, si esta operación tiene éxito, la añadirá también al \textit{data source} y a la base de datos. Por último, notificará al \textit{adapter} de que un nuevo objeto se ha insertado para que la vista se actualice correctamente.
 \\\\
-El launcher del botón de ajustes simplemente generará un \textit{intent} que delegará el trabajo en otra actividad, la cual se implementará posteriormente.
+\textbf{El launcher del botón de ajustes} simplemente \textbf{generará un \textit{intent}} que delegará el trabajo en otra actividad, la cual se implementará posteriormente.
 
 \subsection{SQL ROM Data}
 
@@ -2590,8 +2588,9 @@ Para guardar, obtener y listar todas las ROMs y sus datos, se van a generar los 
 \subsubsection{ROM Management}
 A continuación se explica el \texttt{ROMManagement} más en profundidad:
 \\\\
-La función principal es \texttt{addROM()}, que permite registrar una nueva ROM. Este método limpia el nombre del archivo recibido, eliminando extensiones y caracteres indeseados para generar un título más legible. A continuación, se crea una entidad \texttt{ROMEntity} que representa la ROM con su ruta, título, tipo y fecha de añadido. Esta entidad se guarda en la base de datos y se añade a la lista de ROMs en memoria mediante \texttt{saveROMToDatabaseAndDataSource()}.
-
+La función principal es \textbf{\texttt{addROM()}}, que \textbf{permite registrar una nueva ROM}. Este método limpia el nombre del archivo recibido, eliminando extensiones y caracteres indeseados para generar un título más legible. A continuación, \textbf{se crea una entidad \texttt{ROMEntity}} que representa la ROM con su ruta, título, tipo y fecha de añadido. Esta entidad \textbf{se guarda en la base de datos y se añade a la lista de ROMs} en memoria mediante 
+\\\texttt{saveROMToDatabaseAndDataSource()}.
+\clearpage
 \begin{lstlisting}[language=Kotlin, caption={ROM Management - Añadir una ROM.}, label={code:romManagementAddRom}]
     fun addROM(context: Context, romPath: String, romTitle: String) {
 
@@ -2618,7 +2617,7 @@ La función principal es \texttt{addROM()}, que permite registrar una nueva ROM.
     }
 \end{lstlisting}
 
-En cuanto a la eliminación de ROMs, la función \texttt{deleteRom()} permite borrarlas tanto de la base de datos como del almacenamiento y las preferencias asociadas. Si se elimina correctamente, también se actualiza la fuente de datos en memoria y se informa al usuario con un mensaje emergente. Internamente, este proceso utiliza \texttt{deleteROMFile()}, que se encarga de borrar físicamente los archivos relacionados y actualizar la base de datos.
+En cuanto a la eliminación de ROMs, la función \textbf{\texttt{deleteRom()} permite borrarlas tanto de la base de datos como del almacenamiento} y las preferencias asociadas. Si se elimina correctamente, también se actualiza la fuente de datos en memoria y se informa al usuario con un mensaje emergente. Internamente, este proceso utiliza \texttt{deleteROMFile()}, que se encarga de borrar físicamente los archivos relacionados y actualizar la base de datos.
 \\\\
 Existe una clase llamada \texttt{FileManager}, que podría definirse como una capa inferior en cuanto al mantenimiento de archivos. Contiene una implementación bastante común, por lo que se va a omitir la explicación su código.
 
@@ -2675,7 +2674,7 @@ Existe una clase llamada \texttt{FileManager}, que podría definirse como una ca
     }
 \end{lstlisting}
 
-Por último, la función \texttt{loadROMSFromDBIfNeeded()} sincroniza la fuente de datos en memoria con el contenido de la base de datos. Si el número de ROMs en memoria no coincide con el de la base de datos, las recarga todas, teniendo en cuenta también posibles valores almacenados en \texttt{SharedPreferences}, como portadas personalizadas o nombres editados.
+Por último, la función \textbf{\texttt{loadROMSFromDBIfNeeded()} sincroniza la fuente de datos en memoria con el contenido de la base de datos}. Si el número de ROMs en memoria no coincide con el de la base de datos, las recarga todas, teniendo en cuenta también posibles valores almacenados en \texttt{SharedPreferences}, como portadas personalizadas o nombres editados.
 
 \begin{lstlisting}[language=Kotlin, caption={ROM Management - Recarga de ROMs en Memoria.}, label={code:romManagementReloadRoms}]
     fun loadROMSFromDBIfNeeded(context: Context){
@@ -2694,13 +2693,13 @@ Por último, la función \texttt{loadROMSFromDBIfNeeded()} sincroniza la fuente 
 \end{lstlisting}
 
 \subsection{ROM Adapter}
-Como se ha explicado ya, el \texttt{ROMAdapter} es el encargado de gestionar la forma en que se muestran las ROMs en el \texttt{RecyclerView}. Este adaptador extiende de \texttt{RecyclerView.Adapter} y se inicializa con una lista de ROMs y el número de columnas que se van a mostrar.
+Como se ha explicado ya, el \textbf{\texttt{ROMAdapter} es el encargado de gestionar la forma en que se muestran las ROMs} en el \texttt{RecyclerView}. Este adaptador extiende de \texttt{RecyclerView.Adapter} y se inicializa con una lista de ROMs y el número de columnas que se van a mostrar.
 \\\\
 Contiene una clase interna llamada \texttt{ViewHolder}, que se encarga de gestionar la vista de cada elemento. Esta clase contiene una referencia a la vista de la ROM y a su imagen, así como los métodos para enlazar los datos de la ROM con la vista.
 \\\\
-A cada ROM, por defecto, se le asigna una imagen predeterminada que se encuentra en la carpeta de recursos. Esta imagen se puede cambiar posteriormente a través de un \textit{dialog} que permite al usuario seleccionar una imagen de su galería.
+A cada ROM, por defecto, se le asigna una \textbf{imagen predeterminada} que se encuentra en la carpeta de recursos. Esta imagen \textbf{se puede cambiar posteriormente} a través de un \textit{dialog} que permite al usuario seleccionar una imagen de su galería.
 \\\\
-A cada view se le hace el inflado mediante un layout que define cómo representar cada objeto de forma individual. Este layout se encuentra en la carpeta de recursos y contiene un \texttt{ImageView} y un \texttt{TextView} para mostrar la imagen y el título de la ROM, respectivamente. El layout se infla en el método \texttt{onCreateViewHolder()} del adaptador.
+A cada view se le hace el \textit{inflado} mediante un layout que define cómo representar cada objeto de forma individual. Este layout se encuentra en la carpeta de recursos y contiene un \texttt{ImageView} y un \texttt{TextView} para mostrar la imagen y el título de la ROM, respectivamente. El layout se infla en el método \texttt{onCreateViewHolder()} del adaptador.
 
 \begin{lstlisting}[language=Kotlin, caption={ROM Adapter.}, label={code:romAdapter}]
     class ROMAdapter(val romList: MutableList<ROM>, private val spanCount: Int)  :
@@ -2746,7 +2745,7 @@ Una vez implementados los puntos anteriores, la aplicación debe permitir añadi
 \end{figure}
 
 \section{SettingsActivity}
-La actividad de configuración es la encargada de gestionar la configuración del emulador. Esta actividad se lanza desde el \texttt{MainActivity} y permite al usuario modificar distintas opciones del emulador, como la paleta de colores o modificar la interfaz de juego. Implementa la interfaz \texttt{OnPreferenceStartFragmentCallback}, lo que permite mostrar fragmentos secundarios de configuración según las interacciones del usuario.
+La actividad de configuración es la encargada de \textbf{gestionar la configuración del emulador}. Esta actividad se lanza desde el \texttt{MainActivity} y permite al usuario \textbf{modificar distintas opciones del emulador}, como la paleta de colores o modificar la interfaz de juego. Implementa la interfaz \texttt{OnPreferenceStartFragmentCallback}, lo que permite mostrar fragmentos secundarios de configuración según las interacciones del usuario.
 \\\\
 En el método \texttt{onCreate()} se incluye una barra de herramientas y un contenedor de fragmentos. La barra se configura para permitir la navegación hacia atrás. Por otro lado, se obtiene el valor del identificador de juego a través del \textit{intent} que ha lanzado la actividad anterior. Este identificador determina si se deben mostrar las preferencias asociadas a un juego específico (\texttt{GameSettingsFragment}) o las preferencias generales de la aplicación (\texttt{SettingsFragment}). Si el identificador es distinto de -1, se interpreta que la configuración está vinculada a un juego concreto.
 
@@ -2784,7 +2783,7 @@ En el método \texttt{onCreate()} se incluye una barra de herramientas y un cont
         [...]
 \end{lstlisting}
 
-La función \texttt{onPreferenceStartFragment()} se ejecuta cuando el usuario selecciona una opción de configuración que abre un nuevo fragmento. En este método se instancia dinámicamente el nuevo fragmento a partir de la clase especificada en la preferencia. Además, se le pasan los extras necesarios, como el identificador visto previamente. El fragmento se añade a la pila de retroceso para que el usuario pueda navegar hacia atrás de forma natural.
+La función \texttt{onPreferenceStartFragment()} se ejecuta cuando el usuario selecciona una opción de configuración que abre un nuevo fragmento. En este método se \textbf{instancia dinámicamente el nuevo fragmento} a partir de la clase especificada en la preferencia. Además, se le pasan los extras necesarios, como el identificador visto previamente. \textbf{El fragmento se añade a la pila de retroceso para que el usuario pueda navegar hacia atrás} de forma natural.
 
 \begin{lstlisting}[language=Kotlin, caption={SettingsActivity - Selección de Otro Fragmento.}, label={code:settingsActivitySelect}]
     override fun onPreferenceStartFragment(
@@ -2808,7 +2807,7 @@ La función \texttt{onPreferenceStartFragment()} se ejecuta cuando el usuario se
     }
 \end{lstlisting}
 
-El \texttt{SettingsFragment} que se utiliza por defecto en la actividad, utiliza un archivo XML de preferencias, donde vienen definidos y enlazados con sus respectivas clases todos los subfragmentos a los que se puede navegar. Además, utilizar fragmentos ofrece la posibilidad de añadir toda la lógica que se necesite según qué situación.
+El \textbf{\texttt{SettingsFragment}} que se utiliza por defecto en la actividad, \textbf{utiliza un archivo XML de preferencias}, donde \textbf{vienen definidos} y enlazados con sus respectivas clases \textbf{todos los subfragmentos} a los que se puede navegar. Además, utilizar fragmentos ofrece la posibilidad de añadir toda la lógica que se necesite según qué situación.
 
 \begin{lstlisting}[language=Kotlin, caption={SettingsActivity - Archivo de Preferencias.}, label={code:settingsActivityPreferences}]
     <PreferenceScreen
@@ -2831,7 +2830,7 @@ El \texttt{SettingsFragment} que se utiliza por defecto en la actividad, utiliza
         [...]
 \end{lstlisting}
 
-Por último, se ha implementado el método \texttt{onSupportNavigateUp()}, el cual se encarga de devolver el control a la actividad anterior cuando el usuario pulsa el botón de retroceso en la barra de herramientas. Se crea un \textit{intent} con el identificador de juego actual para devolverlo como resultado, y se lanza \texttt{onBackPressedDispatcher} para que la navegación hacia atrás se gestione correctamente.
+Por último, se ha implementado el método \textbf{\texttt{onSupportNavigateUp()}}, el cual \textbf{se encarga de devolver el control a la actividad anterior cuando el usuario pulsa el botón de retroceso} en la barra de herramientas. Se crea un \textit{intent} con el identificador de juego actual para devolverlo como resultado, y se lanza \texttt{onBackPressedDispatcher} para que la navegación hacia atrás se gestione correctamente.
 \\\\
 El resultado es el que se puede ver en las siguientes figuras:
 
@@ -2841,7 +2840,7 @@ El resultado es el que se puede ver en las siguientes figuras:
     \caption{Transición entre Fragmentos en la Pantalla de Ajustes.}\label{figure:settingsFragments}
 \end{figure}
 
-Los ajustes que el usuario tome, tanto de forma general como de forma individual por cada juego, se guardarán mediante \textit{SharedPreferences}. Existen excepciones como la carátula que el usuario quiera configurar a cada juego, que se deben guardar en memoria privada.
+\textbf{Los ajustes} que el usuario tome, tanto de forma general como de forma individual por cada juego, \textbf{se guardarán mediante \textit{SharedPreferences}}. Existen excepciones como la carátula que el usuario quiera configurar a cada juego, que se deben guardar en memoria privada.
 \\\\
 A continuación se muestra un ejemplo en el que el usuario modifica la portada de un juego:
 
@@ -2853,7 +2852,7 @@ A continuación se muestra un ejemplo en el que el usuario modifica la portada d
 
 \subsection{Skins}
 
-El emulador permite al usuario cambiar la apariencia de la interfaz de juego. Para ello, se ha implementado un sistema de \textit{skins} que permite personalizar la apariencia del emulador. Cada skin se define mediante una entidad SQL que contiene los colores, imágenes y estilos de los distintos elementos de la interfaz.
+El emulador \textbf{permite al usuario cambiar la apariencia de la interfaz de juego}. Para ello, se ha implementado un \textbf{sistema de \textit{skins}} que permite personalizar la apariencia del emulador. Cada skin se define mediante una entidad SQL que contiene los colores, imágenes y estilos de los distintos elementos de la interfaz.
 \\\\
 El sistema de \textit{skins} se basa en el uso de \texttt{SharedPreferences} para almacenar la configuración de la skin seleccionada por el usuario. Al iniciar el emulador, se carga la skin seleccionada y se aplican los estilos correspondientes a los distintos elementos de la interfaz.
 \\\\
@@ -2871,19 +2870,89 @@ De la misma manera que se ha hecho con la página principal que muestra todas la
     \item \textbf{CreateCustomSkinActivity}: Una actividad que permite al usuario crear una skin personalizada. Muestra un layout por defecto en el que el usuario puede seleccionar los colores y las imágenes de los distintos elementos de la interfaz.
 \end{itemize}
 
-La diferencia con el \texttt{ROMAdapter} es que no se va a utilizar un \texttt{GridLayoutManager}, ya que se van a listar en forma de lista. Además, siempre aparecerá una skin por defecto, que vendrá preconfigurada con la aplicación y que los usuarios pueden utilizar pero no eliminar ni editar.
+La \textbf{diferencia con el \texttt{ROMAdapter}} es que \textbf{no se va a utilizar un \texttt{GridLayoutManager}}, ya que se van a listar en forma de lista. Además, siempre aparecerá una skin por defecto, que vendrá preconfigurada con la aplicación y que los usuarios pueden utilizar pero no eliminar ni editar.
 \\\\
-La lógica del manejador de skins es muy similar a la de las ROMs, con la diferencia de que no se están manejando ficheros, solamente entidades SQL. Por otro lado, la configuración del \textit{RecyclerView} y los \textit{listeners} también sigue el mismo patrón. Por ello, vamos a obviar la parte de código para evitar redundancias.
+La \textbf{lógica} del manejador de skins es muy \textbf{similar a la de las ROMs}, con la diferencia de que \textbf{no se están manejando ficheros}, solamente entidades SQL. Por otro lado, la configuración del \textit{RecyclerView} y los \textit{listeners} también sigue el mismo patrón. Por ello, vamos a obviar la parte de código para evitar redundancias.
 \\\\
-El emulador comenzará utilizando la skin predeterminada, pero el usuario podrá cambiarla en cualquier momento tanto por otra skin que genere como por el diseño original que utiliza botones comunes de Android.
+El emulador \textbf{comenzará utilizando la skin predeterminada}, pero el usuario podrá cambiarla en cualquier momento tanto por otra skin que genere como por el diseño original que utiliza botones comunes de Android. Esta skin predeterminada quedará configurada en su \texttt{DataSource}, y \textbf{no podrá ser editada ni eliminada}. De esta manera aseguramos que siempre haya una opción como mínimo a la hora de utilizar skins.
+
+\begin{lstlisting}[language=Kotlin, caption={Configuración de la Skin predeterminada}, label={code:defaultskinconfig}]
+    fun getDefaultSkin(): Skin {
+        return Skin(
+            title = "Default Skin",
+            backgroundColor = "#E2B74F",
+            startSelectButtons = FileManager.getDrawableAsByteArray(appContext, R.drawable.default_start_select),
+            aButton = FileManager.getDrawableAsByteArray(appContext, R.drawable.default_a),
+            bButton = FileManager.getDrawableAsByteArray(appContext, R.drawable.default_b),
+            screenOn = FileManager.getDrawableAsByteArray(appContext, R.drawable.default_screen),
+            screenOff = FileManager.getDrawableAsByteArray(appContext, R.drawable.default_screen_off),
+            dpad = FileManager.getDrawableAsByteArray(appContext, R.drawable.default_dpad),
+            leftHomeImage = FileManager.getDrawableAsByteArray(appContext, R.drawable.default_logo),
+            rightBottomImage = FileManager.getDrawableAsByteArray(appContext, R.drawable.default_speakers),
+            homeButton = FileManager.getDrawableAsByteArray(appContext, R.drawable.default_home),
+            editable = false,
+            deletable = false
+        )
+    }
+\end{lstlisting}
 
 \subsection{Diseño de Skin Predeterminada}
-Para la skin predeterminada se ha optado por un diseño sencillo, que no sature al usuario y que permita una buena visibilidad de los elementos. Se ha utilizado un fondo amarillo con un color negro para los botones. Dar las gracias a Carla Maciá Díez por la ayuda proporcionada con todos los elementos. A continuación se muestra el diseño de todos los elementos de la skin predeterminada:
+Para la \textbf{skin predeterminada} se ha optado por un \textbf{diseño sencillo}, que no sature al usuario y que permita una buena visibilidad de los elementos. Se ha utilizado un fondo amarillo con un color negro para los botones. Dar las \textbf{gracias a Carla Maciá Díez} por la ayuda proporcionada con todos los elementos. A continuación se muestra el diseño de todos los elementos de la skin predeterminada:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{include/images/new_design_elements.png}
+    \includegraphics[width=0.6\textwidth]{include/images/new_design_elements.png}
     \caption{Nuevos Diseños para los Elementos de la Interfaz de Juego.}\label{figure:newDesignElements}
+\end{figure}
+\clearpage
+A continuación el resultado obtenido:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{include/images/default_skin.png}
+    \caption{Resultado del Nuevo Diseño Predeterminado.}\label{figure:newDesignExamples}
+\end{figure}
+
+Partiendo del \textit{layout} predeterminado, este se reutiliza en la pantalla de ajustes para permitir la creación y edición de skins. La única modificación aplicada consiste en \textbf{añadir bordes a los distintos elementos de la interfaz}, con el objetivo de \textbf{proporcionar al usuario una guía visual clara sobre qué componentes son editables} en función de la zona de la pantalla con la que interactúe.
+\\\\
+A continuación se muestra cómo sería el flujo para crear una skin con un fondo rosa:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{include/images/skin_pink.png}
+    \caption{Flujo para Crear una Skin con un Color Personalizado.}\label{figure:skincustomcolor}
+\end{figure}
+
+\section{Identidad Visual de la Aplicación}
+
+Como cierre del capítulo de Desarrollo, se ha dedicado tiempo a la creación y diseño de un logotipo que represente la identidad visual de la aplicación.
+\\\\
+Desde el inicio del proceso creativo, se tuvo como objetivo combinar tres conceptos clave: \textit{emulador}, \textit{Game Boy} y \textit{abeja}. La elección del nombre \textbf{GBee} surge como un juego de palabras entre las siglas de la consola (GB) y la palabra inglesa \textit{bee} (abeja), dando lugar a una denominación breve, fácil de pronunciar y recordar. En coherencia con esta idea, se seleccionaron como colores predominantes el amarillo y el negro, propios de la iconografía asociada a las abejas.
+\\\\
+Para alcanzar un diseño que reflejara estos elementos de forma sencilla y eficaz, se realizaron diversos bocetos con un \textbf{enfoque minimalista}. El objetivo fue lograr una imagen en la que, a primera vista, se pudieran identificar los tres conceptos mencionados de manera integrada y reconocible.
+\\\\
+Dar las \textbf{gracias a Carla Maciá Díez y Paula Solanellas Serrano} por su ayuda a la hora de buscar ideas y trasladarlas a papel.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{include/images/logo_sketches.png}
+    \caption{Diseño de Logotipos para la Aplicación.}\label{figure:logosketches}
+\end{figure}
+
+El \textbf{diseño final} tomó ideas de varios de los logos que aparecen en la figura previa, obteniendo el siguiente resultado:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{include/images/gbee.png}
+    \caption{Diseño Final del Logotipo.}\label{figure:logofinal}
+\end{figure}
+
+El logotipo se añadió al proyecto, presentándose de la siguiente manera:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{include/images/logo_app.png}
+    \caption{Logotipo Añadido a la Aplicación.}\label{figure:logofinalapp}
 \end{figure}
 
 \cleardoublepage
