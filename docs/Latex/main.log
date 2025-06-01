@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2025.5.13)  31 MAY 2025 21:13
+This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023/Debian) (preloaded format=xelatex 2025.5.13)  1 JUN 2025 13:02
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1887,7 +1887,7 @@ LaTeX Info: Redefining \ttfamily on input line 2.
 
 ] [14] [15] [16]
 Overfull \hbox (1.09497pt too wide) detected at line 174
- []\TU/lmss/bx/n/10.95 149
+ []\TU/lmss/bx/n/10.95 151
  []
 
 )
@@ -2728,13 +2728,15 @@ Underfull \hbox (badness 10000) in paragraph at lines 4--7
 
 
 
-]
+] [74]
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10> not available
 (Font)              Font shape `TU/lmtt/b/n' tried instead on input line 35.
- [74]
-Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [75]
+Underfull \vbox (badness 1365) has occurred while \output is active []
+
+ [75
+
+]
 Underfull \hbox (badness 10000) in paragraph at lines 123--128
 
  []
@@ -2769,20 +2771,25 @@ Underfull \hbox (badness 10000) in paragraph at lines 198--205
 
  []
 
-[78]
-Underfull \hbox (badness 10000) in paragraph at lines 240--245
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 240--245
-
- []
-
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [79]
+ [78]
+Underfull \hbox (badness 10000) in paragraph at lines 240--245
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 240--245
+
+ []
+
+[79]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [80
+
+]
 Underfull \hbox (badness 10000) in paragraph at lines 297--300
 
  []
@@ -2793,17 +2800,11 @@ Underfull \hbox (badness 10000) in paragraph at lines 301--304
  []
 
 
-Underfull \vbox (badness 3240) has occurred while \output is active []
-
- [80]
 Underfull \hbox (badness 10000) in paragraph at lines 322--325
 
  []
 
-
-Underfull \vbox (badness 6300) has occurred while \output is active []
-
- [81]
+[81]
 Underfull \hbox (badness 10000) in paragraph at lines 340--345
 
  []
@@ -2814,66 +2815,70 @@ Underfull \hbox (badness 10000) in paragraph at lines 340--345
  []
 
 
-Underfull \vbox (badness 2173) has occurred while \output is active []
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [82] [83]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [84]
+ [84
+
+
+] [85]
+Underfull \vbox (badness 3219) has occurred while \output is active []
+
+ [86]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [85]
-Underfull \vbox (badness 2150) has occurred while \output is active []
-
- [86] [87]
+ [87] [88]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [88]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [89]
+ [89] [90]
 Underfull \hbox (badness 10000) in paragraph at lines 720--723
 
  []
 
-[90]
-Underfull \hbox (badness 10000) in paragraph at lines 768--773
 
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 768--773
+Underfull \hbox (badness 10000) in paragraph at lines 747--750
 
  []
 
 [91]
+Underfull \hbox (badness 10000) in paragraph at lines 768--773
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 768--773
+
+ []
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 775--778
 
  []
 
+[92
 
+]
 Underfull \hbox (badness 10000) in paragraph at lines 807--810
 
  []
 
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [92]
-Underfull \vbox (badness 5288) has occurred while \output is active []
-
- [93] [94]
+[93] [94]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [95]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [96]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [97]
 Underfull \hbox (badness 10000) in paragraph at lines 1037--1040
 
  []
 
-[97]
+
 Underfull \hbox (badness 10000) in paragraph at lines 1043--1046
 
  []
@@ -2891,15 +2896,17 @@ Underfull \hbox (badness 10000) in paragraph at lines 1079--1084
 File: include/images/openfile.jpg Graphic file (type bmp)
 <include/images/openfile.jpg>
 
-Underfull \vbox (badness 1742) has occurred while \output is active []
-
- [99]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [100]
+ [99] [100]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [101] [102] [103]
+ [101
+
+]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [102] [103]
 Underfull \hbox (badness 10000) in paragraph at lines 1306--1311
 
  []
@@ -2909,206 +2916,221 @@ Underfull \hbox (badness 10000) in paragraph at lines 1306--1311
 
  []
 
-[104] [105] [106]
-Underfull \hbox (badness 10000) in paragraph at lines 1456--1461
+[104] [105]
+LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10.95> not available
+(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 1358.
+ [106] [107]
+Underfull \hbox (badness 10000) in paragraph at lines 1457--1462
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1456--1461
+Underfull \hbox (badness 10000) in paragraph at lines 1457--1462
 
  []
 
-[107] [108] [109]
-Underfull \hbox (badness 10000) in paragraph at lines 1539--1544
+[108]
+Overfull \hbox (0.11148pt too wide) in paragraph at lines 1494--1495
+[]\TU/lmr/m/n/10.95 Por otro lado, la \TU/lmr/bx/n/10.95 función \TU/lmtt/b/n/10.95 handleInterrupt(address: Int, type: InterruptType) \TU/lmr/bx/n/10.95 ges-
+ []
+
+[109]
+Underfull \hbox (badness 10000) in paragraph at lines 1540--1545
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1539--1544
+Underfull \hbox (badness 10000) in paragraph at lines 1540--1545
 
  []
 
 [110]
-Underfull \hbox (badness 10000) in paragraph at lines 1581--1584
+Underfull \hbox (badness 10000) in paragraph at lines 1582--1585
 
  []
 
-[111]
-Underfull \hbox (badness 10000) in paragraph at lines 1635--1638
+[111] [112]
+Underfull \hbox (badness 10000) in paragraph at lines 1636--1639
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1641--1644
+Underfull \hbox (badness 10000) in paragraph at lines 1642--1645
 
  []
 
-[112]
+[113
+
+] [114]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [113] [114]
-LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10.95> not available
-(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 1740.
-
-Underfull \hbox (badness 10000) in paragraph at lines 1761--1764
+ [115]
+Underfull \hbox (badness 10000) in paragraph at lines 1762--1765
 
  []
 
-[115]
-Underfull \hbox (badness 10000) in paragraph at lines 1783--1786
+
+Underfull \hbox (badness 10000) in paragraph at lines 1784--1788
 
  []
 
 [116]
-Underfull \hbox (badness 10000) in paragraph at lines 1820--1823
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
- []
-
-[117]
-Underfull \hbox (badness 10000) in paragraph at lines 1846--1849
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1862--1867
+ [117]
+Underfull \hbox (badness 10000) in paragraph at lines 1822--1825
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1862--1867
+Underfull \hbox (badness 10000) in paragraph at lines 1848--1851
 
  []
 
-[118] [119]
-Underfull \hbox (badness 10000) in paragraph at lines 1928--1931
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1934--1939
+[118]
+Underfull \hbox (badness 10000) in paragraph at lines 1864--1869
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1934--1939
+Underfull \hbox (badness 10000) in paragraph at lines 1864--1869
+
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [119]
+Underfull \hbox (badness 10000) in paragraph at lines 1925--1928
 
  []
 
 [120]
-Underfull \hbox (badness 10000) in paragraph at lines 1982--1989
+Underfull \hbox (badness 10000) in paragraph at lines 1931--1936
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1982--1989
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1982--1989
+Underfull \hbox (badness 10000) in paragraph at lines 1931--1936
 
  []
 
 [121]
-Underfull \hbox (badness 10000) in paragraph at lines 2016--2019
-
- []
-
-[122]
-Underfull \hbox (badness 10000) in paragraph at lines 2044--2049
+Underfull \hbox (badness 10000) in paragraph at lines 1979--1986
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2044--2049
+Underfull \hbox (badness 10000) in paragraph at lines 1979--1986
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1979--1986
 
  []
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [123]
-Underfull \hbox (badness 10000) in paragraph at lines 2072--2077
+ [122
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 2013--2016
+
+ []
+
+[123]
+Underfull \hbox (badness 10000) in paragraph at lines 2041--2046
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2072--2077
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2080--2083
+Underfull \hbox (badness 10000) in paragraph at lines 2041--2046
 
  []
 
 [124]
-Underfull \hbox (badness 10000) in paragraph at lines 2100--2103
+Underfull \hbox (badness 10000) in paragraph at lines 2069--2074
 
  []
 
 
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [125]
-Underfull \hbox (badness 10000) in paragraph at lines 2154--2163
+Underfull \hbox (badness 10000) in paragraph at lines 2069--2074
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2154--2163
+Underfull \hbox (badness 10000) in paragraph at lines 2077--2080
+
+ []
+
+[125]
+Underfull \hbox (badness 10000) in paragraph at lines 2097--2100
+
+ []
+
+[126]
+Underfull \hbox (badness 10000) in paragraph at lines 2151--2160
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2154--2163
+Underfull \hbox (badness 10000) in paragraph at lines 2151--2160
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2154--2163
+Underfull \hbox (badness 10000) in paragraph at lines 2151--2160
 
  []
 
-[126] [127]
-Underfull \hbox (badness 10000) in paragraph at lines 2207--2210
+
+Underfull \hbox (badness 10000) in paragraph at lines 2151--2160
+
+ []
+
+[127]
+Underfull \hbox (badness 10000) in paragraph at lines 2204--2207
 
  []
 
 [128]
-Underfull \hbox (badness 10000) in paragraph at lines 2257--2260
+Underfull \vbox (badness 3219) has occurred while \output is active []
+
+ [129]
+Underfull \hbox (badness 10000) in paragraph at lines 2254--2257
 
  []
 
 
-Overfull \hbox (0.58603pt too wide) in paragraph at lines 2282--2283
+Overfull \hbox (0.58603pt too wide) in paragraph at lines 2279--2280
 []\TU/lmr/m/n/10.95 Por último, el \TU/lmtt/m/n/10.95 GameThread \TU/lmr/m/n/10.95 estará constantemente renderizando mientras que el flag \TU/lmtt/m/n/10.95 running
  []
 
-
-Underfull \vbox (badness 3240) has occurred while \output is active []
-
- [129] [130]
+[130]
 File: include/images/render_surface_view.png Graphic file (type bmp)
 <include/images/render_surface_view.png>
- [131]
-Underfull \hbox (badness 10000) in paragraph at lines 2397--2404
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [131] [132]
+Underfull \hbox (badness 10000) in paragraph at lines 2394--2401
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2397--2404
+Underfull \hbox (badness 10000) in paragraph at lines 2394--2401
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2397--2404
+Underfull \hbox (badness 10000) in paragraph at lines 2394--2401
 
  []
 
-[132]
-Underfull \hbox (badness 10000) in paragraph at lines 2438--2441
+[133]
+Underfull \hbox (badness 10000) in paragraph at lines 2435--2438
 
  []
 
@@ -3116,112 +3138,115 @@ File: include/images/design_1_1.png Graphic file (type bmp)
 <include/images/design_1_1.png>
 File: include/images/design_1_2.png Graphic file (type bmp)
 <include/images/design_1_2.png>
-[133]
-Underfull \vbox (badness 2932) has occurred while \output is active []
-
- [134]
-File: include/images/transition_title.png Graphic file (type bmp)
-<include/images/transition_title.png>
-
-Underfull \hbox (badness 10000) in paragraph at lines 2506--2509
-
- []
-
-[135]
-Underfull \hbox (badness 10000) in paragraph at lines 2522--2525
-
- []
-
-
-Overfull \hbox (11.99475pt too wide) in paragraph at lines 2522--2525
-\TU/lmr/m/n/10.95 A continuación se muestra el código de la actividad principal, donde se inicializa el \TU/lmtt/m/n/10.95 RecyclerView
- []
-
-[136]
-Underfull \hbox (badness 10000) in paragraph at lines 2568--2581
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2568--2581
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2568--2581
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2568--2581
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2568--2581
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2568--2581
-
- []
-
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [137]
-Underfull \hbox (badness 10000) in paragraph at lines 2594--2597
+ [134]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [135]
+File: include/images/transition_title.png Graphic file (type bmp)
+<include/images/transition_title.png>
+
+Underfull \hbox (badness 10000) in paragraph at lines 2503--2506
+
+ []
+
+[136]
+Underfull \hbox (badness 10000) in paragraph at lines 2519--2522
+
+ []
+
+
+Overfull \hbox (11.99475pt too wide) in paragraph at lines 2519--2522
+\TU/lmr/m/n/10.95 A continuación se muestra el código de la actividad principal, donde se inicializa el \TU/lmtt/m/n/10.95 RecyclerView
+ []
+
+[137]
+Underfull \hbox (badness 10000) in paragraph at lines 2565--2578
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2565--2578
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2565--2578
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2565--2578
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2565--2578
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2565--2578
 
  []
 
 [138]
-Underfull \hbox (badness 10000) in paragraph at lines 2624--2627
+Underfull \hbox (badness 10000) in paragraph at lines 2591--2594
+
+ []
+
+[139]
+Underfull \hbox (badness 10000) in paragraph at lines 2621--2624
 
  []
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [139]
+ [140]
 Underfull \vbox (badness 2150) has occurred while \output is active []
 
- [140]
-Underfull \hbox (badness 10000) in paragraph at lines 2700--2707
+ [141]
+Underfull \hbox (badness 10000) in paragraph at lines 2697--2704
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2700--2707
+Underfull \hbox (badness 10000) in paragraph at lines 2697--2704
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2700--2707
+Underfull \hbox (badness 10000) in paragraph at lines 2697--2704
 
  []
 
-[141]
+[142]
 File: include/images/add_rom.png Graphic file (type bmp)
 <include/images/add_rom.png>
 
-Underfull \hbox (badness 10000) in paragraph at lines 2752--2755
+Underfull \hbox (badness 10000) in paragraph at lines 2749--2752
 
  []
 
-[142] [143]
-Underfull \hbox (badness 10000) in paragraph at lines 2837--2840
-
- []
-
-
-Underfull \vbox (badness 2671) has occurred while \output is active []
+[143]
+Underfull \vbox (badness 3219) has occurred while \output is active []
 
  [144]
+Underfull \hbox (badness 10000) in paragraph at lines 2834--2837
+
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [145]
 File: include/images/settings_fragments.png Graphic file (type bmp)
 <include/images/settings_fragments.png>
 
-Underfull \hbox (badness 10000) in paragraph at lines 2847--2850
+Underfull \hbox (badness 10000) in paragraph at lines 2844--2847
 
  []
 
@@ -3230,23 +3255,23 @@ File: include/images/settings_misc.png Graphic file (type bmp)
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [145]
-Underfull \hbox (badness 10000) in paragraph at lines 2859--2864
+ [146]
+Underfull \hbox (badness 10000) in paragraph at lines 2856--2861
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2859--2864
+Underfull \hbox (badness 10000) in paragraph at lines 2856--2861
 
  []
 
-[146]
-Underfull \hbox (badness 10000) in paragraph at lines 2877--2882
+[147]
+Underfull \hbox (badness 10000) in paragraph at lines 2874--2879
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2877--2882
+Underfull \hbox (badness 10000) in paragraph at lines 2874--2879
 
  []
 
@@ -3255,7 +3280,10 @@ File: include/images/new_design_elements.png Graphic file (type bmp)
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [147] [148]) (./main.bbl
+ [148] [149] [150
+
+
+]) (./main.bbl
 chapter without number
 
 Underfull \hbox (badness 2088) in paragraph at lines 14--26
@@ -3267,12 +3295,10 @@ Underfull \hbox (badness 10000) in paragraph at lines 14--26
 [][][] [] [][][][][][][][][][][][][][][][][][] [] [][][][] [] [][][][] [] [][][] [] [][][][][][][][] [] [][][][][][] [] [][][][] [] [][][] [] [][][][][][][] []
  []
 
-[149
+[151
 
 
-
-
-]) [150] (./main.aux)
+]) [152] (./main.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2020/03/25>
@@ -3287,10 +3313,10 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 Here is how much of TeX's memory you used:
  49600 strings out of 474878
  1060737 string characters out of 5762516
- 2690627 words of memory out of 5000000
+ 2692627 words of memory out of 5000000
  70705 multiletter control sequences out of 15000+600000
  563777 words of font info for 98 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 113i,21n,134p,11019b,2135s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 113i,21n,134p,11019b,2133s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on main.pdf (176 pages).
+Output written on main.pdf (178 pages).

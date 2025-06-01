@@ -30,7 +30,7 @@ El desarrollo comienza con la implementación de la \textbf{Unidad Central de Pr
 
 \subsection{Registros}
 Para definirlos en nuestro programa, \textbf{utilizaremos el tipo Byte} o UByte de Kotlin. En mi caso por desconocimiento del segundo tipo, comencé a programarlo con Byte. La diferencia entre ambos es que Byte utiliza el rango de [-128:128] y UByte el de [0:255] (igual que la GB). Podemos hacer uso de cualquiera de los dos mientras tengamos en mente que, si el primero lo convertimos a Integer, será un valor distinto al original. \textbf{En cuanto a PC y SP}, optaremos por \textbf{utilizar Integers}, ya que son \textbf{valores de 2 bytes y siempre contienen una dirección de memoria}.
-
+\clearpage
 \begin{lstlisting}[language=Kotlin, caption={Declaración de Registros}, label={code:kotlinregistros}]
     var A: Byte = 0
     var F: Byte = 0             // Contains the 4 flags (11110000 -> ZNHC0000)
@@ -242,7 +242,7 @@ Para la instrucción \textbf{ADD} (en este caso \textbf{ADD A, B}), la operació
 La \textbf{diferencia entre ADD y ADC} reside en que en \textbf{este último al resultado también se le suma el valor del carry} y, por ende, se debe tener en cuenta en la actualización del flag Half-Carry.
 \\\\
 En los casos que impliquen el uso de direcciones de memoria (operaciones de 2 bytes), se puede emplear el código utilizado en las instrucciones de carga (LD) \ref{instrLd} como referencia.
-
+\clearpage
 \begin{lstlisting}[language=Kotlin, caption={Operaciones INC y DEC}, label={code:kotlinincdec}]
     fun inc_8bit_register(register: Byte): Byte{
         val toReturn = (register.toInt() + 1).toByte()
@@ -398,7 +398,7 @@ La función \textbf{CP B} (Compare B) se encarga de \textbf{comparar el valor de
 \end{lstlisting}
 
 La \textbf{función CPL} (Complementary) se encarga de \textbf{complementar el valor del registro A, invirtiendo todos sus bits mediante una operación XOR con 0xFF}. Esto transforma todos los bits de A en sus opuestos, cambiando ceros por unos y viceversa. Después de realizar la operación, la función establece el flag N para indicar que se ha realizado una operación que afecta al signo del número, y también establece el flag H para indicar que puede haber un acarreo en la operación.
-
+\cleardoubleevenpage
 \begin{lstlisting}[language=Kotlin, caption={Operación CCF}, label={code:kotlinccf}]
     fun ccf(): Int{
 
@@ -745,9 +745,9 @@ Por otro lado, \textbf{DI deshabilita las interrupciones en el procesador}, bloq
 \end{lstlisting}
 
 La \textbf{función PUSH BC almacena los valores de los registros B y C en la pila}. Primero, decrece el puntero de la pila (SP) en 1 y escribe el contenido de B en la dirección de memoria apuntada, luego vuelve a decrecer la pila y escribe el contenido de C. Esta operación asegura que el registro C se almacene en la parte baja de la pila y B en la parte alta.
-
+\\\\
 Por otro lado, la función \textbf{POP BC recupera los valores de los registros B y C desde la pila}. Comienza leyendo el byte almacenado en la dirección de memoria apuntada por SP y lo asigna al registro C, luego incrementa la pila para apuntar al siguiente byte. A continuación, lee el byte en la nueva dirección y lo asigna al registro B, y nuevamente incrementa SP.
-
+\clearpage
 \begin{lstlisting}[language=Kotlin, caption={Operaciones I/O}, label={code:kotlinio}]
     fun ldh_n_a(): Int{
 
@@ -1076,9 +1076,9 @@ De momento se implementará en el MainActivity un botón que al pulsarlo y selec
     }
 \end{lstlisting}
 
-Con \textit{registerForActivityResult(ActivityResultContracts.OpenDocument())} se puede registrar el lanzador para abrir documentos. Si el URI que se devuelve no es nulo, se procederá a crear el Intent, añadiendo el URI como un EXTRA.
+Con \textit{registerForActivityResult(ActivityResultContracts.OpenDocument())} se puede \textbf{registrar el lanzador para abrir documentos}. Si el URI que se devuelve no es nulo, se procederá a crear el Intent, añadiendo el URI como un EXTRA.
 \\\\
-El método \textit{onFilePicker()} se ejecuta al pulsar el botón añadido al layout e inicia el proceso de selección de documentos mediante \textit{openFileLauncher.launch(arrayOf("application/octet-stream"))}. El tipo \textit{application/octet-stream} indica que se deben aceptar archivos binarios genéricos.
+El método \textit{onFilePicker()} se ejecuta al pulsar el botón añadido al layout e inicia el proceso de selección de documentos mediante \textit{openFileLauncher.launch(arrayOf("application/octet-stream"))}. El \textbf{tipo \textit{application/octet-stream}} indica que se deben \textbf{aceptar archivos binarios genéricos}.
 \\\\
 Para obtener el parámetro y sus bytes correspondientes en la actividad de destino, se ejecutará lo siguiente:
 
@@ -1094,7 +1094,7 @@ Para obtener el parámetro y sus bytes correspondientes en la actividad de desti
     }
 \end{lstlisting}
 
-Con \textit{intent.getStringExtra()} se puede obtener la URI del archivo que se ha proporcionado anteriormente en el Intent. Es necesario especificar la constante que identifica la clave bajo la cual se guardó el parámetro; en este caso, se utiliza \textit{ROM\_URI\_EXTRA}.
+Con \textit{intent.getStringExtra()} se puede \textbf{obtener la URI del archivo} que se ha proporcionado anteriormente en el Intent. Es necesario especificar la constante que identifica la clave bajo la cual se guardó el parámetro; en este caso, se utiliza \textit{ROM\_URI\_EXTRA}.
 
 \begin{figure}[H]
 \centering
@@ -1103,9 +1103,9 @@ Con \textit{intent.getStringExtra()} se puede obtener la URI del archivo que se 
 \label{figure:sdopen}
 \end{figure}
 
-A continuación, se procede a obtener los bytes del archivo y se envían al módulo de Emulator. En este momento, nos centraremos únicamente en la parte correspondiente a la ROM:
+A continuación, se procede a \textbf{obtener los bytes del archivo} y enviarlos al módulo de \textit{Emulator}. En este momento, nos centraremos únicamente en la parte correspondiente a la ROM:
 
-\begin{lstlisting}[language=Kotlin, caption={Carga de ROM y manejo de errores durante el proceso.}, label={code:kotlinloadrom}]
+\begin{lstlisting}[language=Kotlin, caption={Función principal de carga de ROM y manejo de errores durante el proceso.}, label={code:kotlinloadrom}]
     fun load_rom(romBytes: ByteArray): Boolean{
 
         try {
@@ -1126,9 +1126,9 @@ A continuación, se procede a obtener los bytes del archivo y se envían al mód
     }
 \end{lstlisting}
 
-En la función, se comprueba que los bytes pasados como parámetro no sean nulos. A continuación, se calcula el tamaño total de la ROM para asegurar que no exceda el tamaño máximo permitido (rango de 0x0000 a 0x7FFF). Se escriben todos los bytes en la memoria del emulador, y se invoca la función \textit{rom\_init()} para obtener datos como el título. Si alguna de las operaciones anteriores falla, se devuelve false y la ejecución se detiene.
-
-\begin{lstlisting}[language=Kotlin, caption={Carga de ROM y manejo de errores durante el proceso.}, label={code:kotlinloadromread}]
+En la función, se comprueba que los bytes pasados como parámetro no sean nulos. A continuación, \textbf{se calcula el tamaño total de la ROM} para asegurar que no exceda el tamaño máximo permitido (rango de 0x0000 a 0x7FFF). Se \textbf{escriben todos los bytes en la memoria} del emulador, y se invoca la función \textit{rom\_init()} para obtener datos como el título. Si alguna de las operaciones anteriores falla, se devuelve false y la ejecución se detiene.
+\clearpage
+\begin{lstlisting}[language=Kotlin, caption={Inicialización de la ROM y ejemplos de variables de clase.}, label={code:kotlinloadromread}]
     enum class CONSOLE_TYPE(val value : Int){
         DMG(0),
         DMG_CGB(0x80),
@@ -1232,14 +1232,14 @@ En la función, se comprueba que los bytes pasados como parámetro no sean nulos
     }
 \end{lstlisting}
 
-Desglosemos el código:
+A continuación el desglose del código:
 
 \begin{enumerate}
-    \item Se compara el logotipo de Nintendo almacenado en el módulo de memoria con el presente en el cartucho. Si no coinciden, se procede a finalizar la ejecución del programa.
-    \item Se obtienen los bytes correspondientes al título del juego y se convierten a una cadena de texto utilizando el conjunto de caracteres ASCII. Dado que la longitud del título depende de la versión del cartucho, se detendrá la lectura al encontrar el primer valor 0x00.
-    \item Se extrae el código de licencia. Primero, se verifica si el valor antiguo contiene 0x33 para utilizar los nuevos códigos de licencia. De lo contrario, se empleará el listado antiguo. Ambos listados pueden definirse mediante un par de mapas (\textit{Maps}) para acceder rápidamente al valor correspondiente según el código obtenido.
-    \item A continuación, se extraen de manera directa los valores correspondientes al tipo de cartucho, tamaño de la ROM/RAM, versión de la ROM y el tipo de mapper.
-    \item Se realiza una copia de la región 0x0000-0x00FF del cartucho. La Game Boy "oculta" esta porción de código hasta que la secuencia de arranque ha finalizado.
+    \item Se \textbf{compara el logotipo} de Nintendo almacenado en el módulo de memoria con el presente en el cartucho. \textbf{Si no coinciden}, se procede a \textbf{finalizar la ejecución} del programa.
+    \item Se \textbf{obtienen los bytes} correspondientes al \textbf{título} del juego y se convierten a una cadena de texto utilizando el conjunto de caracteres ASCII. Dado que la longitud del título depende de la versión del cartucho, se detendrá la lectura al encontrar el primer valor 0x00.
+    \item Se \textbf{extrae el código de licencia}. Primero, se verifica si el valor antiguo contiene 0x33 para utilizar los nuevos códigos de licencia. De lo contrario, se empleará el listado antiguo. Ambos listados pueden definirse mediante un par de mapas (\textit{Maps}) para acceder rápidamente al valor correspondiente según el código obtenido.
+    \item A continuación, se \textbf{extraen} de manera directa los valores correspondientes al \textbf{tipo de cartucho, tamaño de la ROM/RAM, versión de la ROM y el tipo de mapper}.
+    \item Se realiza una \textbf{copia de la región 0x0000-0x00FF} del cartucho. La Game Boy "oculta" esta porción de código hasta que la secuencia de arranque ha finalizado.
 \end{enumerate}
 
 Aquí los resultados obtenidos con la carga de las ROMS \textit{Super Marioland}, \textit{Pokémon Azul} y \textit{Harry Potter y la Piedra Filosofal}:
@@ -1273,7 +1273,7 @@ RAM Size: 2
 Console Type: CGB
 \end{lstlisting}
 
-Además, se puede observar que la ROM se ha cargado correctamente en nuestra memoria virtual. En el caso de \textit{Harry Potter} y la piedra filosofal, los siguientes bytes son visibles en la región 0x0000-0x015F:
+Además, se puede observar que la ROM se ha cargado correctamente en nuestra memoria virtual. En el caso de \textit{Harry Potter y la Piedra Filosofal}, los siguientes bytes son visibles en la región 0x0000-0x015F:
 
 \begin{lstlisting}[language=Consola, caption={Visualización de la ROM cargada en la memoria virtual.}, label={code:rommemloaded}]
 0000: E1 CD 9D 31 E9 87 87 87 85 6F 3E 00 8C 67 7E C9  | ...1.....o>..g~.
@@ -1303,15 +1303,15 @@ Además, se puede observar que la ROM se ha cargado correctamente en nuestra mem
 \subsection{Lectura/Escritura en ROM}\label{rom:read_write}
 
 \paragraph{Implementación de las Acciones de Lectura y Escritura en ROM}
-Para implementar las operaciones, es necesario tener en cuenta cómo cada \hyperref[history_mbcs]{MBC} gestiona de manera específica las diferentes regiones de memoria y los registros asociados. Cada MBC presenta un mecanismo particular para el acceso y la selección de bancos de ROM y RAM, lo que afecta directamente la forma en que el emulador debe interactuar con ellos.
+Para implementar las operaciones, es necesario \textbf{tener en cuenta cómo cada \hyperref[history_mbcs]{MBC} gestiona} de manera específica las \textbf{diferentes regiones de memoria y los registros asociados}. Cada MBC presenta un mecanismo particular para el acceso y la selección de bancos de ROM y RAM, lo que afecta directamente la forma en la que el emulador debe interactuar con ellos.
 \\\\
-Con el objetivo de lograr un emulador completo, es imprescindible implementar todos los tipos de controladores, desde el MBC1 hasta el MBC7, así como otros controladores especiales. No obstante, en este apartado se detallará exclusivamente la implementación del MBC1, que abarca una amplia gama de títulos, incluyendo juegos como \textit{Tetris DX} y \textit{Mario \& Yoshi}.
+Con el objetivo de lograr un emulador completo, es \textbf{imprescindible implementar todos los tipos de controladores}, desde el MBC1 hasta el MBC7, así como otros controladores especiales. No obstante, en este apartado \textbf{se detallará exclusivamente la implementación del MBC1}, que abarca una amplia gama de títulos, incluyendo juegos como \textit{Tetris DX} y \textit{Mario \& Yoshi}.
 \\\\
 La estructura propuesta, de forma que se faciliten la integración de los distintos tipos de MBC, es la siguiente:
 \begin{itemize}
-    \item Se generará una interfaz llamada MBCInterface, el cual tendrá dos funciones a implementar de lectura y escritura.
-    \item Una clase abstracta MBC la cual implementa la interfaz y que contendrá datos como el modo de banca, el banco actual de ROM o los bancos de RAM.
-    \item El módulo de ROM contendrá una variable de clase de tipo MBCInterface que por defecto será nulo y que obtendrá valor en la lectura inicial de ROM.
+    \item Se \textbf{generará una interfaz} llamada MBCInterface, el cual tendrá d\textbf{os funciones a implementar de lectura y escritura}.
+    \item Una \textbf{clase abstracta MBC} la cual \textbf{implementa la interfaz} y que contendrá datos como el modo de banca, el banco actual de ROM o los bancos de RAM.
+    \item El \textbf{módulo de ROM} contendrá una \textbf{variable de clase} de tipo MBCInterface que por defecto será nulo y que obtendrá valor en la lectura inicial de ROM.
     \item El tipo NoMBC implementará directamente el MBCInterface, mientras que MBC1 heredará de la clase abstracta MBC.
     \item A la hora de escribir o leer en ROM, simplemente se trasladará la responsabilidad de la tarea a la variable guardada.
 \end{itemize}
@@ -1355,11 +1355,12 @@ Como ya ha sido explicado, dependiendo de las regiones de memoria en las que se 
 Desglosemos el código:
 
 \begin{itemize}
-    \item Si la dirección de memoria a leer se encuentra en el rango \texttt{0x0000-0x3FFF} (ROM fija o estática), primero se comprobará el modo de banco. En el caso del modo básico, la lectura se redirigirá al módulo de memoria. Para el modo avanzado, la lectura se realizará directamente sobre los bytes cargados del fichero \texttt{.gb/.gbc}. La función \texttt{getROM0BankAddr(address: Int)} verifica la cantidad de bancos ROM que contiene el cartucho, aplicando, si es necesario, una máscara y utilizando el registro de dos bits de la región \texttt{0x4000-0x5FFF} de manera complementaria.
+    \item Si la \textbf{dirección de memoria a leer} se encuentra en el \textbf{rango \texttt{0x0000-0x3FFF}} (ROM fija o estática), primero se \textbf{comprobará el modo de banco}. En el caso del modo básico, la lectura se redirigirá al módulo de memoria. Para el modo avanzado, la lectura se realizará directamente sobre los bytes cargados del fichero \texttt{.gb/.gbc}. La función \texttt{getROM0BankAddr(address: Int)} verifica la cantidad de bancos ROM que contiene el cartucho, aplicando, si es necesario, una máscara y utilizando el registro de dos bits de la región \texttt{0x4000-0x5FFF} de manera complementaria.
 
-    \item Si la dirección se encuentra en la región de ROM dinámica, \texttt{0x4000-0x7FFF}, los datos se obtendrán directamente del fichero \texttt{.gb/.gbc}. La función \texttt{getROMSwBankAddr(address: Int)} implementará una lógica similar a la de \texttt{getROM0BankAddr}, con la diferencia de que, en este caso, se sumará el resultado de la multiplicación entre el número de banco ROM actual y el tamaño de un banco (16 KiB) a la dirección indicada.
+    \item Si la \textbf{dirección} se encuentra en la \textbf{región de ROM dinámica, \texttt{0x4000-0x7FFF}, los datos se obtendrán directamente del fichero \texttt{.gb/.gbc}}.\\
+    La función \texttt{getROMSwBankAddr(address: Int)} implementará una lógica similar a la de \texttt{getROM0BankAddr}, con la diferencia de que, en este caso, se sumará el resultado de la multiplicación entre el número de banco ROM actual y el tamaño de un banco (16 KiB) a la dirección indicada.
 
-    \item Si la dirección se encuentra dentro del rango de la RAM externa, se comprobará primero que esta esté activada, para proceder a leer los valores correspondientes de la variable de clase.
+    \item Si la \textbf{dirección} se encuentra dentro del \textbf{rango de la RAM externa}, se \textbf{comprobará} primero que esta \textbf{esté activada}, para proceder a leer los valores correspondientes de la variable de clase.
 \end{itemize}
 
 Veamos ahora la escritura:
@@ -1437,7 +1438,7 @@ Con esto ya tendríamos lo básico para que nuestro controlador funcione. Partie
 
 \section{Interrupciones}
 
-Las interrupciones deben ser procesadas en todos los ciclos de CPU, justo antes de ejecutar la siguiente instrucción de ROM. En la siguiente implementación, se puede ver el inicio del método \texttt{tick()}:
+Las \textbf{interrupciones} deben ser \textbf{procesadas en todos los ciclos de CPU}, justo antes de ejecutar la siguiente instrucción de ROM. En la siguiente implementación, se puede ver el inicio del método \texttt{tick()}:
 
 \begin{lstlisting}[language=Kotlin, caption={Interrupciones en el método principal de la CPU.}, label={code:cpuhandleinterrupt}]
     fun tick(): Boolean{
@@ -1453,9 +1454,9 @@ Las interrupciones deben ser procesadas en todos los ciclos de CPU, justo antes 
         [...]
 \end{lstlisting}
 
-El flag \textit{pendingEI} es una variable que se activa en el momento que un opcode EI es ejecutado. Como se explicó previamente, esta instrucción no habilita las interrupciones de forma inmediata, si no que toma efecto en el siguiente ciclo de ejecución.
+El \textbf{flag \textit{pendingEI}} es una variable que \textbf{se activa en el momento que un opcode EI es ejecutado}. Como se explicó previamente, esta instrucción no habilita las interrupciones de forma inmediata, si no que toma efecto en el siguiente ciclo de ejecución.
 \\\\
-En el método \texttt{handleInterrupts()}, se va a comprobar que las interrupciones estén habilitadas y que se deba procesar al menos una. En caso de que ambas condiciones se cumplan, se delegará el trabajo al módulo específico de las interrupciones.
+En el \textbf{método \texttt{handleInterrupts()}}, se va a \textbf{comprobar que las interrupciones estén habilitadas y que se deba procesar al menos una}. En caso de que ambas condiciones se cumplan, se delegará el trabajo al módulo específico de las interrupciones.
 \\\\
 La lógica principal del módulo es la siguiente:
 
@@ -1482,20 +1483,20 @@ La lógica principal del módulo es la siguiente:
     }
 \end{lstlisting}
 
-Primero se ejecuta la función \texttt{flush()}, la cual se encarga de verificar las interrupciones pendientes y, si se detecta alguna, manejarla de manera adecuada:
+\textbf{Primero se ejecuta la función \texttt{flush()}}, la cual se encarga de verificar las interrupciones pendientes y, si se detecta alguna, manejarla de manera adecuada:
 
 \begin{enumerate}
-    \item Se obtienen las interrupciones activas mediante la función getPendingInterrupts(), que retorna una máscara de bits representando las interrupciones pendientes.
-    \item Se evalúa si cada tipo de interrupción está activa utilizando operaciones AND en combinación con las máscaras de interrupción.
+    \item Se \textbf{obtienen las interrupciones activas} mediante la función getPendingInterrupts(), que retorna una máscara de bits representando las interrupciones pendientes.
+    \item Se \textbf{evalúa si} cada tipo de interrupción \textbf{está activa} utilizando operaciones AND en combinación con las máscaras de interrupción.
     \item Si se detecta una interrupción activa para el tipo VBLANK, se llama a la función \texttt{handleInterrupt()} con la dirección de interrupción (0x0040) y el tipo correspondiente, finalizando así la ejecución de flush. Para el resto de tipos se hace lo mismo, siguiente la prioridad de bit.
 \end{enumerate}
 
-Por otro lado, la función \texttt{handleInterrupt(address: Int, type: InterruptType)} gestiona el proceso de atender una interrupción específica, asegurándose de que no se produzcan interrupciones adicionales durante su ejecución.
+Por otro lado, la \textbf{función \texttt{handleInterrupt(address: Int, type: InterruptType)} gestiona el proceso de atender una interrupción específica}, asegurándose de que no se produzcan interrupciones adicionales durante su ejecución.
 
 \begin{enumerate}
-    \item Se deshabilitan las interrupciones globalmente llamando a enableInterrupts(false). Esto evita que otras interrupciones se ejecuten mientras se atiende la actual.
-    \item Se lee el valor actual del registro IF, se realiza una operación bit a bit and con la máscara invertida para desactivar el bit correspondiente a la interrupción actual, y se actualiza en memoria.
-    \item Finalmente, se ejecuta la rutina de servicio de interrupción llamando al método \\
+    \item Se \textbf{deshabilitan las interrupciones globalmente} llamando a enableInterrupts(false). Esto evita que otras interrupciones se ejecuten mientras se atiende la actual.
+    \item Se \textbf{lee el valor actual del registro IF}, se realiza una operación bit a bit and con la máscara invertida para desactivar el bit correspondiente a la interrupción actual, y se actualiza en memoria.
+    \item Finalmente, \textbf{se ejecuta la rutina de servicio de interrupción} llamando al método \\
     \texttt{executeInterrupt(address)}. En este se desactiva el HALT de la CPU (en caso de que lo estuviese), se pushea PC al stack pointer, y se sobreescribe PC con la dirección obtenida por parámetro. 
 \end{enumerate}
 
@@ -1536,22 +1537,22 @@ La implementación debe simular el comportamiento de los \hyperref[history_timer
     }
 \end{lstlisting}
 
-A la hora de interactuar con el registro DIV, es importante considerar que internamente consta de 16 bits, aunque externamente solo se exponen los 8 bits más altos. Para manejarlo, se utiliza una variable de clase llamada \textit{div16}, que se inicializa siempre en 0x0000.
+A la hora de interactuar con el \textbf{registro DIV}, es importante considerar que \textbf{internamente consta de 16 bits}, aunque externamente solo se exponen los 8 bits más altos. Para manejarlo, se utiliza una variable de clase llamada \textit{div16}, que se inicializa siempre en 0x0000.
 \\\\
-Cuando se realiza una operación de escritura en este registro, únicamente se reinician a 0 los 8 bits menos significativos, preservando el estado de los 8 bits más altos. Por otro lado, al leer el registro, solo se devuelven los 8 bits más altos del valor contenido.
+Cuando se realiza una \textbf{operación de escritura} en este registro, únicamente \textbf{se reinician a 0 los 8 bits menos significativos}, preservando el estado de los 8 bits más altos. Por otro lado, al leer el registro, solo se devuelven los 8 bits más altos del valor contenido.
 \\\\
 Por último, se debe implementar la función que actualice en cada ciclo de ejecución el temporizador. Los pasos que debe seguir son:
 
 \begin{itemize}
-    \item Comparar el valor actual de DIV y verificar si ha llegado el momento de incrementar el contador TIMA basado en el valor de TAC (registro de control del temporizador).
-    \item Usar el valor de TAC para determinar la frecuencia de incremento de DIV. Dependiendo de los dos primeros bits de TAC, el temporizador se incrementará a una velocidad diferente (256, 4, 16 o 64 ciclos de máquina).
-    \item Si TIMA llega a 0xFF, se recarga con el valor de TMA y se genera una interrupción de temporizador.
+    \item \textbf{Comparar el valor actual de DIV y verificar si ha llegado el momento de incrementar el contador TIMA} basado en el valor de TAC (registro de control del temporizador).
+    \item \textbf{Usar el valor de TAC para determinar la frecuencia de incremento de DIV}. Dependiendo de los dos primeros bits de TAC, el temporizador se incrementará a una velocidad diferente (256, 4, 16 o 64 ciclos de máquina).
+    \item \textbf{Si TIMA llega a 0xFF, se recarga con el valor de TMA} y se genera una interrupción de temporizador.
 \end{itemize}
 
 \begin{lstlisting}[language=Kotlin, caption={Lectura y escritura en registros de Timers.}, label={code:timertick}]
     fun tick(){
         val prevDIV = div16
-        div16 += 1
+        div16 = (div16 + 1) and 0xFFFF
 
         var timerUpdate = false
         val tacValue = Memory.read(TAC).toInt() and 0xFF
@@ -1578,12 +1579,12 @@ Por último, se debe implementar la función que actualice en cada ciclo de ejec
 
 \section{RAM}
 
-En la Game Boy, el término RAM puede hacer referencia a distintas áreas de memoria: WRAM (Working RAM), HRAM (High RAM), VRAM (Video RAM) o la RAM externa presente en algunos cartuchos. Este módulo se centrará en la implementación de WRAM y HRAM, ya que la VRAM está estrechamente vinculada al funcionamiento del módulo PPU (Processing Pixel Unit), mientras que la RAM externa está gestionada por los controladores de memoria de los cartuchos \hyperref[history_mbcs]{(MBC, Memory Bank Controllers)}.
+En la Game Boy, el término \textbf{RAM puede hacer referencia a} distintas áreas de memoria: \textbf{WRAM (Working RAM), HRAM (High RAM), VRAM (Video RAM) o la RAM externa} presente en algunos cartuchos. Este módulo se centrará en la implementación de WRAM y HRAM, ya que la VRAM está estrechamente vinculada al funcionamiento del módulo PPU (Processing Pixel Unit), mientras que la RAM externa está gestionada por los controladores de memoria de los cartuchos \hyperref[history_mbcs]{(MBC, Memory Bank Controllers)}.
 \\\\
-La implementación de la \textbf{HRAM}, siendo esta un espacio fijo de memoria, se delegará directamente al módulo Memory, que ya se encarga de manejar lecturas y escrituras en memoria. Debido a la simplicidad de su gestión y a que no requiere lógica específica adicional, no se desarrollará un apartado independiente para explicar su implementación en esta documentación.
+La implementación de la \textbf{HRAM}, siendo esta un \textbf{espacio fijo de memoria}, se delegará directamente al módulo Memory, que ya se encarga de manejar lecturas y escrituras en memoria. Debido a la simplicidad de su gestión y a que \textbf{no requiere lógica adicional}, no se desarrollará un apartado independiente para explicar su implementación en esta documentación.
 
 \subsection{WRAM}
-La WRAM en modo DMG es fija y se maneja directamente, mientras que en modo CGB incluye un banco fijo y hasta siete bancos conmutables adicionales, permitiendo que la memoria sea más dinámica. Estos bancos se almacenan en un array (\textit{wramBanks}) y el banco activo se controla mediante la variable \textit{wramBank}. Las lecturas y escrituras en la WRAM consideran si se está accediendo a un banco conmutable o al espacio fijo, ajustando automáticamente la dirección de memoria según sea necesario.
+La \textbf{WRAM en modo DMG es fija y se maneja directamente}, mientras que en \textbf{modo CGB incluye un banco fijo y hasta siete bancos conmutables adicionales}, permitiendo que la memoria sea más dinámica. Estos bancos se almacenan en un array (\textit{wramBanks}) y el \textbf{banco activo se controla mediante la variable \textit{wramBank}}. Las lecturas y escrituras en la WRAM consideran si se está accediendo a un banco conmutable o al espacio fijo, ajustando automáticamente la dirección de memoria según sea necesario.
 
 \begin{lstlisting}[language=Kotlin, caption={Lectura y escritura en Work RAM.}, label={code:wramreadwrite}]
     private var wramBanks: Array<ByteArray> = Array(CGB_SW_BANKS) { ByteArray(ECHO_RAM_START - SWITCHABLE_WRAM_START) } // Not used if not in CGB mode
@@ -1608,8 +1609,8 @@ La WRAM en modo DMG es fija y se maneja directamente, mientras que en modo CGB i
 
 \subsection{VRAM}
 
-Al estar estrechamente vinculada al módulo de la PPU, será ahi donde declaremos la variable. Únicamente se llegará a utilizar en modo CGB, ya que de otra forma acudiremos al módulo de memoria. Su implementación no tiene mucho más misterio: debe tener las dimensiones correctas y, en caso de estar en modo CGB, obtener o escribir los valores en ella:
-
+Al estar estrechamente vinculada al módulo de la PPU, será ahi donde declaremos la variable. \textbf{Únicamente} se llegará a \textbf{utilizar en modo CGB}, ya que \textbf{de otra forma acudiremos al módulo de memoria}. Su implementación no tiene mucho más misterio: debe tener las dimensiones correctas y, en caso de estar en modo CGB, obtener o escribir los valores en ella:
+\clearpage
 \begin{lstlisting}[language=Kotlin, caption={Lectura y escritura en Video RAM.}, label={code:vramreadwrite}]
     private var vRam : ByteArray = ByteArray((VRAM_END - VRAM_START) + 1)
 
@@ -1634,13 +1635,13 @@ Al estar estrechamente vinculada al módulo de la PPU, será ahi donde declaremo
 
 La RAM Externa, como se ha visto, reside en los cartuchos y es gestionada por los controladores de memoria. En este caso, se ha implementado un controlador MBC1, por lo que la RAM externa se manejará a través de él. La lectura y escritura en la RAM externa se delegan al controlador MBC1, que se encarga de gestionar los bancos de RAM y de redirigir las operaciones a la RAM externa.
 \\\\
-La implementación ya se ha proporcionado en el apartado de \hyperref[rom:read_write]{lectura y escritura en ROM}.
+La \textbf{implementación} ya se ha \textbf{proporcionado en el apartado de \hyperref[rom:read_write]{lectura y escritura en ROM}}.
 
 \section{DMA}
 
-Como se ha descrito en el \hyperref[dma]{apartado teórico}, definiremos una función que inicie el proceso de DMA. Por ahora no será utilizada, ya que para ello antes se debe implementar la PPU.
+Como se ha descrito en el \hyperref[dma]{apartado teórico}, se ha \textbf{definido una función que inicie el proceso de DMA}. Por ahora no será utilizada, ya que para ello antes se debe implementar la PPU.
 \\\\
-En esta función de inicio daremos por activado el proceso, calcularemos la dirección de memoria sobre la que comenzar a iterar, y desactivaremos todas las interrupciones para que otra no pueda interrumpir la ejecución.
+Esta función de inicio \textbf{activará el proceso}, \textbf{calculará la dirección de memoria} sobre la que comenzar a iterar, y \textbf{desactivará todas las interrupciones} para que otra no pueda interrumpir la ejecución.
 
 \begin{lstlisting}[language=Kotlin, caption={Inicio del proceso DMA.}, label={code:dmainit}]
     private var active : Boolean = false
@@ -1657,7 +1658,7 @@ En esta función de inicio daremos por activado el proceso, calcularemos la dire
     }
 \end{lstlisting}
 
-En el método \textit{tick()} comprobaremos si hay o no un delay para comenzar la ejecución. En caso negativo obtendremos la dirección de inicio a la que le sumaremos el offset actual, y copiaremos el byte desde la RAM a la OAM. Al terminar de copiar los 160 bytes, desactivaremos el proceso y reactivaremos las interrupciones para continuar con la ejecución normal.
+En el \textbf{método \textit{tick()}} se \textbf{comprueba si hay o no un delay para comenzar la ejecución}. En caso negativo se \textbf{obtiene la dirección de inicio} a la que se \textbf{suma el offset} actual, y \textbf{copia el byte desde la RAM a la OAM}. \textbf{Al terminar} de copiar los 160 bytes, se \textbf{desactiva el proceso y se reactivan las interrupciones} para continuar con la ejecución normal.
 
 \begin{lstlisting}[language=Kotlin, caption={Proceso DMA.}, label={code:dmaprocess}]
     fun tick(){
@@ -1679,14 +1680,14 @@ En el método \textit{tick()} comprobaremos si hay o no un delay para comenzar l
 
 \section{PPU}
 
-En la PPU debemos antes de nada definir bastantes objetos con los que luego podamos trabajar de forma eficiente:
+En la PPU se deben, antes de nada, \textbf{definir} bastantes objetos con los que luego poder trabajar de forma eficiente:
 \begin{itemize}
-    \item Enumeradores para obtener los bits individuales del LCDC, LCD Status, modo de PPU, paletas de color seleccionadas y atributos de un sprite.
-    \item Un mapa que represente las distintas paletas y sus códigos de color con los que podamos trabajar en Android.
-    \item Todas las variables de clase que necesitemos, como el contador de sprites por línea de renderizado, array de bytes para la VRam y la OAM, frame actual, paleta de color seleccionada, etc\ldots
+    \item \textbf{Enumeradores para obtener los bits individuales} del LCDC, LCD Status, modo de PPU, paletas de color seleccionadas y atributos de un sprite.
+    \item Un \textbf{mapa} que represente las distintas \textbf{paletas y sus códigos de color} con los que podamos trabajar en Android.
+    \item Todas las variables de clase necesarias, como el contador de sprites por línea de renderizado, array de bytes para la VRam y la OAM, frame actual, paleta de color seleccionada, etc\ldots
 \end{itemize}
 
-Una vez definidos todos estos objetos, podremos pasar a inicializar la PPU:\label{handleLCDC}
+Una vez definidos todos estos objetos, se podrá \textbf{inicializar la PPU}:\label{handleLCDC}
 
 \begin{lstlisting}[language=Kotlin, caption={Inicialización de la PPU.}, label={code:ppuinit}]
     fun init() {
@@ -1734,21 +1735,21 @@ Una vez definidos todos estos objetos, podremos pasar a inicializar la PPU:\labe
     }
 \end{lstlisting}
 
-Primero se configura la pantalla LCD:
+Primero se \textbf{configura} la \textbf{pantalla LCD}:
 
 \begin{itemize}
     \item \textbf{LCD Status (\texttt{LCD\_STAT})}: Se escribe el valor $0x81$ (\texttt{10000001} en binario). Este valor activa la interrupción cuando la línea de escaneo coincide con el valor de \texttt{LYC} y asegura que la pantalla empiece en un estado adecuado.
     \item \textbf{LCD Control (\texttt{LCDC})}: Se escribe el valor $0x91$ (\texttt{10010001} en binario), que habilita la pantalla, permite el uso de sprites y selecciona un modo de dirección de tiles.
 \end{itemize}
 
-Ahora configuramos los registros de desplazamiento y posición:
+Ahora \textbf{se configuran} los \textbf{registros de desplazamiento y posición}:
 \begin{itemize}
     \item \textbf{\texttt{SCY} y \texttt{SCX}}: Se establecen en $0$ para que la imagen de fondo no esté desplazada.
     \item \textbf{\texttt{LY} y \texttt{LYC}}: Se inician en $0$ para que la pantalla empiece desde la primera línea de escaneo.
     \item \textbf{\texttt{WY} y \texttt{WX}}: Controlan la posición de la ventana en pantalla, comenzando en $0$.
 \end{itemize}
 
-Configuramos la paleta de colores detectando el tipo de consola:
+\textbf{Se configura la paleta de colores} detectando el tipo de consola:
 \begin{itemize}
     \item Si es modo DMG o en en modo compatibilidad (DMG\_CGB):
     \begin{itemize}
@@ -1758,7 +1759,7 @@ Configuramos la paleta de colores detectando el tipo de consola:
     \item Para el modo CGB, aún falta implementar la configuración específica.
 \end{itemize}
 
-Finalmente, se llama a \texttt{handleLCDC(0x91)} para aplicar la configuración del registro \texttt{LCDC}
+Finalmente, se llama a \texttt{handleLCDC(0x91)} para aplicar la \textbf{configuración del registro \texttt{LCDC}}.
 \\\\
 Al igual que el DMA y la CPU, la PPU también dispondrá de su propio método \texttt{tick()}. En él, comprobaremos que la PPU esté activa y ejecutaremos el código de los distintos modos según venga indicado en el \texttt{LCD Stat}.
 
@@ -1780,9 +1781,10 @@ Al igual que el DMA y la CPU, la PPU también dispondrá de su propio método \t
 
 \subsection{Modo 0: H-Blank}
 
-El proceso verifica si se ha alcanzado el número total de ciclos (LINE\_TOTAL\_TICKS) para la línea actual y, si es así, se actualiza el valor del registro LY. Si la línea actual ha alcanzado o superado la resolución vertical de la Game Boy (GB\_Y\_RESOLUTION), significa que la PPU ha terminado de procesar todas las líneas visibles y entra en el modo V-Blank. En este caso, el método actualiza el estado de LCD\_STAT para reflejar este cambio y solicita una interrupción de V-Blank. Además, incrementa el contador de fotogramas y llama a calculateFPS() para actualizar la métrica de rendimiento.
+El proceso \textbf{verifica si se ha alcanzado el número total de ciclos \\
+(LINE\_TOTAL\_TICKS) para la línea actual} y, si es así, se \textbf{actualiza} el valor del \textbf{registro LY}. Si la \textbf{línea actual} ha alcanzado o superado la \textbf{resolución vertical} de la Game Boy (GB\_Y\_RESOLUTION), significa que la PPU ha terminado de procesar todas las líneas visibles y entra en el \textbf{modo V-Blank}. En este caso, el método \textbf{actualiza} el estado de \textbf{LCD\_STAT} para reflejar este cambio y \textbf{solicita una interrupción de V-Blank}. Además, incrementa el contador de fotogramas y llama a calculateFPS() para actualizar la métrica de rendimiento.
 \\\\
-Por otro lado, si LY no ha alcanzado este límite, significa que la PPU aún está dentro del proceso de renderizado de la pantalla y debe volver al modo OAM. En este caso, el método actualiza LCD\_STAT para reflejar este cambio y, si la interrupción de estado del LCD para OAM está habilitada, solicita la interrupción correspondiente. Finalmente, restablece lineTicks a cero para comenzar el procesamiento de la nueva línea.
+Por otro lado, \textbf{si LY no ha alcanzado este límite}, significa que la PPU aún está dentro del proceso de renderizado de la pantalla y debe \textbf{volver al modo OAM}. En este caso, el método actualiza LCD\_STAT para reflejar este cambio y, si la interrupción de estado del LCD para OAM está habilitada, solicita la interrupción correspondiente. Finalmente, \textbf{restablece lineTicks a cero} para comenzar el procesamiento de la nueva línea.
 
 \begin{lstlisting}[language=Kotlin, caption={Lógica del proceso de H-Blank.}, label={code:ppuhblank}]
     private fun hBlankMode(stat: Byte){
@@ -1817,9 +1819,9 @@ Por otro lado, si LY no ha alcanzado este límite, significa que la PPU aún est
 
 \subsection{Modo 1: V-Blank}
 
-El proceso verifica si se ha alcanzado el número total de ciclos para la línea actual y, si es así, incrementa el valor del registro LY. Luego, obtiene el valor actualizado y comprueba si ha alcanzado o superado el número total de líneas. Si esto ocurre, significa que el periodo de V-Blank ha finalizado y la PPU debe volver al modo OAM para comenzar el renderizado del siguiente cuadro.
+El proceso \textbf{verifica} si se ha alcanzado el \textbf{número total de ciclos} para la línea actual y, si es así, \textbf{incrementa el valor del registro LY}. Luego, obtiene el valor actualizado y \textbf{comprueba si ha alcanzado o superado el número total de líneas}. Si esto ocurre, significa que el periodo de V-Blank ha finalizado y la PPU debe \textbf{volver al modo OAM} para comenzar el renderizado del siguiente cuadro.
 \\\\
-En este caso, el método actualiza el estado de LCD\_STAT para reflejar el cambio al modo OAM y restablece LY\_ADDR a 0, indicando el inicio de un nuevo fotograma. Además, si la interrupción de estado del LCD para OAM está habilitada, solicita la interrupción. Al igual que en H-Blank, lineTicks se restablece a cero para comenzar el procesamiento de la nueva línea.
+En este caso, el método \textbf{actualiza el estado de LCD\_STAT} para reflejar el cambio al modo OAM y \textbf{restablece \texttt{LY\_ADDR} a 0}, indicando el inicio de un nuevo fotograma. Además, si la interrupción de estado del LCD para OAM está habilitada, solicita la interrupción. Al igual que en H-Blank, \textbf{lineTicks se restablece a cero} para comenzar el procesamiento de la nueva línea.
 
 \begin{lstlisting}[language=Kotlin, caption={Lógica del proceso de V-Blank.}, label={code:ppuvblank}]
     private fun vBlankMode(stat: Byte){
@@ -1843,9 +1845,9 @@ En este caso, el método actualiza el estado de LCD\_STAT para reflejar el cambi
 
 \subsection{Modo 2: OAM Scan}
 
-Aquí gestionamos el modo OAM Scan, el cual se encarga de escanear los sprites visibles en la línea actual antes de proceder al renderizado.
+En esta parte se gestiona el modo \texttt{OAM Scan}, el cual se encarga de \textbf{escanear los sprites visibles en la línea actual} antes de proceder al renderizado.
 \\\\
-Si el contador lineTicks ha alcanzado el número de ciclos necesarios para el modo OAM, la PPU cambia al modo de dibujo (DRAW\_LCD), actualizando el estado de LCD\_STAT y reiniciando los parámetros del FIFO fetcher, que se encarga de obtener los píxeles a renderizar. Sin embargo, en el primer ciclo, se inicializa el conteo de sprites en la línea y se llama a loadLineSprites(), que carga los sprites visibles en la línea actual para que puedan ser procesados durante la fase de dibujo.
+\textbf{Si el contador lineTicks ha alcanzado el número de ciclos} necesarios para el modo OAM, la \textbf{PPU cambia al modo de dibujo (\texttt{DRAW\_LCD})}, actualizando el estado de \texttt{LCD\_STAT} y reiniciando los parámetros del FIFO fetcher, que se encarga de obtener los píxeles a renderizar. Sin embargo, en el \textbf{primer ciclo}, se inicializa el \textbf{conteo de sprites en la línea} y se llama a \texttt{loadLineSprites()}, que carga los sprites visibles en la línea actual para que puedan ser procesados durante la fase de dibujo.
 
 \begin{lstlisting}[language=Kotlin, caption={Lógica del proceso de OAM Scan.}, label={code:ppuoamscan}]
     private fun oamMode(stat: Byte){ // MODE 2
@@ -1859,11 +1861,11 @@ Si el contador lineTicks ha alcanzado el número de ciclos necesarios para el mo
     }
 \end{lstlisting}
 
-El método \texttt{loadLineSprites()} se encarga de seleccionar y ordenar los sprites que deben renderizarse en la línea de escaneo actual de la pantalla. Esta función solo se ejecuta si los sprites están habilitados o si la consola es un modelo CGB, ya que en este último caso siempre se procesan los sprites.
+El método \textbf{\texttt{loadLineSprites()}} se encarga de \textbf{seleccionar y ordenar los sprites que deben renderizarse} en la línea de escaneo actual. Esta función \textbf{solo se ejecuta si los sprites están habilitados} o si la consola es un modelo CGB, ya que en este último caso siempre se procesan los sprites.
 \\\\
-Primero, se obtiene la línea de escaneo actual, sumándole un desplazamiento para compensar la posición real de los sprites. Luego, se determina el tamaño de los sprites, que puede ser de 8 o 16 píxeles. A continuación, se inicializa el array \texttt{objsFetched} con valores nulos y se resetea el contador que indica el número de sprites obtenidos por línea. Por último, se recorre la memoria OAM en bloques de 4 bytes (siendo cada uno en orden: posición Y, posición X, índice de tile y atributos). Si se han alcanzado el número máximo de sprites por línea, el bucle se detiene.
+Primero, \textbf{se obtiene la línea de escaneo actual}, sumándole un desplazamiento para compensar la posición real de los sprites. Luego, se d\textbf{etermina el tamaño de los sprites}, que puede ser de 8 o 16 píxeles. A continuación, se \textbf{inicializa el array \texttt{objsFetched}} con valores nulos y se \textbf{resetea el contador} que indica el número de \textbf{sprites obtenidos} por línea. Por último, se \textbf{recorre la memoria OAM en bloques de 4 bytes} (siendo cada uno en orden: posición Y, posición X, índice de tile y atributos). Si se han alcanzado el número máximo de sprites por línea, el bucle se detiene.
 \\\\
-Para cada sprite, se verifican las coordenadas x e y para determinar si es visible en la línea actual. Si lo es, se almacena en el array \texttt{objsFetched}, incrementando el contador a posteriori. Finalmente, se ordena la lista de sprites por su posición x, asegurando que aquellos con menor x se rendericen primero.
+\textbf{Para cada sprite}, se verifican las coordenadas X e Y para \textbf{determinar si es visible en la línea actual}. Si lo es, se almacena en el array \texttt{objsFetched}, incrementando el contador a posteriori. Finalmente, \textbf{se ordena la lista de sprites por su posición x}, asegurando que aquellos con menor x se rendericen primero.
 
 \begin{lstlisting}[language=Kotlin, caption={Obtención de sprites en modo OAM Scan.}, label={code:ppuoamscansprites}]
     private fun loadLineSprites(){
@@ -1906,50 +1908,45 @@ Para cada sprite, se verifican las coordenadas x e y para determinar si es visib
 
 \subsection{Modo 3: Drawing Pixels}
 
-El modo de dibujo es el proceso en el que la PPU renderiza los píxeles en la pantalla. En este modo, se obtienen los datos de los tiles y se procesan para generar la imagen final. La función \texttt{drawLCDMode()} gestiona este proceso:
+El modo de dibujo es el proceso en el que la \textbf{PPU renderiza los píxeles en la pantalla}. En este modo, \textbf{se obtienen los datos de los tiles y se procesan para generar la imagen final}. La función \texttt{drawLCDMode()} gestiona este proceso:
 
 \begin{lstlisting}[language=Kotlin, caption={Dibujado de píxeles en Modo 3.}, label={code:ppuoamdrawpixels}]
     private fun drawLCDMode(stat: Byte){
-
         fifoFetcher.process()
-
         if(fifoFetcher.getPushedPixels() >= GB_X_RESOLUTION){ // ENTER HBLANK MODE
-
             fifoFetcher.clear()
-
             Memory.write(LCD_STAT, StatObj.PPU_MODE.set(stat, PPUMode.HBlank.number))
-
             if(StatObj.HBLANK_INTERRUPT.get(stat) != 0)
                 Interrupt.requestInterrupt(Interrupt.InterruptType.LCD_STAT.getByteMask()) // ASK FOR LCD STAT INTERRUPT IF LCD_STAT HAS THE HBLANK BIT ACTIVATED
         }
     }
 \end{lstlisting}
 
-El código propio del FIFO vendrá documentado más adelante, pero por ahora se debe entender que su función es transferir la información de los píxeles al búfer de la pantalla. 
+El código del \textbf{FIFO} vendrá documentado más adelante, pero por ahora se debe entender que su función es \textbf{transferir la información de los píxeles al búfer de la pantalla}. 
 \\\\
-Después del proceso, se comprueba que el número total de píxeles (correspondientes a la línea actual) que se han añadido sea mayor o igual a la resolución horizontal de la pantalla. Si estamos en este caso, reiniciaremos el proceso volviendo al modo H-Blank, y lanzando una interrupcion del Stat si estuviese activo.
+Después del proceso, se \textbf{comprueba} que el \textbf{número total de píxeles} (correspondientes a la línea actual) que se han añadido sea \textbf{mayor o igual a la resolución horizontal de la pantalla}. Si el proceso se encuentra en este caso, reiniciará el proceso volviendo al modo H-Blank, y lanzará una interrupcion del Stat si estuviese activo.
 
 \subsection{FIFO Fetcher}
 
-Como viene definido en la parte teórica, la GB disponía de dos FIFO's, los cuales trabajan de manera independiente para transferir los píxeles de Background y Window por un lado, y los Sprites por otro. El proceso original finalizaba haciendo una mezcla de la información proporcionada por ambos.
+Como viene definido en la parte teórica, la GB disponía de \textbf{dos FIFO's}, los cuales \textbf{trabajan de manera independiente} para transferir los píxeles de Background y Window por un lado, y los Sprites por otro. El proceso original \textbf{finalizaba} haciendo una \textbf{mezcla de la información proporcionada por ambos}.
 \\\\
-En este proyecto se va a utilizar una implementación algo más sencilla, tanto de implementar como de entender, basada en la guía de programación de \cite{lld}.
+En este proyecto se va a utilizar una \textbf{implementación} algo \textbf{más sencilla}, tanto de implementar como de entender, basada en la guía de programación de \cite{lld}.
 \\\\
 Como variables de clase, se necesita guardar:
 
 \begin{itemize} 
-    \item Estado del fetcher (las distintas etapas del procesado).
-    \item Coordenada X del tile en VRAM del que se está obteniendo información.
-    \item Coordenada X del scanline que se va a dibujar.
-    \item El propio FIFO, del cual se realizará una implementación propia.
-    \item El búfer de video, que será un array de enteros, con un tamaño fijo equivalente a \texttt{Resolución\_Y * Resolución\_X}.
-    \item Un array de 3 bytes donde se irá insertando información específica del tile sobre el que se trabajará.
-    \item Un array de 3 objetos OAM (definido más adelante) se guardarán los metadatos de los sprites.
-    \item Un array de 6 bytes que almacene los datos de píxeles crudos de los sprites.
-    \item La coordenada Y de la línea actual sobre la que se deben procesar los tiles.
-    \item Coordenadas globales X e Y en el mapa de tiles para determinar qué tile de VRAM debe ser obtenido y procesado.
+    \item \textbf{Estado del fetcher} (las distintas etapas del procesado).
+    \item \textbf{Coordenada X del tile en VRAM} del que se está obteniendo información.
+    \item \textbf{Coordenada X del scanline} que se va a dibujar.
+    \item \textbf{El propio FIFO}, del cual se realizará una implementación propia.
+    \item \textbf{El búfer de video}, que será un array de enteros, con un tamaño fijo equivalente a \texttt{Resolución\_Y * Resolución\_X}.
+    \item Un \textbf{array de 3 bytes} donde se irá insertando \textbf{información específica del tile} sobre el que se trabajará.
+    \item Un \textbf{array de 3 objetos OAM} (definido más adelante) se guardarán los \textbf{metadatos de los sprites}.
+    \item Un \textbf{array de 6 bytes} que almacene los \textbf{datos de píxeles} crudos de los sprites.
+    \item La \textbf{coordenada Y de la línea actual} sobre la que se deben procesar los tiles.
+    \item \textbf{Coordenadas globales X e Y en el mapa de tiles} para determinar qué tile de VRAM debe ser obtenido y procesado.
 \end{itemize}
-
+\clearpage
 La lógica principal de procesado se ha implementado de la siguiente manera:
 
 \begin{lstlisting}[language=Kotlin, caption={Código principal del FIFO Fetcher.}, label={code:ppufifoprocess}]
@@ -1979,13 +1976,13 @@ La lógica principal de procesado se ha implementado de la siguiente manera:
     }
 \end{lstlisting}
 
-En primer lugar, \texttt{process()} accede a los registros de memoria SCX, SCY y LY. Utilizando estos registros, calcula las coordenadas absolutas (mapX, mapY) en el espacio del mapa de tiles. Por ejemplo, \texttt{mapY = SCY + LY} permite ajustar la renderización vertical según el desplazamiento del fondo, mientras que \texttt{mapX = SCX + fetchX} hace lo mismo para el eje horizontal. La variable tileY se deriva de \texttt{mapY \% 8} para identificar la línea específica dentro del tile actual, esencial para acceder a los datos de píxeles correctos en VRAM.
+En primer lugar, \textbf{\texttt{process()} accede a los registros de memoria SCX, SCY y LY}. Utilizando estos registros, \textbf{calcula las coordenadas absolutas} (mapX, mapY) en el espacio del mapa de tiles. Por ejemplo, \texttt{mapY = SCY + LY} permite ajustar la renderización vertical según el desplazamiento del fondo, mientras que \texttt{mapX = SCX + fetchX} hace lo mismo para el eje horizontal. La variable tileY se deriva de \texttt{mapY \% 8} para identificar la línea específica dentro del tile actual, esencial para acceder a los datos de píxeles correctos en VRAM.
 \\\\
-Para evitar conflictos con el PPU, en la función se verifica el estado de los ciclos de renderizado mediante \texttt{PPU.getLineTicks() \% 2 == 0}. Esta condición asegura que \texttt{fetch()} solo se ejecute cada 2 ciclos de máquina, simulando el comportamiento del hardware real, donde el acceso a VRAM está restringido durante ciertas fases del renderizado.
+Para evitar conflictos con el PPU, en la función se \textbf{verifica el estado de los ciclos de renderizado} mediante \texttt{PPU.getLineTicks() \% 2 == 0}. Esta condición asegura que \texttt{fetch()} solo se ejecute cada 2 ciclos de máquina, simulando el comportamiento del hardware real, donde el acceso a VRAM está restringido durante ciertas fases del renderizado.
 \\\\
-Finalmente, \texttt{pushPixelsToBuffer()} transfiere los píxeles desde el FIFO al búfer de video. Esta etapa es crítica para mantener un flujo constante de datos hacia la pantalla, asegurando que no haya retrasos en la visualización.
+Finalmente, \textbf{\texttt{pushPixelsToBuffer()} transfiere los píxeles desde el FIFO al búfer de video}. Esta etapa es crítica para mantener un flujo constante de datos hacia la pantalla, asegurando que no haya retrasos en la visualización.
 \\\\
-La función \texttt{fetch()} implementa una máquina de estados, en el que cada estado representa una etapa específica del pipeline. Los estados son los siguientes:
+La función \textbf{\texttt{fetch()} implementa una máquina de estados}, en el que cada estado representa una etapa específica del pipeline. Los estados son los siguientes:
 
 \begin{itemize}
     \item \textbf{\texttt{OBTAIN\_TILE}}: donde se determina qué tile debe ser renderizado.
