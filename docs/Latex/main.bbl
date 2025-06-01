@@ -1,6 +1,30 @@
 \begin{thebibliography}{}
 
 \bibitem [\protect \citeauthoryear {%
+{Alexsteb}%
+}{%
+{Alexsteb}%
+}{%
+{\protect \APACyear {2021}}%
+}]{%
+tetris}
+\APACinsertmetastar {%
+tetris}%
+\begin{APACrefauthors}%
+{Alexsteb}.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2021}{}{}.
+\newblock
+\APACrefbtitle {{Disassembly of Tetris for the Gameboy}.} {{Disassembly of
+  Tetris for the Gameboy}.}
+\newblock
+\APAChowpublished
+  {\url{https://github.com/alexsteb/tetris_disassembly/tree/master}}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
 {Antonio Niño Díaz}%
 }{%
 {Antonio Niño Díaz}%
@@ -264,7 +288,8 @@ opcodes}%
 \APACrefbtitle {{Gameboy CPU (LR35902) instruction set}.} {{Gameboy CPU
   (LR35902) instruction set}.}
 \newblock
-\APAChowpublished {\url{http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf}}.
+\APAChowpublished
+  {\url{https://www.pastraiser.com/cpu/gameboy/gameboy_opcodes.html}}.
 \PrintBackRefs{\CurrentBib}
 
 \bibitem [\protect \citeauthoryear {%

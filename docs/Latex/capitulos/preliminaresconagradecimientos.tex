@@ -1,9 +1,9 @@
 \chapter*{Preámbulo}
 \thispagestyle{empty}
 
-Este Trabajo Final de Máster (TFM) surge de la motivación por aprender cómo desarrollar un programa que emule el funcionamiento completo de una consola, integrando los conocimientos adquiridos durante el curso. Además de ser un reto personal y técnico, este proyecto permite explorar áreas clave como la arquitectura de sistemas, la optimización de recursos y la interacción con hardware virtualizado.
+Este Trabajo Final de Máster (TFM) surge de la motivación por \textbf{aprender cómo desarrollar un programa que emule el funcionamiento completo de una consola}, integrando los conocimientos adquiridos durante el curso. Además de ser un \textbf{reto personal y técnico}, este proyecto permite explorar áreas clave como la arquitectura de sistemas, la optimización de recursos y la interacción con hardware virtualizado.
 \\\\
-El objetivo es crear una aplicación capaz de funcionar en dispositivos móviles, permitiendo a amigos, familiares y otros usuarios revivir una experiencia nostálgica de la infancia. Desde un punto de vista técnico, la emulación representa un desafío complejo, ya que involucra aspectos como la sincronización de hardware, la gestión de ciclos de reloj, el manejo de gráficos y la interpretación precisa de código máquina. El resultado no solo será un aporte académico significativo, sino también una oportunidad para compartir una parte importante de la historia de los videojuegos con las nuevas generaciones.
+El objetivo es crear una aplicación capaz de funcionar en dispositivos móviles, permitiendo a amigos, familiares y otros usuarios revivir una experiencia nostálgica de la infancia. Desde un punto de vista técnico, la emulación representa un desafío complejo, ya que involucra aspectos como la sincronización de hardware, la gestión de ciclos de reloj, el manejo de gráficos y la interpretación precisa de código máquina. El resultado no solo será un \textbf{aporte académico significativo}, sino también una \textbf{oportunidad para compartir una parte importante de la historia de los videojuegos} con las nuevas generaciones.
 
 \cleardoublepage %salta a nueva página impar
 \chapter*{Agradecimientos}
@@ -13,7 +13,15 @@ El objetivo es crear una aplicación capaz de funcionar en dispositivos móviles
 
 Este máster en Desarrollo de Software para dispositivos móviles ha sido una experiencia enriquecedora, llena de aprendizaje y crecimiento a lo largo de los últimos dos años.
 \\\\
-Quisiera expresar mi más sincero agradecimiento a mi familia, por su constante apoyo y aliento a lo largo de este viaje. A mi pareja, Carla, cuyo respaldo y motivación fueron esenciales para continuar en los momentos más difíciles. A mis amigos, Jose Malagón y Raquel González, compañeros de grado y amigos entrañables, con quienes he mantenido una valiosa amistad. A mis compañeros de trabajo, por su paciencia y apoyo en la tarea de compaginar estudios y empleo. Finalmente, un especial agradecimiento a mi tutor, Luis Lucas Ibáñez, por su interés en mi trabajo y su constante guía a lo largo del desarrollo de este proyecto.
+Quisiera expresar mi más sincero agradecimiento a mi familia, por su constante apoyo y aliento a lo largo de este viaje. En especial a mis padres, Francisco y Consuelo, quienes han estado conmigo tanto en los buenos como en los malos momentos.
+\\\\
+A mi pareja, Carla Maciá Díez, cuyo respaldo y motivación fueron esenciales para continuar en los momentos más difíciles. Sin ella, creo que no hubiese tomado la decisión de matricularme en el máster.
+\\\\
+A Jose Malagón y Raquel González, compañeros de grado y amigos entrañables, con quienes he mantenido una valiosa amistad y a los cuales he echado en falta al caminar por el campus de la universidad.
+\\\\
+A Leire Lucía López y Franck Leterme por haber estado ahí durante todo este proceso. Su compañía, ya fuera para echar unas partidas, salir a despejarme o simplemente compartir un rato juntos, me ayudó a desconectar del bucle constante de trabajo y universidad. Gracias por ser ese respiro necesario en los momentos más intensos.
+\\\\
+Finalmente, especial agradecimiento a mi tutor, Luis Lucas Ibáñez, por su interés en mi trabajo y su constante guía a lo largo del desarrollo de este proyecto.
 
 
 \cleardoublepage %salta a nueva página impar
@@ -40,14 +48,14 @@ Satoru Iwata.
 \label{resumen}
 \textbf{GBee} es una aplicación que funciona como \textbf{emulador de Game Boy}, desarrollado específicamente de forma nativa para dispositivos \textbf{Android} mediante el lenguaje de programación Kotlin, utilizando Android Studio como entorno de desarrollo, y se estructura en módulos que reflejan los componentes esenciales de la arquitectura de la consola.
 \\\\
-El proyecto nace de la curiosidad por entender los aspectos técnicos y arquitectónicos de una consola, y cómo estos pueden ser emulados en un entorno moderno. A lo largo del trabajo, se abordan temas clave como la gestión de la Unidad Central de Procesamiento (CPU), la Unidad de Procesamiento de Gráficos (PPU), y la sincronización de ciclos para garantizar una emulación precisa.
+El proyecto \textbf{nace de la curiosidad} por entender los aspectos técnicos y arquitectónicos de una consola, y \textbf{cómo estos pueden ser emulados en un entorno moderno}. A lo largo del trabajo, se abordan temas clave como la gestión de la Unidad Central de Procesamiento (CPU), la Unidad de Procesamiento de Gráficos (PPU), y la sincronización de ciclos para garantizar una emulación precisa.
 \\\\
-El núcleo del sistema es la CPU, que implementa las instrucciones del procesador Sharp LR35902, un derivado del Z80 de 8 bits. Para ello se ha realizado una interpretación directa de los opcodes, controlando ciclos de máquina y de reloj, y gestionando interrupciones. Además, se ha implementado un sistema de temporización precisa, basada en la frecuencia original, clave para asegurar una ejecución sincronizada con el resto de los subsistemas.
+El núcleo del sistema es la CPU, que \textbf{implementa las instrucciones del procesador Sharp LR35902}, un derivado del Z80 de 8 bits. Para ello se ha realizado una \textbf{interpretación directa de los opcodes}, controlando ciclos de máquina y de reloj, y gestionando interrupciones. Además, se ha implementado un sistema de temporización precisa, basada en la frecuencia original, clave para asegurar una ejecución sincronizada con el resto de los subsistemas.
 \\\\
-Uno de los componentes más complejos es la PPU, encargada del renderizado del fondo, la ventana y los sprites. Se ha replicado el comportamiento por estados, respetando los tiempos de cada uno y ajustando los cambios de modo en función de la línea de escaneo y otros registros. Se utiliza un SurfaceView para dibujar en pantalla, implementando una rutina de renderizado en bucle sincronizada con los 60 fotogramas por segundo que produce el hardware original.
+Uno de los componentes más complejos es la \textbf{PPU, encargada del renderizado del fondo, la ventana y los sprites}. Se ha \textbf{replicado el comportamiento por estados}, respetando los tiempos de cada uno y ajustando los cambios de modo en función de la línea de escaneo y otros registros. Se utiliza un \texttt{SurfaceView} para dibujar en pantalla, implementando una rutina de renderizado en bucle sincronizada con los 60 fotogramas por segundo que produce el hardware original.
 \\\\
-El sistema de memoria incluye módulos para la RAM interna, RAM externa, I/O, video RAM, y memoria de cartucho, incluyendo soporte para bancos de memoria. Esto permite gestionar juegos más complejos que utilizan paginación de memoria tanto para la ROM como para la RAM.
+El sistema de memoria incluye \textbf{módulos para la RAM interna, RAM externa, I/O, video RAM, y memoria de cartucho}, incluyendo soporte para bancos de memoria. Esto permite gestionar juegos más complejos que utilizan paginación de memoria tanto para la ROM como para la RAM.
 \\\\
-En cuanto a la interacción con el usuario, se ha diseñado una interfaz de usuario intuitiva, con botones táctiles superpuestos al juego. El usuario puede seleccionar una ROM desde el almacenamiento del dispositivo mediante una funcionalidad de Android que permite navegar por el sistema de archivos.
+En cuanto a la interacción con el usuario, se ha diseñado una \textbf{interfaz intuitiva}, con botones táctiles superpuestos al juego. El usuario puede seleccionar una ROM desde el almacenamiento del dispositivo mediante una funcionalidad de Android que permite navegar por el sistema de archivos.
 
 \cleardoublepage
