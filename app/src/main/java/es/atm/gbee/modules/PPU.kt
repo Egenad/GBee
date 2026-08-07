@@ -122,7 +122,6 @@ enum class ObjFlags(private val shift: Int, private val mask: Int) {
 }
 
 object PPU {
-
     private var currentFrame : Int          = 0
     private var frameCount : Int            = 0
     private var lineTicks : Int             = 0
@@ -245,7 +244,6 @@ object PPU {
     }
 
     private fun drawLCDMode(stat: Byte){ // MODE 3
-
         fifoFetcher.process()
 
         if(fifoFetcher.getPushedPixels() >= GB_X_RESOLUTION){ // ENTER HBLANK MODE
@@ -337,7 +335,6 @@ object PPU {
     }
 
     fun writeToOAM(address: Int, startAddress: Int, value: Byte){
-
         var arrayAddress = address and 0xFFFF
 
         if(startAddress != -1)
@@ -397,9 +394,7 @@ object PPU {
      * GB can only render 10 sprites per line.
      */
     private fun loadLineSprites(){
-
         if(objEnabled || ROM.isCGB()) { // CGB Ignores this condition
-
             val currentY = (Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF) + OAM_Y_OFFSET
             val lcdc = Memory.getByteOnAddress(LCDC_ADDR)
             val objSize = LCDCObj.OBJ_SIZE.get(lcdc)
@@ -523,5 +518,25 @@ object PPU {
 
     fun getFetchedSpriteEntries() : Array<OAMObj?>{
         return objsFetched
+    }
+
+    fun getWindowScreenX() : Int{
+        return (Memory.getByteOnAddress(WX).toInt() and 0xFF) - WIN_X_OFFSET
+    }
+
+    fun getWindowScreenY() : Int{
+        return Memory.getByteOnAddress(WY).toInt() and 0xFF
+    }
+
+    fun getScrollX() : Int{
+        return Memory.getByteOnAddress(SCX).toInt() and 0xFF
+    }
+
+    fun getScrollY() : Int{
+        return Memory.getByteOnAddress(SCY).toInt() and 0xFF
+    }
+
+    fun getLY() : Int{
+        return Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
     }
 }

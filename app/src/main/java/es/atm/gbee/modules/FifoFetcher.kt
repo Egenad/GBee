@@ -84,8 +84,12 @@ class FifoFetcher {
     private var objTileData : Array<OAMObj?> = Array(3) { null }
     private var objFetchedData = ByteArray(6)
     private var fetchedSprites: Int = 0
+    
+    private var windowStartedThisLine: Boolean = false
 
     fun process(){
+        initWindow()
+        
         val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
         val scy = Memory.getByteOnAddress(SCY).toInt() and 0xFF
         val ly  = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
@@ -128,16 +132,16 @@ class FifoFetcher {
      * By default the tilemap used is the one at 0x9800.
      */
     private fun getBGTile(){
-        val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
-        val wy = Memory.getByteOnAddress(WY).toInt() and 0xFF
-        val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
-        val wx = Memory.getByteOnAddress(WX).toInt() and 0xFF - WIN_X_OFFSET
+        val ly = PPU.getLY()
+        val scx = PPU.getScrollX()
+        val wy = PPU.getWindowScreenY()
+        val wx = PPU.getWindowScreenX()
 
         // Obtain tilemap to use (BG or WIN)
         val windowTile = isWindowTile()
         val tilemapToUse = if(windowTile) PPU.getWinTilemapAddr() else PPU.getBGTilemapAddr()
 
-        val xCoordinate = if (windowTile) ((fetchX - wx) / 8) else (mapX / 8) and 0x1F
+        val xCoordinate = if (windowTile) (fetchX / 8) else (mapX / 8) and 0x1F
         val yCoordinate = if (windowTile) ((ly - wy) / 8) else (mapY / 8)
 
         val address = tilemapToUse + ((xCoordinate + (yCoordinate * GB_X_TOTAL_TILES)) and 0x3ff)
@@ -150,12 +154,11 @@ class FifoFetcher {
     }
 
     private fun getSpriteTile(){
-
         val fetchedObjs = PPU.getFetchedSpriteEntries()
 
         for (obj in fetchedObjs) {
             if(obj != null) {
-                val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
+                val scx = PPU.getScrollX()
                 val sprX = ((obj.x.toInt() and 0xFF) - OAM_X_OFFSET) + (scx % PIXELS_PER_TILE)
 
                 if ((sprX >= fetchX && sprX < fetchX + OAM_X_OFFSET) ||
@@ -188,16 +191,14 @@ class FifoFetcher {
     }
 
     private fun pushState(){
-
         val bgPush = pushBGPixelsToFifo()
-
         if(bgPush){
             state = FetcherState.OBTAIN_TILE
         }
     }
 
     private fun loadSpriteData(offset: Int){
-        val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
+        val ly = PPU.getLY()
         val spriteHeight = if (LCDCObj.OBJ_SIZE.get(Memory.getByteOnAddress(LCDC_ADDR)) == 1) 16 else 8
 
         for(i in 0 until fetchedSprites){
@@ -225,7 +226,7 @@ class FifoFetcher {
         if(backgroundFifo.getSize() >= 8)
             return false // Fifo is full
 
-        val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
+        val scx = PPU.getScrollX()
         val x = fetchX - (OAM_X_OFFSET - (scx % PIXELS_PER_TILE))
 
         for(i in 0..7){
@@ -253,7 +254,7 @@ class FifoFetcher {
 
             if(objTileData[i] != null) {
 
-                val scx = Memory.getByteOnAddress(SCX).toInt() and 0xFF
+                val scx = PPU.getScrollX()
                 val sprX = ((objTileData[i]!!.x.toInt() and 0xFF) - OAM_X_OFFSET) + (scx % PIXELS_PER_TILE)
 
                 val offset = fifoX - sprX
@@ -304,16 +305,16 @@ class FifoFetcher {
         if(backgroundFifo.getSize() >= 8){ // Process pixels if the FIFO has at least 8
             val pixelData = backgroundFifo.pop()?.value
 
-            if(lineX >= ((Memory.getByteOnAddress(SCX).toInt() and 0xFF) % 8) && pixelData != null){ // Check that Coordinate X is inside the visible region of the screen
-                val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
-                val address = pushedPixels + (ly * GB_X_RESOLUTION)                                  // Address = Pixels already pushed + (Actual Line * X Resolution)
+            // Check that Coordinate X is inside the visible region of the screen
+            if(lineX >= ((PPU.getScrollX()) % 8) && pixelData != null){ 
+                val ly = PPU.getLY()
+                val address = pushedPixels + (ly * GB_X_RESOLUTION) // Address = Pixels already pushed + (Actual Line * X Resolution)
 
                 //val mixedPixel = mixPixels(pixelData, spritePixel)
 
                 putValueToVideoBuffer(address, pixelData)
                 pushedPixels++
             }
-
             lineX++
         }
     }
@@ -333,6 +334,7 @@ class FifoFetcher {
         fetchX = 0
         pushedPixels = 0
         fifoX = 0
+        windowStartedThisLine = false
     }
 
     fun getPushedPixels(): Int{
@@ -346,19 +348,30 @@ class FifoFetcher {
     fun getValueFromVideoBuffer(address: Int): Int{
         return videoBuffer[address]
     }
+    
+    private fun initWindow(){
+        val ly = PPU.getLY()
+        val wy = PPU.getWindowScreenY()
+        val wx = PPU.getWindowScreenX()
+        val pushedPixels = getPushedPixels()
+        
+        if (PPU.windowIsEnabled() && ly >= wy && pushedPixels >= wx && !windowStartedThisLine){
+            windowStartedThisLine = true
+            state = FetcherState.OBTAIN_TILE
+            fetchX = 0
+            while(!backgroundFifo.isEmpty()){
+                backgroundFifo.pop()
+            }
+        }
+    }
 
     private fun isWindowTile(): Boolean{
-
-        val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
-        val wy = Memory.getByteOnAddress(WY).toInt() and 0xFF
-        val wx = Memory.getByteOnAddress(WX).toInt() and 0xFF - WIN_X_OFFSET
-
-        return (PPU.windowIsEnabled() && fetchX >= wx && ly >= wy)
+        return windowStartedThisLine
     }
 
     private fun calculeTileDataOffset(): Int{
-        val ly = Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
-        val wy = Memory.getByteOnAddress(WY).toInt() and 0xFF
+        val ly = PPU.getLY()
+        val wy = PPU.getWindowScreenY()
 
         val isWindowTile = isWindowTile()
         return if (isWindowTile) ((ly - wy) % 8) * 2 else tileY
