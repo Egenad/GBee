@@ -170,8 +170,9 @@ class FifoFetcher {
                 }
 
                 val sprX = (obj.x.toInt() and 0xFF) - OAM_X_OFFSET
+                val tileEndOffset = PIXELS_PER_TILE - 1
 
-                if (sprX + 7 >= tileStartScreenX && sprX <= tileStartScreenX + 7) {
+                if (sprX + tileEndOffset >= tileStartScreenX && sprX <= tileStartScreenX + tileEndOffset) {
                     objTileData[fetchedSprites] = obj
                     fetchedSprites++
                 }
@@ -239,8 +240,8 @@ class FifoFetcher {
         val x = if (windowStartedThisLine) fetchX - OAM_X_OFFSET
                 else fetchX - (OAM_X_OFFSET - (scx % PIXELS_PER_TILE))
 
-        for(i in 0..7){
-            val bit = 7 - i
+        for(i in 0 until PIXELS_PER_TILE){
+            val bit = (PIXELS_PER_TILE - 1) - i
 
             val low = (((tileData[1].toInt() and 0xFF) shr bit) and 1)
             val high = ((((tileData[2].toInt() and 0xFF) shr bit) and 1) shl 1)
@@ -274,10 +275,10 @@ class FifoFetcher {
                 val sprX = (objTileData[i]!!.x.toInt() and 0xFF) - OAM_X_OFFSET
                 val offset = screenX - sprX
 
-                if (offset !in 0..7) // Out of bounds
+                if (offset !in 0 until PIXELS_PER_TILE) // Out of bounds
                     continue
 
-                var bitToUse = 7 - offset
+                var bitToUse = (PIXELS_PER_TILE - 1) - offset
 
                 if (ObjFlags.X_FLIP.get(objTileData[i]!!.flags) == 1)
                     bitToUse =  offset
@@ -317,13 +318,13 @@ class FifoFetcher {
      * Mode 3: PPU transfers pixels to the LCD
      */
     private fun pushPixelsToBuffer(){
-        if(backgroundFifo.getSize() >= 8){ // Process pixels if the FIFO has at least 8
+        if(backgroundFifo.getSize() >= PIXELS_PER_TILE){ // Process pixels if the FIFO has at least 8
             val pixelData = backgroundFifo.pop()?.value
             val scx = PPU.getScrollX()
 
             // Check that Coordinate X is inside the visible region of the screen
             // Window pixels are never discarded
-            if((windowStartedThisLine || lineX >= (scx % 8)) && pixelData != null){ 
+            if((windowStartedThisLine || lineX >= (scx % PIXELS_PER_TILE)) && pixelData != null){ 
                 val ly = PPU.getLY()
                 val address = pushedPixels + (ly * GB_X_RESOLUTION) // Address = Pixels already pushed + (Actual Line * X Resolution)
 
