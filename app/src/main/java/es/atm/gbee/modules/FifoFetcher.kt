@@ -86,6 +86,7 @@ class FifoFetcher {
     private var fetchedSprites: Int = 0
     
     private var windowStartedThisLine: Boolean = false
+    private var windowPixelsInFifo: Int = 0
 
     fun process(){
         initWindow()
@@ -119,7 +120,6 @@ class FifoFetcher {
             getBGTile()
 
         if(PPU.objsAreEnabled() && PPU.getFetchedSpriteEntries().isNotEmpty()) {
-            fetchedSprites = 0
             getSpriteTile()
         }
 
@@ -155,14 +155,23 @@ class FifoFetcher {
 
     private fun getSpriteTile(){
         val fetchedObjs = PPU.getFetchedSpriteEntries()
+        fetchedSprites = 0
 
         for (obj in fetchedObjs) {
             if(obj != null) {
                 val scx = PPU.getScrollX()
-                val sprX = ((obj.x.toInt() and 0xFF) - OAM_X_OFFSET) + (scx % PIXELS_PER_TILE)
+                val wx = PPU.getWindowScreenX()
 
-                if ((sprX >= fetchX && sprX < fetchX + OAM_X_OFFSET) ||
-                ((sprX + OAM_X_OFFSET) >= fetchX && (sprX + OAM_X_OFFSET) < fetchX + OAM_X_OFFSET)) {
+                // Calculate the screen X where the current tile being fetched starts.
+                val tileStartScreenX = if (windowStartedThisLine) {
+                    wx + fetchX
+                } else {
+                    fetchX - (scx % PIXELS_PER_TILE)
+                }
+
+                val sprX = (obj.x.toInt() and 0xFF) - OAM_X_OFFSET
+
+                if (sprX + 7 >= tileStartScreenX && sprX <= tileStartScreenX + 7) {
                     objTileData[fetchedSprites] = obj
                     fetchedSprites++
                 }
@@ -227,7 +236,8 @@ class FifoFetcher {
             return false // Fifo is full
 
         val scx = PPU.getScrollX()
-        val x = fetchX - (OAM_X_OFFSET - (scx % PIXELS_PER_TILE))
+        val x = if (windowStartedThisLine) fetchX - OAM_X_OFFSET
+                else fetchX - (OAM_X_OFFSET - (scx % PIXELS_PER_TILE))
 
         for(i in 0..7){
             val bit = 7 - i
@@ -236,30 +246,35 @@ class FifoFetcher {
             val high = ((((tileData[2].toInt() and 0xFF) shr bit) and 1) shl 1)
             var color = if(PPU.bgWinIsEnabled()) PPU.getColorIndex(high or low) else PPU.getColorIndex(0) // Pixel Color
 
-            if(PPU.objsAreEnabled())
-                color = obtainSpriteColor(color)
+            if(PPU.objsAreEnabled()) {
+                val pixelScreenX = if (windowStartedThisLine) {
+                    PPU.getWindowScreenX() + windowPixelsInFifo
+                } else {
+                    fifoX - (scx % PIXELS_PER_TILE)
+                }
+                color = obtainSpriteColor(color, pixelScreenX)
+            }
 
             if(x >= 0){
                 backgroundFifo.push(color)
                 fifoX++
+                if (windowStartedThisLine) windowPixelsInFifo++
             }
         }
 
         return true
     }
 
-    private fun obtainSpriteColor(color: Int): Int{
+    private fun obtainSpriteColor(color: Int, screenX: Int): Int{
 
         for (i in 0 until fetchedSprites) {
 
             if(objTileData[i] != null) {
 
-                val scx = PPU.getScrollX()
-                val sprX = ((objTileData[i]!!.x.toInt() and 0xFF) - OAM_X_OFFSET) + (scx % PIXELS_PER_TILE)
+                val sprX = (objTileData[i]!!.x.toInt() and 0xFF) - OAM_X_OFFSET
+                val offset = screenX - sprX
 
-                val offset = fifoX - sprX
-
-                if (offset < 0 || offset > 7) // Out of bounds
+                if (offset !in 0..7) // Out of bounds
                     continue
 
                 var bitToUse = 7 - offset
@@ -304,9 +319,11 @@ class FifoFetcher {
     private fun pushPixelsToBuffer(){
         if(backgroundFifo.getSize() >= 8){ // Process pixels if the FIFO has at least 8
             val pixelData = backgroundFifo.pop()?.value
+            val scx = PPU.getScrollX()
 
             // Check that Coordinate X is inside the visible region of the screen
-            if(lineX >= ((PPU.getScrollX()) % 8) && pixelData != null){ 
+            // Window pixels are never discarded
+            if((windowStartedThisLine || lineX >= (scx % 8)) && pixelData != null){ 
                 val ly = PPU.getLY()
                 val address = pushedPixels + (ly * GB_X_RESOLUTION) // Address = Pixels already pushed + (Actual Line * X Resolution)
 
@@ -335,6 +352,7 @@ class FifoFetcher {
         pushedPixels = 0
         fifoX = 0
         windowStartedThisLine = false
+        windowPixelsInFifo = 0
     }
 
     fun getPushedPixels(): Int{
@@ -357,6 +375,7 @@ class FifoFetcher {
         
         if (PPU.windowIsEnabled() && ly >= wy && pushedPixels >= wx && !windowStartedThisLine){
             windowStartedThisLine = true
+            windowPixelsInFifo = 0
             state = FetcherState.OBTAIN_TILE
             fetchX = 0
             while(!backgroundFifo.isEmpty()){
