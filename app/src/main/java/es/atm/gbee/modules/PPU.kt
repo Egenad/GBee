@@ -102,6 +102,7 @@ enum class PPUMode(val number: Int){
 *    Bits 2, 1, 0 - CGB palette [CGB Mode Only]: Which of OBP0–7 to use
 */
 data class OAMObj(
+    val oamIndex: Int,
     val y: Byte,
     val x: Byte,
     val tile: Byte,
@@ -142,7 +143,7 @@ object PPU {
     private var bgWinEnabled : Boolean      = true          // Bit 0
 
     private var lineSpriteCount: Int = 0
-    private var objsFetched : Array<OAMObj?> = Array(MAX_OBJ_PER_SCANLINE) { OAMObj(0, 0, 0, 0) }
+    private var objsFetched : Array<OAMObj?> = Array(MAX_OBJ_PER_SCANLINE) { OAMObj(0,0, 0, 0, 0) }
 
     private var fifoFetcher : FifoFetcher = FifoFetcher()
 
@@ -404,26 +405,22 @@ object PPU {
             lineSpriteCount = 0
 
             for (i in oamRam.indices step 4) {
-
-                if (lineSpriteCount >= MAX_OBJ_PER_SCANLINE) {
+                if (lineSpriteCount >= MAX_OBJ_PER_SCANLINE)
                     break
-                }
 
                 val y = oamRam[i].toInt() and 0xFF
                 val x = oamRam[i + 1].toInt() and 0xFF
                 val tile = oamRam[i + 2]
                 val flags = oamRam[i + 3]
 
-                if (x == 0 || x >= (GB_X_RESOLUTION + OAM_X_OFFSET)) { // Sprite not visible
+                if (x == 0 || x >= (GB_X_RESOLUTION + OAM_X_OFFSET)) // Sprite not visible
                     continue
-                }
 
                 if (y <= currentY && (y + spriteHeight) > currentY) { // Sprite on current line
-                    objsFetched[lineSpriteCount] = OAMObj(y.toByte(), x.toByte(), tile, flags)
+                    objsFetched[lineSpriteCount] = OAMObj(i/4, y.toByte(), x.toByte(), tile, flags)
                     lineSpriteCount++
                 }
             }
-
             objsFetched.sortBy { it?.x ?: Byte.MAX_VALUE} // Sort by X position
         }
     }
