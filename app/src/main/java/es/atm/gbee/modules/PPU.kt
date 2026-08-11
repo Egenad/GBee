@@ -421,7 +421,14 @@ object PPU {
                     lineSpriteCount++
                 }
             }
-            objsFetched.sortBy { it?.x ?: Byte.MAX_VALUE} // Sort by X position
+            if (!ROM.isCGB()) {
+                objsFetched.sortWith(
+                    compareBy<OAMObj?> (
+                        { it?.x?.toInt()?.and(0xFF) ?: Int.MAX_VALUE },
+                        { it?.oamIndex ?: Int.MAX_VALUE }
+                    )
+                )
+            }
         }
     }
 
@@ -507,6 +514,13 @@ object PPU {
         // index == BGP index (0xFF47)
         val bgpColorIndex = ((Memory.getByteOnAddress(BGP).toInt() and 0xFF) shr (index * 2)) and 0b11
         return tileColors[bgpColorIndex]
+    }
+
+    fun getObjColorIndex(index: Int, palette: Int): Int{
+        val tileColors = getPaletteColors(selectedPalette)
+        val paletteAddress = if (palette == 0) OBP0 else OBP1
+        val objColorIndex = ((Memory.getByteOnAddress(paletteAddress).toInt() and 0xFF) shr (index * 2)) and 0b11
+        return tileColors[objColorIndex]
     }
 
     fun getBufferPixelFromIndex(index: Int): Int{
