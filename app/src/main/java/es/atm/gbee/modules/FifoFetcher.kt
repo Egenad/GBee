@@ -1,23 +1,23 @@
 package es.atm.gbee.modules
 
-enum class FetcherState(val number: Int){
-    OBTAIN_TILE(0),
-    LOW_DATA_TILE(1),
-    HIGH_DATA_TILE(2),
-    SLEEP(3),
-    PUSH(4)
+enum class FetcherState{
+    OBTAIN_TILE,
+    LOW_DATA_TILE,
+    HIGH_DATA_TILE,
+    SLEEP,
+    PUSH
 }
 
-enum class ObjFetcherState(val number: Int) {
-    GET_TILE(0), // Search for an OBJ tile that matches with actual X coordinate
-    SYNC_BG_FETCHER(1), // Advance the BG/WIN fetcher state
-    SCX_PENALTY(2), // Apply the SCX penalty on X=0
-    ADVANCE_FIRST(3), // First advance, 1 dot
-    ADVANCE_SECOND(4), // Second advance, 3 dots
-    LOW_DATA_TILE(5),
-    HIGH_DATA_TILE(6),
-    PUSH(7),
-    FINISH(8)
+enum class ObjFetcherState {
+    GET_TILE, // Search for an OBJ tile that matches with actual X coordinate
+    SYNC_BG_FETCHER, // Advance the BG/WIN fetcher state
+    SCX_PENALTY, // Apply the SCX penalty on X=0
+    ADVANCE_FIRST, // First advance, 1 dot
+    ADVANCE_SECOND, // Second advance, 3 dots
+    LOW_DATA_TILE,
+    HIGH_DATA_TILE,
+    PUSH,
+    FINISH
 }
 
 data class FetchedTileData(
@@ -98,7 +98,7 @@ class Fifo {
         if (previous == null) {
             head = sprite
         } else {
-            previous?.next = sprite
+            previous.next = sprite
         }
         if (tail === existing) {
             tail = sprite
@@ -132,11 +132,6 @@ class Fifo {
         return dequeuedEntry as? FifoEntrySprite
     }
 
-    /** Returns the rendered value at the head without consuming it. */
-    fun peek(): Int? {
-        return head?.value
-    }
-
     /** Reports whether the FIFO contains no entries. */
     fun isEmpty(): Boolean {
         return size == 0
@@ -159,7 +154,7 @@ class FifoFetcher {
     private var state : FetcherState = FetcherState.OBTAIN_TILE
     private var objState : ObjFetcherState = ObjFetcherState.GET_TILE
 
-    private var lineX : Int         = 0     // X position of the line. Actual X scanline coordinate.
+    private var lineX : Int         = 0     // X position of the line. Actual X scan-line coordinate.
     private var fetchX : Int        = 0     // Tile X Coordinate to be fetched. Used to calculate mapX and obtain tiles from VRAM.
     private var pushedPixels : Int  = 0     // Pixels pushed to the screen
 
@@ -171,7 +166,7 @@ class FifoFetcher {
     private var mapX: Int  = 0              // Global X position of the map
     private var tileY: Int = 0              // Line of the tile to be fetched
 
-    private val videoBuffer: IntArray = IntArray(GB_Y_RESOLUTION * GB_X_RESOLUTION) { 0 }
+    private val videoBuffer: IntArray = IntArray(GB_Y_RESOLUTION * GB_X_RESOLUTION)
     private var bgTileData: FetchedTileData = FetchedTileData() // Fetched Tile Data
     private var spriteTileData: FetchedTileData = FetchedTileData() // Fetched Sprite Tile Data
 
@@ -281,7 +276,7 @@ class FifoFetcher {
     }
 
     /**
-     * Finds the next unprocessed scanline sprite whose visible left edge equals the
+     * Finds the next unprocessed scan-line sprite whose visible left edge equals the
      * current output X. Sprites clipped by the left edge are triggered at X=0.
      */
     private fun findSpriteToFetch() : OAMObj?{
@@ -358,17 +353,13 @@ class FifoFetcher {
         if(PPU.lcdIsEnabled())
             getBGTile()
 
-        /*if(PPU.objsAreEnabled() && PPU.getFetchedSpriteEntries().isNotEmpty()) {
-            getSpriteTile()
-        }*/
-
         state = FetcherState.LOW_DATA_TILE
         fetchX += 8
     }
 
     /**
      * Determines which background/window tile to fetch pixels from.
-     * By default the tilemap used is the one at 0x9800.
+     * By default, the tilemap used is the one at 0x9800.
      */
     private fun getBGTile(){
         val ly = PPU.getLY()
@@ -587,7 +578,7 @@ class FifoFetcher {
         clear()
     }
 
-    /** Returns the number of visible pixels already written on the current scanline. */
+    /** Returns the number of visible pixels already written on the current scan-line. */
     fun getPushedPixels(): Int{
         return pushedPixels
     }

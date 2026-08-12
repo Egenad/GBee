@@ -24,6 +24,72 @@ flowchart TD
 
 El fetcher BG/WIN avanza cada dos dots. Un fetch OBJ se procesa dot a dot y bloquea temporalmente `pushPixelsToBuffer()`, alargando el modo 3. `pushedPixels` representa la coordenada X visible; `lineX` también incluye los píxeles de BG descartados por `SCX & 7`.
 
+## Registros y coordenadas que usa el fetcher
+
+Los nombres `SCX`, `LY`, `WX`, etc. no son variables arbitrarias del emulador: son registros de la PPU accesibles mediante direcciones de memoria. El juego escribe algunos de ellos para configurar la imagen y la PPU actualiza otros mientras dibuja la pantalla.
+
+| Registro | Dirección | Significado en `FifoFetcher` |
+|---|---:|---|
+| `LCDC` | `0xFF40` | Control general del LCD. Sus bits habilitan LCD, BG/WIN y OBJ, seleccionan los tilemaps, el modo de direccionamiento de tiles y el tamaño de los sprites. |
+| `SCY` | `0xFF42` | Scroll vertical del Background. La fila del mapa que se muestra se obtiene con `SCY + LY`. |
+| `SCX` | `0xFF43` | Scroll horizontal del Background. Selecciona el tile inicial y también el desplazamiento fino dentro de ese tile. No desplaza Window ni los sprites. |
+| `LY` | `0xFF44` | Línea que la PPU está procesando: `0..143` durante la imagen visible y `144..153` durante VBlank. En modo 3 también es la coordenada Y de destino en `videoBuffer`. |
+| `LYC` | `0xFF45` | Valor con el que se compara `LY` para generar la condición de coincidencia de STAT. No participa directamente en el fetch de píxeles. |
+| `BGP` | `0xFF47` | Paleta monocroma de BG/Window en DMG. Convierte cada índice de color `0..3` en uno de los cuatro tonos. |
+| `OBP0`, `OBP1` | `0xFF48`, `0xFF49` | Paletas monocromas de los sprites en DMG. El atributo del OBJ decide cuál se aplica. |
+| `WY` | `0xFF4A` | Primera scanline en la que Window puede aparecer. Window es elegible verticalmente cuando `LY >= WY`. |
+| `WX` | `0xFF4B` | Posición horizontal de Window codificada con un offset de hardware. Su borde izquierdo visible es `WX - 7`, no `WX`. |
+
+`WX` y `WY` colocan Window respecto a la pantalla; no son valores de scroll dentro de su tilemap. Por eso, cuando Window comienza, sus coordenadas de tile parten de cero. En cambio, `SCX` y `SCY` desplazan la vista sobre el tilemap de Background, que mide 32×32 tiles y se repite al superar sus límites.
+
+Los campos X e Y de OAM también contienen offsets de hardware. La posición visible de un sprite se calcula como `OAM_X - 8` y `OAM_Y - 16`. Esto permite representar sprites parcialmente fuera de los bordes superior e izquierdo.
+
+### Coordenadas internas
+
+- `fetchX`: avance horizontal del fetcher en bloques de ocho píxeles. Vuelve a cero cuando empieza una scanline o cuando BG cambia a Window.
+- `mapX = SCX + fetchX`: coordenada horizontal usada para escoger el tile de Background.
+- `mapY = SCY + LY`: coordenada vertical usada para escoger el tile y la fila de Background.
+- `tileY = (mapY % 8) * 2`: fila dentro del tile. Se multiplica por dos porque cada fila de ocho píxeles ocupa dos bytes, uno por bitplane.
+- `lineX`: cantidad de píxeles extraídos del FIFO BG, incluidos los iniciales que se descartan por scroll fino.
+- `pushedPixels`: coordenada X visible; solo aumenta cuando un píxel se escribe realmente en `videoBuffer`.
+
+### Por qué se usa `SCX & 7`
+
+Cada tile tiene ocho píxeles. Por tanto, `SCX` se divide conceptualmente en dos partes:
+
+```text
+SCX = [ índice/desplazamiento de tile ][ posición dentro del tile ]
+                                          ^ 3 bits bajos
+```
+
+`SCX & 7` (o `SCX & 0b111`) conserva esos tres bits bajos y produce un valor entre 0 y 7. Como `SCX` ya se lee como un entero sin signo entre 0 y 255, en este caso es equivalente a `SCX % 8`.
+
+Ejemplo con `SCX = 13`:
+
+```text
+13 / 8 = 1  -> la vista empieza en el segundo tile del mapa
+13 & 7 = 5  -> empieza en el píxel 5 de ese tile
+```
+
+El fetcher siempre obtiene el tile completo. En `pushPixelsToBuffer()` usa `lineX >= SCX % 8` para descartar sus primeros cinco píxeles en el ejemplo. Estos píxeles avanzan `lineX`, pero no `pushedPixels`, porque quedan fuera de la pantalla. Al empezar Window deja de aplicarse este descarte: Window posee su propio origen y no usa `SCX`.
+
+La misma cantidad aparece en `applyScxPenalty()`, pero con otra finalidad. Si un sprite toca o atraviesa el borde izquierdo (`spriteX <= 0`), el hardware hace que su fetch dependa de la fase de scroll fino de BG. El estado `SCX_PENALTY` consume `SCX & 7` dots adicionales antes de continuar el fetch OBJ. Para sprites que empiezan después de X=0 la penalización es cero. En resumen:
+
+| Situación | Uso de `SCX & 7` |
+|---|---|
+| Comienzo de una línea de Background | Cantidad de píxeles iniciales del primer tile que se descartan. |
+| Fetch de un OBJ con `spriteX <= 0` | Cantidad de dots de penalización antes de leer el sprite. |
+| Background ya alineado (`SCX & 7 == 0`) | No hay descarte fino ni esa penalización adicional. |
+| Window activa | No se descartan píxeles por `SCX`; Window no utiliza el scroll de BG. |
+
+### Otras máscaras y módulos del código
+
+- `byte.toInt() and 0xFF`: interpreta el patrón de ocho bits de un `Byte` de Kotlin como un valor sin signo `0..255`.
+- `(mapX / 8) and 0x1F`: limita la columna a `0..31`; el tilemap tiene 32 columnas y vuelve a comenzar al hacer scroll fuera de él.
+- `(xCoordinate + yCoordinate * 32) and 0x3FF`: limita el offset a los 1024 bytes de un tilemap de 32×32 entradas.
+- `tileIndex and 0xFE`: en modo OBJ 8×16 fuerza un índice base par; después `row / 8` selecciona el tile superior o inferior.
+- `mapY % 8` y `(LY - WY) % 8`: seleccionan la fila `0..7` dentro del tile de BG o Window respectivamente.
+
 ## Cómo trabajan juntos BG/WIN y OBJ
 
 Aunque el código mantiene dos máquinas de estados y dos FIFO, no produce ambos tipos de píxel de manera completamente independiente. `fetch()` actúa como árbitro del pipeline: normalmente cede los dots pares al fetcher BG/WIN, pero entrega temporalmente el control al fetcher OBJ cuando la salida alcanza el inicio de un sprite.
@@ -40,6 +106,48 @@ El índice crudo es esencial: la prioridad OBJ no depende del color ARGB resulta
 ### 2. Detección y detención por OBJ
 
 Antes de avanzar BG/WIN, `fetch()` llama a `findSpriteToFetch()`. Cuando `pushedPixels` coincide con el borde izquierdo visible de un objeto, ese objeto pasa a `activeSprite`. Desde ese momento `tickObjFetcher()` devuelve `false` y `process()` deja de llamar a `pushPixelsToBuffer()`.
+
+El fetcher BG/WIN trabaja por adelantado respecto a la salida. `fetchX` indica hasta qué zona se están obteniendo tiles, mientras que `pushedPixels` indica el siguiente píxel visible que debe escribirse. Por ejemplo, cuando la salida está en X=40, el fetcher puede haber decodificado ya el tile que contiene X=40..47 y haber dejado esos ocho píxeles en `backgroundFifo`.
+
+La detección del sprite utiliza `pushedPixels`, no `fetchX`. Cuando la salida alcanza la X de inicio del OBJ, la comprobación ocurre antes del tick BG/WIN y antes de extraer el siguiente píxel del FIFO:
+
+```text
+BG/WIN obtiene tiles por adelantado
+        ↓
+backgroundFifo contiene el fondo de la próxima X visible
+        ↓
+pushedPixels alcanza triggerX del sprite
+        ↓
+se detienen la salida y, normalmente, el fetch BG/WIN
+        ↓
+se obtiene y se inserta el OBJ en spriteFifo
+        ↓
+se reanuda la salida y se mezclan ambos FIFO
+```
+
+Por ello, bloquear BG/WIN durante el fetch OBJ no significa perder el fondo situado detrás del sprite: sus píxeles ya estaban esperando en `backgroundFifo` y no se consumen durante la pausa. Si un píxel OBJ tiene índice 0, `mixPixels()` devuelve el píxel BG correspondiente.
+
+Existe una excepción de sincronización. Si se detecta el OBJ cuando `backgroundFifo` está vacío, `SYNC_BG_FETCHER` llama a `tickBGWINFetcher()` hasta que haya fondo disponible. Después continúa el fetch OBJ. En resumen, el flujo asegura primero que exista fondo para la mezcla y luego mantiene congelada la salida mientras obtiene el sprite.
+
+La X guardada en OAM incluye un offset de 8, por lo que primero se convierte a coordenadas de pantalla:
+
+```kotlin
+val spriteX = (obj.x.toInt() and 0xFF) - OAM_X_OFFSET
+val triggerX = maxOf(0, spriteX)
+```
+
+`spriteX` puede ser negativa cuando el sprite comienza fuera del borde izquierdo. Sin embargo, `pushedPixels` empieza en 0 y nunca toma valores negativos. Si se comparase directamente `spriteX == pushedPixels`, un sprite parcialmente visible con `spriteX = -3` nunca activaría su fetch y se perderían también los píxeles suyos que sí pertenecen a la pantalla.
+
+`maxOf(0, spriteX)` limita solamente la coordenada de **disparo** del fetch:
+
+| X almacenada en OAM | `spriteX = OAM_X - 8` | `triggerX` | Resultado |
+|---:|---:|---:|---|
+| 16 | 8 | 8 | El fetch comienza cuando la salida llega a X=8. |
+| 8 | 0 | 0 | El sprite empieza exactamente en el borde izquierdo. |
+| 5 | -3 | 0 | Se obtiene en X=0; sus tres primeros píxeles quedan recortados y los otros cinco pueden verse. |
+| 0 | -8 | 0 | Se procesa al inicio por temporización, aunque sus ocho píxeles quedan fuera de pantalla. |
+
+Esto no cambia la posición real del sprite a X=0. `pushSpritePixels()` sigue calculando cada posición con el `spriteX` original y descarta cualquier `fifoOffset` que quede fuera de `0..7`. `triggerX` responde a "¿cuándo debe empezar el fetch?", mientras que `spriteX` responde a "¿dónde está cada píxel?".
 
 La coordenada visible queda congelada mientras el fetch OBJ consume sus dots. El BG FIFO tampoco pierde píxeles: únicamente puede avanzar dentro de `SYNC_BG_FETCHER` si estaba vacío. Esta detención representa la penalización que alarga el modo 3 en el hardware.
 
@@ -70,6 +178,23 @@ Así, los sprites no se mezclan al leer VRAM. Primero se combinan entre ellos de
 Al principio de una línea, `SCX & 7` hace que se descarten varios píxeles del FIFO BG. Esos descartes no consumen `spriteFifo`, porque sus posiciones ya están expresadas en coordenadas visibles.
 
 Cuando la salida alcanza `WX - 7`, `initWindow()` reinicia la máquina BG/WIN y vacía `backgroundFifo` para comenzar a obtener tiles de Window. El FIFO OBJ se conserva: Window sustituye al fondo como fuente de BG/WIN, pero los sprites continúan asociados a la misma coordenada de pantalla.
+
+La activación se decide mediante esta condición:
+
+```kotlin
+if (PPU.windowIsEnabled() && ly >= wy && pushedPixels >= wx && !windowStartedThisLine) {
+```
+
+Las cuatro comprobaciones deben cumplirse simultáneamente:
+
+- `PPU.windowIsEnabled()`: el bit 5 de LCDC permite mostrar Window. Si está desactivado, BG continúa siendo la fuente de tiles.
+- `ly >= wy`: la scanline actual ha alcanzado o sobrepasado `WY`. Antes de esa línea, Window todavía no debe aparecer verticalmente.
+- `pushedPixels >= wx`: la salida horizontal visible ha alcanzado la posición de inicio. Aquí `wx` ya contiene `WX - 7`, porque el registro de hardware incluye ese desplazamiento.
+- `!windowStartedThisLine`: impide volver a iniciar Window en cada dot posterior de la misma scanline.
+
+Se usa `>=` en las comparaciones de posición para detectar tanto el punto exacto como un umbral que ya se haya sobrepasado. Esto es especialmente importante horizontalmente: si `WX` es menor que 7, `wx` será negativo y `pushedPixels`, que comienza en cero, debe activar Window inmediatamente. Con una comparación `pushedPixels == wx`, ese caso nunca se cumpliría.
+
+Cuando la condición se cumple, `windowStartedThisLine` pasa a `true`, `fetchX` vuelve a cero y se descartan los píxeles BG preparados. A partir de entonces `getBGTile()` selecciona el tilemap de Window y calcula sus coordenadas desde `WX`/`WY`, mientras que el contador visible `pushedPixels` continúa desde su posición actual.
 
 ### Ejemplo de una línea con un sprite
 
@@ -135,7 +260,7 @@ La pausa cambia la duración de modo 3, no la coordenada final del sprite: duran
 
 ## Obtención de sprites
 
-- `findSpriteToFetch()`: busca el primer objeto de la línea que aún no se ha procesado y cuyo X visible coincide con `pushedPixels`. Los sprites parcialmente fuera de la izquierda se activan en X=0.
+- `findSpriteToFetch()`: busca el primer objeto de la línea que aún no se ha procesado y cuyo `triggerX` coincide con `pushedPixels`. Calcula `triggerX = maxOf(0, OAM_X - 8)` para activar en X=0 los sprites recortados por la izquierda, sin modificar su posición real.
 - `startSpriteFetch(sprite)`: guarda el objeto activo, limpia sus bytes temporales y entra en sincronización.
 - `syncBgFetcher()`: avanza BG/WIN si su FIFO está vacío y continúa cuando ya existe fondo para mezclar.
 - `applyScxPenalty()`: consume `SCX & 7` dots para un sprite situado en el borde izquierdo.

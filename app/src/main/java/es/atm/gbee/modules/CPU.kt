@@ -112,7 +112,7 @@ object CPU {
 
         // Opcode execution
         val opcode = fetch()
-        val valop = opcode.toHexString(HexFormat.Default)
+        //val valop = opcode.toHexString(HexFormat.Default)
 
         if(opcode == 0x20.toByte() && pendingBootROM && lastOpcode == opcode){
             println("Boot checksum failed")
@@ -121,7 +121,7 @@ object CPU {
 
         try {
             cycles += execute(opcode)
-        }catch (ex: IllegalArgumentException){
+        }catch (_: IllegalArgumentException){
             return false
         }
 
