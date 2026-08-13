@@ -9,8 +9,8 @@ const val TM_1_START : Int  = 0x9800 // TileMap 1 Start Address
 const val TM_1_END : Int    = 0x9BFF // TileMap 1 End Address
 const val TM_2_START : Int  = 0x9C00 // TileMap 2 Start Address
 const val TM_2_END : Int    = 0x9FFF // TileMap 2 End Address
-const val LCD_STAT : Int    = 0xFF41 // LCD STATUS
 const val LCDC_ADDR : Int   = 0xFF40 // LCDC - LCD Control
+const val LCD_STAT : Int    = 0xFF41 // LCD STATUS
 const val LY_ADDR : Int     = 0xFF44 // LCD Y Coordinate, values range [0 - 153]. 144 to 153 = VBlank
 const val LYC_ADDR : Int    = 0xFF45 // LY Comparation
 
@@ -358,7 +358,6 @@ object PPU {
                 DMA.start(value)
             }
             LCDC_ADDR -> {
-                println("LCDC_ADDR: $value")
                 Memory.write(address, value)
                 handleLCDC(value)
             }
@@ -367,6 +366,41 @@ object PPU {
             }
             BGP -> { // Background Palette
                 Memory.write(address, value)
+            }
+            SCX -> {
+                Log.d(
+                    "PPU_WRITE",
+                    "SCX frame=$currentFrame LY=${getLY()} " +
+                            "ticks=$lineTicks old=${getScrollX()} " +
+                            "new=${value.toInt() and 0xFF}"
+                )
+                Memory.write(address, value)
+            }
+            LYC_ADDR -> {
+                Log.d(
+                    "PPU_WRITE",
+                    "LYC frame=$currentFrame LY=${getLY()} " +
+                            "new=${value.toInt() and 0xFF}"
+                )
+                Memory.write(address, value)
+            }
+            LCD_STAT -> {
+                Log.d(
+                    "PPU_WRITE",
+                    "STAT frame=$currentFrame LY=${getLY()} " +
+                            "old=${(Memory.read(LCD_STAT).toInt() and 0xFF).toString(16)} " +
+                            "written=${(value.toInt() and 0xFF).toString(16)}"
+                )
+
+                val oldStat = Memory.read(LCD_STAT).toInt() and 0xFF
+
+                val readOnlyBits = oldStat and 0x07
+                val writableBits = value.toInt() and 0x78
+
+                Memory.write(
+                    LCD_STAT,
+                    (0x80 or readOnlyBits or writableBits).toByte()
+                )
             }
             else -> {
                 Memory.write(address, value)
