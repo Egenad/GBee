@@ -52,13 +52,14 @@ object Timer {
         }
 
         if(timerUpdate && (tacValue and (1 shl 2) != 0)){
-            var timaValue = Memory.read(TIMA).toInt() and 0xFF
-            timaValue++
-            Memory.write(TIMA, timaValue.toByte())
-
-            if(timaValue == 0xFF){
+            val timaValue = Memory.read(TIMA).toInt() and 0xFF
+            if (timaValue == 0xFF) {
                 Memory.write(TIMA, Memory.read(TMA))
-                Interrupt.requestInterrupt(Interrupt.InterruptType.TIMER.getByteMask())
+                Interrupt.requestInterrupt(
+                    Interrupt.InterruptType.TIMER.getByteMask()
+                )
+            } else {
+                Memory.write(TIMA, (timaValue + 1).toByte())
             }
         }
     }

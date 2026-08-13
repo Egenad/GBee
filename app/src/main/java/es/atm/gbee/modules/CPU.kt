@@ -101,6 +101,10 @@ object CPU {
             return true
         }
 
+        if (cpu_halted && Interrupt.getPendingInterrupts() != 0) {
+            cpu_halted = false
+        }
+
         // Interrupts
         if(!pendingEI){
             handleInterrupts()
