@@ -95,6 +95,11 @@ object CPU {
 
     @OptIn(ExperimentalStdlibApi::class)
     fun tick(): Boolean{
+        // Check if DMA is active
+        if (DMA.transferring()) {
+            cycles += CYCLES_4
+            return true
+        }
 
         // Interrupts
         if(!pendingEI){
@@ -105,7 +110,7 @@ object CPU {
         }
 
         // Halt or DMA transferring
-        if(cpu_halted || DMA.transferring()){
+        if(cpu_halted){
             cycles += CYCLES_4
             return true
         }
@@ -750,14 +755,15 @@ object CPU {
     }
 
     fun rla(): Int{
-        val carry = if ((F.toInt() and FLAG_C) != 0) 1 else 0
+        val oldValue = A.toInt() and 0xFF
+        val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
 
-        A = ((A.toInt() shl 1) or carry).toByte()
+        A = ((oldValue shl 1) or oldCarry).toByte()
 
         clearFlag(FLAG_Z)
         clearFlag(FLAG_N)
         clearFlag(FLAG_H)
-        updateFlag(FLAG_C, (A.toInt() and 0x80) != 0)
+        updateFlag(FLAG_C, (oldValue and 0x80) != 0)
 
         return CYCLES_4
     }
@@ -816,13 +822,12 @@ object CPU {
     }
 
     fun rra(): Int{
-
         val oldValue = A.toInt() and 0xFF
         val carry = if ((F.toInt() and FLAG_C) != 0) 1 else 0
 
         A = ((oldValue ushr 1) or (carry shl 7)).toByte()
 
-        updateFlag(FLAG_Z, A == 0.toByte())
+        clearFlag(FLAG_Z)
         clearFlag(FLAG_N)
         clearFlag(FLAG_H)
         updateFlag(FLAG_C, (oldValue and 0x01) != 0)
@@ -1018,17 +1023,19 @@ object CPU {
 
     fun inc_hl_v(): Int{
         val hl = get_16bit_address(H, L)
-        val value = ((Memory.getByteOnAddress(hl) + 1) and 0xFF).toByte()
-        Memory.writeByteOnAddress(hl, value)
+        val oldValue = Memory.getByteOnAddress(hl)
+        val newValue = inc_8bit_register(oldValue)
 
+        Memory.writeByteOnAddress(hl, newValue)
         return CYCLES_12
     }
 
     fun dec_hl_v(): Int{
         val hl = get_16bit_address(H, L)
-        val value = ((Memory.getByteOnAddress(hl) - 1) and 0xFF).toByte()
-        Memory.writeByteOnAddress(hl, value)
+        val oldValue = Memory.getByteOnAddress(hl)
+        val newValue = dec_8bit_register(oldValue)
 
+        Memory.writeByteOnAddress(hl, newValue)
         return CYCLES_12
     }
 
@@ -1040,11 +1047,9 @@ object CPU {
     }
 
     fun scf(): Int{
-
         clearFlag(FLAG_N)
         clearFlag(FLAG_H)
         setFlag(FLAG_C)
-
         return CYCLES_4
     }
 

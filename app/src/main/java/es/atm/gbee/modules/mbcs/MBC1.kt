@@ -1,5 +1,7 @@
 package es.atm.gbee.modules.mbcs
 
+import android.util.Log
+
 import es.atm.gbee.modules.ENABLE_RAM_END
 import es.atm.gbee.modules.EXTERNAL_RAM_START
 import es.atm.gbee.modules.Memory
@@ -47,6 +49,10 @@ class MBC1(romBytes: ByteArray) : MBC() {
             }
             in ROM_SW_START..ROM_END -> return romData?.get(getROMSwBankAddr(address)) ?: 0xFF.toByte() // READ FROM SWITCHABLE ROM BANK
             in EXTERNAL_RAM_START..< WRAM_START -> { // READ FROM EXTERNAL RAM
+                Log.d("MBC1",
+                    "MBC1 external read addr=${address.toString(16)} " +
+                            "romBank=$currentRomBank ramBank=$currentRamBank mode=$bankingMode"
+                )
                 return if(ramEnabled) {
                     ramBanks!![currentRamBank][address - EXTERNAL_RAM_START]
                 } else 0xFF.toByte()
@@ -58,6 +64,12 @@ class MBC1(romBytes: ByteArray) : MBC() {
 
     override fun write(address: Int, value: Byte) {
         val valueInt = value.toInt() and 0xFF
+
+        Log.d("MBC1",
+            "MBC1 write addr=${address.toString(16)} " +
+                    "value=${valueInt.toString(16)} " +
+                    "romBank=$currentRomBank ramBank=$currentRamBank mode=$bankingMode"
+        )
 
         when {
             address <= ENABLE_RAM_END -> {  // ENABLE RAM

@@ -15,7 +15,7 @@ object DMA {
         offset = 0
         startDelay = 2
         startAddress = (value.toInt() and 0xFF) shl 8   // If value is 0xC0, startAddress will be 0xC000
-        Interrupt.enableInterrupts(false)               // Disable interrupts while copying
+        //Interrupt.enableInterrupts(false)               // Disable interrupts while copying
     }
 
     fun tick(){
@@ -26,8 +26,8 @@ object DMA {
                 offset++
                 active = (offset and 0xFF) < TOTAL_BYTES_TO_COPY
 
-                if(!active)
-                    Interrupt.enableInterrupts(true)
+                //if(!active)
+                    //Interrupt.enableInterrupts(true)
             }else{
                 startDelay--
             }

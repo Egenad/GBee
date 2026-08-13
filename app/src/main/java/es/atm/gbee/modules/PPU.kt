@@ -1,6 +1,7 @@
 package es.atm.gbee.modules
 
 import android.os.SystemClock
+import android.util.Log
 
 const val SIGNED_TILE_REGION : Int = 0x8800
 
@@ -274,6 +275,10 @@ object PPU {
 
                 currentFrame++
 
+                if (currentFrame % 60 == 0) {
+                    debugOam()
+                }
+
                 calculateFPS()
 
             }else{ // RETURN TO OAM MODE
@@ -387,6 +392,26 @@ object PPU {
         objEnabled = LCDCObj.OBJ_ENABLE.get(value) != 0
         // Bit 0
         bgWinEnabled = LCDCObj.MASTER_ENABLE.get(value) != 0
+    }
+
+    private fun debugOam() {
+        Log.d("OAM","----- OAM frame=$currentFrame -----")
+
+        for (i in 0 until OAM_OBJ_NUMBER) {
+            val base = i * 4
+            val y = oamRam[base].toInt() and 0xFF
+            val x = oamRam[base + 1].toInt() and 0xFF
+            val tile = oamRam[base + 2].toInt() and 0xFF
+            val flags = oamRam[base + 3].toInt() and 0xFF
+
+            if (x != 0 && y != 0) {
+                Log.d("OAM",
+                    "OBJ[$i] screenX=${x - OAM_X_OFFSET} " +
+                            "screenY=${y - OAM_Y_OFFSET} " +
+                            "tile=$tile flags=${flags.toString(16)}"
+                )
+            }
+        }
     }
 
     /**
