@@ -1,6 +1,7 @@
 package es.atm.gbee.modules
 
 import android.os.SystemClock
+import android.util.Log
 
 const val SIGNED_TILE_REGION : Int = 0x8800
 
@@ -8,8 +9,8 @@ const val TM_1_START : Int  = 0x9800 // TileMap 1 Start Address
 const val TM_1_END : Int    = 0x9BFF // TileMap 1 End Address
 const val TM_2_START : Int  = 0x9C00 // TileMap 2 Start Address
 const val TM_2_END : Int    = 0x9FFF // TileMap 2 End Address
-const val LCD_STAT : Int    = 0xFF41 // LCD STATUS
 const val LCDC_ADDR : Int   = 0xFF40 // LCDC - LCD Control
+const val LCD_STAT : Int    = 0xFF41 // LCD STATUS
 const val LY_ADDR : Int     = 0xFF44 // LCD Y Coordinate, values range [0 - 153]. 144 to 153 = VBlank
 const val LYC_ADDR : Int    = 0xFF45 // LY Comparation
 
@@ -102,6 +103,7 @@ enum class PPUMode(val number: Int){
 *    Bits 2, 1, 0 - CGB palette [CGB Mode Only]: Which of OBP0–7 to use
 */
 data class OAMObj(
+    val oamIndex: Int,
     val y: Byte,
     val x: Byte,
     val tile: Byte,
@@ -122,7 +124,6 @@ enum class ObjFlags(private val shift: Int, private val mask: Int) {
 }
 
 object PPU {
-
     private var currentFrame : Int          = 0
     private var frameCount : Int            = 0
     private var lineTicks : Int             = 0
@@ -143,7 +144,7 @@ object PPU {
     private var bgWinEnabled : Boolean      = true          // Bit 0
 
     private var lineSpriteCount: Int = 0
-    private var objsFetched : Array<OAMObj?> = Array(MAX_OBJ_PER_SCANLINE) { OAMObj(0, 0, 0, 0) }
+    private var objsFetched : Array<OAMObj?> = Array(MAX_OBJ_PER_SCANLINE) { OAMObj(0,0, 0, 0, 0) }
 
     private var fifoFetcher : FifoFetcher = FifoFetcher()
 
@@ -245,7 +246,6 @@ object PPU {
     }
 
     private fun drawLCDMode(stat: Byte){ // MODE 3
-
         fifoFetcher.process()
 
         if(fifoFetcher.getPushedPixels() >= GB_X_RESOLUTION){ // ENTER HBLANK MODE
@@ -274,6 +274,10 @@ object PPU {
                     Interrupt.requestInterrupt(Interrupt.InterruptType.LCD_STAT.getByteMask()) // ASK FOR LCD STAT INTERRUPT IF LCD_STAT HAS THE VBLANK BIT ACTIVATED
 
                 currentFrame++
+
+                if (currentFrame % 60 == 0) {
+                    debugOam()
+                }
 
                 calculateFPS()
 
@@ -337,7 +341,6 @@ object PPU {
     }
 
     fun writeToOAM(address: Int, startAddress: Int, value: Byte){
-
         var arrayAddress = address and 0xFFFF
 
         if(startAddress != -1)
@@ -355,7 +358,6 @@ object PPU {
                 DMA.start(value)
             }
             LCDC_ADDR -> {
-                println("LCDC_ADDR: $value")
                 Memory.write(address, value)
                 handleLCDC(value)
             }
@@ -364,6 +366,41 @@ object PPU {
             }
             BGP -> { // Background Palette
                 Memory.write(address, value)
+            }
+            SCX -> {
+                Log.d(
+                    "PPU_WRITE",
+                    "SCX frame=$currentFrame LY=${getLY()} " +
+                            "ticks=$lineTicks old=${getScrollX()} " +
+                            "new=${value.toInt() and 0xFF}"
+                )
+                Memory.write(address, value)
+            }
+            LYC_ADDR -> {
+                Log.d(
+                    "PPU_WRITE",
+                    "LYC frame=$currentFrame LY=${getLY()} " +
+                            "new=${value.toInt() and 0xFF}"
+                )
+                Memory.write(address, value)
+            }
+            LCD_STAT -> {
+                Log.d(
+                    "PPU_WRITE",
+                    "STAT frame=$currentFrame LY=${getLY()} " +
+                            "old=${(Memory.read(LCD_STAT).toInt() and 0xFF).toString(16)} " +
+                            "written=${(value.toInt() and 0xFF).toString(16)}"
+                )
+
+                val oldStat = Memory.read(LCD_STAT).toInt() and 0xFF
+
+                val readOnlyBits = oldStat and 0x07
+                val writableBits = value.toInt() and 0x78
+
+                Memory.write(
+                    LCD_STAT,
+                    (0x80 or readOnlyBits or writableBits).toByte()
+                )
             }
             else -> {
                 Memory.write(address, value)
@@ -391,15 +428,33 @@ object PPU {
         bgWinEnabled = LCDCObj.MASTER_ENABLE.get(value) != 0
     }
 
+    private fun debugOam() {
+        Log.d("OAM","----- OAM frame=$currentFrame -----")
+
+        for (i in 0 until OAM_OBJ_NUMBER) {
+            val base = i * 4
+            val y = oamRam[base].toInt() and 0xFF
+            val x = oamRam[base + 1].toInt() and 0xFF
+            val tile = oamRam[base + 2].toInt() and 0xFF
+            val flags = oamRam[base + 3].toInt() and 0xFF
+
+            if (x != 0 && y != 0) {
+                Log.d("OAM",
+                    "OBJ[$i] screenX=${x - OAM_X_OFFSET} " +
+                            "screenY=${y - OAM_Y_OFFSET} " +
+                            "tile=$tile flags=${flags.toString(16)}"
+                )
+            }
+        }
+    }
+
     /**
      * Grabs the sprites for the current line.
      * Saves all data on objsFetched array. Because of hardware limitations,
      * GB can only render 10 sprites per line.
      */
     private fun loadLineSprites(){
-
         if(objEnabled || ROM.isCGB()) { // CGB Ignores this condition
-
             val currentY = (Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF) + OAM_Y_OFFSET
             val lcdc = Memory.getByteOnAddress(LCDC_ADDR)
             val objSize = LCDCObj.OBJ_SIZE.get(lcdc)
@@ -409,27 +464,30 @@ object PPU {
             lineSpriteCount = 0
 
             for (i in oamRam.indices step 4) {
-
-                if (lineSpriteCount >= MAX_OBJ_PER_SCANLINE) {
+                if (lineSpriteCount >= MAX_OBJ_PER_SCANLINE)
                     break
-                }
 
                 val y = oamRam[i].toInt() and 0xFF
                 val x = oamRam[i + 1].toInt() and 0xFF
                 val tile = oamRam[i + 2]
                 val flags = oamRam[i + 3]
 
-                if (x == 0 || x >= (GB_X_RESOLUTION + OAM_X_OFFSET)) { // Sprite not visible
+                if (x == 0 || x >= (GB_X_RESOLUTION + OAM_X_OFFSET)) // Sprite not visible
                     continue
-                }
 
                 if (y <= currentY && (y + spriteHeight) > currentY) { // Sprite on current line
-                    objsFetched[lineSpriteCount] = OAMObj(y.toByte(), x.toByte(), tile, flags)
+                    objsFetched[lineSpriteCount] = OAMObj(i/4, y.toByte(), x.toByte(), tile, flags)
                     lineSpriteCount++
                 }
             }
-
-            objsFetched.sortBy { it?.x ?: Byte.MAX_VALUE} // Sort by X position
+            if (!ROM.isCGB()) {
+                objsFetched.sortWith(
+                    compareBy<OAMObj?> (
+                        { it?.x?.toInt()?.and(0xFF) ?: Int.MAX_VALUE },
+                        { it?.oamIndex ?: Int.MAX_VALUE }
+                    )
+                )
+            }
         }
     }
 
@@ -517,11 +575,38 @@ object PPU {
         return tileColors[bgpColorIndex]
     }
 
+    fun getObjColorIndex(index: Int, palette: Int): Int{
+        val tileColors = getPaletteColors(selectedPalette)
+        val paletteAddress = if (palette == 0) OBP0 else OBP1
+        val objColorIndex = ((Memory.getByteOnAddress(paletteAddress).toInt() and 0xFF) shr (index * 2)) and 0b11
+        return tileColors[objColorIndex]
+    }
+
     fun getBufferPixelFromIndex(index: Int): Int{
         return fifoFetcher.getValueFromVideoBuffer(index)
     }
 
     fun getFetchedSpriteEntries() : Array<OAMObj?>{
         return objsFetched
+    }
+
+    fun getWindowScreenX() : Int{
+        return (Memory.getByteOnAddress(WX).toInt() and 0xFF) - WIN_X_OFFSET
+    }
+
+    fun getWindowScreenY() : Int{
+        return Memory.getByteOnAddress(WY).toInt() and 0xFF
+    }
+
+    fun getScrollX() : Int{
+        return Memory.getByteOnAddress(SCX).toInt() and 0xFF
+    }
+
+    fun getScrollY() : Int{
+        return Memory.getByteOnAddress(SCY).toInt() and 0xFF
+    }
+
+    fun getLY() : Int{
+        return Memory.getByteOnAddress(LY_ADDR).toInt() and 0xFF
     }
 }

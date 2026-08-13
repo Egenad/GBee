@@ -82,5 +82,6 @@
 			"xelatex"
 		]
 	}
-    ]
+    ],
+	"intellij.buildTool": "gradle"
 }
