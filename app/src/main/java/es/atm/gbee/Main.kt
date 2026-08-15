@@ -12,7 +12,6 @@ import kotlin.system.exitProcess
 private var lastCpuCycles : Int = 0
 
 fun main(args: Array<String>){
-
     PPU.init()
     CPU.init()
 

@@ -36,7 +36,6 @@ object Emulator {
     }
 
     private suspend fun runCpu(bytes: ByteArray){
-
         running = true
 
         PPU.init()
@@ -74,7 +73,7 @@ object Emulator {
                 }
             }
 
-            updateEmuCycles()
+            //updateEmuCycles()
 
         }
     }

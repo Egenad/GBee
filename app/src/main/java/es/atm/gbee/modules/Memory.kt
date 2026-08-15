@@ -277,6 +277,10 @@ object Memory {
         if(address in 0..< MEMORY_SIZE) memory[address] = value
     }
 
+    fun cleanVRAM() {
+        memory.fill(0, VRAM_START, VRAM_END + 1)
+    }
+
     fun getNintendoLogo() : ByteArray{
         return nintendoLogo
     }

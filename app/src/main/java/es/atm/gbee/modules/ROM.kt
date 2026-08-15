@@ -515,6 +515,6 @@ object ROM {
     }
 
     fun isCGB(): Boolean{
-        return console == CONSOLE_TYPE.CGB
+        return console == CONSOLE_TYPE.CGB || console == CONSOLE_TYPE.DMG_CGB
     }
 }

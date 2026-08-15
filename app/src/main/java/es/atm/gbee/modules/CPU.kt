@@ -54,6 +54,7 @@ object CPU {
     var PC: Int = 0             // Program Counter
 
     private var cycles = 0
+    private var machineCycleClock: MachineCycleClock = EmulationClock
 
     // Flags description:
     // Z = Set to 1 if the result of the last operation is zero. Cleared to 0 if the result is not zero.
@@ -93,11 +94,31 @@ object CPU {
         L = 0
     }
 
+    private fun consumeMachineCycle() {
+        machineCycleClock.advanceMachineCycle()
+        cycles += CYCLES_4
+    }
+
+    private fun readMachineCycle(address: Int): Byte {
+        val value = Memory.getByteOnAddress(address)
+        consumeMachineCycle()
+        return value
+    }
+
+    private fun writeMachineCycle(address: Int, value: Byte) {
+        Memory.writeByteOnAddress(address, value)
+        consumeMachineCycle()
+    }
+
+    private fun idleMachineCycle() {
+        consumeMachineCycle()
+    }
+
     @OptIn(ExperimentalStdlibApi::class)
     fun tick(): Boolean{
         // Check if DMA is active
         if (DMA.transferring()) {
-            cycles += CYCLES_4
+            idleMachineCycle()
             return true
         }
 
@@ -106,16 +127,18 @@ object CPU {
         }
 
         // Interrupts
-        handleInterrupts()
-
-        // Halt or DMA transferring
-        if(cpu_halted){
-            cycles += CYCLES_4
+        if(handleInterrupts()){
             return true
         }
 
-        // Opcode execution
-        val opcode = fetch()
+        // Halt or DMA transferring
+        if(cpu_halted){
+            idleMachineCycle()
+            return true
+        }
+
+        val cyclesBeforeInstruction = cycles
+        val opcode = fetch() // Opcode execution
         //val valop = opcode.toHexString(HexFormat.Default)
 
         if(opcode == 0x20.toByte() && pendingBootROM && lastOpcode == opcode){
@@ -124,7 +147,12 @@ object CPU {
         }
 
         try {
-            cycles += execute(opcode)
+            val expectedCycles = execute(opcode)
+
+            while (cycles - cyclesBeforeInstruction < expectedCycles) {
+                idleMachineCycle()
+            }
+
         }catch (_: IllegalArgumentException){
             return false
         }
@@ -162,30 +190,33 @@ object CPU {
         return (F.toInt() and flag) != 0
     }
 
-    private fun handleInterrupts() {
+    private fun handleInterrupts(): Boolean {
         if(Interrupt.getInterruptEnabled() && Interrupt.getPendingInterrupts() != 0){
             // Handle the interrupt
             Interrupt.flush()
+            return true
         }
+        return false
     }
 
     fun executeInterrupt(address: Int){
-
         cpu_halted = false
+
+        idleMachineCycle()
+        idleMachineCycle()
 
         // PUSH PC TO STACK
         SP = (SP - 1) and 0xFFFF
-        Memory.writeByteOnAddress(SP, ((PC shr 8) and 0xFF).toByte())   // high
+        writeMachineCycle(SP, ((PC shr 8) and 0xFF).toByte())   // high
         SP = (SP - 1) and 0xFFFF
-        Memory.writeByteOnAddress(SP, (PC and 0xFF).toByte())           // low
+        writeMachineCycle(SP, (PC and 0xFF).toByte())           // low
 
+        idleMachineCycle()
         PC = address
-
-        cycles += CYCLES_20
     }
 
     fun fetch(): Byte {
-        val byte = Memory.getByteOnAddress(PC)
+        val byte = readMachineCycle(PC)
 
         if(!cpu_halt_bug){
             PC = (PC + 1) and 0xFFFF
@@ -463,7 +494,7 @@ object CPU {
 
     fun set_16bit_address_value(high: Byte, low: Byte, value: Byte){
         val address = get_16bit_address(high, low)
-        Memory.writeByteOnAddress(address, value)
+        writeMachineCycle(address, value)
     }
 
     fun inc_8bit_register(register: Byte): Byte{
@@ -536,9 +567,9 @@ object CPU {
 
     fun executeRetOperation(){
 
-        val low = Memory.getByteOnAddress(SP).toInt() and 0xFF
+        val low = readMachineCycle(SP).toInt() and 0xFF
         SP = (SP + 1) and 0xFFFF
-        val high = Memory.getByteOnAddress(SP).toInt() and 0xFF
+        val high = readMachineCycle(SP).toInt() and 0xFF
         SP = (SP + 1) and 0xFFFF
 
         PC = (high shl 8) or low
@@ -547,18 +578,18 @@ object CPU {
     fun executeRstOperation(address: Int){
         val returnAddress = PC
         SP = (SP - 1) and 0xFFFF
-        Memory.writeByteOnAddress(SP, (returnAddress ushr 8).toByte()) // high
+        writeMachineCycle(SP, (returnAddress ushr 8).toByte()) // high
         SP = (SP - 1) and 0xFFFF
-        Memory.writeByteOnAddress(SP, (returnAddress and 0xFF).toByte())  // low
+        writeMachineCycle(SP, (returnAddress and 0xFF).toByte())  // low
 
         PC = address and 0xFFFF
     }
 
     fun executeCallOperation(address: Int){
         SP = (SP - 1) and 0xFFFF
-        Memory.writeByteOnAddress(SP, (PC ushr 8).toByte()) // high
+        writeMachineCycle(SP, (PC ushr 8).toByte()) // high
         SP = (SP - 1) and 0xFFFF
-        Memory.writeByteOnAddress(SP, (PC and 0xFF).toByte()) // low
+        writeMachineCycle(SP, (PC and 0xFF).toByte()) // low
 
         PC = address
     }
@@ -602,7 +633,7 @@ object CPU {
 
     fun ld_bc_a(): Int{
         val address = get_16bit_address(B, C)
-        Memory.writeByteOnAddress(address, A)
+        writeMachineCycle(address, A)
         return CYCLES_8
     }
 
@@ -649,8 +680,8 @@ object CPU {
         val spLow = SP and 0xFF
         val spHigh = (SP shr 8) and 0xFF
 
-        Memory.writeByteOnAddress(address, spLow.toByte())
-        Memory.writeByteOnAddress(address + 1, spHigh.toByte())
+        writeMachineCycle(address, spLow.toByte())
+        writeMachineCycle(address + 1, spHigh.toByte())
 
         return CYCLES_20
     }
@@ -673,7 +704,7 @@ object CPU {
 
     fun ld_a_bc(): Int{
         val address = get_16bit_address(B, C)
-        A = Memory.getByteOnAddress(address)
+        A = readMachineCycle(address)
 
         return CYCLES_8
     }
@@ -717,8 +748,12 @@ object CPU {
     }
 
     fun stop_0(): Int{
-        // TODO
-        //cpu_halted = true
+        PC = (PC + 1) and 0xFFFF
+
+        if (!CGBSpeed.executeStop()) {
+            cpu_halted = true
+        }
+
         return CYCLES_4
     }
 
@@ -733,7 +768,7 @@ object CPU {
 
     fun ld_de_a(): Int{
         val address = ((D.toInt() shl 8) or (E.toInt() and 0xFF)) and 0xFFFF
-        Memory.writeByteOnAddress(address, A)
+        writeMachineCycle(address, A)
 
         return CYCLES_8
     }
@@ -800,7 +835,7 @@ object CPU {
 
     fun ld_a_de(): Int{
         val address = get_16bit_address(D, E)
-        A = Memory.getByteOnAddress(address)
+        A = readMachineCycle(address)
 
         return CYCLES_8
     }
@@ -863,7 +898,7 @@ object CPU {
 
     fun ldi_hl_a(): Int{
         val hl = get_16bit_address(H, L)
-        Memory.writeByteOnAddress(hl, A)
+        writeMachineCycle(hl, A)
 
         val newHL = (hl + 1) and 0xFFFF
         H = (newHL ushr 8).toByte()
@@ -952,7 +987,7 @@ object CPU {
 
     fun ldi_a_hl(): Int{
         val hl = get_16bit_address(H, L)
-        A = Memory.getByteOnAddress(hl)
+        A = readMachineCycle(hl)
 
         val newHL = (hl + 1) and 0xFFFF
         H = (newHL ushr 8).toByte()
@@ -1015,7 +1050,7 @@ object CPU {
 
     fun ldd_hl_a(): Int{
         val hl = get_16bit_address(H, L)
-        Memory.writeByteOnAddress(hl, A)
+        writeMachineCycle(hl, A)
 
         val newHL = (hl - 1) and 0xFFFF
         H = (newHL ushr 8).toByte()
@@ -1031,19 +1066,19 @@ object CPU {
 
     fun inc_hl_v(): Int{
         val hl = get_16bit_address(H, L)
-        val oldValue = Memory.getByteOnAddress(hl)
+        val oldValue = readMachineCycle(hl)
         val newValue = inc_8bit_register(oldValue)
 
-        Memory.writeByteOnAddress(hl, newValue)
+        writeMachineCycle(hl, newValue)
         return CYCLES_12
     }
 
     fun dec_hl_v(): Int{
         val hl = get_16bit_address(H, L)
-        val oldValue = Memory.getByteOnAddress(hl)
+        val oldValue = readMachineCycle(hl)
         val newValue = dec_8bit_register(oldValue)
 
-        Memory.writeByteOnAddress(hl, newValue)
+        writeMachineCycle(hl, newValue)
         return CYCLES_12
     }
 
@@ -1087,7 +1122,7 @@ object CPU {
 
     fun ldd_a_hl(): Int{
         val hl = get_16bit_address(H, L)
-        A = Memory.getByteOnAddress(hl)
+        A = readMachineCycle(hl)
 
         val newHL = (hl - 1) and 0xFFFF
         H = (newHL ushr 8).toByte()
@@ -1156,7 +1191,7 @@ object CPU {
 
     fun ld_b_hl(): Int{
         val hl = get_16bit_address(H, L)
-        B = Memory.getByteOnAddress(hl)
+        B = readMachineCycle(hl)
         return CYCLES_8
     }
 
@@ -1196,7 +1231,7 @@ object CPU {
 
     fun ld_c_hl(): Int{
         val hl = get_16bit_address(H, L)
-        C = Memory.getByteOnAddress(hl)
+        C = readMachineCycle(hl)
         return CYCLES_8
     }
 
@@ -1236,7 +1271,7 @@ object CPU {
 
     fun ld_d_hl(): Int{
         val hl = get_16bit_address(H, L)
-        D = Memory.getByteOnAddress(hl)
+        D = readMachineCycle(hl)
         return CYCLES_8
     }
 
@@ -1276,7 +1311,7 @@ object CPU {
 
     fun ld_e_hl(): Int{
         val hl = get_16bit_address(H, L)
-        E = Memory.getByteOnAddress(hl)
+        E = readMachineCycle(hl)
         return CYCLES_8
     }
 
@@ -1316,7 +1351,7 @@ object CPU {
 
     fun ld_h_hl(): Int{
         val hl = get_16bit_address(H, L)
-        H = Memory.getByteOnAddress(hl)
+        H = readMachineCycle(hl)
         return CYCLES_8
     }
 
@@ -1356,7 +1391,7 @@ object CPU {
 
     fun ld_l_hl(): Int{
         val hl = get_16bit_address(H, L)
-        L = Memory.getByteOnAddress(hl)
+        L = readMachineCycle(hl)
         return CYCLES_8
     }
 
@@ -1382,7 +1417,7 @@ object CPU {
 
     fun ld_hl_e(): Int{
         val hl = get_16bit_address(H, L)
-        Memory.writeByteOnAddress(hl, E)
+        writeMachineCycle(hl, E)
 
         return CYCLES_8
     }
@@ -1449,7 +1484,7 @@ object CPU {
 
     fun ld_a_hl(): Int{
         val hl = get_16bit_address(H, L)
-        A = Memory.getByteOnAddress(hl)
+        A = readMachineCycle(hl)
         return CYCLES_8
     }
 
@@ -1525,7 +1560,7 @@ object CPU {
 
     fun add_a_hl(): Int{
         val address = get_16bit_address(H, L)
-        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
+        val value = readMachineCycle(address).toInt() and 0xFF
         val intA = A.toInt() and 0xFF
         val result = intA + value
         A = (result and 0xFF).toByte()
@@ -1620,7 +1655,7 @@ object CPU {
     fun adc_a_hl(): Int{
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
         val address = get_16bit_address(H, L)
-        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
+        val value = readMachineCycle(address).toInt() and 0xFF
 
         val intA = A.toInt() and 0xFF
         val result = intA + (value + carry)
@@ -1713,7 +1748,7 @@ object CPU {
         val address = get_16bit_address(H, L)
 
         val intA = A.toInt() and 0xFF
-        val intMem = Memory.getByteOnAddress(address).toInt() and 0xFF
+        val intMem = readMachineCycle(address).toInt() and 0xFF
         val result = intA - intMem
         A = (result and 0xFF).toByte()
 
@@ -1806,7 +1841,7 @@ object CPU {
 
     fun sbc_a_hl(): Int{
         val address = get_16bit_address(H, L)
-        val intMem = Memory.getByteOnAddress(address).toInt() and 0xFF
+        val intMem = readMachineCycle(address).toInt() and 0xFF
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
         val intA = A.toInt() and 0xFF
         val result = intA - (intMem + carry)
@@ -1860,7 +1895,7 @@ object CPU {
 
     fun and_hl(): Int{
         val hl = get_16bit_address(H,L)
-        executeAndOperation(Memory.getByteOnAddress(hl))
+        executeAndOperation(readMachineCycle(hl))
         return CYCLES_8
     }
 
@@ -1901,7 +1936,7 @@ object CPU {
 
     fun xor_hl(): Int{
         val hl = get_16bit_address(H,L)
-        executeXorOrOperation(Memory.getByteOnAddress(hl), false)
+        executeXorOrOperation(readMachineCycle(hl), false)
         return CYCLES_8
     }
 
@@ -1942,7 +1977,7 @@ object CPU {
 
     fun or_hl(): Int{
         val hl = get_16bit_address(H,L)
-        executeXorOrOperation(Memory.getByteOnAddress(hl), true)
+        executeXorOrOperation(readMachineCycle(hl), true)
         return CYCLES_8
     }
 
@@ -1983,7 +2018,7 @@ object CPU {
 
     fun cp_hl(): Int{
         val hl = get_16bit_address(H,L)
-        executeCpOperation(Memory.getByteOnAddress(hl))
+        executeCpOperation(readMachineCycle(hl))
         return CYCLES_8
     }
 
@@ -2003,9 +2038,9 @@ object CPU {
 
     fun pop_bc(): Int{
 
-        C = Memory.getByteOnAddress(SP)
+        C = readMachineCycle(SP)
         SP = (SP + 1) and 0xFFFF
-        B = Memory.getByteOnAddress(SP)
+        B = readMachineCycle(SP)
         SP = (SP + 1) and 0xFFFF
 
         return CYCLES_12
@@ -2041,9 +2076,9 @@ object CPU {
 
     fun push_bc(): Int{
         SP = (SP - 1) and 0xFFFF
-        Memory.writeByteOnAddress(SP, B) // high
+        writeMachineCycle(SP, B) // high
         SP = (SP - 1) and 0xFFFF
-        Memory.writeByteOnAddress(SP, C) // low
+        writeMachineCycle(SP, C) // low
 
         return CYCLES_16
     }
@@ -2394,9 +2429,9 @@ object CPU {
 
     fun pop_de(): Int{
 
-        E = Memory.getByteOnAddress(SP)
+        E = readMachineCycle(SP)
         SP = (SP + 1) and 0xFFFF
-        D = Memory.getByteOnAddress(SP)
+        D = readMachineCycle(SP)
         SP = (SP + 1) and 0xFFFF
 
         return CYCLES_12
@@ -2426,9 +2461,9 @@ object CPU {
 
     fun push_de(): Int{
         SP = (SP - 1) and 0xFFFF
-        Memory.writeByteOnAddress(SP, D)
+        writeMachineCycle(SP, D)
         SP = (SP - 1) and 0xFFFF
-        Memory.writeByteOnAddress(SP, E)
+        writeMachineCycle(SP, E)
 
         return CYCLES_16
     }
@@ -2497,16 +2532,16 @@ object CPU {
 
         val byte = fetch().toInt() and 0xFF
         val address = (0xFF00 + byte) and 0xFFFF
-        Memory.writeByteOnAddress(address, A)
+        writeMachineCycle(address, A)
 
         return CYCLES_12
     }
 
     fun pop_hl(): Int{
 
-        L = Memory.getByteOnAddress(SP)
+        L = readMachineCycle(SP)
         SP = (SP + 1) and 0xFFFF
-        H = Memory.getByteOnAddress(SP)
+        H = readMachineCycle(SP)
         SP = (SP + 1) and 0xFFFF
 
         return CYCLES_12
@@ -2514,15 +2549,15 @@ object CPU {
 
     fun ld_cn_a(): Int{
         val address = (0xFF00 + (C.toInt() and 0xFF)) and 0xFFFF
-        Memory.writeByteOnAddress(address, A)
+        writeMachineCycle(address, A)
         return CYCLES_8
     }
 
     fun push_hl(): Int{
         SP = (SP - 1) and 0xFFFF
-        Memory.writeByteOnAddress(SP, H)
+        writeMachineCycle(SP, H)
         SP = (SP - 1) and 0xFFFF
-        Memory.writeByteOnAddress(SP, L)
+        writeMachineCycle(SP, L)
 
         return CYCLES_16
     }
@@ -2555,7 +2590,7 @@ object CPU {
 
     fun ld_nn_a(): Int{
         val address = fetch16()
-        Memory.writeByteOnAddress(address, A)
+        writeMachineCycle(address, A)
         return CYCLES_16
     }
 
@@ -2569,15 +2604,15 @@ object CPU {
         val byte = fetch().toInt() and 0xFF
         val address = (0xFF00 + byte) and 0xFFFF
 
-        A = Memory.getByteOnAddress(address)
+        A = readMachineCycle(address)
 
         return CYCLES_12
     }
 
     fun pop_af(): Int{
-        F = (Memory.getByteOnAddress(SP).toInt() and 0xF0).toByte()
+        F = (readMachineCycle(SP).toInt() and 0xF0).toByte()
         SP = (SP + 1) and 0xFFFF
-        A = Memory.getByteOnAddress(SP)
+        A = readMachineCycle(SP)
         SP = (SP + 1) and 0xFFFF
 
         return CYCLES_12
@@ -2585,7 +2620,7 @@ object CPU {
 
     fun ld_a_cn(): Int{
         val address = (0xFF00 + (C.toInt() and 0xFF)) and 0xFFFF
-        A = Memory.getByteOnAddress(address)
+        A = readMachineCycle(address)
         return CYCLES_8
     }
 
@@ -2598,9 +2633,9 @@ object CPU {
     fun push_af(): Int{
 
         SP = (SP - 1) and 0xFFFF
-        Memory.writeByteOnAddress(SP, A)
+        writeMachineCycle(SP, A)
         SP = (SP - 1) and 0xFFFF
-        Memory.writeByteOnAddress(SP, F)
+        writeMachineCycle(SP, F)
 
         return CYCLES_16
     }
@@ -2633,7 +2668,7 @@ object CPU {
 
     fun ld_a_nn(): Int{
         val address = fetch16()
-        A = Memory.getByteOnAddress(address)
+        A = readMachineCycle(address)
         return CYCLES_16
     }
 
@@ -2713,10 +2748,10 @@ object CPU {
 
     fun rlc_hl(): Int{
         val address = get_16bit_address(H, L)
-        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
+        val value = readMachineCycle(address).toInt() and 0xFF
         val carry = (value ushr 7) and 0x1
         val result = ((value shl 1) or carry).toByte()
-        Memory.writeByteOnAddress(address, result)
+        writeMachineCycle(address, result)
 
         uccu_flags(result, carry)
 
@@ -2796,10 +2831,10 @@ object CPU {
     fun rrc_hl(): Int{
 
         val address = get_16bit_address(H, L)
-        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
+        val value = readMachineCycle(address).toInt() and 0xFF
         val carry = value and 0x1
         val result = ((value shr 1) or (carry shl 7)).toByte()
-        Memory.writeByteOnAddress(address, result)
+        writeMachineCycle(address, result)
 
         uccu_flags(result, carry)
 
@@ -2890,12 +2925,12 @@ object CPU {
 
     fun rl_hl(): Int{
         val address = get_16bit_address(H, L)
-        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
+        val value = readMachineCycle(address).toInt() and 0xFF
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
         val newCarry = (value ushr 7) and 0x1
 
         val result = ((value shl 1) or oldCarry).toByte()
-        Memory.writeByteOnAddress(address, result)
+        writeMachineCycle(address, result)
 
         uccu_flags(result, newCarry)
 
@@ -2988,12 +3023,12 @@ object CPU {
 
     fun rr_hl(): Int{
         val address = get_16bit_address(H, L)
-        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
+        val value = readMachineCycle(address).toInt() and 0xFF
         val oldCarry = if (flagIsSet(FLAG_C)) 1 else 0
         val newCarry = value and 0x1
 
         val result = ((value shr 1) or (oldCarry shl 7)).toByte()
-        Memory.writeByteOnAddress(address, result)
+        writeMachineCycle(address, result)
 
         uccu_flags(result, newCarry)
 
@@ -3074,10 +3109,10 @@ object CPU {
 
     fun sla_hl(): Int{
         val address = get_16bit_address(H, L)
-        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
+        val value = readMachineCycle(address).toInt() and 0xFF
         val newCarry = (value ushr 7) and 0x1
         val result = ((value shl 1) and 0xFE).toByte()
-        Memory.writeByteOnAddress(address, result)
+        writeMachineCycle(address, result)
 
         uccu_flags(result, newCarry)
 
@@ -3168,12 +3203,12 @@ object CPU {
 
     fun sra_hl(): Int{
         val address = get_16bit_address(H,L)
-        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
+        val value = readMachineCycle(address).toInt() and 0xFF
         val oldBit7 = value and 0x80
         val newCarry = value and 0x1
 
         val result = ((value shr 1) or oldBit7).toByte()
-        Memory.writeByteOnAddress(address, result)
+        writeMachineCycle(address, result)
 
         uccu_flags(result, newCarry)
 
@@ -3260,11 +3295,11 @@ object CPU {
 
     fun swap_hl(): Int{
         val address = get_16bit_address(H, L)
-        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
+        val value = readMachineCycle(address).toInt() and 0xFF
         val low = (value and 0x0F) shl 4
         val high = (value and 0xF0) shr 4
         val result = (low or high).toByte()
-        Memory.writeByteOnAddress(address, result)
+        writeMachineCycle(address, result)
 
         uccu_flags(result, 0)
 
@@ -3344,10 +3379,10 @@ object CPU {
 
     fun srl_hl(): Int{
         val address = get_16bit_address(H, L)
-        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
+        val value = readMachineCycle(address).toInt() and 0xFF
         val newCarry = value and 0x1
         val result = ((value shr 1) and 0x7F).toByte()
-        Memory.writeByteOnAddress(address, result)
+        writeMachineCycle(address, result)
 
         uccu_flags(result, newCarry)
 
@@ -3381,7 +3416,7 @@ object CPU {
             6 -> bitZero = ((L.toInt() and 0xFF) and bit) == 0
             7 -> {
                 val address = get_16bit_address(H, L)
-                bitZero = ((Memory.getByteOnAddress(address).toInt() and 0xFF) and bit) == 0
+                bitZero = ((readMachineCycle(address).toInt() and 0xFF) and bit) == 0
                 cyclesToReturn = CYCLES_12
             }
             8 -> bitZero = ((A.toInt() and 0xFF) and bit) == 0
@@ -3407,8 +3442,8 @@ object CPU {
             6 -> L = ((L.toInt() and 0xFF) and bit).toByte()
             7 -> {
                 val address = get_16bit_address(H, L)
-                val result = ((Memory.getByteOnAddress(address).toInt() and 0xFF) and bit).toByte()
-                Memory.writeByteOnAddress(address, result)
+                val result = ((readMachineCycle(address).toInt() and 0xFF) and bit).toByte()
+                writeMachineCycle(address, result)
                 cyclesToReturn = CYCLES_16
             }
             8 -> A = ((A.toInt() and 0xFF) and bit).toByte()
@@ -3433,8 +3468,8 @@ object CPU {
             6 -> L = ((L.toInt() and 0xFF) or bit).toByte()
             7 -> {
                 val address = get_16bit_address(H, L)
-                val result = ((Memory.getByteOnAddress(address).toInt() and 0xFF) or bit).toByte()
-                Memory.writeByteOnAddress(address, result)
+                val result = ((readMachineCycle(address).toInt() and 0xFF) or bit).toByte()
+                writeMachineCycle(address, result)
                 cyclesToReturn = CYCLES_16
             }
             8 -> A = ((A.toInt() and 0xFF) or bit).toByte()

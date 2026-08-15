@@ -3,7 +3,8 @@ package es.atm.gbee.modules
 const val JOYPAD        = 0xFF00 // Joy Pad information and System Type
 const val SB            = 0xFF01 // Serial Transfer Data
 const val SC            = 0xFF02 // Serial Transfer Control
-
+const val KEY0          = 0xFF4C // Select mode CGB / compatibility
+const val KEY1          = 0xFF4D // CPU Speed change. Bit 7 = Current Speed. Bit 0 = Switch armed
 const val DISABLE_ROM   = 0xFF50
 const val CGB_WRAM_BANK = 0xFF70
 
@@ -55,7 +56,6 @@ object IO {
     }
 
     fun readFromIO(address: Int) : Byte{
-
         if(address == JOYPAD){
             return readJoyPad()
         }
@@ -72,6 +72,10 @@ object IO {
             return Timer.readFromTimer(address)
         }
 
+        if (address == KEY1) {
+            return CGBSpeed.readKEY1()
+        }
+
         if(address == IF || address in LCDC_ADDR..WX){
             return Memory.read(address)
         }
@@ -81,7 +85,6 @@ object IO {
     }
 
     fun writeToIO(address: Int, value: Byte){
-
         if(address == JOYPAD){
             writeToJoyPad(value)
             return
@@ -112,6 +115,10 @@ object IO {
         if(address in LCDC_ADDR..WX){
             PPU.writeToLCD(address, value)
             return
+        }
+
+        if (address == KEY1) {
+            return CGBSpeed.writeKEY1(value)
         }
 
         if(address == DISABLE_ROM){
