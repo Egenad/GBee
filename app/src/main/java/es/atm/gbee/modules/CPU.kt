@@ -1,19 +1,5 @@
 package es.atm.gbee.modules
 
-/*
-01: ok
-02: ok
-03: ok
-04: ok
-05: ok
-06: ok
-07: ok
-08: ok
-09: 01
-10: ok
-11: 01
- */
-
 // These are CLOCK CYCLES, not MACHINE CYCLES
 // 1 Machine Cycle = 4 Clock Cycles
 const val CYCLES_4  = 4     // 1 MC
@@ -717,9 +703,10 @@ object CPU {
     }
 
     fun rrca(): Int{
-        val carry = A.toInt() and 1
+        val oldValue = A.toInt() and 0xFF
+        val carry = oldValue and 1
 
-        A = ((A.toInt() ushr 1) or (carry shl 7)).toByte()
+        A = ((oldValue ushr 1) or (carry shl 7)).toByte()
 
         clearFlag(FLAG_Z)
         clearFlag(FLAG_N)
@@ -1538,7 +1525,7 @@ object CPU {
 
     fun add_a_hl(): Int{
         val address = get_16bit_address(H, L)
-        val value = Memory.getByteOnAddress(address).toInt()
+        val value = Memory.getByteOnAddress(address).toInt() and 0xFF
         val intA = A.toInt() and 0xFF
         val result = intA + value
         A = (result and 0xFF).toByte()
@@ -1819,7 +1806,7 @@ object CPU {
 
     fun sbc_a_hl(): Int{
         val address = get_16bit_address(H, L)
-        val intMem = Memory.getByteOnAddress(address).toInt()
+        val intMem = Memory.getByteOnAddress(address).toInt() and 0xFF
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
         val intA = A.toInt() and 0xFF
         val result = intA - (intMem + carry)
@@ -3378,7 +3365,6 @@ object CPU {
     }
 
     fun bit_operation(register: Int, bitNumber: Int): Int{
-
         require(bitNumber in 0..7) { "Bit must be between 0 and 7" }
         require(register in 1..8) { "Register must be between 1 and 8" }
 
@@ -3396,7 +3382,7 @@ object CPU {
             7 -> {
                 val address = get_16bit_address(H, L)
                 bitZero = ((Memory.getByteOnAddress(address).toInt() and 0xFF) and bit) == 0
-                cyclesToReturn = CYCLES_16
+                cyclesToReturn = CYCLES_12
             }
             8 -> bitZero = ((A.toInt() and 0xFF) and bit) == 0
         }
@@ -3406,7 +3392,6 @@ object CPU {
     }
 
     fun res_operation(register: Int, bitNumber: Int): Int{
-
         require(bitNumber in 0..7) { "Bit must be between 0 and 7" }
         require(register in 1..8) { "Register must be between 1 and 8" }
 
@@ -3433,7 +3418,6 @@ object CPU {
     }
 
     fun set_operation(register: Int, bitNumber: Int): Int{
-
         require(bitNumber in 0..7) { "Bit must be between 0 and 7" }
         require(register in 1..8) { "Register must be between 1 and 8" }
 

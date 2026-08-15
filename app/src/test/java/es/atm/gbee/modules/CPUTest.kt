@@ -122,4 +122,18 @@ class CPUTest {
         assertFalse(CPU.flagIsSet(FLAG_H))
         assertFalse(CPU.flagIsSet(FLAG_C))
     }
+
+    @Test
+    fun testRrcaWithBit7Set() {
+        CPU.A = 0x80.toByte()
+        CPU.F = 0xF0.toByte()
+
+        CPU.rrca()
+
+        assertEquals(0x40.toByte(), CPU.A)
+        assertFalse(CPU.flagIsSet(FLAG_Z))
+        assertFalse(CPU.flagIsSet(FLAG_N))
+        assertFalse(CPU.flagIsSet(FLAG_H))
+        assertFalse(CPU.flagIsSet(FLAG_C))
+    }
 }
