@@ -29,7 +29,6 @@ object Interrupt {
     private var IME : Boolean = false               // Flag that enables or disables all interrupts. (Interrupt Master Enable)
 
     fun getPendingInterrupts(): Int{
-
         val ifVal = Memory.getByteOnAddress(IF).toInt()
         val ieVal = Memory.getByteOnAddress(IE).toInt()
 

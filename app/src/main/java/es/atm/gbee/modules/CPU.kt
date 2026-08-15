@@ -1,5 +1,19 @@
 package es.atm.gbee.modules
 
+/*
+01: ok
+02: ok
+03: ok
+04: ok
+05: ok
+06: ok
+07: ok
+08: ok
+09: 01
+10: ok
+11: 01
+ */
+
 // These are CLOCK CYCLES, not MACHINE CYCLES
 // 1 Machine Cycle = 4 Clock Cycles
 const val CYCLES_4  = 4     // 1 MC
@@ -63,7 +77,7 @@ object CPU {
 
     private var cpu_halted      = false
     private var cpu_halt_bug    = false
-    private var pendingEI       = false
+    private var imeEnableDelay  = 0
 
     private var pendingBootROM  = true
 
@@ -81,7 +95,7 @@ object CPU {
         pendingBootROM = true
         cpu_halted = false
         cpu_halt_bug = false
-        pendingEI = false
+        imeEnableDelay = 0
         lastOpcode = 0xFF.toByte()
         A = 0
         F = 0
@@ -106,12 +120,7 @@ object CPU {
         }
 
         // Interrupts
-        if(!pendingEI){
-            handleInterrupts()
-        }else{
-            pendingEI = false
-            Interrupt.enableInterrupts(true)
-        }
+        handleInterrupts()
 
         // Halt or DMA transferring
         if(cpu_halted){
@@ -135,6 +144,14 @@ object CPU {
         }
 
         lastOpcode = opcode
+        
+        if (imeEnableDelay > 0) {
+            imeEnableDelay--
+
+            if (imeEnableDelay == 0) {
+                Interrupt.enableInterrupts(true)
+            }
+        }
 
         return true
     }
@@ -479,18 +496,18 @@ object CPU {
         return toReturn
     }
 
-    fun updateAddOperationFlags(val1: Int, val2: Int, result: Int){
-        updateFlag(FLAG_Z, result.toByte() == 0.toByte())                               // Activated (1) if the result of the operation is 0.
-        clearFlag(FLAG_N)                                             // Set to 0
-        updateFlag(FLAG_H, (val1 and 0xF) + (val2 and 0xF) > 0xF)     // Set (1) if there was a carry from the low nibble (the first 4 bits) during the operation.
-        updateFlag(FLAG_C, result > 0xFF)                             // Set (1) if there was a carry during the addition (greater than 0xFF)
+    fun updateAddOperationFlags(val1: Int, val2: Int, result: Int, carry: Int = 0){
+        updateFlag(FLAG_Z, result.toByte() == 0.toByte()) // Activated (1) if the result of the operation is 0.
+        clearFlag(FLAG_N) // Set to 0
+        updateFlag(FLAG_H, (val1 and 0x0F) + (val2 and 0x0F) + carry > 0x0F )// Set (1) if there was a carry from the low nibble (the first 4 bits) during the operation.
+        updateFlag(FLAG_C, val1 + val2 + carry > 0xFF) // Set (1) if there was a carry during the addition (greater than 0xFF)
     }
 
-    fun updateSubOperationFlags(val1: Int, val2: Int, result: Int){
-        updateFlag(FLAG_Z, result.toByte() == 0.toByte())                               // Activated (1) if the result of the operation is 0.
-        updateFlag(FLAG_N, true)                                      // Activated (1) because a subtraction was performed.
-        updateFlag(FLAG_H, (val1 and 0xF) < (val2 and 0xF))           // Set (1) if there was a carry from the low nibble (the first 4 bits) during the subtraction.
-        updateFlag(FLAG_C, (val1 and 0xFF) < (val2 and 0xFF))         // Set (1) if there was a carry during the subtraction from the most significant bit (bit 7).
+    fun updateSubOperationFlags(val1: Int, val2: Int, result: Int, carry: Int = 0){
+        updateFlag(FLAG_Z, result.toByte() == 0.toByte()) // Activated (1) if the result of the operation is 0.
+        updateFlag(FLAG_N, true) // Activated (1) because a subtraction was performed.
+        updateFlag(FLAG_H, (val1 and 0xF) < (val2 and 0xF) + carry) // Set (1) if there was a carry from the low nibble (the first 4 bits) during the subtraction.
+        updateFlag(FLAG_C, (val1 and 0xFF) < (val2 and 0xFF) + carry) // Set (1) if there was a carry during the subtraction from the most significant bit (bit 7).
     }
 
     fun executeAndOperation(register: Byte){
@@ -1114,11 +1131,9 @@ object CPU {
     }
 
     fun ccf(): Int{
-
-        val newCarry = ((F.toInt() and 0xFF) and FLAG_C) == 0
-        updateFlag(FLAG_C, newCarry)
-        setFlag(FLAG_N)
-        setFlag(FLAG_H)
+        updateFlag(FLAG_C, !flagIsSet(FLAG_C))
+        clearFlag(FLAG_N)
+        clearFlag(FLAG_H)
 
         return CYCLES_4
     }
@@ -1550,7 +1565,7 @@ object CPU {
         val result = intA + (intB + carry)
         A = (result and 0xFF).toByte()
 
-        updateAddOperationFlags(intA, intB + carry, result)
+        updateAddOperationFlags(intA, intB, result, carry)
 
         return CYCLES_4
     }
@@ -1562,7 +1577,7 @@ object CPU {
         val result = intA + (intC + carry)
         A = (result and 0xFF).toByte()
 
-        updateAddOperationFlags(intA, intC + carry, result)
+        updateAddOperationFlags(intA, intC, result, carry)
 
         return CYCLES_4
     }
@@ -1574,7 +1589,7 @@ object CPU {
         val result = intA + (intD + carry)
         A = (result and 0xFF).toByte()
 
-        updateAddOperationFlags(intA, intD + carry, result)
+        updateAddOperationFlags(intA, intD, result, carry)
 
         return CYCLES_4
     }
@@ -1586,7 +1601,7 @@ object CPU {
         val result = intA + (intE + carry)
         A = (result and 0xFF).toByte()
 
-        updateAddOperationFlags(intA, intE + carry, result)
+        updateAddOperationFlags(intA, intE, result, carry)
 
         return CYCLES_4
     }
@@ -1598,7 +1613,7 @@ object CPU {
         val result = intA + (intH + carry)
         A = (result and 0xFF).toByte()
 
-        updateAddOperationFlags(intA, intH + carry, result)
+        updateAddOperationFlags(intA, intH, result, carry)
 
         return CYCLES_4
     }
@@ -1610,7 +1625,7 @@ object CPU {
         val result = intA + (intL + carry)
         A = (result and 0xFF).toByte()
 
-        updateAddOperationFlags(intA, intL + carry, result)
+        updateAddOperationFlags(intA, intL, result, carry)
 
         return CYCLES_4
     }
@@ -1624,7 +1639,7 @@ object CPU {
         val result = intA + (value + carry)
         A = (result and 0xFF).toByte()
 
-        updateAddOperationFlags(intA, value + carry, result)
+        updateAddOperationFlags(intA, value, result, carry)
 
         return CYCLES_8
     }
@@ -1635,7 +1650,7 @@ object CPU {
         val result = intA + (intA + carry)
         A = (result and 0xFF).toByte()
 
-        updateAddOperationFlags(intA, intA + carry, result)
+        updateAddOperationFlags(intA, intA, result, carry)
 
         return CYCLES_4
     }
@@ -1737,7 +1752,7 @@ object CPU {
         val result = intA - (intB + carry)
         A = (result and 0xFF).toByte()
 
-        updateSubOperationFlags(intA, intB + carry, result)
+        updateSubOperationFlags(intA, intB, result, carry)
 
         return CYCLES_4
     }
@@ -1749,7 +1764,7 @@ object CPU {
         val result = intA - (intC + carry)
         A = (result and 0xFF).toByte()
 
-        updateSubOperationFlags(intA, intC + carry, result)
+        updateSubOperationFlags(intA, intC, result, carry)
 
         return CYCLES_4
     }
@@ -1761,7 +1776,7 @@ object CPU {
         val result = intA - (intD + carry)
         A = (result and 0xFF).toByte()
 
-        updateSubOperationFlags(intA, intD + carry, result)
+        updateSubOperationFlags(intA, intD, result, carry)
 
         return CYCLES_4
     }
@@ -1773,7 +1788,7 @@ object CPU {
         val result = intA - (intE + carry)
         A = (result and 0xFF).toByte()
 
-        updateSubOperationFlags(intA, intE + carry, result)
+        updateSubOperationFlags(intA, intE, result, carry)
 
         return CYCLES_4
     }
@@ -1785,7 +1800,7 @@ object CPU {
         val result = intA - (intH + carry)
         A = (result and 0xFF).toByte()
 
-        updateSubOperationFlags(intA, intH + carry, result)
+        updateSubOperationFlags(intA, intH, result, carry)
 
         return CYCLES_4
     }
@@ -1797,7 +1812,7 @@ object CPU {
         val result = intA - (intL + carry)
         A = (result and 0xFF).toByte()
 
-        updateSubOperationFlags(intA, intL + carry, result)
+        updateSubOperationFlags(intA, intL, result, carry)
 
         return CYCLES_4
     }
@@ -1810,7 +1825,7 @@ object CPU {
         val result = intA - (intMem + carry)
         A = (result and 0xFF).toByte()
 
-        updateSubOperationFlags(intA, intMem + carry, result)
+        updateSubOperationFlags(intA, intMem, result, carry)
 
         return CYCLES_8
     }
@@ -1821,7 +1836,7 @@ object CPU {
         val result = intA - (intA + carry)
         A = (result and 0xFF).toByte()
 
-        updateSubOperationFlags(intA, intA + carry, result)
+        updateSubOperationFlags(intA, intA, result, carry)
 
         return CYCLES_4
     }
@@ -2371,12 +2386,12 @@ object CPU {
 
     fun adc_a_n(): Int{
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
-        val intA = A.toInt()
-        val intN = fetch()
+        val intA = A.toInt() and 0xFF
+        val intN = fetch().toInt() and 0xFF
         val result = intA + (intN + carry)
         A = (result and 0xFF).toByte()
 
-        updateAddOperationFlags(intA, intN + carry, result)
+        updateAddOperationFlags(intA, intN, result, carry)
 
         return CYCLES_8
     }
@@ -2432,8 +2447,8 @@ object CPU {
     }
 
     fun sub_n(): Int{
-        val byte = fetch().toInt()
-        val intA = A.toInt()
+        val byte = fetch().toInt() and 0xFF
+        val intA = A.toInt() and 0xFF
         val result = intA - byte
         A = (result and 0xFF).toByte()
 
@@ -2480,15 +2495,15 @@ object CPU {
     }
 
     fun sbc_a_n(): Int{
-        val byte = fetch().toInt()
+        val byte = fetch().toInt() and 0xFF
         val carry = if (flagIsSet(FLAG_C)) 1 else 0
-        val intA = A.toInt()
+        val intA = A.toInt() and 0xFF
         val result = intA - (byte + carry)
         A = (result and 0xFF).toByte()
 
-        updateSubOperationFlags(intA, byte + carry, result)
+        updateSubOperationFlags(intA, byte, result, carry)
 
-        return CYCLES_4
+        return CYCLES_8
     }
 
     fun ldh_n_a(): Int{
@@ -2532,14 +2547,16 @@ object CPU {
     }
 
     fun add_sp_n(): Int{
-        val byte = fetch().toInt() and 0xFF
+        val byte = fetch()
+        val offset = byte.toInt()
+        val unsignedOffset = offset and 0xFF
         val oldSP = SP
-        SP = (SP + byte) and 0xFFFF
+        SP = (oldSP + offset) and 0xFFFF
 
         clearFlag(FLAG_Z)
         clearFlag(FLAG_N)
-        updateFlag(FLAG_H, (oldSP and 0xF) + (byte and 0xF) > 0xF)
-        updateFlag(FLAG_C, SP > 0xFF)
+        updateFlag(FLAG_H, (oldSP and 0xF) + (unsignedOffset and 0xF) > 0xF)
+        updateFlag(FLAG_C, (oldSP and  0xFF) + unsignedOffset > 0xFF)
 
         return CYCLES_16
     }
@@ -2586,6 +2603,7 @@ object CPU {
     }
 
     fun di(): Int{
+        imeEnableDelay = 0
         Interrupt.enableInterrupts(false)
         return CYCLES_4
     }
@@ -2606,7 +2624,6 @@ object CPU {
     }
 
     fun ld_hl_sp_n(): Int{
-
         val n = fetch().toInt()
         val sp = SP
         val result = sp + n
@@ -2623,12 +2640,7 @@ object CPU {
     }
 
     fun ld_sp_hl(): Int{
-
-        val intH = H.toInt()
-        val intL = L.toInt()
-
-        SP = (intH shl 8) or intL
-
+        SP = get_16bit_address(H, L)
         return CYCLES_8
     }
 
@@ -2639,7 +2651,7 @@ object CPU {
     }
 
     fun ei(): Int{
-        pendingEI = true
+        imeEnableDelay = 2
         return CYCLES_4
     }
 

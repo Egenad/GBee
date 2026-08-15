@@ -2,6 +2,7 @@ package es.atm.gbee.modules
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CPUTest {
@@ -76,5 +77,49 @@ class CPUTest {
 
         assertEquals(0x04.toByte(), CPU.B)
         assertEquals(0xCE.toByte(), CPU.C)
+    }
+    
+    @Test
+    fun testAdcImmediateOverflow() {
+        CPU.PC = 0xC000
+        CPU.A = 0xFF.toByte()
+        CPU.F = 0x00
+
+        Memory.writeByteOnAddress(0xC000, 0x01)
+
+        CPU.adc_a_n()
+
+        assertEquals(0x00.toByte(), CPU.A)
+        assertTrue(CPU.flagIsSet(FLAG_Z))
+        assertFalse(CPU.flagIsSet(FLAG_N))
+        assertTrue(CPU.flagIsSet(FLAG_H))
+        assertTrue(CPU.flagIsSet(FLAG_C))
+    }
+    
+    @Test
+    fun testAdcImmediateHalfCarryFromCarry() {
+        CPU.PC = 0xC000
+        CPU.A = 0x00
+        CPU.F = FLAG_C.toByte()
+        Memory.writeByteOnAddress(0xC000, 0x0F)
+
+        CPU.adc_a_n()
+
+        assertEquals(0x10.toByte(), CPU.A)
+        assertTrue(CPU.flagIsSet(FLAG_H))
+        assertFalse(CPU.flagIsSet(FLAG_C))
+    }
+    
+    @Test
+    fun testCcfClearsNHAndPreservesZ() {
+        CPU.F = 0xF0.toByte()
+
+        CPU.ccf()
+
+        assertEquals(0x80.toByte(), CPU.F)
+        assertTrue(CPU.flagIsSet(FLAG_Z))
+        assertFalse(CPU.flagIsSet(FLAG_N))
+        assertFalse(CPU.flagIsSet(FLAG_H))
+        assertFalse(CPU.flagIsSet(FLAG_C))
     }
 }
