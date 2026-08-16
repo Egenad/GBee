@@ -278,7 +278,9 @@ object Memory {
     }
 
     fun cleanVRAM() {
-        memory.fill(0, VRAM_START, VRAM_END + 1)
+        for (address in VRAM_START..VRAM_END) {
+            writeByteOnAddress(address, 0)
+        }
     }
 
     fun getNintendoLogo() : ByteArray{

@@ -1,28 +1,22 @@
 package es.atm.gbee.modules
 
-import es.atm.gbee.etc.printVRAM
-import es.atm.gbee.modules.Memory.insertBootstrapToMemory
+import es.atm.gbee.core.data.boot_roms.BootController
+import es.atm.gbee.core.data.boot_roms.DMGBoot
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.system.exitProcess
+import kotlin.time.Duration.Companion.milliseconds
 
 object Emulator {
-
     private var running : Boolean = false
     private var paused : Boolean = false
-    private var lastCpuCycles : Int = 0
-    private var bootCompleted = false
-
     private var cpuScope: CoroutineScope? = null
+
     val audioSys: Audio = Audio()
 
     fun run(bytes : ByteArray?){
-
         if(bytes == null || bytes.isEmpty()){
             println("Error: No bytes passed")
             System.err.println("No file was selected / passed through input")
@@ -38,57 +32,33 @@ object Emulator {
     private suspend fun runCpu(bytes: ByteArray){
         running = true
 
-        PPU.init()
         CPU.init()
 
         // LOAD GAME ROM
         if(!ROM.loadRom(bytes)){
             System.err.println("Failed to load ROM. Program must exit.")
+            running = false
             return
         }
 
-        insertBootstrapToMemory()
-        println("Memory initialized - Ready to Boot")
+        // PPU initialization depends on the console type read from the ROM header.
+        PPU.init()
+        BootController.start(DMGBoot)
 
         while (running) {
-            if (CPU.getBootstrapPending()) {
-                if (!CPU.tick()) {
-                    System.err.println("An error on the boot process has occurred. Program must exit.")
-                    exitProcess(0)
-                }
-            } else {
-                if (!bootCompleted) {
-                    println("ROM - Reload Boot Portion")
-                    ROM.reloadBootPortion()
-                    bootCompleted = true
-                }
+            if (paused) {
+                delay(10.milliseconds)
+                continue
+            }
 
-                if (paused) {
-                    delay(10)
-                    continue
-                }
+            if (BootController.isRunning) {
+                BootController.tick()
+            } else {
                 if (!CPU.tick()) {
                     System.err.println("CPU Error")
                     break
                 }
             }
-
-            //updateEmuCycles()
-
-        }
-    }
-
-    private fun updateEmuCycles(){
-        val currentCpuCycles = CPU.getCPUCycles()
-        val cpuCycles = currentCpuCycles - lastCpuCycles
-        lastCpuCycles = currentCpuCycles
-
-        for (i in 0 until cpuCycles / 4) {
-            for (n in 0 until 4) {
-                Timer.tick()
-                PPU.tick()
-            }
-            DMA.tick()
         }
     }
 
@@ -105,7 +75,6 @@ object Emulator {
     fun stop(){
         println("Emulator - Stopped")
         running = false
-        bootCompleted = false
         cpuScope?.cancel()
         resetModules()
     }
@@ -119,6 +88,7 @@ object Emulator {
     }
 
     private fun resetModules(){
+        BootController.reset()
         CPU.reset()
         PPU.reset()
         Memory.reset()

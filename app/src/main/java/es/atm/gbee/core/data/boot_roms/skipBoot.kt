@@ -1,16 +1,17 @@
 package es.atm.gbee.core.data.boot_roms
 
-object CGBBoot : BootSequence {
+object SkipBoot : BootSequence {
     override var phase: Phase
         get() = TODO("Not yet implemented")
         set(value) {}
 
     override fun init() {
-        TODO("Not yet implemented")
+        initializePostBootRegisters()
     }
 
-    override fun tick(): Boolean {
+    override fun tick(): Boolean = true
+
+    private fun initializePostBootRegisters(){
         TODO("Not yet implemented")
     }
-
 }
