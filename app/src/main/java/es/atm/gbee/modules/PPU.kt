@@ -301,6 +301,7 @@ object PPU {
             if(ly >= TOTAL_LINES){ // RETURN TO OAM MODE
                 Memory.write(LCD_STAT, StatObj.PPU_MODE.set(stat, PPUMode.OAM.number))
                 Memory.write(LY_ADDR, 0)
+                compare_LY_LYC()
 
                 if(StatObj.OAM_INTERRUPT.get(stat) != 0)
                     Interrupt.requestInterrupt(Interrupt.InterruptType.LCD_STAT.getByteMask()) // ASK FOR LCD STAT INTERRUPT IF LCD_STAT HAS THE OAM BIT ACTIVATED
@@ -369,24 +370,27 @@ object PPU {
             }
             SCX -> {
                 Log.d(
-                    "PPU_WRITE",
-                    "SCX frame=$currentFrame LY=${getLY()} " +
-                            "ticks=$lineTicks old=${getScrollX()} " +
-                            "new=${value.toInt() and 0xFF}"
+                    "PPU_WRITE_SCX",
+                    "SCX frame=$currentFrame PC=${CPU.PC.toString(16)} " +
+                        "LY=${getLY()} ticks=$lineTicks " +
+                        "base=${Memory.getByteOnAddress(0xFF96).toInt() and 0xFF} " +
+                        "extra=${Memory.getByteOnAddress(0xC1BF).toInt() and 0xFF} " +
+                        "old=${getScrollX()} new=${value.toInt() and 0xFF}"
                 )
                 Memory.write(address, value)
             }
             LYC_ADDR -> {
                 Log.d(
-                    "PPU_WRITE",
+                    "PPU_WRITE_LYC",
                     "LYC frame=$currentFrame LY=${getLY()} " +
                             "new=${value.toInt() and 0xFF}"
                 )
                 Memory.write(address, value)
+                compare_LY_LYC()
             }
             LCD_STAT -> {
                 Log.d(
-                    "PPU_WRITE",
+                    "PPU_WRITE_STAT",
                     "STAT frame=$currentFrame LY=${getLY()} " +
                             "old=${(Memory.read(LCD_STAT).toInt() and 0xFF).toString(16)} " +
                             "written=${(value.toInt() and 0xFF).toString(16)}"
