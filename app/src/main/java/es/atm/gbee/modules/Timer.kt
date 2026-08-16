@@ -36,9 +36,7 @@ object Timer {
     private var div16 : Int = 0x0000
 
     fun tick(){
-
         val prevDIV = div16
-
         div16 = (div16 + 1) and 0xFFFF
 
         var timerUpdate = false

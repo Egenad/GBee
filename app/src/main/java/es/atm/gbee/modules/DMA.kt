@@ -4,7 +4,6 @@ const val DMA_RGSTR : Int           = 0xFF46
 const val TOTAL_BYTES_TO_COPY : Int = 0xA0
 
 object DMA {
-
     private var active : Boolean = false
     private var offset : Int = 0
     private var startAddress : Int = 0

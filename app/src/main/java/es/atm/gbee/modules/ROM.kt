@@ -396,7 +396,6 @@ object ROM {
     }
 
     fun loadRom(romBytes: ByteArray): Boolean{
-
         try {
             if(romBytes.isNotEmpty()){
                 val cartSize = min(romBytes.size, ROM_END - ROM_START + 1)
@@ -415,17 +414,6 @@ object ROM {
     }
 
     private fun romInit(romBytes: ByteArray): Boolean{
-
-        // Compare Cartridge Header with the Boot fixed one
-
-        // Get header section from the romBytes
-        val bootByteArray = Memory.getNintendoLogo()
-        val cartByteArray = extractByteArray(romBytes, N_LOGO_START, N_LOGO_END, true) // Nintendo Logo on Cartridge goes from 0x104 to 0x133
-
-        if(memcmp(Memory.getNintendoLogo(), cartByteArray, bootByteArray.size) != 0){
-            return false
-        }
-
         cartTitle   = convertBytesToString(extractByteArray(romBytes, TITLE_START, TITLE_END, true))
 
         licenseCode = if((extractByte(romBytes, OLD_LCNS_CODE).toInt() and 0xFF) == NEW_LICENSE_CODE){
@@ -515,6 +503,6 @@ object ROM {
     }
 
     fun isCGB(): Boolean{
-        return console == CONSOLE_TYPE.CGB
+        return console == CONSOLE_TYPE.CGB || console == CONSOLE_TYPE.DMG_CGB
     }
 }

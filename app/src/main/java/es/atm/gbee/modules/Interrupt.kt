@@ -3,7 +3,7 @@ package es.atm.gbee.modules
 const val VBLANK_PTR    = 0x0040
 const val LCD_STAT_PTR  = 0x0048
 const val TIMER_PTR     = 0x0050
-const val SERIAL_PTR    = 0x0048
+const val SERIAL_PTR    = 0x0058
 const val JOYPAD_PTR    = 0x0060
 
 const val IF            = 0xFF0F // Points out which interrupts are requested.
@@ -29,7 +29,6 @@ object Interrupt {
     private var IME : Boolean = false               // Flag that enables or disables all interrupts. (Interrupt Master Enable)
 
     fun getPendingInterrupts(): Int{
-
         val ifVal = Memory.getByteOnAddress(IF).toInt()
         val ieVal = Memory.getByteOnAddress(IE).toInt()
 
@@ -50,7 +49,6 @@ object Interrupt {
     }
 
     fun flush(){
-
         val activeInterrupts = getPendingInterrupts()
 
         if ((activeInterrupts and InterruptType.VBLANK.getInterruptMask()) != 0)        return handleInterrupt(VBLANK_PTR, InterruptType.VBLANK)

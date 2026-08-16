@@ -26,8 +26,20 @@ const val WAVE_PATTERN_START : Int  = 0xFF30
 const val WAVE_PATTERN_END : Int    = 0xFF3F
 
 class Audio {
+    fun writeToAudio(address: Int, value: Byte) {
+        when (address) {
+            MASTER_CONTROL -> writeMasterControl(value)
+            CHNL_1_LENGTH -> Memory.write(address, value)
+            CHNL_1_VOLUME -> Memory.write(address, value)
+            SOUND_PANNING -> Memory.write(address, value)
+            MASTER_VOLUME -> Memory.write(address, value)
+        }
+    }
 
-    fun writeToAudio(address: Int, value: Byte){
+    private fun writeMasterControl(value: Byte) {
+        val writableBit = value.toInt() and 0x80
+        val statusBits = Memory.read(MASTER_CONTROL).toInt() and 0x0F
 
+        Memory.write(MASTER_CONTROL, (writableBit or statusBits).toByte())
     }
 }
