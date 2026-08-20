@@ -7,6 +7,7 @@ import es.atm.gbee.modules.Memory
 import es.atm.gbee.modules.RAM_BANK_NUMBER_END
 import es.atm.gbee.modules.ROM
 import es.atm.gbee.modules.ROM.BankingMode
+import es.atm.gbee.modules.ROM.cartHasBattery
 import es.atm.gbee.modules.ROM.cartHasRam
 import es.atm.gbee.modules.ROM_BANK_NUMBER_END
 import es.atm.gbee.modules.ROM_BANK_NUMBER_END_MBC5
@@ -67,6 +68,12 @@ class MBC5(romBytes: ByteArray) : MBC() {
                     saveExRAMToFile()
                 }
                 currentRamBank = valueInt and 0x0F
+            }
+            address in EXTERNAL_RAM_START..< WRAM_START -> {                                       // WRITE TO EXTERNAL RAM
+                if(ramEnabled){
+                    ramBanks!![currentRamBank][address - EXTERNAL_RAM_START] = value
+                    if(cartHasBattery()) saveNeeded = true
+                }
             }
         }
     }
