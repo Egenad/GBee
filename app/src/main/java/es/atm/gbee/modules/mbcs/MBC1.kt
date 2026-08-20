@@ -21,9 +21,7 @@ const val MBC1_RAM_BANK_SIZE : Int = 8 * 1024   // 4 RAM Banks Max, 8 KiB each
 const val MBC1_ROM_BANK_SIZE : Int = 16 * 1024  // 16 KiB each ROM bank
 
 class MBC1(romBytes: ByteArray) : MBC() {
-
-    private var saveNeeded = false
-    override var ramBanks: Array<ByteArray>? = Array(4){ByteArray(MBC1_RAM_BANK_SIZE)}
+    override var ramBanks: Array<ByteArray>? = Array(ROM.getRamTotalBanks()){ByteArray(MBC1_RAM_BANK_SIZE)}
     override var romData: ByteArray?
 
     init {
@@ -43,7 +41,7 @@ class MBC1(romBytes: ByteArray) : MBC() {
         when (address) {
             in ROM_START..< ROM_SW_START -> { // READ FROM ROM FIXED BANK
                 return when(bankingMode){
-                    BankingMode.MODE_0 -> Memory.read(address)
+                    BankingMode.MODE_0 -> romData?.get(address) ?: 0xFF.toByte()
                     BankingMode.MODE_1 -> romData?.get(getROM0BankAddr(address)) ?: 0xFF.toByte()
                 }
             }
@@ -54,7 +52,7 @@ class MBC1(romBytes: ByteArray) : MBC() {
                             "romBank=$currentRomBank ramBank=$currentRamBank mode=$bankingMode"
                 )
                 return if(ramEnabled) {
-                    ramBanks!![currentRamBank][address - EXTERNAL_RAM_START]
+                    ramBanks!![getEffectiveRamBank()][address - EXTERNAL_RAM_START]
                 } else 0xFF.toByte()
             }
         }
@@ -95,8 +93,7 @@ class MBC1(romBytes: ByteArray) : MBC() {
             }
             address in EXTERNAL_RAM_START..< WRAM_START -> {                                       // WRITE TO EXTERNAL RAM
                 if(ramEnabled){
-                    ramBanks!![currentRamBank][address - EXTERNAL_RAM_START] = value
-
+                    ramBanks!![getEffectiveRamBank()][address - EXTERNAL_RAM_START] = value
                     if(cartHasBattery()) saveNeeded = true
                 }
             }
@@ -136,4 +133,7 @@ class MBC1(romBytes: ByteArray) : MBC() {
 
         return addressToReturn
     }
+
+    private fun getEffectiveRamBank(): Int =
+        if (bankingMode == BankingMode.MODE_0) 0 else currentRamBank
 }

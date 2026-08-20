@@ -44,6 +44,53 @@ Los nombres `SCX`, `LY`, `WX`, etc. no son variables arbitrarias del emulador: s
 
 Los campos X e Y de OAM también contienen offsets de hardware. La posición visible de un sprite se calcula como `OAM_X - 8` y `OAM_Y - 16`. Esto permite representar sprites parcialmente fuera de los bordes superior e izquierdo.
 
+### Cambio de `SCX` durante un frame y scroll por secciones
+
+El scroll por secciones no evita el registro `SCX`: lo reutiliza varias veces durante un mismo frame. La PPU dibuja la pantalla de arriba abajo, por lo que una escritura a `SCX` no modifica las líneas que ya han sido dibujadas; afecta a las scanlines que se procesen después de la escritura.
+
+Un juego puede aprovecharlo de la siguiente manera:
+
+```text
+comienza el frame con SCX = desplazamiento de la sección superior
+                    ↓
+la PPU alcanza una línea indicada por LYC
+                    ↓
+se solicita la interrupción LCD STAT
+                    ↓
+la rutina de interrupción escribe otro valor en SCX
+                    ↓
+las líneas siguientes se dibujan con el nuevo desplazamiento
+```
+
+Repitiendo el proceso en varias líneas se obtiene un scroll diferencial o efecto parallax: montañas, árboles, playa y olas pueden desplazarse a velocidades diferentes aunque el hardware sólo tenga un registro `SCX` para Background. No existen varios fondos independientes; cada franja conserva visualmente el valor que tenía `SCX` cuando fue renderizada.
+
+#### Ejemplo de la escena de la playa de Link's Awakening
+
+Durante esta escena el juego divide la imagen mediante valores de `LYC` como `0x30`, `0x56`, `0x68` y `0x00`. La rutina LCD STAT combina dos tipos de datos mantenidos por el propio juego:
+
+- un desplazamiento base de cámara, aplicado de forma general;
+- un desplazamiento adicional para cada sección de la escena.
+
+La rutina calcula conceptualmente:
+
+```text
+SCX = scrollBase + offsetDeLaSecciónActual
+```
+
+Después escribe el resultado en el registro real `SCX` y programa en `LYC` el límite de la sección siguiente. Durante el primer tramo de la animación, Marin se mueve como sprite mientras aumenta el offset de una sección: esto produce el efecto de que la cámara intenta alcanzarla. Más adelante comienza a aumentar también el scroll base y Marin y la cámara avanzan de forma coordinada hacia Link.
+
+Por eso, registrar únicamente la escritura de `SCX` realizada durante VBlank puede dar la impresión de que el fondo permanece inmóvil. Las escrituras que producen el scroll diferencial suceden en mitad del frame, dentro de la interrupción LCD STAT, en las líneas visibles que separan las secciones.
+
+La cadena de interrupciones depende de que la PPU vuelva a comprobar `LY == LYC` siempre que cambie cualquiera de los dos registros. Esto incluye:
+
+- cada incremento de `LY`;
+- el retorno de `LY` a `0` al terminar VBlank;
+- una escritura del juego en `LYC`.
+
+Si falta alguna de esas comparaciones, no se actualiza correctamente el bit de coincidencia de STAT ni se solicita la interrupción correspondiente. En particular, si no se comprueba la coincidencia al volver a `LY = 0`, se rompe el enlace entre el último límite de un frame y la primera sección del siguiente. El sprite puede continuar moviéndose porque su posición se actualiza por otra ruta, pero el scroll por secciones queda detenido.
+
+En GBee, `FifoFetcher.process()` consulta `SCX` en cada dot para calcular `mapX`. De esta forma, cuando la CPU cambia `SCX` desde la rutina STAT durante HBlank, el fetch de las scanlines posteriores utiliza el nuevo origen horizontal.
+
 ### Coordenadas internas
 
 - `fetchX`: avance horizontal del fetcher en bloques de ocho píxeles. Vuelve a cero cuando empieza una scanline o cuando BG cambia a Window.

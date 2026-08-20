@@ -7,6 +7,7 @@ import es.atm.gbee.etc.memcmp
 import es.atm.gbee.etc.printROM
 import es.atm.gbee.modules.mbcs.MBCInterface
 import es.atm.gbee.modules.mbcs.MBC1
+import es.atm.gbee.modules.mbcs.MBC5
 import es.atm.gbee.modules.mbcs.NoMBC
 import java.io.File
 import kotlin.math.min
@@ -53,6 +54,7 @@ const val GLOBAL_CHECKSUM_END : Int     = 0x14F
 const val NEW_LICENSE_CODE : Int        = 0x33
 
 const val ENABLE_RAM_END : Int          = 0x1FFF
+const val ROM_BANK_NUMBER_END_MBC5      = 0x2FFF
 const val ROM_BANK_NUMBER_END : Int     = 0x3FFF
 const val RAM_BANK_NUMBER_END : Int     = 0x5FFF
 const val RAM_BANK_MODE_END : Int       = 0x7FFF
@@ -455,6 +457,7 @@ object ROM {
         mbcInterface = when(getCartTypeIndex()){
             0 -> NoMBC(romBytes)
             1 -> MBC1(romBytes)
+            5 -> MBC5(romBytes)
             else -> null
         }
     }

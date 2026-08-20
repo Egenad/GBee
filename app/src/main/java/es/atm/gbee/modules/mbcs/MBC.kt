@@ -1,5 +1,6 @@
 package es.atm.gbee.modules.mbcs
 
+import android.util.Log
 import es.atm.gbee.modules.ROM
 import es.atm.gbee.modules.ROM.BankingMode
 import java.io.File
@@ -15,24 +16,27 @@ abstract class MBC : MBCInterface {
     var currentRamBank : Int = 0
     var currentRomBank : Int = 1
 
-    var romBankMask : Int    = 0b11111
+    var romBankMask : Int = 0b11111
 
     var bankingMode: BankingMode = BankingMode.MODE_0
 
-    var ramEnabled: Boolean         = false
+    var ramEnabled: Boolean = false
+    var saveNeeded: Boolean = false
 
     fun saveExRAMToFile(){
-        if(currentRamBank >= 0){
-            val batteryFilename = "${ROM.getCartTitle()}.sav"
-            try {
-                val file = File(batteryFilename)
-                FileOutputStream(file).use { fos ->
-                    fos.write(ramBanks!![currentRamBank])
+        if (!saveNeeded || !ROM.cartHasBattery()) return
+
+        try {
+            FileOutputStream("${ROM.getCartTitle()}.sav").use { output ->
+                ramBanks?.forEach { bank ->
+                    output.write(bank)
                 }
-            } catch (e: IOException) {
-                System.err.println("FAILED TO OPEN OR WRITE: $batteryFilename")
             }
+        } catch (e: IOException) {
+            Log.e("MBC", "Failed to save External RAM to file")
         }
+
+        saveNeeded = false
     }
 
     fun loadExRAMFromFile(){

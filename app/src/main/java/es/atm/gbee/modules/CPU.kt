@@ -1,5 +1,7 @@
 package es.atm.gbee.modules
 
+import android.util.Log
+
 // These are CLOCK CYCLES, not MACHINE CYCLES
 // 1 Machine Cycle = 4 Clock Cycles
 const val CYCLES_4  = 4     // 1 MC
@@ -139,7 +141,9 @@ object CPU {
 
         val cyclesBeforeInstruction = cycles
         val opcode = fetch() // Opcode execution
-        //val valop = opcode.toHexString(HexFormat.Default)
+        val valop = opcode.toHexString(HexFormat.Default)
+
+        Log.d("CPU_OP", "Opcode: $valop")
 
         if(opcode == 0x20.toByte() && pendingBootROM && lastOpcode == opcode){
             println("Boot checksum failed")
@@ -2600,7 +2604,6 @@ object CPU {
     }
 
     fun ldh_a_n(): Int{
-
         val byte = fetch().toInt() and 0xFF
         val address = (0xFF00 + byte) and 0xFFFF
 
